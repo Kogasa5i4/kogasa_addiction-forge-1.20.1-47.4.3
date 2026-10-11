@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "kogasa_addiction:item/kogasa_sword"
+  }
+}

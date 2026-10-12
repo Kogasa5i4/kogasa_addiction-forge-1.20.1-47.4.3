@@ -5,13 +5,10 @@ import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -35,7 +32,7 @@ public class KogasaAnvilHandler {
 
         // 强化次数已满
         int re = KogasaEquipmentData.getReinforcements(left);
-        int maxRe = Config.MAX_REINFORCEMENTS.get();
+        int maxRe = KogasaEquipmentHelper.getEffectiveMaxReinforcements(left);
 
         // 超过上限：必须主动阻止原版输出，否则原版会正常合成
         if (re >= maxRe) {
@@ -46,7 +43,7 @@ public class KogasaAnvilHandler {
         }
 
         // 检查右侧是否为同类型装备
-        TagKey<Item> matchTag = getMatchingTag(left);
+        TagKey<Item> matchTag = KogasaEquipmentHelper.getMatchingTag(left);
         if (matchTag == null || !right.is(matchTag)) return;
 
         // 检查该类型装备是否已经吸收过
@@ -62,8 +59,10 @@ public class KogasaAnvilHandler {
         KogasaEquipmentData.setReinforcements(result, re + 1);
         KogasaEquipmentData.addUsedMaterial(result, rightId.toString());
 
-        // 累加材料的固有价值
-        double absorbValue = KogasaEquipmentHelper.getEquipmentBaseValue(right);
+        // 累加材料的固有价值（按配置比例缩放）
+        double baseValue = KogasaEquipmentHelper.getEquipmentBaseValue(right);
+        double ratio = KogasaEquipmentHelper.getAbsorbedRatio(right);
+        double absorbValue = baseValue * ratio;
         if (absorbValue > 0) {
             KogasaEquipmentData.addAbsorbedValue(result, absorbValue);
         }
@@ -72,27 +71,5 @@ public class KogasaAnvilHandler {
         event.setOutput(result);
         event.setCost(Config.REINFORCEMENT_COST.get());
         event.setMaterialCost(1); // 消耗 1 个右侧装备
-    }
-
-    /**
-     * 根据左侧 Kogasa 物品返回对应的匹配标签
-     */
-    private static TagKey<Item> getMatchingTag(ItemStack stack) {
-        Item item = stack.getItem();
-        // 用注册名判断，避免为每种类型创建单独的类判断
-        ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
-        if (id == null) return null;
-        String path = id.getPath();
-
-        if (path.endsWith("_sword")) return ItemTags.SWORDS;
-        if (path.endsWith("_pickaxe")) return ItemTags.PICKAXES;
-        if (path.endsWith("_axe")) return ItemTags.AXES;
-        if (path.endsWith("_shovel")) return ItemTags.SHOVELS;
-        if (path.endsWith("_hoe")) return ItemTags.HOES;
-        if (path.endsWith("_helmet")) return Tags.Items.ARMORS_HELMETS;
-        if (path.endsWith("_chestplate")) return Tags.Items.ARMORS_CHESTPLATES;
-        if (path.endsWith("_leggings")) return Tags.Items.ARMORS_LEGGINGS;
-        if (path.endsWith("_boots")) return Tags.Items.ARMORS_BOOTS;
-        return null;
     }
 }

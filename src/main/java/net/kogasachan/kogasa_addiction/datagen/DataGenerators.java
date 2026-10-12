@@ -1,12 +1,17 @@
 package net.kogasachan.kogasa_addiction.datagen;
 
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
+import net.minecraft.data.tags.TagsProvider;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import java.util.concurrent.CompletableFuture;
 
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID,
         bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -17,11 +22,21 @@ public class DataGenerators {
         DataGenerator generator = event.getGenerator();
         PackOutput output = generator.getPackOutput();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
+        CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
-        // 服务端数据 (配方、战利品表等)
+        // 方块标签
+        ModBlockTagsProvider blockTags = new ModBlockTagsProvider(output, lookupProvider, existingFileHelper);
+        generator.addProvider(event.includeServer(), blockTags);
+        CompletableFuture<TagsProvider.TagLookup<Block>> blockTagLookup = blockTags.contentsGetter();
+
+        // 物品标签
+        generator.addProvider(event.includeServer(),
+                new ModItemTagsProvider(output, lookupProvider, blockTagLookup, existingFileHelper));
+
+        // 配方
         generator.addProvider(event.includeServer(), new ModRecipeProvider(output));
 
-        // 客户端数据 (模型、语言文件等)
+        // 物品模型
         generator.addProvider(event.includeClient(),
                 new ModItemModelProvider(output, existingFileHelper));
     }

@@ -15,6 +15,7 @@ public class KogasaEquipmentData {
     private static final String USED_MATERIALS = "UsedMaterials";
     private static final String GROWTH = "Growth";
     private static final String ABSORBED_VALUE = "AbsorbedValue";
+    private static final String GROWTH_ENCHANTS_GRANTED = "GrowthEnchantsGranted";
 
     public static double getAbsorbedValue(ItemStack stack) {
         return getTag(stack).getDouble(ABSORBED_VALUE);
@@ -68,6 +69,16 @@ public class KogasaEquipmentData {
     public static void setGrowth(ItemStack stack, double value) {
         CompoundTag tag = getTag(stack);
         tag.putDouble(GROWTH, value);
+        saveTag(stack, tag);
+    }
+
+    public static int getGrowthEnchantsGranted(ItemStack stack) {
+        return getTag(stack).getInt(GROWTH_ENCHANTS_GRANTED);
+    }
+
+    public static void setGrowthEnchantsGranted(ItemStack stack, int value) {
+        CompoundTag tag = getTag(stack);
+        tag.putInt(GROWTH_ENCHANTS_GRANTED, value);
         saveTag(stack, tag);
     }
 

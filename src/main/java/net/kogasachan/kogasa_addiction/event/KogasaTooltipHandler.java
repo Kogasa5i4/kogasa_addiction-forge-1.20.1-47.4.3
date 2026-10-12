@@ -36,7 +36,7 @@ public class KogasaTooltipHandler {
         int re = KogasaEquipmentData.getReinforcements(stack);
         double growth = KogasaEquipmentData.getGrowth(stack);
         List<String> used = KogasaEquipmentData.getUsedMaterials(stack);
-        int maxRe = Config.MAX_REINFORCEMENTS.get();
+        int maxRe = KogasaEquipmentHelper.getEffectiveMaxReinforcements(stack);
 
         double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
 
@@ -156,6 +156,18 @@ public class KogasaTooltipHandler {
                 tooltip.add(Component.translatable(
                                 "tooltip.kogasa_addiction.growth", percent)
                         .withStyle(ChatFormatting.GREEN));
+
+                // 新增：成长附魔进度
+                int grantedEnchants = KogasaEquipmentData.getGrowthEnchantsGranted(stack);
+                int maxEnchants = Config.MAX_GROWTH_ENCHANTS.get();
+                if (Config.ENABLE_GROWTH_ENCHANT.get() && maxEnchants > 0) {
+                    tooltip.add(Component.translatable(
+                                    "tooltip.kogasa_addiction.growth_enchant", grantedEnchants, maxEnchants)
+                            .withStyle(ChatFormatting.LIGHT_PURPLE));
+                }
+                tooltip.add(Component.translatable(
+                                "tooltip.kogasa_addiction.growth_enchant_count", grantedEnchants)
+                        .withStyle(ChatFormatting.LIGHT_PURPLE));
             } else {
                 tooltip.add(Component.translatable("tooltip.kogasa_addiction.hint.ctrl")
                         .withStyle(ChatFormatting.DARK_GRAY));

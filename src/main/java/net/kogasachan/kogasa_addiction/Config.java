@@ -5,15 +5,20 @@ import net.minecraftforge.common.ForgeConfigSpec;
 public class Config {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
+    public static final ForgeConfigSpec.BooleanValue SHOW_MINING_SPEED = BUILDER
+            .comment("Show current mining speed in tooltips for digger tools.")
+            .comment("在挖掘工具的 Tooltip 中显示当前挖掘速度。")
+            .define("showMiningSpeed", true);
+
     public static final ForgeConfigSpec.BooleanValue ENABLE_BLAST_FURNACE_INGOT = BUILDER
             .comment("Enable blast furnace to produce special ingots while burning.")
             .comment("允许伞之锭从燃烧的高炉中掉落。")
             .define("enableBlastFurnaceIngot", true);
 
     public static final ForgeConfigSpec.DoubleValue BLAST_FURNACE_INGOT_CHANCE = BUILDER
-            .comment("Chance per burning tick to produce an ingot. 0.005 = 0.5%.")
-            .comment("伞之锭掉落的概率，0.005 = 0.5%。")
-            .defineInRange("blastFurnaceIngotChance", 0.005, 0.0, 1.0);
+            .comment("Chance per burning tick to produce an ingot. 0.01 = 1%.")
+            .comment("伞之锭掉落的概率，0.01 = 1%。")
+            .defineInRange("blastFurnaceIngotChance", 0.000005, 0.0, 1.0);
 
     public static final ForgeConfigSpec.BooleanValue ENABLE_KOGASA_EQUIPMENT = BUILDER
             .comment("Enable Kogasa equipment system.")
@@ -23,7 +28,7 @@ public class Config {
     public static final ForgeConfigSpec.IntValue MAX_REINFORCEMENTS = BUILDER
             .comment("Maximum reinforcement count.")
             .comment("最大强化数。")
-            .defineInRange("maxReinforcements", 10, 1, Integer.MAX_VALUE);
+            .defineInRange("maxReinforcements", 3, 1, Integer.MAX_VALUE);
 
     public static final ForgeConfigSpec.IntValue REINFORCEMENT_COST = BUILDER
             .comment("Experience level cost per reinforcement.")
@@ -48,7 +53,52 @@ public class Config {
     public static final ForgeConfigSpec.DoubleValue MAX_GROWTH = BUILDER
             .comment("Maximum growth. 1.0 = 100%.")
             .comment("最大成长幅度。1.0 = 100%.")
-            .defineInRange("maxGrowth", 1.0, 0.0, Float.MAX_VALUE);
+            .defineInRange("maxGrowth", 1.0, 0.0, Double.MAX_VALUE);
+
+    public static final ForgeConfigSpec.BooleanValue ENABLE_EXTRA_SLOTS = BUILDER
+            .comment("Unlock extra reinforcement slots through growth.")
+            .comment("通过成长解锁额外强化槽位。")
+            .define("enableExtraSlots", true);
+
+    public static final ForgeConfigSpec.DoubleValue GROWTH_PER_EXTRA_SLOT = BUILDER
+            .comment("Growth required to unlock one extra reinforcement slot. 0.01 = 1% growth.")
+            .comment("解锁一个额外强化槽所需的成长值。0.01 = 1%。")
+            .defineInRange("growthPerExtraSlot", 0.01, 0.0001, Double.MAX_VALUE);
+
+    public static final ForgeConfigSpec.IntValue MAX_EXTRA_SLOTS = BUILDER
+            .comment("Maximum extra reinforcement slots unlocked by growth.")
+            .comment("通过成长解锁的最大额外强化槽数。")
+            .defineInRange("maxExtraSlots", 3, 0, Integer.MAX_VALUE);
+
+    public static final ForgeConfigSpec.DoubleValue WEAPON_ABSORBED_RATIO = BUILDER
+            .comment("Absorbed value ratio for weapons and tools.")
+            .comment("工具吸收强化倍率。")
+            .defineInRange("weaponAbsorbedRatio", 1.0, 0.0, 10.0);
+
+    public static final ForgeConfigSpec.DoubleValue ARMOR_ABSORBED_RATIO = BUILDER
+            .comment("Absorbed value ratio for armor.")
+            .comment("护甲吸收强化倍率。")
+            .defineInRange("armorAbsorbedRatio", 1.0, 0.0, 10.0);
+
+    public static final ForgeConfigSpec.BooleanValue ENABLE_GROWTH_ENCHANT = BUILDER
+            .comment("Unlock random enchantments when growth reaches thresholds.")
+            .comment("成长值达到阈值时解锁随机附魔。")
+            .define("enableGrowthEnchant", true);
+
+    public static final ForgeConfigSpec.DoubleValue GROWTH_PER_ENCHANT = BUILDER
+            .comment("Growth required to unlock one random enchantment. 0.01 = 1% growth per enchant.")
+            .comment("解锁一个随机附魔所需的成长值。0.01 = 1%。")
+            .defineInRange("growthPerEnchant", 0.01, 0.0001, Double.MAX_VALUE);
+
+    public static final ForgeConfigSpec.IntValue MAX_GROWTH_ENCHANTS = BUILDER
+            .comment("Maximum number of enchantments granted by growth.")
+            .comment("通过成长获得的最大附魔数量。")
+            .defineInRange("maxGrowthEnchants", 5, 0, Integer.MAX_VALUE);
+
+    public static final ForgeConfigSpec.BooleanValue ALLOW_MAX_LEVEL_ENCHANTS = BUILDER
+            .comment("If true, granted enchantments get a random level from 1 to max. If false, always level 1.")
+            .comment("为 true 时附魔等级随机 1~上限；为 false 时固定 1 级。")
+            .define("allowMaxLevelEnchants", true);
 
     public static final ForgeConfigSpec.IntValue DURABILITY_FIXED_PER_REINFORCEMENT = BUILDER
             .comment("Fixed durability added per reinforcement.")
@@ -59,6 +109,11 @@ public class Config {
             .comment("Durability ratio added per reinforcement. 0.1 = +10% of base.")
             .comment("每次强化因强化次数而增加的耐久值比例。0.1 = +10%。")
             .defineInRange("durabilityRatioPerReinforcement", 0.2, 0.0, Double.MAX_VALUE);
+
+    public static final ForgeConfigSpec.DoubleValue MINING_SPEED_RATIO_PER_REINFORCEMENT = BUILDER
+            .comment("Mining speed ratio added per reinforcement. 0.5 = +50% per level.")
+            .comment("每次强化增加的挖掘速度倍率。0.5 = 每级 +50%。")
+            .defineInRange("miningSpeedRatioPerReinforcement", 0.5, 0.0, 10.0);
 
     public static final ForgeConfigSpec.DoubleValue REINFORCEMENT_MULTIPLIER_PER_LEVEL = BUILDER
             .comment("Multiplier bonus per reinforcement. 0.1 = +10% per level.")

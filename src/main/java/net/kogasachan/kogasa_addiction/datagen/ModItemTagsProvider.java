@@ -1,0 +1,40 @@
+package net.kogasachan.kogasa_addiction.datagen;
+
+import net.kogasachan.kogasa_addiction.KogasaAddiction;
+import net.kogasachan.kogasa_addiction.item.ModItems;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.PackOutput;
+import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.level.block.Block;
+import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.data.ExistingFileHelper;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.CompletableFuture;
+
+public class ModItemTagsProvider extends ItemTagsProvider {
+
+    public ModItemTagsProvider(PackOutput output,
+                               CompletableFuture<HolderLookup.Provider> lookupProvider,
+                               CompletableFuture<TagLookup<Block>> blockTags,
+                               @Nullable ExistingFileHelper existingFileHelper) {
+        super(output, lookupProvider, blockTags, KogasaAddiction.MODID, existingFileHelper);
+    }
+
+    @Override
+    protected void addTags(HolderLookup.Provider provider) {
+        // ===== 工具/武器：加入原版标签 =====
+        this.tag(ItemTags.SWORDS).add(ModItems.KOGASA_SWORD.get());
+        this.tag(ItemTags.PICKAXES).add(ModItems.KOGASA_PICKAXE.get());
+        this.tag(ItemTags.AXES).add(ModItems.KOGASA_AXE.get());
+        this.tag(ItemTags.SHOVELS).add(ModItems.KOGASA_SHOVEL.get());
+        this.tag(ItemTags.HOES).add(ModItems.KOGASA_HOE.get());
+
+        // ===== 护甲：加入 Forge 通用标签 =====
+        this.tag(Tags.Items.ARMORS_HELMETS).add(ModItems.KOGASA_HELMET.get());
+        this.tag(Tags.Items.ARMORS_CHESTPLATES).add(ModItems.KOGASA_CHESTPLATE.get());
+        this.tag(Tags.Items.ARMORS_LEGGINGS).add(ModItems.KOGASA_LEGGINGS.get());
+        this.tag(Tags.Items.ARMORS_BOOTS).add(ModItems.KOGASA_BOOTS.get());
+    }
+}

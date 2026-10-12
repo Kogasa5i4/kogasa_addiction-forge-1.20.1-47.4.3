@@ -1,7 +1,8 @@
 package net.kogasachan.kogasa_addiction.item;
 
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;

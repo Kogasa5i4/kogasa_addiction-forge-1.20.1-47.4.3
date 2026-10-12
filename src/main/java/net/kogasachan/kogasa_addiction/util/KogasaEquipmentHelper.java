@@ -3,11 +3,15 @@ package net.kogasachan.kogasa_addiction.util;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.kogasachan.kogasa_addiction.Config;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.*;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.UUID;
@@ -106,7 +110,6 @@ public class KogasaEquipmentHelper {
         double totalKnockback = getKnockbackResistance(stack);
 
         UUID uuid = switch (slot) {
-            case FEET -> ARMOR_UUIDS[0];
             case LEGS -> ARMOR_UUIDS[1];
             case CHEST -> ARMOR_UUIDS[2];
             case HEAD -> ARMOR_UUIDS[3];
@@ -184,7 +187,11 @@ public class KogasaEquipmentHelper {
      * 挖掘速度
      */
     public static float getDestroySpeed(ItemStack stack, float baseSpeed) {
-        return (float) (baseSpeed * KogasaEquipmentData.getMultiplier(stack));
+        int re = KogasaEquipmentData.getReinforcements(stack);
+        double growth = KogasaEquipmentData.getGrowth(stack);
+        double ratio = Config.MINING_SPEED_RATIO_PER_REINFORCEMENT.get();
+        double multiplier = (1.0 + re * ratio) * (1.0 + growth);
+        return (float) (baseSpeed * multiplier);
     }
 
     /**
@@ -216,6 +223,7 @@ public class KogasaEquipmentHelper {
             return baseDamage * KogasaEquipmentData.getMultiplier(stack) + absorbed;
         }
     }
+
     public static double getDisplayAttackSpeed(ItemStack stack) {
         double baseSpeed = getBaseAttackSpeed(stack);
         double cap = Config.ATTACK_SPEED_CAP.get();
@@ -277,5 +285,55 @@ public class KogasaEquipmentHelper {
      */
     public static double getTotalMultiplier(ItemStack stack) {
         return getReinforcementMultiplier(stack) * getGrowthMultiplier(stack);
+    }
+
+    /**
+     * 计算该装备实际可用的强化上限：
+     * 基础上限 + 成长解锁的额外槽位
+     */
+    public static int getEffectiveMaxReinforcements(ItemStack stack) {
+        int base = Config.MAX_REINFORCEMENTS.get();
+        if (!Config.ENABLE_EXTRA_SLOTS.get()) return base;
+
+        double growth = KogasaEquipmentData.getGrowth(stack);
+        double perSlot = Config.GROWTH_PER_EXTRA_SLOT.get();
+        int maxExtra = Config.MAX_EXTRA_SLOTS.get();
+
+        int extra = (int) Math.floor(growth / perSlot);
+        extra = Math.min(extra, maxExtra);
+
+        return base + extra;
+    }
+
+    /**
+     * 根据左侧 Kogasa 物品返回对应的匹配标签
+     */
+    public static TagKey<Item> getMatchingTag(ItemStack stack) {
+        Item item = stack.getItem();
+        // 用注册名判断，避免为每种类型创建单独的类判断
+        ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
+        if (id == null) return null;
+        String path = id.getPath();
+
+        if (path.endsWith("_sword")) return ItemTags.SWORDS;
+        if (path.endsWith("_pickaxe")) return ItemTags.PICKAXES;
+        if (path.endsWith("_axe")) return ItemTags.AXES;
+        if (path.endsWith("_shovel")) return ItemTags.SHOVELS;
+        if (path.endsWith("_hoe")) return ItemTags.HOES;
+        if (path.endsWith("_helmet")) return Tags.Items.ARMORS_HELMETS;
+        if (path.endsWith("_chestplate")) return Tags.Items.ARMORS_CHESTPLATES;
+        if (path.endsWith("_leggings")) return Tags.Items.ARMORS_LEGGINGS;
+        if (path.endsWith("_boots")) return Tags.Items.ARMORS_BOOTS;
+        return null;
+    }
+
+    /**
+     * 根据材料类型返回吸收值比例
+     */
+    public static double getAbsorbedRatio(ItemStack material) {
+        if (material.getItem() instanceof ArmorItem) {
+            return Config.ARMOR_ABSORBED_RATIO.get();
+        }
+        return Config.WEAPON_ABSORBED_RATIO.get();
     }
 }

@@ -19,14 +19,14 @@ public class KogasaPonderPlugin implements PonderPlugin {
         // 场景 1：高炉视角
         helper.addStoryBoard(
                 ResourceLocation.fromNamespaceAndPath("minecraft", "blast_furnace"),
-                ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "kogasa_ingot_from_furnace"),
+                ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "kogasa_ingot_scene"),
                 KogasaPonderScenes::kogasaIngotScene
         );
 
         // 场景 2：锭视角
         helper.addStoryBoard(
                 ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "kogasa_ingot"),
-                ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "kogasa_ingot_obtain"),
+                ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "kogasa_ingot_scene"),
                 KogasaPonderScenes::kogasaIngotScene
         );
     }

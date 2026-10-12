@@ -9,6 +9,7 @@ import net.kogasachan.kogasa_addiction.util.MixinConfigCache;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
@@ -55,28 +56,6 @@ public class KogasaTooltipHandler {
                         .withStyle(ChatFormatting.DARK_GREEN);
                 tooltip.set(i, newLine);
                 break;
-            }
-        }
-
-        // 找到原版攻速行的索引并替换
-        String speedAttrKey = Component.translatable(
-                "attribute.name.generic.attack_speed").getString();
-
-        if (!(stack.getItem() instanceof ArmorItem)) {
-            double speed = KogasaEquipmentHelper.getDisplayAttackSpeed(stack);
-
-            for (int i = 0; i < tooltip.size(); i++) {
-                Component line = tooltip.get(i);
-                if (line.getString().contains(speedAttrKey)) {
-                    Component newLine;
-                    newLine = Component.translatable(
-                                    "tooltip.kogasa_addiction.vanilla_attack_speed",
-                                    String.format("%.1f", speed))
-                            .withStyle(line.getStyle()) // 继承原样式
-                            .withStyle(ChatFormatting.DARK_GREEN);
-                    tooltip.set(i, newLine);
-                    break;
-                }
             }
         }
 

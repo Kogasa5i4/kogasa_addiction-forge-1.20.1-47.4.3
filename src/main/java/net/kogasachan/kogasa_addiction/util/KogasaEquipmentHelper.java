@@ -60,6 +60,12 @@ public class KogasaEquipmentHelper {
             return buildHandModifiers(stack, baseDamage, absorbed, baseSpeed);
         }
 
+        if (item instanceof HoeItem hoe) {
+            double baseDamage = 1.0 + hoe.getAttackDamage();
+            double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
+            return buildHandModifiers(stack, baseDamage, absorbed, -3.0F);
+        }
+
         // 其他类型的 Kogasa 装备（暂时没有）
         return item.getDefaultAttributeModifiers(slot);
     }
@@ -180,6 +186,9 @@ public class KogasaEquipmentHelper {
         if (item instanceof ArmorItem armor) {
             return armor.getDefense();
         }
+        if (item instanceof HoeItem hoe) {
+            return hoe.getTier().getAttackDamageBonus();
+        }
         return 0;
     }
 
@@ -254,14 +263,16 @@ public class KogasaEquipmentHelper {
     }
 
     /**
-     * 击退抗性：初始 0.05（下界合金的一半），反比例渐近到 1.0。
-     * 公式：y = 1 - 0.95 / (growth + 1)
+     * 击退抗性
      */
     public static double getKnockbackResistance(ItemStack stack) {
+        int re = KogasaEquipmentData.getReinforcements(stack);
         double growth = KogasaEquipmentData.getGrowth(stack);
         double base = Config.KNOCKBACK_BASE_RESISTANCE.get();
         double max = Config.KNOCKBACK_MAX_PER_PIECE.get();
-        return max - (max - base) / (growth + 1.0);
+        // 融合增加"最大上限"，成长逼近该上限
+        double effectiveMax = Math.min(max * (1.0 + re * 0.5), 1.0);
+        return effectiveMax - (effectiveMax - base) / (growth + 1.0);
     }
 
     /**

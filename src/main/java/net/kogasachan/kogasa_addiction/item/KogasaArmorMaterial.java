@@ -51,9 +51,8 @@ public class KogasaArmorMaterial {
             return KogasaAddiction.MODID + ":kogasa";
         }
 
-        @Override
-        public float getToughness() {
-            return 0.5F;
+        @Override public float getToughness() {
+            return 2.0F;
         }
 
         @Override

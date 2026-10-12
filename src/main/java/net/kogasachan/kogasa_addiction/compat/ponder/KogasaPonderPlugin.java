@@ -14,7 +14,7 @@ public class KogasaPonderPlugin implements PonderPlugin {
     }
 
     @Override
-    public void registerScenes(PonderSceneRegistrationHelper<ResourceLocation> helper) {
+    public void registerScenes(@NotNull PonderSceneRegistrationHelper<ResourceLocation> helper) {
         if (!ModList.get().isLoaded("ponder")) return;
         // 场景 1：高炉视角
         helper.addStoryBoard(

@@ -103,7 +103,7 @@ public class Config {
     public static final ForgeConfigSpec.IntValue DURABILITY_FIXED_PER_REINFORCEMENT = BUILDER
             .comment("Fixed durability added per reinforcement.")
             .comment("每次强化增加的固定耐久值")
-            .defineInRange("durabilityFixedPerReinforcement", 100, 0, 10000);
+            .defineInRange("durabilityFixedPerReinforcement", 500, 0, 10000);
 
     public static final ForgeConfigSpec.DoubleValue DURABILITY_RATIO_PER_REINFORCEMENT = BUILDER
             .comment("Durability ratio added per reinforcement. 0.1 = +10% of base.")
@@ -113,7 +113,7 @@ public class Config {
     public static final ForgeConfigSpec.DoubleValue MINING_SPEED_RATIO_PER_REINFORCEMENT = BUILDER
             .comment("Mining speed ratio added per reinforcement. 0.5 = +50% per level.")
             .comment("每次强化增加的挖掘速度倍率。0.5 = 每级 +50%。")
-            .defineInRange("miningSpeedRatioPerReinforcement", 0.5, 0.0, 10.0);
+            .defineInRange("miningSpeedRatioPerReinforcement", 1.5, 0.0, 10.0);
 
     public static final ForgeConfigSpec.DoubleValue REINFORCEMENT_MULTIPLIER_PER_LEVEL = BUILDER
             .comment("Multiplier bonus per reinforcement. 0.1 = +10% per level.")

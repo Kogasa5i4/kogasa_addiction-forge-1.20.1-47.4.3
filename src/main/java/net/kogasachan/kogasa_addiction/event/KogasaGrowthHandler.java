@@ -189,48 +189,49 @@ public class KogasaGrowthHandler {
     public static boolean grantOrUpgradeEnchant(ItemStack stack, Player player) {
         Map<Enchantment, Integer> existing = EnchantmentHelper.getEnchantments(stack);
 
-        // 无附魔：授予新附魔
-        if (existing.isEmpty()) {
-            Enchantment ench = pickRandomNewEnchantment(stack, player);
-            if (ench == null) return false;
-
-            int level;
-            if (Config.ALLOW_MAX_LEVEL_ENCHANTS.get()) {
-                level = 1 + player.getRandom().nextInt(ench.getMaxLevel());
-            } else {
-                level = 1;
-            }
-            stack.enchant(ench, level);
-            return true;
-        }
-
-        // 有附魔：找可升级的
+        // 1. 优先：找可升级的已有附魔
         List<Enchantment> upgradeable = new ArrayList<>();
         for (Map.Entry<Enchantment, Integer> entry : existing.entrySet()) {
             if (entry.getValue() < entry.getKey().getMaxLevel() + 1) {
                 upgradeable.add(entry.getKey());
             }
         }
-        if (upgradeable.isEmpty()) return false;
 
-        Enchantment chosen = upgradeable.get(player.getRandom().nextInt(upgradeable.size()));
-        int newLevel = existing.get(chosen) + 1;
+        if (!upgradeable.isEmpty()) {
+            Enchantment chosen = upgradeable.get(player.getRandom().nextInt(upgradeable.size()));
+            int newLevel = existing.get(chosen) + 1;
+            Map<Enchantment, Integer> updated = new HashMap<>(existing);
+            updated.put(chosen, newLevel);
+            EnchantmentHelper.setEnchantments(updated, stack);
+            return true;
+        }
 
-        // 用新的 map 替换所有附魔
+        // 2. 兜底：所有已有附魔都满级，授予新附魔
+        Enchantment newEnch = pickRandomNewEnchantment(stack, player, existing);
+        if (newEnch == null) return false;
+
+        int level;
+        if (Config.ALLOW_MAX_LEVEL_ENCHANTS.get()) {
+            level = 1 + player.getRandom().nextInt(newEnch.getMaxLevel());
+        } else {
+            level = 1;
+        }
         Map<Enchantment, Integer> updated = new HashMap<>(existing);
-        updated.put(chosen, newLevel);
+        updated.put(newEnch, level);
         EnchantmentHelper.setEnchantments(updated, stack);
         return true;
     }
 
     /**
-     * 从物品可接受的附魔中随机选一个（排除诅咒）
+     * 从物品可接受、且尚未拥有的附魔中随机选一个
      */
-    private static Enchantment pickRandomNewEnchantment(ItemStack stack, Player player) {
+    private static Enchantment pickRandomNewEnchantment(ItemStack stack, Player player,
+                                                        Map<Enchantment, Integer> existing) {
         List<Enchantment> candidates = new ArrayList<>();
         for (Enchantment ench : ForgeRegistries.ENCHANTMENTS) {
             if (ench.isCurse()) continue;
             if (!ench.canEnchant(stack)) continue;
+            if (existing.containsKey(ench)) continue;  // 已有则跳过
             candidates.add(ench);
         }
         if (candidates.isEmpty()) return null;

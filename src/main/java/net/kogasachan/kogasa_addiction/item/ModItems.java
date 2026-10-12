@@ -1,11 +1,19 @@
 package net.kogasachan.kogasa_addiction.item;
 
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class ModItems {
 
@@ -15,7 +23,13 @@ public class ModItems {
     // 材料
     public static final RegistryObject<Item> KOGASA_INGOT = ITEMS.register(
             "kogasa_ingot",
-            () -> new Item(new Item.Properties().fireResistant())
+            () -> new Item(new Item.Properties().fireResistant()) {
+                @Override
+                public void appendHoverText(@NotNull ItemStack itemStack, @Nullable Level level, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
+                    super.appendHoverText(itemStack, level, tooltip, flag);
+                    tooltip.add(Component.translatable("tooltip.kogasa_addiction.kogasa_ingot.obtain"));
+                }
+            }
     );
 
     // 工具/武器

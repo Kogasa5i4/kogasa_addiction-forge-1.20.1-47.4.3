@@ -88,12 +88,19 @@ public class AnvilReinforcementCategory implements IRecipeCategory<AnvilReinforc
     public void setRecipe(IRecipeLayoutBuilder builder, AnvilReinforcementRecipe recipe,
                           @NotNull IFocusGroup focuses) {
         builder.addInputSlot(1, 1).addItemStack(recipe.input());
-        builder.addInputSlot(50, 1).addItemStacks(recipe.material());
+        builder.addInputSlot(50, 1).addItemStacks(recipe.materials());
         builder.addOutputSlot(108, 1)
                 .addItemStack(recipe.output())
                 .addRichTooltipCallback((slotView, tooltip) -> {
-                    tooltip.add(Component.translatable("jei.kogasa_addiction.hint.absorb")
-                            .withStyle(ChatFormatting.RED));
+                    if (recipe.kind() == RecipeKind.ABILITY) {
+                        tooltip.add(Component.translatable(
+                                        "jei.kogasa_addiction.hint.ability")
+                                .withStyle(ChatFormatting.AQUA));
+                    } else {
+                        tooltip.add(Component.translatable(
+                                        "jei.kogasa_addiction.hint.reinforcement")
+                                .withStyle(ChatFormatting.GOLD));
+                    }
                 });
     }
 
@@ -140,7 +147,10 @@ public class AnvilReinforcementCategory implements IRecipeCategory<AnvilReinforc
         arrow.draw(guiGraphics, 76, 1);
 
         // 经验消耗
-        int cost = Config.REINFORCEMENT_COST.get();
+        // 经验成本根据类型选择
+        int cost = recipe.kind() == RecipeKind.ABILITY
+                ? Config.ABILITY_INFUSION_COST.get()
+                : Config.REINFORCEMENT_COST.get();
         String experienceString = Component.translatable(
                 "jei.kogasa_addiction.anvil.experience", cost).getString();
 

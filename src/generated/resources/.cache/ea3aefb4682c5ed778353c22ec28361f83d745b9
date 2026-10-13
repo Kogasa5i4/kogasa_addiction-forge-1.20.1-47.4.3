@@ -1,4 +1,6 @@
-// 1.20.1	2026-10-11T13:09:03.1588132	Item Models: kogasa_addiction
+// 1.20.1	2026-10-13T22:40:26.9572097	Item Models: kogasa_addiction
+f8f1ed43191af03450f7e31b95d54ffe19f92235 assets/kogasa_addiction/models/item/aya_ingot.json
+cd32a30f4ba2bc14b8d9741e8a675bd9d630a9be assets/kogasa_addiction/models/item/cirno_ingot.json
 24a221de8262e37fca8cba8a1ff15564ece0b4bb assets/kogasa_addiction/models/item/kogasa_axe.json
 64f4401d8169ed228a89e2fd8ce863a19265c4ce assets/kogasa_addiction/models/item/kogasa_boots.json
 d9fae0436459addb806e4f4c04e2cf9644ddbdf2 assets/kogasa_addiction/models/item/kogasa_chestplate.json
@@ -9,3 +11,4 @@ d9fae0436459addb806e4f4c04e2cf9644ddbdf2 assets/kogasa_addiction/models/item/kog
 2a554b404ee1866ed8d650c7ddbbcaae2778839e assets/kogasa_addiction/models/item/kogasa_pickaxe.json
 58774c39febf4f90e783b86b9ee6d95dd6106a61 assets/kogasa_addiction/models/item/kogasa_shovel.json
 a856702e55cbfdf7c9978c320fb5e0e239c3c5ec assets/kogasa_addiction/models/item/kogasa_sword.json
+fdd1dee9ee225ce590d70de97887e3d7f85d36f7 assets/kogasa_addiction/models/item/koishi_ingot.json

@@ -16,6 +16,9 @@ public class ModItemModelProvider extends ItemModelProvider {
     protected void registerModels() {
         // 1. 材料：普通物品模型
         basicItem(ModItems.KOGASA_INGOT.get());
+        basicItem(ModItems.AYA_INGOT.get());
+        basicItem(ModItems.CIRNO_INGOT.get());
+        basicItem(ModItems.KOISHI_INGOT.get());
 
         // 2. 工具与武器：手持模型 (item/handheld)
         // 注意：这里使用了 withExistingParent 来覆盖默认的 item/generated

@@ -3,6 +3,8 @@ package net.kogasachan.kogasa_addiction.util;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.kogasachan.kogasa_addiction.Config;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -164,8 +166,8 @@ public class KogasaEquipmentHelper {
         double growth = KogasaEquipmentData.getGrowth(stack);
         int fixedPerRe = Config.DURABILITY_FIXED_PER_REINFORCEMENT.get();
         double ratioPerRe = Config.DURABILITY_RATIO_PER_REINFORCEMENT.get();
-        double multiplier = 1.0 + re * ratioPerRe;
-        return (int) ((baseMaxDamage * multiplier + re * fixedPerRe) * (1.0 + growth));
+        double multiplier = (1.0 + re * ratioPerRe) * (1.0 + growth) * getNewsMultiplier(stack);
+        return (int) (baseMaxDamage * multiplier + re * fixedPerRe);
     }
 
     /**
@@ -199,18 +201,21 @@ public class KogasaEquipmentHelper {
         int re = KogasaEquipmentData.getReinforcements(stack);
         double growth = KogasaEquipmentData.getGrowth(stack);
         double ratio = Config.MINING_SPEED_RATIO_PER_REINFORCEMENT.get();
-        double multiplier = (1.0 + re * ratio) * (1.0 + growth);
+        double multiplier = (1.0 + re * ratio) * (1.0 + growth) * getNewsMultiplier(stack);
         return (float) (baseSpeed * multiplier);
     }
 
     /**
-     * 攻速成长：修饰符从 baseSpeed 逼近 0.0，达到后封顶。
-     * progress = min(growth × ratio, 1.0)
+     * 攻击速度
      */
     public static double getAttackSpeedModifier(ItemStack stack, double baseSpeed) {
         double growth = KogasaEquipmentData.getGrowth(stack);
+        double news = KogasaAbilityData.hasAbility(stack, KogasaAbility.AYA)
+                ? KogasaAbilityData.getNewsValue(stack) : 0.0;
         double ratio = Config.ATTACK_SPEED_GROWTH_RATIO.get();
-        double progress = Math.min(growth * ratio, 1.0);
+
+        // progress 加上 news 的贡献
+        double progress = Math.min((growth + news) * ratio, 1.0);
         return baseSpeed * (1.0 - progress);
     }
 
@@ -258,8 +263,10 @@ public class KogasaEquipmentHelper {
      */
     public static boolean isAttackSpeedCapped(ItemStack stack) {
         double growth = KogasaEquipmentData.getGrowth(stack);
+        double news = KogasaAbilityData.hasAbility(stack, KogasaAbility.AYA)
+                ? KogasaAbilityData.getNewsValue(stack) : 0.0;
         double ratio = Config.ATTACK_SPEED_GROWTH_RATIO.get();
-        return growth * ratio >= 1.0;
+        return (growth + news) * ratio >= 1.0;
     }
 
     /**
@@ -268,19 +275,27 @@ public class KogasaEquipmentHelper {
     public static double getKnockbackResistance(ItemStack stack) {
         int re = KogasaEquipmentData.getReinforcements(stack);
         double growth = KogasaEquipmentData.getGrowth(stack);
+        double news = KogasaAbilityData.hasAbility(stack, KogasaAbility.AYA)
+                ? KogasaAbilityData.getNewsValue(stack) : 0.0;
         double base = Config.KNOCKBACK_BASE_RESISTANCE.get();
         double max = Config.KNOCKBACK_MAX_PER_PIECE.get();
-        // 融合增加"最大上限"，成长逼近该上限
+
+        // 有效成长值 = growth + news，加速逼近上限
+        double effectiveGrowth = growth + news;
+
         double effectiveMax = Math.min(max * (1.0 + re * 0.5), 1.0);
-        return effectiveMax - (effectiveMax - base) / (growth + 1.0);
+        return effectiveMax - (effectiveMax - base) / (effectiveGrowth + 1.0);
     }
 
     /**
-     * 强化倍率：1.0 + 强化次数 × 0.1
+     * 强化倍率
      */
     public static double getReinforcementMultiplier(ItemStack stack) {
+        if (!KogasaAbilityData.hasAbility(stack, KogasaAbility.KOGASA)) {
+            return 1.0;
+        }
         int re = KogasaEquipmentData.getReinforcements(stack);
-        double perLevel = Config.REINFORCEMENT_MULTIPLIER_PER_LEVEL.get();
+        double perLevel = Config.KOGASA_REINFORCEMENT_MULTIPLIER_PER_LEVEL.get();
         return 1.0 + re * perLevel;
     }
 
@@ -292,10 +307,12 @@ public class KogasaEquipmentHelper {
     }
 
     /**
-     * 综合倍率：强化 × 成长
+     * 综合倍率：强化 × 成长 × AYA 新闻值倍率
      */
     public static double getTotalMultiplier(ItemStack stack) {
-        return getReinforcementMultiplier(stack) * getGrowthMultiplier(stack);
+        return getReinforcementMultiplier(stack)
+                * getGrowthMultiplier(stack)
+                * getNewsMultiplier(stack);
     }
 
     /**
@@ -354,5 +371,15 @@ public class KogasaEquipmentHelper {
     public static int getDynamicHarvestLevel(ItemStack stack, int baseLevel) {
         int re = KogasaEquipmentData.getReinforcements(stack);
         return Math.max(baseLevel, re);
+    }
+
+    /**
+     * AYA 新闻值倍率。没有 AYA 能力时返回 1.0。
+     */
+    public static double getNewsMultiplier(ItemStack stack) {
+        if (!KogasaAbilityData.hasAbility(stack, KogasaAbility.AYA)) {
+            return 1.0;
+        }
+        return 1.0 + KogasaAbilityData.getNewsValue(stack);
     }
 }

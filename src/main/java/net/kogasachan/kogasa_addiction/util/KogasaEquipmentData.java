@@ -83,12 +83,10 @@ public class KogasaEquipmentData {
     }
 
     /**
-     * 综合数值倍率：强化 + 成长
+     * 综合数值倍率
      */
     public static double getMultiplier(ItemStack stack) {
-        int re = getReinforcements(stack);
-        double growth = getGrowth(stack);
-        return (1.0 + re * 0.1) * (1.0 + growth);
+        return KogasaEquipmentHelper.getTotalMultiplier(stack);
     }
 
     /**

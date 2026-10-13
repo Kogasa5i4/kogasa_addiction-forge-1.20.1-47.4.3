@@ -2,6 +2,8 @@ package net.kogasachan.kogasa_addiction.event;
 
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
@@ -9,6 +11,7 @@ import net.kogasachan.kogasa_addiction.util.MixinConfigCache;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -129,6 +132,86 @@ public class KogasaTooltipHandler {
                 tooltip.add(Component.translatable("tooltip.kogasa_addiction.hint.ctrl")
                         .withStyle(ChatFormatting.DARK_GRAY));
             }
+        }
+
+        // ===== 能力信息（Alt） =====
+        if (Screen.hasAltDown()) {
+            List<KogasaAbility> abilities = KogasaAbilityData.getAbilities(stack);
+            int maxSlots = KogasaAbilityData.getMaxAbilitySlots(stack);
+
+            // 标题
+            tooltip.add(Component.translatable(
+                            "tooltip.kogasa_addiction.abilities", abilities.size(), maxSlots)
+                    .withStyle(ChatFormatting.AQUA));
+
+            // 能力列表 / 空提示
+            if (abilities.isEmpty()) {
+                tooltip.add(Component.translatable("tooltip.kogasa_addiction.abilities.none")
+                        .withStyle(ChatFormatting.DARK_GRAY));
+                tooltip.add(Component.translatable("tooltip.kogasa_addiction.abilities.how_to")
+                        .withStyle(ChatFormatting.DARK_GRAY));
+            } else {
+                for (KogasaAbility ability : abilities) {
+                    tooltip.add(Component.literal("  ✦ ")
+                            .append(ability.getDisplayName())
+                            .withStyle(ChatFormatting.LIGHT_PURPLE));
+                }
+            }
+            // 槽位满且未解锁第 2 槽 → 显示解锁提示（只在有能力时显示）
+            if (abilities.size() >= maxSlots && maxSlots < 2) {
+                tooltip.add(Component.translatable(
+                                "tooltip.kogasa_addiction.abilities.full_hint")
+                        .withStyle(ChatFormatting.DARK_GRAY));
+            }
+
+            if (KogasaAbilityData.hasAbility(stack, KogasaAbility.KOGASA)) {
+                double reMult = KogasaEquipmentHelper.getReinforcementMultiplier(stack);
+                tooltip.add(Component.translatable(
+                                "tooltip.kogasa_addiction.kogasa.multiplier",
+                                String.format("%.2f", reMult))
+                        .withStyle(ChatFormatting.GOLD));
+            }
+
+            if (KogasaAbilityData.hasAbility(stack, KogasaAbility.AYA)) {
+                double news = KogasaAbilityData.getNewsValue(stack);
+                int killed = KogasaAbilityData.getKilledMobCount(stack);
+                int mined = KogasaAbilityData.getMinedBlockCount(stack);
+                int damage = KogasaAbilityData.getDamageTakenCount(stack);
+
+                tooltip.add(Component.translatable(
+                                "tooltip.kogasa_addiction.aya.news_value",
+                                String.format("%.2f%%", news * 100),
+                                String.format("×%.3f", 1.0 + news))
+                        .withStyle(ChatFormatting.GOLD));
+                tooltip.add(Component.translatable(
+                                "tooltip.kogasa_addiction.aya.records",
+                                killed, mined, damage)
+                        .withStyle(ChatFormatting.GRAY));
+            }
+
+            if (KogasaAbilityData.hasAbility(stack, KogasaAbility.CIRNO)) {
+                double cost = Config.CIRNO_REVIVE_GROWTH_COST.get();
+                boolean canRevive = growth >= cost;
+
+                MutableComponent reviveLine = Component.translatable(
+                        "tooltip.kogasa_addiction.cirno.revive_status",
+                        String.format("%.2f", cost));
+                reviveLine.withStyle(canRevive ? ChatFormatting.GREEN : ChatFormatting.RED);
+                tooltip.add(reviveLine);
+            }
+
+            if (KogasaAbilityData.hasAbility(stack, KogasaAbility.KOISHI)) {
+                double chance = Config.KOISHI_CRIT_CHANCE.get() * 100;
+                double mult = Config.KOISHI_CRIT_MULTIPLIER.get();
+                tooltip.add(Component.translatable(
+                                "tooltip.kogasa_addiction.koishi.crit_info",
+                                String.format("%.0f%%", chance),
+                                String.format("%.1f", mult))
+                        .withStyle(ChatFormatting.LIGHT_PURPLE));
+            }
+        } else {
+            tooltip.add(Component.translatable("tooltip.kogasa_addiction.hint.alt")
+                    .withStyle(ChatFormatting.DARK_GRAY));
         }
     }
 

@@ -14,6 +14,9 @@ public class CreativeTabHandler {
     public static void onBuildTab(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.KOGASA_INGOT);
+            event.accept(ModItems.AYA_INGOT);
+            event.accept(ModItems.CIRNO_INGOT);
+            event.accept(ModItems.KOISHI_INGOT);
         }
         if (event.getTabKey() == CreativeModeTabs.COMBAT) {
             event.accept(ModItems.KOGASA_SWORD);

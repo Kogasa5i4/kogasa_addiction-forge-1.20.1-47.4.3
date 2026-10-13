@@ -7,7 +7,7 @@ public class Config {
 
     public static final ForgeConfigSpec.BooleanValue SHOW_MINING_SPEED = BUILDER
             .comment("Show current mining speed in tooltips for digger tools.")
-            .comment("在挖掘工具的 Tooltip 中显示当前挖掘速度。")
+            .comment("在挖掘工具的工具提示中显示当前挖掘速度。")
             .define("showMiningSpeed", true);
 
     public static final ForgeConfigSpec.BooleanValue ENABLE_KOGASA_INGOT = BUILDER
@@ -53,7 +53,7 @@ public class Config {
     public static final ForgeConfigSpec.DoubleValue MAX_GROWTH = BUILDER
             .comment("Maximum growth. 1.0 = 100%.")
             .comment("最大成长幅度。1.0 = 100%.")
-            .defineInRange("maxGrowth", 10, 0.0, Double.MAX_VALUE);
+            .defineInRange("maxGrowth", 3, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.BooleanValue ENABLE_EXTRA_SLOTS = BUILDER
             .comment("Unlock extra reinforcement slots through growth.")
@@ -73,12 +73,12 @@ public class Config {
     public static final ForgeConfigSpec.DoubleValue WEAPON_ABSORBED_RATIO = BUILDER
             .comment("Absorbed value ratio for weapons and tools.")
             .comment("工具吸收强化倍率。")
-            .defineInRange("weaponAbsorbedRatio", 1.0, 0.0, 10.0);
+            .defineInRange("weaponAbsorbedRatio", 0.5, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue ARMOR_ABSORBED_RATIO = BUILDER
             .comment("Absorbed value ratio for armor.")
             .comment("护甲吸收强化倍率。")
-            .defineInRange("armorAbsorbedRatio", 1.0, 0.0, 10.0);
+            .defineInRange("armorAbsorbedRatio", 0.5, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.BooleanValue ENABLE_GROWTH_ENCHANT = BUILDER
             .comment("Unlock random enchantments when growth reaches thresholds.")
@@ -93,7 +93,7 @@ public class Config {
     public static final ForgeConfigSpec.IntValue MAX_GROWTH_ENCHANTS = BUILDER
             .comment("Maximum number of enchantments granted by growth.")
             .comment("通过成长获得的最大附魔数量。")
-            .defineInRange("maxGrowthEnchants", 5, 0, Integer.MAX_VALUE);
+            .defineInRange("maxGrowthEnchants", 100, 0, Integer.MAX_VALUE);
 
     public static final ForgeConfigSpec.BooleanValue ALLOW_MAX_LEVEL_ENCHANTS = BUILDER
             .comment("If true, granted enchantments get a random level from 1 to max. If false, always level 1.")
@@ -114,11 +114,6 @@ public class Config {
             .comment("Mining speed ratio added per reinforcement. 0.5 = +50% per level.")
             .comment("每次强化增加的挖掘速度倍率。0.5 = 每级 +50%。")
             .defineInRange("miningSpeedRatioPerReinforcement", 1.5, 0.0, 10.0);
-
-    public static final ForgeConfigSpec.DoubleValue REINFORCEMENT_MULTIPLIER_PER_LEVEL = BUILDER
-            .comment("Multiplier bonus per reinforcement. 0.1 = +10% per level.")
-            .comment("每次强化增加的倍率。0.1 = 每级 +10%。")
-            .defineInRange("reinforcementMultiplierPerLevel", 0.1, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue KNOCKBACK_BASE_RESISTANCE = BUILDER
             .comment("Knockback resistance at growth = 0. Default 0.05 (half of netherite).")
@@ -148,6 +143,87 @@ public class Config {
             .comment("攻速成长比例。progress = min(growth * ratio, 1.0). " +
                     "1.0时等同于空手攻速（4.0）。")
             .defineInRange("attackSpeedGrowthRatio", 1.0, 0.01, Double.MAX_VALUE);
+
+    // ===== 能力槽位 =====
+    public static final ForgeConfigSpec.IntValue ABILITY_INFUSION_COST = BUILDER
+            .comment("Experience level cost to infuse an ability ingot into equipment.")
+            .comment("在铁砧中为装备注入能力锭消耗的经验等级。")
+            .defineInRange("abilityInfusionCost", 3, 0, 40);
+
+    public static final ForgeConfigSpec.DoubleValue GROWTH_FOR_SECOND_ABILITY_SLOT = BUILDER
+            .comment("Growth required to unlock the 2nd ability slot. 0.5 = 50% growth.")
+            .comment("解锁第 2 个能力槽所需的成长值。0.5 = 50%。")
+            .defineInRange("growthForSecondAbilitySlot", 0.5, 0.0, 1.0);
+
+    // ===== Aya 能力 =====
+    public static final ForgeConfigSpec.DoubleValue NEWS_VALUE_PER_RECORD = BUILDER
+            .comment("News value gained per new record (mob/block/damage type).")
+            .comment("每记录一种新生物/方块/伤害类型获得的新闻值。")
+            .defineInRange("newsValuePerRecord", 0.01, 0.0, 1.0);
+
+    public static final ForgeConfigSpec.DoubleValue MAX_NEWS_VALUE = BUILDER
+            .comment("Maximum news value.")
+            .comment("新闻值上限。")
+            .defineInRange("maxNewsValue", 1.0, 0.0, 100.0);
+
+    // ===== Cirno - 攻击缓慢 =====
+    public static final ForgeConfigSpec.DoubleValue CIRNO_SLOW_CHANCE = BUILDER
+            .comment("Chance to apply Slowness IV to the target when attacking.")
+            .comment("攻击时对目标施加缓慢 IV 的概率。")
+            .defineInRange("cirnoSlowChance", 0.99, 0.0, 1.0);
+
+    public static final ForgeConfigSpec.DoubleValue CIRNO_SELF_SLOW_CHANCE = BUILDER
+            .comment("Chance to apply Slowness to yourself when attacking.")
+            .comment("攻击时对自己施加缓慢的概率。")
+            .defineInRange("cirnoSelfSlowChance", 0.09, 0.0, 1.0);
+
+    public static final ForgeConfigSpec.IntValue CIRNO_SLOW_DURATION = BUILDER
+            .comment("Slowness duration applied to the target (in ticks). 200 = 10s.")
+            .comment("对目标施加缓慢的持续时间（tick）。200 = 10秒。")
+            .defineInRange("cirnoSlowDuration", 200, 1, 72000);
+
+    public static final ForgeConfigSpec.IntValue CIRNO_SLOW_AMPLIFIER = BUILDER
+            .comment("Slowness amplifier on target. 3 = Slowness IV.")
+            .comment("对目标施加缓慢的等级。3 = 缓慢 IV。")
+            .defineInRange("cirnoSlowAmplifier", 3, 0, 10);
+
+    public static final ForgeConfigSpec.IntValue CIRNO_SELF_SLOW_DURATION = BUILDER
+            .comment("Slowness duration applied to yourself (in ticks). 100 = 5s.")
+            .comment("对自己施加缓慢的持续时间（tick）。100 = 5秒。")
+            .defineInRange("cirnoSelfSlowDuration", 100, 1, 72000);
+
+    public static final ForgeConfigSpec.IntValue CIRNO_SELF_SLOW_AMPLIFIER = BUILDER
+            .comment("Slowness amplifier on yourself. 0 = Slowness I.")
+            .comment("对自己施加缓慢的等级。0 = 缓慢 I。")
+            .defineInRange("cirnoSelfSlowAmplifier", 0, 0, 10);
+
+    // ===== Cirno - 复活 =====
+    public static final ForgeConfigSpec.BooleanValue CIRNO_REVIVE_ENABLED = BUILDER
+            .comment("Enable Cirno ability to revive from durability loss.")
+            .comment("启用琪露诺能力：耐久耗尽时消耗成长值复活。")
+            .define("cirnoReviveEnabled", true);
+
+    public static final ForgeConfigSpec.DoubleValue CIRNO_REVIVE_GROWTH_COST = BUILDER
+            .comment("Growth consumed to revive the item when durability runs out.")
+            .comment("耐久耗尽时消耗的成长值以复活装备。")
+            .defineInRange("cirnoReviveGrowthCost", 0.9, 0.0, 1.0);
+
+    // ===== Koishi 能力 =====
+    public static final ForgeConfigSpec.DoubleValue KOISHI_CRIT_CHANCE = BUILDER
+            .comment("Koishi crit chance. 0.75 = 75%.")
+            .comment("koishi 暴击概率。0.75 = 75%。")
+            .defineInRange("koishiCritChance", 0.75, 0.0, 1.0);
+
+    public static final ForgeConfigSpec.DoubleValue KOISHI_CRIT_MULTIPLIER = BUILDER
+            .comment("Koishi crit damage multiplier. 1.5 = 150%.")
+            .comment("koishi 暴击伤害倍率。1.5 = 150%。")
+            .defineInRange("koishiCritMultiplier", 1.5, 1.0, 10.0);
+
+    // ===== Kogasa 能力 =====
+    public static final ForgeConfigSpec.DoubleValue KOGASA_REINFORCEMENT_MULTIPLIER_PER_LEVEL = BUILDER
+            .comment("Kogasa reinforcement overall multiplier bonus per reinforcement. 0.1 = +10% per level.")
+            .comment("强化装备每次强化增加的总体倍率。0.1 = 每级 +10%。")
+            .defineInRange("kogasaReinforcementMultiplierPerLevel", 0.1, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 }

@@ -6,6 +6,8 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
@@ -52,21 +54,36 @@ public class KogasaJEIPlugin implements IModPlugin {
         return output;
     }
 
-    @Override
-    public @NotNull ResourceLocation getPluginUid() {
-        return PLUGIN_UID;
+    /**
+     * 4 种能力锭 × 示例装备 → 输出带能力的装备
+     * 使用剑作为输入代表，tooltip 说明适用于所有 Kogasa 装备
+     */
+    private static void registerAbilityRecipes(List<AnvilReinforcementRecipe> recipes) {
+        // 用 LinkedHashMap 保证顺序：kogasa → aya → cirno → koishi
+        Map<Item, KogasaAbility> abilityIngots = new LinkedHashMap<>();
+        abilityIngots.put(ModItems.KOGASA_INGOT.get(), KogasaAbility.KOGASA);
+        abilityIngots.put(ModItems.AYA_INGOT.get(), KogasaAbility.AYA);
+        abilityIngots.put(ModItems.CIRNO_INGOT.get(), KogasaAbility.CIRNO);
+        abilityIngots.put(ModItems.KOISHI_INGOT.get(), KogasaAbility.KOISHI);
+
+        ItemStack sampleEquipment = new ItemStack(ModItems.KOGASA_SWORD.get());
+
+        for (Map.Entry<Item, KogasaAbility> entry : abilityIngots.entrySet()) {
+            ItemStack input = sampleEquipment.copy();
+            List<ItemStack> materials = List.of(new ItemStack(entry.getKey()));
+
+            ItemStack output = input.copy();
+            KogasaAbilityData.addAbility(output, entry.getValue());
+
+            recipes.add(new AnvilReinforcementRecipe(
+                    input, materials, output, RecipeKind.ABILITY));
+        }
     }
 
-    @Override
-    public void registerCategories(@NotNull IRecipeCategoryRegistration registration) {
-        if (!ModList.get().isLoaded("jei")) return;
-        registration.addRecipeCategories(new AnvilReinforcementCategory(registration.getJeiHelpers().getGuiHelper()));
-    }
-
-    @Override
-    public void registerRecipes(@NotNull IRecipeRegistration registration) {
-        List<AnvilReinforcementRecipe> recipes = new ArrayList<>();
-
+    /**
+     * 9 种装备 × 对应标签内材料 → 输出强化后的装备
+     */
+    private static void registerReinforcementRecipes(List<AnvilReinforcementRecipe> recipes) {
         Map<Item, TagKey<Item>> equipmentTags = new LinkedHashMap<>();
         equipmentTags.put(ModItems.KOGASA_SWORD.get(), ItemTags.SWORDS);
         equipmentTags.put(ModItems.KOGASA_PICKAXE.get(), ItemTags.PICKAXES);
@@ -82,25 +99,47 @@ public class KogasaJEIPlugin implements IModPlugin {
             Item kogasaItem = entry.getKey();
             TagKey<Item> tag = entry.getValue();
 
-            // 遍历标签，过滤掉 Kogasa 自身和空气
+            // 收集标签内所有物品（排除 Kogasa 自身和空气）
             List<ItemStack> materials = new ArrayList<>();
             BuiltInRegistries.ITEM.getTagOrEmpty(tag).forEach(holder -> {
                 Item item = holder.value();
                 if (item == Items.AIR) return;
-                if (item instanceof IKogasaEquipment) return;  // ← 关键过滤
+                if (item instanceof IKogasaEquipment) return;
                 materials.add(new ItemStack(item));
             });
-
-            // 如果过滤后为空，跳过这个配方
             if (materials.isEmpty()) continue;
 
             ItemStack input = new ItemStack(kogasaItem);
             ItemStack output = input.copy();
             KogasaEquipmentData.setReinforcements(output, 1);
 
-            recipes.add(new AnvilReinforcementRecipe(input, materials, output));
+            recipes.add(new AnvilReinforcementRecipe(
+                    input, materials, output, RecipeKind.REINFORCEMENT));
         }
+    }
 
+    @Override
+    public @NotNull ResourceLocation getPluginUid() {
+        return PLUGIN_UID;
+    }
+
+    @Override
+    public void registerCategories(@NotNull IRecipeCategoryRegistration registration) {
+        if (!ModList.get().isLoaded("jei")) return;
+        registration.addRecipeCategories(new AnvilReinforcementCategory(registration.getJeiHelpers().getGuiHelper()));
+    }
+
+    @Override
+    public void registerRecipes(@NotNull IRecipeRegistration registration) {
+        List<AnvilReinforcementRecipe> recipes = new ArrayList<>();
+
+        // ========== 1. 能力配方（4 个，排前面） ==========
+        registerAbilityRecipes(recipes);
+
+        // ========== 2. 强化配方（9 个） ==========
+        registerReinforcementRecipes(recipes);
+
+        KogasaAddiction.LOGGER.info("Registered {} JEI anvil recipes", recipes.size());
         registration.addRecipes(AnvilReinforcementCategory.RECIPE_TYPE, recipes);
     }
 

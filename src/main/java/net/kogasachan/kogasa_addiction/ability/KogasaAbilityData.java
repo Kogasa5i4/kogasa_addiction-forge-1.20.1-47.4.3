@@ -1,0 +1,183 @@
+package net.kogasachan.kogasa_addiction.ability;
+
+import net.kogasachan.kogasa_addiction.Config;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * 能力 NBT 数据结构：
+ * {
+ * "Abilities": ["aya", "koishi"],           // 已拥有能力 ID 列表
+ * "NewsValue": 0.15,                        // 新闻值
+ * "AyaKilledMobs": ["minecraft:zombie"],    // 已记录生物 ID
+ * "AyaMinedBlocks": ["minecraft:stone"],    // 已记录方块 ID
+ * "AyaDamagesTaken": ["minecraft:mob_attack"] // 已记录伤害类型 ID
+ * }
+ */
+public class KogasaAbilityData {
+
+    private static final String ROOT = "KogasaAbilities";
+    private static final String ABILITIES = "Abilities";
+    private static final String NEWS_VALUE = "NewsValue";
+    private static final String AYA_KILLED_MOBS = "AyaKilledMobs";
+    private static final String AYA_MINED_BLOCKS = "AyaMinedBlocks";
+    private static final String AYA_DAMAGES_TAKEN = "AyaDamagesTaken";
+
+    // ==================== 基础读写 ====================
+
+    private static CompoundTag getTag(ItemStack stack) {
+        return stack.getOrCreateTag().getCompound(ROOT);
+    }
+
+    private static void saveTag(ItemStack stack, CompoundTag tag) {
+        stack.getOrCreateTag().put(ROOT, tag);
+    }
+
+    // ==================== 能力列表 ====================
+
+    /**
+     * 获取已拥有的能力列表
+     */
+    public static List<KogasaAbility> getAbilities(ItemStack stack) {
+        ListTag list = getTag(stack).getList(ABILITIES, Tag.TAG_STRING);
+        List<KogasaAbility> result = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            KogasaAbility ability = KogasaAbility.byId(list.getString(i));
+            if (ability != null) result.add(ability);
+        }
+        return result;
+    }
+
+    /**
+     * 是否拥有指定能力
+     */
+    public static boolean hasAbility(ItemStack stack, KogasaAbility ability) {
+        return getAbilities(stack).contains(ability);
+    }
+
+    /**
+     * 是否拥有任意能力
+     */
+    public static boolean hasAnyAbility(ItemStack stack) {
+        return !getAbilities(stack).isEmpty();
+    }
+
+    /**
+     * 添加能力。返回 false 表示已拥有或槽位不足。
+     */
+    public static boolean addAbility(ItemStack stack, KogasaAbility ability) {
+        List<KogasaAbility> current = getAbilities(stack);
+        if (current.contains(ability)) return false;
+        if (current.size() >= getMaxAbilitySlots(stack)) return false;
+
+        CompoundTag tag = getTag(stack);
+        ListTag list = tag.getList(ABILITIES, Tag.TAG_STRING);
+        list.add(StringTag.valueOf(ability.getId()));
+        tag.put(ABILITIES, list);
+        saveTag(stack, tag);
+        return true;
+    }
+
+    /**
+     * 移除能力（仅调试命令用）
+     */
+    public static boolean removeAbility(ItemStack stack, KogasaAbility ability) {
+        List<KogasaAbility> current = getAbilities(stack);
+        if (!current.contains(ability)) return false;
+
+        CompoundTag tag = getTag(stack);
+        ListTag list = new ListTag();
+        for (KogasaAbility a : current) {
+            if (a != ability) list.add(StringTag.valueOf(a.getId()));
+        }
+        tag.put(ABILITIES, list);
+        saveTag(stack, tag);
+        return true;
+    }
+
+    /**
+     * 清空所有能力（调试命令用）
+     */
+    public static void clearAbilities(ItemStack stack) {
+        CompoundTag tag = getTag(stack);
+        tag.put(ABILITIES, new ListTag());
+        saveTag(stack, tag);
+    }
+
+    // ==================== 能力槽位 ====================
+
+    /**
+     * 当前装备的能力槽位上限。
+     * 基础 1 个，成长值达到阈值后解锁第 2 个，强制上限为 2。
+     */
+    public static int getMaxAbilitySlots(ItemStack stack) {
+        double growth = net.kogasachan.kogasa_addiction.util.KogasaEquipmentData.getGrowth(stack);
+        double threshold = Config.GROWTH_FOR_SECOND_ABILITY_SLOT.get();
+        return growth >= threshold ? 2 : 1;
+    }
+
+    // ==================== Aya 独立成长值 ====================
+
+    public static double getNewsValue(ItemStack stack) {
+        return getTag(stack).getDouble(NEWS_VALUE);
+    }
+
+    public static void addNewsValue(ItemStack stack, double amount) {
+        CompoundTag tag = getTag(stack);
+        double current = tag.getDouble(NEWS_VALUE);
+        double max = Config.MAX_NEWS_VALUE.get();
+        tag.putDouble(NEWS_VALUE, Math.min(current + amount, max));
+        saveTag(stack, tag);
+    }
+
+    // ==================== Aya 已记录集合 ====================
+
+    /**
+     * 检查某类记录是否已存在，不存在则添加。返回 true 表示是新记录。
+     */
+    public static boolean tryAddRecord(ItemStack stack, String key, String value) {
+        CompoundTag tag = getTag(stack);
+        ListTag list = tag.getList(key, Tag.TAG_STRING);
+        for (int i = 0; i < list.size(); i++) {
+            if (list.getString(i).equals(value)) return false;
+        }
+        list.add(StringTag.valueOf(value));
+        tag.put(key, list);
+        saveTag(stack, tag);
+        return true;
+    }
+
+    public static int getRecordCount(ItemStack stack, String key) {
+        return getTag(stack).getList(key, Tag.TAG_STRING).size();
+    }
+
+    public static boolean tryAddKilledMob(ItemStack stack, String mobId) {
+        return tryAddRecord(stack, AYA_KILLED_MOBS, mobId);
+    }
+
+    public static boolean tryAddMinedBlock(ItemStack stack, String blockId) {
+        return tryAddRecord(stack, AYA_MINED_BLOCKS, blockId);
+    }
+
+    public static boolean tryAddDamageTaken(ItemStack stack, String damageTypeId) {
+        return tryAddRecord(stack, AYA_DAMAGES_TAKEN, damageTypeId);
+    }
+
+    public static int getKilledMobCount(ItemStack stack) {
+        return getRecordCount(stack, AYA_KILLED_MOBS);
+    }
+
+    public static int getMinedBlockCount(ItemStack stack) {
+        return getRecordCount(stack, AYA_MINED_BLOCKS);
+    }
+
+    public static int getDamageTakenCount(ItemStack stack) {
+        return getRecordCount(stack, AYA_DAMAGES_TAKEN);
+    }
+}

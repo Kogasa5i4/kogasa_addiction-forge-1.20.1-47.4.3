@@ -45,8 +45,10 @@ public class MiningVanillaTooltipHandler {
         int speedInsertIdx = -1;
         if (hasAttackSpeed) {
             double speed;
+            boolean capped = false;
             if (isKogasa) {
                 speed = KogasaEquipmentHelper.getDisplayAttackSpeed(stack);
+                capped = KogasaEquipmentHelper.isAttackSpeedCapped(stack);
             } else {
                 double baseSpeed = getVanillaBaseSpeed(stack);
                 speed = 4.0 + baseSpeed;
@@ -56,13 +58,15 @@ public class MiningVanillaTooltipHandler {
                     "tooltip.kogasa_addiction.vanilla_attack_speed",
                     String.format("%.1f", speed));
 
+            ChatFormatting color = capped ? ChatFormatting.GOLD : ChatFormatting.DARK_GREEN;
+
             int insertIdx = findAttackDamageLine(tooltip);
             if (insertIdx >= 0) {
                 speedInsertIdx = insertIdx + 1;
-                tooltip.add(speedInsertIdx, speedLine.withStyle(ChatFormatting.DARK_GREEN));
+                tooltip.add(speedInsertIdx, speedLine.withStyle(color));
             } else {
                 speedInsertIdx = tooltip.size();
-                tooltip.add(speedLine.withStyle(ChatFormatting.DARK_GREEN));
+                tooltip.add(speedLine.withStyle(color));
             }
         }
 

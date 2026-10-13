@@ -37,8 +37,6 @@
   "message.kogasa_addiction.growth_enchant": "✦ 装备觉醒了新的附魔力量",
   "message.kogasa_addiction.growth_enchant.max": "✦ 装备的附魔已达到极限",
   "tooltip.kogasa_addiction.absorbed": "吸收强化：+%s",
-  "tooltip.kogasa_addiction.attack_speed": "攻速：%s / %s",
-  "tooltip.kogasa_addiction.attack_speed.max": "攻速：%s（已封顶）",
   "tooltip.kogasa_addiction.growth": "成长：%s",
   "tooltip.kogasa_addiction.growth_enchant": "成长附魔：%s/%s",
   "tooltip.kogasa_addiction.hint.ctrl": "按住 <Ctrl> 查看成长",

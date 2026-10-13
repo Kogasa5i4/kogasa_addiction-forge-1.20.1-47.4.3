@@ -100,23 +100,6 @@ public class KogasaTooltipHandler {
                 }
             }
 
-            // 攻速（仅工具/武器有）
-            if (!(stack.getItem() instanceof ArmorItem)) {
-                double currentSpeed = KogasaEquipmentHelper.getDisplayAttackSpeed(stack);
-                if (KogasaEquipmentHelper.isAttackSpeedCapped(stack)) {
-                    tooltip.add(Component.translatable(
-                                    "tooltip.kogasa_addiction.attack_speed.max",
-                                    String.format("%.2f", currentSpeed))
-                            .withStyle(ChatFormatting.GREEN));
-                } else {
-                    tooltip.add(Component.translatable(
-                                    "tooltip.kogasa_addiction.attack_speed",
-                                    String.format("%.2f", currentSpeed),
-                                    "4.00")
-                            .withStyle(ChatFormatting.GOLD));
-                }
-            }
-
             // 吸收值
             if (absorbed > 0) {
                 tooltip.add(Component.translatable(

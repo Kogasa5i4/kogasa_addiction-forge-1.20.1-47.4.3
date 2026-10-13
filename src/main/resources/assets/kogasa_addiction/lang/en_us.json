@@ -37,8 +37,6 @@
   "message.kogasa_addiction.growth_enchant": "✦ The equipment has awakened a new enchantment",
   "message.kogasa_addiction.growth_enchant.max": "✦ The equipment has reached its enchantment limit",
   "tooltip.kogasa_addiction.absorbed": "Absorbed Bonus: +%s",
-  "tooltip.kogasa_addiction.attack_speed": "Attack Speed: %s / %s",
-  "tooltip.kogasa_addiction.attack_speed.max": "Attack Speed: %s (Max)",
   "tooltip.kogasa_addiction.growth": "Growth: %s",
   "tooltip.kogasa_addiction.growth_enchant": "Growth Enchants: %s/%s",
   "tooltip.kogasa_addiction.hint.ctrl": "Hold <Ctrl> for growth info",

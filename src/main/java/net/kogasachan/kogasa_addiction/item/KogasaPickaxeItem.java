@@ -40,12 +40,14 @@ public class KogasaPickaxeItem extends PickaxeItem implements IKogasaEquipment {
             int level = KogasaEquipmentHelper.getDynamicHarvestLevel(
                     stack, this.getTier().getLevel());
 
-            if (level > 6) { return true; }
+            if (level > 6) {
+                return true;
+            }
 
             if (state.is(Tags.Blocks.NEEDS_NETHERITE_TOOL)) return level >= 4;
             if (state.is(BlockTags.NEEDS_DIAMOND_TOOL)) return level >= 3;
-            if (state.is(BlockTags.NEEDS_IRON_TOOL))    return level >= 2;
-            if (state.is(BlockTags.NEEDS_STONE_TOOL))   return level >= 1;
+            if (state.is(BlockTags.NEEDS_IRON_TOOL)) return level >= 2;
+            if (state.is(BlockTags.NEEDS_STONE_TOOL)) return level >= 1;
         }
         return super.isCorrectToolForDrops(stack, state);
     }

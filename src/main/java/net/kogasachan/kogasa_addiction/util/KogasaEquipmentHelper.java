@@ -3,6 +3,7 @@ package net.kogasachan.kogasa_addiction.util;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.kogasachan.kogasa_addiction.Config;
+import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -346,5 +347,13 @@ public class KogasaEquipmentHelper {
             return Config.ARMOR_ABSORBED_RATIO.get();
         }
         return Config.WEAPON_ABSORBED_RATIO.get();
+    }
+
+    /**
+     * 动态挖掘等级：max(Tier基础等级, 强化次数)
+     */
+    public static int getDynamicHarvestLevel(ItemStack stack, int baseLevel) {
+        int re = KogasaEquipmentData.getReinforcements(stack);
+        return Math.max(baseLevel, re);
     }
 }

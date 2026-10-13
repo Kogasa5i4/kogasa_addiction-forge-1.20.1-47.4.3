@@ -10,13 +10,13 @@ public class Config {
             .comment("在挖掘工具的 Tooltip 中显示当前挖掘速度。")
             .define("showMiningSpeed", true);
 
-    public static final ForgeConfigSpec.BooleanValue ENABLE_BLAST_FURNACE_INGOT = BUILDER
-            .comment("Enable blast furnace to produce special ingots while burning.")
+    public static final ForgeConfigSpec.BooleanValue ENABLE_KOGASA_INGOT = BUILDER
+            .comment("Enable blast furnace to produce kogasa ingots while burning.")
             .comment("允许伞之锭从燃烧的高炉中掉落。")
             .define("enableBlastFurnaceIngot", true);
 
-    public static final ForgeConfigSpec.DoubleValue BLAST_FURNACE_INGOT_CHANCE = BUILDER
-            .comment("Chance per burning tick to produce an ingot. 0.01 = 1%.")
+    public static final ForgeConfigSpec.DoubleValue KOGASA_INGOT_CHANCE = BUILDER
+            .comment("Chance per burning tick to produce a kogasa ingot. 0.01 = 1%.")
             .comment("伞之锭掉落的概率，0.01 = 1%。")
             .defineInRange("blastFurnaceIngotChance", 0.000005, 0.0, 1.0);
 
@@ -53,7 +53,7 @@ public class Config {
     public static final ForgeConfigSpec.DoubleValue MAX_GROWTH = BUILDER
             .comment("Maximum growth. 1.0 = 100%.")
             .comment("最大成长幅度。1.0 = 100%.")
-            .defineInRange("maxGrowth", 1.0, 0.0, Double.MAX_VALUE);
+            .defineInRange("maxGrowth", 10, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.BooleanValue ENABLE_EXTRA_SLOTS = BUILDER
             .comment("Unlock extra reinforcement slots through growth.")
@@ -63,12 +63,12 @@ public class Config {
     public static final ForgeConfigSpec.DoubleValue GROWTH_PER_EXTRA_SLOT = BUILDER
             .comment("Growth required to unlock one extra reinforcement slot. 0.01 = 1% growth.")
             .comment("解锁一个额外强化槽所需的成长值。0.01 = 1%。")
-            .defineInRange("growthPerExtraSlot", 0.01, 0.0001, Double.MAX_VALUE);
+            .defineInRange("growthPerExtraSlot", 0.1, 0.0001, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.IntValue MAX_EXTRA_SLOTS = BUILDER
             .comment("Maximum extra reinforcement slots unlocked by growth.")
             .comment("通过成长解锁的最大额外强化槽数。")
-            .defineInRange("maxExtraSlots", 3, 0, Integer.MAX_VALUE);
+            .defineInRange("maxExtraSlots", 4, 0, Integer.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue WEAPON_ABSORBED_RATIO = BUILDER
             .comment("Absorbed value ratio for weapons and tools.")

@@ -144,9 +144,6 @@ public class KogasaTooltipHandler {
                                     "tooltip.kogasa_addiction.growth_enchant", grantedEnchants, maxEnchants)
                             .withStyle(ChatFormatting.LIGHT_PURPLE));
                 }
-                tooltip.add(Component.translatable(
-                                "tooltip.kogasa_addiction.growth_enchant_count", grantedEnchants)
-                        .withStyle(ChatFormatting.LIGHT_PURPLE));
             } else {
                 tooltip.add(Component.translatable("tooltip.kogasa_addiction.hint.ctrl")
                         .withStyle(ChatFormatting.DARK_GRAY));

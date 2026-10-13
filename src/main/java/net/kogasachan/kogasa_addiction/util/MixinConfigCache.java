@@ -24,8 +24,8 @@ public class MixinConfigCache {
     }
 
     private static void refresh() {
-        enableBlastFurnaceIngot = Config.ENABLE_BLAST_FURNACE_INGOT.get();
-        blastFurnaceIngotChance = Config.BLAST_FURNACE_INGOT_CHANCE.get().floatValue();
+        enableBlastFurnaceIngot = Config.ENABLE_KOGASA_INGOT.get();
+        blastFurnaceIngotChance = Config.KOGASA_INGOT_CHANCE.get().floatValue();
         growthUnlockReinforcements = Config.GROWTH_UNLOCK_REINFORCEMENTS.get();
     }
 }

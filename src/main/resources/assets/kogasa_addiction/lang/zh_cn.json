@@ -41,7 +41,6 @@
   "tooltip.kogasa_addiction.attack_speed.max": "攻速：%s（已封顶）",
   "tooltip.kogasa_addiction.growth": "成长：%s",
   "tooltip.kogasa_addiction.growth_enchant": "成长附魔：%s/%s",
-  "tooltip.kogasa_addiction.growth_enchant_count": "成长附魔次数：%s",
   "tooltip.kogasa_addiction.hint.ctrl": "按住 <Ctrl> 查看成长",
   "tooltip.kogasa_addiction.hint.shift": "按住 <Shift> 查看强化",
   "tooltip.kogasa_addiction.kogasa_ingot.obtain": "通过高炉燃烧有概率获得",

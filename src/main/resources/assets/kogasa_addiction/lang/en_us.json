@@ -41,7 +41,6 @@
   "tooltip.kogasa_addiction.attack_speed.max": "Attack Speed: %s (Max)",
   "tooltip.kogasa_addiction.growth": "Growth: %s",
   "tooltip.kogasa_addiction.growth_enchant": "Growth Enchants: %s/%s",
-  "tooltip.kogasa_addiction.growth_enchant_count": "Growth Enchant Count: %s",
   "tooltip.kogasa_addiction.hint.ctrl": "Hold <Ctrl> for growth info",
   "tooltip.kogasa_addiction.hint.shift": "Hold <Shift> for reinforcement info",
   "tooltip.kogasa_addiction.kogasa_ingot.obtain": "Obtained by burning items in a Blast Furnace",

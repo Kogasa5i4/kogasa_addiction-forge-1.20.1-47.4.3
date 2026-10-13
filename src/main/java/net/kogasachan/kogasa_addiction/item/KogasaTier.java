@@ -11,22 +11,22 @@ public class KogasaTier implements Tier {
     @Override
     public int getUses() {
         return 59;
-    }                  // 木
+    }
 
     @Override
     public float getSpeed() {
         return 2.0F;
-    }             // 木
+    }
 
     @Override
     public float getAttackDamageBonus() {
         return 0.0F;
-    } // 木
+    }
 
     @Override
     public int getLevel() {
         return 0;
-    }                  // 木
+    }
 
     @Override
     public int getEnchantmentValue() {

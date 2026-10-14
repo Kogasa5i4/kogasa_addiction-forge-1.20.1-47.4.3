@@ -28,7 +28,7 @@ public class BlastFurnaceMixin {
 
     /**
      * @author Kogasa Chan
-     * @reason 高炉燃烧时概率产出特殊锭，优先输出到相邻容器
+     * @reason 高炉燃烧时概率产出伞之锭，优先输出到相邻容器
      */
     @Inject(method = "serverTick", at = @At("HEAD"))
     private static void kogasa$produceIngot(Level level, BlockPos pos, BlockState state,
@@ -53,7 +53,7 @@ public class BlastFurnaceMixin {
                 Direction.DOWN
         };
 
-        // 1. 优先尝试插入六个面的容器
+        // 1. 插入六个面的容器
         for (Direction dir : faces) {
             BlockPos targetPos = pos.relative(dir);
             BlockEntity be = level.getBlockEntity(targetPos);
@@ -87,7 +87,7 @@ public class BlastFurnaceMixin {
             searchPos = searchPos.above();
         }
 
-        // 4. 兜底：原行为
+        // 4. 上表面中心
         kogasa_addiction_forge_1_20_1_47_4_3$spawnItem(level, pos.above(), drop);
     }
 
@@ -123,7 +123,7 @@ public class BlastFurnaceMixin {
         ItemEntity itemEntity = new ItemEntity(
                 level,
                 pos.getX() + 0.5,
-                pos.getY() + 0.5,
+                pos.getY() + 1,
                 pos.getZ() + 0.5,
                 stack
         );

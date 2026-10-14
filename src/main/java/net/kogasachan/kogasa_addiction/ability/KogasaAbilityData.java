@@ -114,7 +114,7 @@ public class KogasaAbilityData {
 
     /**
      * 当前装备的能力槽位上限。
-     * 基础 1 个，成长值达到阈值后解锁第 2 个，强制上限为 2。
+     * 基础 1 个，成长值达到阈值后解锁第 2 个。
      */
     public static int getMaxAbilitySlots(ItemStack stack) {
         double growth = net.kogasachan.kogasa_addiction.util.KogasaEquipmentData.getGrowth(stack);
@@ -122,7 +122,7 @@ public class KogasaAbilityData {
         return growth >= threshold ? 2 : 1;
     }
 
-    // ==================== Aya 独立成长值 ====================
+    // ==================== Aya 新闻值 ====================
 
     public static double getNewsValue(ItemStack stack) {
         return getTag(stack).getDouble(NEWS_VALUE);

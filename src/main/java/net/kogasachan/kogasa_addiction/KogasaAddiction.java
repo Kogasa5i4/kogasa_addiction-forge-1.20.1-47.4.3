@@ -30,6 +30,7 @@ public class KogasaAddiction {
     public KogasaAddiction(FMLJavaModLoadingContext context) {
         // 获取模组事件总线
         IEventBus modEventBus = context.getModEventBus();
+        modEventBus.addListener(this::commonSetup);
 
         // 主类本身的注册
         MinecraftForge.EVENT_BUS.register(this);

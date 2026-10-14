@@ -1,4 +1,4 @@
-package net.kogasachan.kogasa_addiction.event;
+package net.kogasachan.kogasa_addiction.event.server;
 
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
@@ -37,8 +37,8 @@ public class CirnoAbilityHandler {
         if (player.getRandom().nextFloat() < Config.CIRNO_SLOW_CHANCE.get()) {
             target.addEffect(new MobEffectInstance(
                     MobEffects.MOVEMENT_SLOWDOWN,
-                    Config.CIRNO_SLOW_DURATION.get(),
-                    Config.CIRNO_SLOW_AMPLIFIER.get(),
+                    (int) (Config.CIRNO_SLOW_DURATION.get() * 20),
+                    Config.CIRNO_SLOW_LEVEL.get() - 1,
                     false, true));
         }
 
@@ -46,8 +46,8 @@ public class CirnoAbilityHandler {
         if (player.getRandom().nextFloat() < Config.CIRNO_SELF_SLOW_CHANCE.get()) {
             player.addEffect(new MobEffectInstance(
                     MobEffects.MOVEMENT_SLOWDOWN,
-                    Config.CIRNO_SELF_SLOW_DURATION.get(),
-                    Config.CIRNO_SELF_SLOW_AMPLIFIER.get(),
+                    (int) (Config.CIRNO_SELF_SLOW_DURATION.get() * 20),
+                    Config.CIRNO_SELF_SLOW_LEVEL.get() - 1,
                     false, true));
         }
     }

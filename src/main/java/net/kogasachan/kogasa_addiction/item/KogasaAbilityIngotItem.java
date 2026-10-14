@@ -7,6 +7,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -25,24 +26,25 @@ public class KogasaAbilityIngotItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level,
-                                List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level,
+                                List<Component> tooltip, @NotNull TooltipFlag flag) {
+        // 能力名
         tooltip.add(Component.translatable(
                         "tooltip.kogasa_addiction.ability_ingot.ability",
                         ability.getDisplayName())
                 .withStyle(ChatFormatting.AQUA));
 
+        // 能力描述
         tooltip.add(ability.getDescription()
                 .copy()
                 .withStyle(ChatFormatting.GRAY));
 
-        // kogasa 锭额外提示高炉来源
-        if (ability == KogasaAbility.KOGASA) {
-            tooltip.add(Component.translatable(
-                            "tooltip.kogasa_addiction.kogasa_ingot.obtain")
-                    .withStyle(ChatFormatting.DARK_GRAY));
-        }
+        // 获取方式提示
+        tooltip.add(Component.translatable(
+                        "tooltip.kogasa_addiction.ability_ingot.obtain." + ability.getId())
+                .withStyle(ChatFormatting.DARK_GRAY));
 
+        // 使用提示
         tooltip.add(Component.translatable(
                         "tooltip.kogasa_addiction.ability_ingot.usage")
                 .withStyle(ChatFormatting.DARK_GRAY));

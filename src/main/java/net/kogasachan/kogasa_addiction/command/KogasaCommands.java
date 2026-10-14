@@ -3,11 +3,15 @@ package net.kogasachan.kogasa_addiction.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
-import net.kogasachan.kogasa_addiction.event.KogasaGrowthHandler;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
+import net.kogasachan.kogasa_addiction.event.server.KogasaGrowthHandler;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
@@ -37,6 +41,13 @@ import java.util.Map;
 
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class KogasaCommands {
+    private static final SuggestionProvider<CommandSourceStack> ABILITY_SUGGESTIONS =
+            (ctx, builder) -> {
+                for (KogasaAbility ability : KogasaAbility.values()) {
+                    builder.suggest(ability.getId());
+                }
+                return builder.buildFuture();
+            };
 
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
@@ -78,6 +89,31 @@ public class KogasaCommands {
                         // /kogasa triggerenchant
                         .then(Commands.literal("triggerenchant")
                                 .executes(KogasaCommands::triggerEnchant))
+                        // /kogasa addability <ability>
+                        .then(Commands.literal("addability")
+                                .then(Commands.argument("ability", StringArgumentType.word())
+                                        .suggests(ABILITY_SUGGESTIONS)
+                                        .executes(ctx -> addAbility(ctx,
+                                                StringArgumentType.getString(ctx, "ability")))))
+                        // /kogasa removeability <ability>
+                        .then(Commands.literal("removeability")
+                                .then(Commands.argument("ability", StringArgumentType.word())
+                                        .suggests(ABILITY_SUGGESTIONS)
+                                        .executes(ctx -> removeAbility(ctx,
+                                                StringArgumentType.getString(ctx, "ability")))))
+                        // /kogasa clearabilities
+                        .then(Commands.literal("clearabilities")
+                                .executes(KogasaCommands::clearAbilities))
+                        // /kogasa newsvalue <amount>
+                        .then(Commands.literal("newsvalue")
+                                .then(Commands.argument("amount", DoubleArgumentType.doubleArg(0.0, 100.0))
+                                        .executes(ctx -> newsValue(ctx,
+                                                DoubleArgumentType.getDouble(ctx, "amount")))))
+                        // /kogasa setnewsvalue <value>
+                        .then(Commands.literal("setnewsvalue")
+                                .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 100.0))
+                                        .executes(ctx -> setNewsValue(ctx,
+                                                DoubleArgumentType.getDouble(ctx, "value")))))
         );
     }
 
@@ -272,6 +308,40 @@ public class KogasaCommands {
             }
         }
 
+        // 能力
+        List<KogasaAbility> abilities = KogasaAbilityData.getAbilities(held);
+        int maxSlots = KogasaAbilityData.getMaxAbilitySlots(held);
+
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.info.abilities.header",
+                abilities.size(), maxSlots), false);
+
+        if (abilities.isEmpty()) {
+            ctx.getSource().sendSuccess(() -> Component.translatable(
+                    "commands.kogasa_addiction.info.abilities.none"), false);
+        } else {
+            for (KogasaAbility ability : abilities) {
+                ctx.getSource().sendSuccess(() -> Component.literal(
+                        "  §7- " + ability.getDisplayName().getString()), false);
+            }
+        }
+
+        // AYA 新闻值（仅当有 AYA 能力）
+        if (KogasaAbilityData.hasAbility(held, KogasaAbility.AYA)) {
+            double news = KogasaAbilityData.getNewsValue(held);
+            int killed = KogasaAbilityData.getKilledMobCount(held);
+            int mined = KogasaAbilityData.getMinedBlockCount(held);
+            int damaged = KogasaAbilityData.getDamageTakenCount(held);
+
+            ctx.getSource().sendSuccess(() -> Component.translatable(
+                    "commands.kogasa_addiction.info.news_value",
+                    String.format("%.4f", news),
+                    String.format("%.2f%%", news * 100)), false);
+            ctx.getSource().sendSuccess(() -> Component.translatable(
+                    "commands.kogasa_addiction.info.news_records",
+                    killed, mined, damaged), false);
+        }
+
         return 1;
     }
 
@@ -382,6 +452,170 @@ public class KogasaCommands {
         final String growthStr = String.format("%.4f", before);
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.triggerenchant.success", growthStr, d), true);
+        return 1;
+    }
+
+    // ==================== addability ====================
+
+    private static int addAbility(CommandContext<CommandSourceStack> ctx, String abilityId)
+            throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        ItemStack held = player.getMainHandItem();
+
+        if (!(held.getItem() instanceof IKogasaEquipment)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.not_kogasa"));
+            return 0;
+        }
+
+        KogasaAbility ability = KogasaAbility.byId(abilityId);
+        if (ability == null) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.unknown_ability", abilityId));
+            return 0;
+        }
+
+        if (KogasaAbilityData.hasAbility(held, ability)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.already_has_ability",
+                    ability.getDisplayName()));
+            return 0;
+        }
+
+        int current = KogasaAbilityData.getAbilities(held).size();
+        int max = KogasaAbilityData.getMaxAbilitySlots(held);
+        if (current >= max) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.ability_slots_full", current, max));
+            return 0;
+        }
+
+        KogasaAbilityData.addAbility(held, ability);
+        player.getInventory().setChanged();
+
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.addability.success",
+                ability.getDisplayName()), true);
+        return 1;
+    }
+
+// ==================== removeability ====================
+
+    private static int removeAbility(CommandContext<CommandSourceStack> ctx, String abilityId)
+            throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        ItemStack held = player.getMainHandItem();
+
+        if (!(held.getItem() instanceof IKogasaEquipment)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.not_kogasa"));
+            return 0;
+        }
+
+        KogasaAbility ability = KogasaAbility.byId(abilityId);
+        if (ability == null) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.unknown_ability", abilityId));
+            return 0;
+        }
+
+        if (!KogasaAbilityData.removeAbility(held, ability)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.doesnt_have_ability",
+                    ability.getDisplayName()));
+            return 0;
+        }
+
+        player.getInventory().setChanged();
+
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.removeability.success",
+                ability.getDisplayName()), true);
+        return 1;
+    }
+
+// ==================== clearabilities ====================
+
+    private static int clearAbilities(CommandContext<CommandSourceStack> ctx)
+            throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        ItemStack held = player.getMainHandItem();
+
+        if (!(held.getItem() instanceof IKogasaEquipment)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.not_kogasa"));
+            return 0;
+        }
+
+        KogasaAbilityData.clearAbilities(held);
+        player.getInventory().setChanged();
+
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.clearabilities.success"), true);
+        return 1;
+    }
+
+// ==================== newsvalue ====================
+
+    private static int newsValue(CommandContext<CommandSourceStack> ctx, double amount)
+            throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        ItemStack held = player.getMainHandItem();
+
+        if (!(held.getItem() instanceof IKogasaEquipment)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.not_kogasa"));
+            return 0;
+        }
+
+        if (!KogasaAbilityData.hasAbility(held, KogasaAbility.AYA)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.requires_aya"));
+            return 0;
+        }
+
+        double before = KogasaAbilityData.getNewsValue(held);
+        KogasaAbilityData.addNewsValue(held, amount);
+        double after = KogasaAbilityData.getNewsValue(held);
+
+        player.getInventory().setChanged();
+
+        final double b = before, a = after;
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.newsvalue.success",
+                String.format("%.4f", b),
+                String.format("%.4f", a)), true);
+        return 1;
+    }
+
+    // ==================== setnewsvalue ====================
+
+    private static int setNewsValue(CommandContext<CommandSourceStack> ctx, double value)
+            throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        ItemStack held = player.getMainHandItem();
+
+        if (!(held.getItem() instanceof IKogasaEquipment)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.not_kogasa"));
+            return 0;
+        }
+
+        if (!KogasaAbilityData.hasAbility(held, KogasaAbility.AYA)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.requires_aya"));
+            return 0;
+        }
+
+        double max = Config.MAX_NEWS_VALUE.get();
+        double newVal = Math.min(value, max);
+        KogasaAbilityData.setNewsValue(held, newVal);
+        player.getInventory().setChanged();
+
+        final double v = newVal;
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.setnewsvalue.success",
+                String.format("%.4f", v)), true);
         return 1;
     }
 }

@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "kogasa_addiction.refmap.json",
   "mixins": [
-    "BlastFurnaceMixin"
+    "BlastFurnaceMixin",
+    "IceBlockMixin"
   ],
   "minVersion": "0.8"
 }

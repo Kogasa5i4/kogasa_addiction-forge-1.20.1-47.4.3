@@ -2,6 +2,7 @@ package net.kogasachan.kogasa_addiction;
 
 import com.mojang.logging.LogUtils;
 import net.kogasachan.kogasa_addiction.item.ModItems;
+import net.kogasachan.kogasa_addiction.network.PacketHandler;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -37,6 +38,7 @@ public class KogasaAddiction {
 
     // 位于模组加载的公共初始化阶段，可用于注册酿造配方、网络包//复杂配方序列化器等
     private void commonSetup(final FMLCommonSetupEvent event) {
+        event.enqueueWork(PacketHandler::register);
     }
 
     // 在创造模式物品栏构建时触发，可用于将物品添加到已有的创造模式标签页

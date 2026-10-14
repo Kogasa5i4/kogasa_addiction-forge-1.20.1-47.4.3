@@ -180,4 +180,10 @@ public class KogasaAbilityData {
     public static int getDamageTakenCount(ItemStack stack) {
         return getRecordCount(stack, AYA_DAMAGES_TAKEN);
     }
+
+    public static void setNewsValue(ItemStack stack, double value) {
+        CompoundTag tag = getTag(stack);
+        tag.putDouble(NEWS_VALUE, value);
+        saveTag(stack, tag);
+    }
 }

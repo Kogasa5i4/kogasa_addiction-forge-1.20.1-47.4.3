@@ -93,7 +93,7 @@ public class KogasaEquipmentData {
      * 是否已解锁成长
      */
     public static boolean isGrowthUnlocked(ItemStack stack) {
-        return getReinforcements(stack) >= MixinConfigCache.growthUnlockReinforcements;
+        return getReinforcements(stack) >= ModConfigCache.growthUnlockReinforcements;
     }
 
     /**

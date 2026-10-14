@@ -1,4 +1,4 @@
-package net.kogasachan.kogasa_addiction.event;
+package net.kogasachan.kogasa_addiction.event.client;
 
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
@@ -7,7 +7,7 @@ import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
-import net.kogasachan.kogasa_addiction.util.MixinConfigCache;
+import net.kogasachan.kogasa_addiction.util.ModConfigCache;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -113,7 +113,7 @@ public class KogasaTooltipHandler {
         }
 
         // ===== 成长信息（Ctrl，仅解锁后显示） =====
-        if (re >= MixinConfigCache.growthUnlockReinforcements) {
+        if (re >= ModConfigCache.growthUnlockReinforcements) {
             if (Screen.hasControlDown()) {
                 String percent = String.format("%.2f%%", growth * 100);
                 tooltip.add(Component.translatable(

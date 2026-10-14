@@ -21,6 +21,8 @@ public class KogasaAddiction {
     // 模组主类
     // modid 注册
     public static final String MODID = "kogasa_addiction";
+    // 方便配置文件而进行的中版本的版本号注册
+    public static final String VERSION = "2.0";
 
     public static final Logger LOGGER = LogUtils.getLogger();
 
@@ -33,7 +35,11 @@ public class KogasaAddiction {
         MinecraftForge.EVENT_BUS.register(this);
 
         ModItems.ITEMS.register(modEventBus);
-        context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        context.registerConfig(
+                ModConfig.Type.COMMON,
+                Config.SPEC,
+                "kogasa_addiction_" + VERSION + ".toml"
+        );
     }
 
     // 位于模组加载的公共初始化阶段，可用于注册酿造配方、网络包//复杂配方序列化器等

@@ -30,7 +30,7 @@ public class Config {
     public static final ForgeConfigSpec.DoubleValue KOGASA_INGOT_CHANCE = BUILDER
             .comment("Chance per burning tick (1/20 seconds) to produce a kogasa ingot. 0.01 = 1%.")
             .comment("每游戏刻（1/20秒）伞之锭掉落的概率，0.01 = 1%。")
-            .defineInRange("kogasaIngotChance", 0.000005, 0.0, 1.0);
+            .defineInRange("kogasaIngotChance", 0.001, 0.0, 1.0);
 
     public static final ForgeConfigSpec.IntValue KOGASA_INGOT_SEARCH_HEIGHT = BUILDER
             .comment("Maximum upward search height for kogasa ingot drop position.")

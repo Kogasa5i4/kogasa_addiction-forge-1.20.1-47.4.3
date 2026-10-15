@@ -10,7 +10,7 @@ import net.minecraftforge.fml.event.config.ModConfigEvent;
 public class ModConfigCache {
 
     public static boolean enableBlastFurnaceIngot = true;
-    public static float blastFurnaceIngotChance = 0.000005f;
+    public static float blastFurnaceIngotChance = 0.001f;
     public static int growthUnlockReinforcements = 3;
     public static double cirnoIngotDropChance = 0.09;
     public static int kogasaIngotSearchHeight = 8;

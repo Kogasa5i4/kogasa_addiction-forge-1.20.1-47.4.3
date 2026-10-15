@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public enum KogasaAbility {
@@ -12,6 +13,22 @@ public enum KogasaAbility {
     CIRNO("cirno", "冰之小妖精"),
     KOISHI("koishi", "紧闭的恋之瞳"),
     KOGASA("kogasa", "愉快的遗忘之伞");
+
+    public List<String> getObtainKeys() {
+        return switch (this) {
+            case KOGASA -> List.of(
+                    "tooltip.kogasa_addiction.ability_ingot.obtain.kogasa.1");
+            case AYA -> List.of(
+                    "tooltip.kogasa_addiction.ability_ingot.obtain.aya.1",
+                    "tooltip.kogasa_addiction.ability_ingot.obtain.aya.2");
+            case CIRNO -> List.of(
+                    "tooltip.kogasa_addiction.ability_ingot.obtain.cirno.1",
+                    "tooltip.kogasa_addiction.ability_ingot.obtain.cirno.2");
+            case KOISHI -> List.of(
+                    "tooltip.kogasa_addiction.ability_ingot.obtain.koishi.1",
+                    "tooltip.kogasa_addiction.ability_ingot.obtain.koishi.2");
+        };
+    }
 
     private static final Map<String, KogasaAbility> BY_ID = new HashMap<>();
 

@@ -10,17 +10,22 @@ import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.kogasachan.kogasa_addiction.util.ModConfigCache;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, value = Dist.CLIENT,
@@ -204,6 +209,52 @@ public class KogasaTooltipHandler {
                                 String.format("%.3f", totalMult))
                         .withStyle(ChatFormatting.GOLD));
             }
+
+            if (KogasaAbilityData.hasAmmo(stack)) {
+                var ammoType = KogasaAbilityData.getAmmoType(stack);
+                if (ammoType == KogasaAbilityData.AmmoType.POTION) {
+                    ResourceLocation potionId = KogasaAbilityData.getAmmoPotionId(stack);
+                    if (potionId != null) {
+                        KogasaAbilityData.PotionKind kind = KogasaAbilityData.getAmmoPotionKind(stack);
+                        Component potionName = getPotionDisplayName(potionId, kind);
+                        tooltip.add(Component.translatable(
+                                        "tooltip.kogasa_addiction.ammo.potion", potionName)
+                                .withStyle(ChatFormatting.LIGHT_PURPLE));
+                    }
+                    var potion = ForgeRegistries.POTIONS.getValue(potionId);
+                    if (potion != null) {
+                        for (var effect : potion.getEffects()) {
+                            tooltip.add(buildEffectLine(effect));
+                        }
+                    }
+                } else if (ammoType == KogasaAbilityData.AmmoType.FIREWORK) {
+                    tooltip.add(Component.translatable("tooltip.kogasa_addiction.ammo.firework")
+                            .withStyle(ChatFormatting.GOLD));
+
+                    // 解析烟花 NBT 并显示详情
+                    ItemStack fireworkStack = KogasaAbilityData.getFireworkStack(stack);
+                    if (!fireworkStack.isEmpty()) {
+                        tooltip.addAll(getFireworkInfo(fireworkStack));
+                    }
+                }
+            }
+
+            // ===== 远程武器专属：穿透、多发 =====
+            if (stack.getItem() instanceof BowItem || stack.getItem() instanceof CrossbowItem) {
+                int pierceLevel = KogasaEquipmentHelper.getBowPierceLevel(stack);
+                int arrowCount = KogasaEquipmentHelper.getBowArrowCount(stack);
+
+                if (pierceLevel > 0) {
+                    tooltip.add(Component.translatable(
+                                    "tooltip.kogasa_addiction.ranged.pierce", pierceLevel)
+                            .withStyle(ChatFormatting.AQUA));
+                }
+                if (arrowCount > 1) {
+                    tooltip.add(Component.translatable(
+                                    "tooltip.kogasa_addiction.ranged.multishot", arrowCount)
+                            .withStyle(ChatFormatting.AQUA));
+                }
+            }
         } else {
             tooltip.add(Component.translatable("tooltip.kogasa_addiction.hint.alt")
                     .withStyle(ChatFormatting.DARK_GRAY));
@@ -214,11 +265,172 @@ public class KogasaTooltipHandler {
      * 把 "minecraft:iron_sword" 转成玩家当前语言下的物品显示名
      */
     private static Component getItemDisplayName(String id) {
-        ResourceLocation loc = ResourceLocation.tryParse(id);
+        // 处理 "arrow:" 前缀：剥掉后按物品 ID 解析
+        String actualId = id;
+        boolean isArrow = false;
+        if (id.startsWith("arrow:")) {
+            actualId = id.substring("arrow:".length());
+            isArrow = true;
+        }
+
+        ResourceLocation loc = ResourceLocation.tryParse(actualId);
         if (loc == null) return Component.literal(id);
 
         var item = ForgeRegistries.ITEMS.getValue(loc);
         if (item == null || item == Items.AIR) return Component.literal(id);
-        return new ItemStack(item).getHoverName();
+
+        Component name = new ItemStack(item).getHoverName();
+        if (isArrow) {
+            // 显示"16× 箭"而不是"箭"，提示消耗数量
+            return Component.translatable(
+                    "tooltip.kogasa_addiction.reinforcement.entry.arrow", name);
+        }
+        return name;
+    }
+
+    private static Component getPotionDisplayName(ResourceLocation potionId,
+                                                  KogasaAbilityData.PotionKind kind) {
+        var potion = ForgeRegistries.POTIONS.getValue(potionId);
+        if (potion == null) return Component.literal(potionId.toString());
+
+        ItemStack potionStack = switch (kind) {
+            case REGULAR -> new ItemStack(Items.POTION);
+            case SPLASH -> new ItemStack(Items.SPLASH_POTION);
+            case LINGERING -> new ItemStack(Items.LINGERING_POTION);
+        };
+        PotionUtils.setPotion(potionStack, potion);
+        return potionStack.getHoverName();
+    }
+
+    /**
+     * 解析烟花火箭的 NBT，返回多行描述
+     */
+    private static List<Component> getFireworkInfo(ItemStack fireworkStack) {
+        List<Component> lines = new ArrayList<>();
+        CompoundTag nbt = fireworkStack.getTag();
+        if (nbt == null || !nbt.contains("Fireworks", Tag.TAG_COMPOUND)) {
+            return lines;
+        }
+
+        CompoundTag fireworks = nbt.getCompound("Fireworks");
+
+        // 飞行时间
+        if (fireworks.contains("Flight", Tag.TAG_BYTE)) {
+            int flight = fireworks.getByte("Flight");
+            lines.add(Component.translatable(
+                            "tooltip.kogasa_addiction.ammo.firework.flight", flight)
+                    .withStyle(ChatFormatting.GRAY));
+        }
+
+        // 爆炸列表
+        ListTag explosions = fireworks.getList("Explosions", Tag.TAG_COMPOUND);
+        if (explosions.isEmpty()) {
+            lines.add(Component.translatable(
+                            "tooltip.kogasa_addiction.ammo.firework.empty")
+                    .withStyle(ChatFormatting.DARK_GRAY));
+            return lines;
+        }
+
+        for (int i = 0; i < explosions.size(); i++) {
+            CompoundTag exp = explosions.getCompound(i);
+            lines.add(buildExplosionLine(exp, i + 1, explosions.size()));
+        }
+
+        return lines;
+    }
+
+    private static Component buildExplosionLine(CompoundTag exp, int index, int total) {
+        // 形状
+        int type = exp.getByte("Type");
+        String shapeKey = switch (type) {
+            case 0 -> "item.minecraft.firework_star.shape.small_ball";
+            case 1 -> "item.minecraft.firework_star.shape.large_ball";
+            case 2 -> "item.minecraft.firework_star.shape.star";
+            case 3 -> "item.minecraft.firework_star.shape.creeper";
+            case 4 -> "item.minecraft.firework_star.shape.burst";
+            default -> "item.minecraft.firework_star.shape.small_ball";
+        };
+
+        MutableComponent line = Component.literal("  " + index + ". ")
+                .append(Component.translatable(shapeKey));
+
+        // 颜色（主色 + 渐变色）
+        int[] colors = exp.getIntArray("Colors");
+        int[] fadeColors = exp.getIntArray("FadeColors");
+
+        if (colors.length > 0) {
+            line.append(Component.literal(" "));
+            for (int i = 0; i < colors.length; i++) {
+                if (i > 0) line.append(Component.literal("/"));
+                line.append(colorComponent(colors[i]));
+            }
+        }
+        if (fadeColors.length > 0) {
+            line.append(Component.literal(" → "));
+            for (int i = 0; i < fadeColors.length; i++) {
+                if (i > 0) line.append(Component.literal("/"));
+                line.append(colorComponent(fadeColors[i]));
+            }
+        }
+
+        // 拖尾 / 闪烁
+        List<Component> flags = new ArrayList<>();
+        if (exp.getBoolean("Trail")) {
+            flags.add(Component.translatable(
+                    "tooltip.kogasa_addiction.ammo.firework.trail"));
+        }
+        if (exp.getBoolean("Flicker")) {
+            flags.add(Component.translatable(
+                    "tooltip.kogasa_addiction.ammo.firework.flicker"));
+        }
+        if (!flags.isEmpty()) {
+            line.append(Component.literal(" ["));
+            for (int i = 0; i < flags.size(); i++) {
+                if (i > 0) line.append(Component.literal(", "));
+                line.append(flags.get(i));
+            }
+            line.append(Component.literal("]"));
+        }
+
+        return line.withStyle(ChatFormatting.LIGHT_PURPLE);
+    }
+
+    /**
+     * int RGB → 颜色名 Component（优先匹配原版染料色）
+     */
+    private static Component colorComponent(int rgb) {
+        for (DyeColor dye : DyeColor.values()) {
+            if (dye.getFireworkColor() == rgb) {
+                return Component.translatable(
+                                "item.minecraft.firework_star." + dye.getName())
+                        .withStyle(style -> style.withColor(dye.getTextColor()));
+            }
+        }
+        // 非原版颜色：显示十六进制
+        return Component.literal(String.format("#%06X", rgb))
+                .withStyle(ChatFormatting.GRAY);
+    }
+
+    private static Component buildEffectLine(MobEffectInstance effect) {
+        Component name = effect.getEffect().getDisplayName();
+        int level = effect.getAmplifier() + 1;
+
+        MutableComponent line = Component.literal("  ").append(name);
+
+        if (level > 1) {
+            line.append(Component.literal(" ")
+                    .append(Component.translatable("enchantment.level." + level)));
+        }
+
+        return line.withStyle(ChatFormatting.GRAY);
+    }
+
+    private static String formatDuration(int totalSeconds) {
+        if (totalSeconds < 60) {
+            return totalSeconds + "s";
+        }
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return String.format("%d:%02d", minutes, seconds);
     }
 }

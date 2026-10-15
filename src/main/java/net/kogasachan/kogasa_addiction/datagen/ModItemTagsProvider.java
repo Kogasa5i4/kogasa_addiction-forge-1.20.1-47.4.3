@@ -36,5 +36,8 @@ public class ModItemTagsProvider extends ItemTagsProvider {
         this.tag(Tags.Items.ARMORS_CHESTPLATES).add(ModItems.KOGASA_CHESTPLATE.get());
         this.tag(Tags.Items.ARMORS_LEGGINGS).add(ModItems.KOGASA_LEGGINGS.get());
         this.tag(Tags.Items.ARMORS_BOOTS).add(ModItems.KOGASA_BOOTS.get());
+
+        this.tag(ItemTags.ARROWS)
+                .add(ModItems.AYA_ARROW.get());
     }
 }

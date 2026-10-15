@@ -21,14 +21,15 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceArgument;
 import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -114,6 +115,28 @@ public class KogasaCommands {
                                 .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0, 100.0))
                                         .executes(ctx -> setNewsValue(ctx,
                                                 DoubleArgumentType.getDouble(ctx, "value")))))
+                        // /kogasa setammo potion <potion>
+                        .then(Commands.literal("setammo")
+                                .then(Commands.literal("potion")
+                                        .then(Commands.argument("potion", ResourceArgument.resource(buildContext, Registries.POTION))
+                                                .executes(ctx -> setAmmoPotion(ctx,
+                                                        ResourceArgument.getResource(ctx, "potion", Registries.POTION).key().location(),
+                                                        KogasaAbilityData.PotionKind.REGULAR))))
+                                .then(Commands.literal("splash")
+                                        .then(Commands.argument("potion", ResourceArgument.resource(buildContext, Registries.POTION))
+                                                .executes(ctx -> setAmmoPotion(ctx,
+                                                        ResourceArgument.getResource(ctx, "potion", Registries.POTION).key().location(),
+                                                        KogasaAbilityData.PotionKind.SPLASH))))
+                                .then(Commands.literal("lingering")
+                                        .then(Commands.argument("potion", ResourceArgument.resource(buildContext, Registries.POTION))
+                                                .executes(ctx -> setAmmoPotion(ctx,
+                                                        ResourceArgument.getResource(ctx, "potion", Registries.POTION).key().location(),
+                                                        KogasaAbilityData.PotionKind.LINGERING))))
+                                .then(Commands.literal("firework")
+                                        .executes(KogasaCommands::setAmmoFirework)))
+                        // /kogasa clearammo
+                        .then(Commands.literal("clearammo")
+                                .executes(KogasaCommands::clearAmmo))
         );
     }
 
@@ -172,27 +195,53 @@ public class KogasaCommands {
             return 0;
         }
 
-        TagKey<Item> matchTag = KogasaEquipmentHelper.getMatchingTag(held);
-        if (matchTag == null || !material.is(matchTag)) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "commands.kogasa_addiction.error.wrong_type"));
-            return 0;
+        // ===== 判断材料类型 =====
+        boolean isRanged = isRangedWeapon(held);
+        boolean isArrowMaterial = isRanged && material.is(ItemTags.ARROWS);
+
+        String materialId;
+        int materialCost = 1;
+
+        if (isRanged) {
+            if (isArrowMaterial) {
+                materialId = "arrow:" + ForgeRegistries.ITEMS.getKey(material.getItem());
+                materialCost = 16;
+                // 箭矢不限重复
+            } else if (material.getItem() instanceof BowItem
+                    || material.getItem() instanceof CrossbowItem) {
+                ResourceLocation rightId = ForgeRegistries.ITEMS.getKey(material.getItem());
+                if (rightId == null) return 0;
+                materialId = rightId.toString();
+                if (KogasaEquipmentData.hasUsedMaterial(held, materialId)) {
+                    ctx.getSource().sendFailure(Component.translatable(
+                            "commands.kogasa_addiction.error.already_absorbed", materialId));
+                    return 0;
+                }
+            } else {
+                ctx.getSource().sendFailure(Component.translatable(
+                        "commands.kogasa_addiction.error.wrong_type"));
+                return 0;
+            }
+        } else {
+            TagKey<Item> matchTag = KogasaEquipmentHelper.getMatchingTag(held);
+            if (matchTag == null || !material.is(matchTag)) {
+                ctx.getSource().sendFailure(Component.translatable(
+                        "commands.kogasa_addiction.error.wrong_type"));
+                return 0;
+            }
+            ResourceLocation rightId = ForgeRegistries.ITEMS.getKey(material.getItem());
+            if (rightId == null) return 0;
+            materialId = rightId.toString();
+            if (KogasaEquipmentData.hasUsedMaterial(held, materialId)) {
+                ctx.getSource().sendFailure(Component.translatable(
+                        "commands.kogasa_addiction.error.already_absorbed", materialId));
+                return 0;
+            }
         }
 
-        ResourceLocation materialId = ForgeRegistries.ITEMS.getKey(material.getItem());
-        if (materialId == null) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "commands.kogasa_addiction.error.invalid_material"));
-            return 0;
-        }
-        if (KogasaEquipmentData.hasUsedMaterial(held, materialId.toString())) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "commands.kogasa_addiction.error.already_absorbed", materialId.toString()));
-            return 0;
-        }
-
+        // ===== 应用 =====
         KogasaEquipmentData.setReinforcements(held, re + 1);
-        KogasaEquipmentData.addUsedMaterial(held, materialId.toString());
+        KogasaEquipmentData.addUsedMaterial(held, materialId);
 
         double baseValue = KogasaEquipmentHelper.getEquipmentBaseValue(material);
         double ratio = KogasaEquipmentHelper.getAbsorbedRatio(material);
@@ -206,6 +255,7 @@ public class KogasaCommands {
         final int oldRe = re;
         final int newRe = re + 1;
         final double absorbValue = absorb;
+        final int cost = materialCost;
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.reinforce.success",
                 oldRe, newRe, String.format("%.2f", absorbValue)), true);
@@ -340,6 +390,33 @@ public class KogasaCommands {
             ctx.getSource().sendSuccess(() -> Component.translatable(
                     "commands.kogasa_addiction.info.news_records",
                     killed, mined, damaged), false);
+        }
+
+        // 弹药（仅远程武器）
+        if (isRangedWeapon(held) && KogasaAbilityData.hasAmmo(held)) {
+            var ammoType = KogasaAbilityData.getAmmoType(held);
+            if (ammoType == KogasaAbilityData.AmmoType.POTION) {
+                ResourceLocation potionId = KogasaAbilityData.getAmmoPotionId(held);
+                var kind = KogasaAbilityData.getAmmoPotionKind(held);
+                if (potionId != null) {
+                    String desc = potionId + " [" + kind.name().toLowerCase() + "]";
+                    ctx.getSource().sendSuccess(() -> Component.translatable(
+                            "commands.kogasa_addiction.info.ammo.potion", desc), false);
+                }
+            } else if (ammoType == KogasaAbilityData.AmmoType.FIREWORK) {
+                ctx.getSource().sendSuccess(() -> Component.translatable(
+                        "commands.kogasa_addiction.info.ammo.firework"), false);
+            }
+        }
+
+        // 远程武器专属：穿透、多发
+        if (isRangedWeapon(held)) {
+            int pierce = KogasaEquipmentHelper.getBowPierceLevel(held);
+            int arrows = KogasaEquipmentHelper.getBowArrowCount(held);
+            ctx.getSource().sendSuccess(() -> Component.translatable(
+                    "commands.kogasa_addiction.info.ranged.pierce", pierce), false);
+            ctx.getSource().sendSuccess(() -> Component.translatable(
+                    "commands.kogasa_addiction.info.ranged.multishot", arrows), false);
         }
 
         return 1;
@@ -499,7 +576,7 @@ public class KogasaCommands {
         return 1;
     }
 
-// ==================== removeability ====================
+    // ==================== removeability ====================
 
     private static int removeAbility(CommandContext<CommandSourceStack> ctx, String abilityId)
             throws CommandSyntaxException {
@@ -534,7 +611,7 @@ public class KogasaCommands {
         return 1;
     }
 
-// ==================== clearabilities ====================
+    // ==================== clearabilities ====================
 
     private static int clearAbilities(CommandContext<CommandSourceStack> ctx)
             throws CommandSyntaxException {
@@ -555,7 +632,7 @@ public class KogasaCommands {
         return 1;
     }
 
-// ==================== newsvalue ====================
+    // ==================== newsvalue ====================
 
     private static int newsValue(CommandContext<CommandSourceStack> ctx, double amount)
             throws CommandSyntaxException {
@@ -617,5 +694,124 @@ public class KogasaCommands {
                 "commands.kogasa_addiction.setnewsvalue.success",
                 String.format("%.4f", v)), true);
         return 1;
+    }
+
+    // ==================== setammo ====================
+
+    private static int setAmmoPotion(CommandContext<CommandSourceStack> ctx,
+                                     ResourceLocation potionId,
+                                     KogasaAbilityData.PotionKind kind)
+            throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        ItemStack held = player.getMainHandItem();
+
+        if (!(held.getItem() instanceof IKogasaEquipment)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.not_kogasa"));
+            return 0;
+        }
+        if (!isRangedWeapon(held)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.not_ranged"));
+            return 0;
+        }
+
+        // 槽位检查
+        int used = KogasaAbilityData.getUsedSlots(held);
+        int max = KogasaAbilityData.getMaxAbilitySlots(held);
+        if (used >= max) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.ability_slots_full", used, max));
+            return 0;
+        }
+
+        KogasaAbilityData.setPotionAmmo(held, potionId, kind);
+        player.getInventory().setChanged();
+
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.setammo.potion.success",
+                potionId.toString(),
+                kind.name().toLowerCase()), true);
+        return 1;
+    }
+
+    private static int setAmmoFirework(CommandContext<CommandSourceStack> ctx)
+            throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        ItemStack held = player.getMainHandItem();
+
+        if (!(held.getItem() instanceof IKogasaEquipment)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.not_kogasa"));
+            return 0;
+        }
+        if (!isRangedWeapon(held)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.not_ranged"));
+            return 0;
+        }
+
+        // 从副手取烟花 NBT
+        ItemStack offhand = player.getOffhandItem();
+        if (!offhand.is(Items.FIREWORK_ROCKET)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.firework_required"));
+            return 0;
+        }
+        CompoundTag nbt = offhand.getTag();
+        if (nbt == null || !nbt.contains("Fireworks")) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.firework_invalid"));
+            return 0;
+        }
+
+        // 槽位检查
+        int used = KogasaAbilityData.getUsedSlots(held);
+        int max = KogasaAbilityData.getMaxAbilitySlots(held);
+        if (used >= max) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.ability_slots_full", used, max));
+            return 0;
+        }
+
+        KogasaAbilityData.setFireworkAmmo(held, nbt.copy());
+        player.getInventory().setChanged();
+
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.setammo.firework.success"), true);
+        return 1;
+    }
+
+// ==================== clearammo ====================
+
+    private static int clearAmmo(CommandContext<CommandSourceStack> ctx)
+            throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        ItemStack held = player.getMainHandItem();
+
+        if (!(held.getItem() instanceof IKogasaEquipment)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.not_kogasa"));
+            return 0;
+        }
+        if (!KogasaAbilityData.hasAmmo(held)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.no_ammo"));
+            return 0;
+        }
+
+        KogasaAbilityData.clearAmmo(held);
+        player.getInventory().setChanged();
+
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.clearammo.success"), true);
+        return 1;
+    }
+
+    // ==================== 辅助 ====================
+
+    private static boolean isRangedWeapon(ItemStack stack) {
+        return stack.getItem() instanceof BowItem
+                || stack.getItem() instanceof CrossbowItem;
     }
 }

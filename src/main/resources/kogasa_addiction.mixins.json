@@ -5,6 +5,8 @@
   "refmap": "kogasa_addiction.refmap.json",
   "mixins": [
     "BlastFurnaceMixin",
+    "CrossbowAutoReloadMixin",
+    "CrossbowMixin",
     "IceBlockMixin"
   ],
   "minVersion": "0.8"

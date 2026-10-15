@@ -28,23 +28,30 @@ public class KogasaAbilityIngotItem extends Item {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level,
                                 List<Component> tooltip, @NotNull TooltipFlag flag) {
-        // 能力名
+        // 1. 能力名
         tooltip.add(Component.translatable(
                         "tooltip.kogasa_addiction.ability_ingot.ability",
                         ability.getDisplayName())
                 .withStyle(ChatFormatting.AQUA));
 
-        // 能力描述
+        // 2. 能力描述
         tooltip.add(ability.getDescription()
                 .copy()
                 .withStyle(ChatFormatting.GRAY));
 
-        // 获取方式提示
-        tooltip.add(Component.translatable(
-                        "tooltip.kogasa_addiction.ability_ingot.obtain." + ability.getId())
-                .withStyle(ChatFormatting.DARK_GRAY));
+        // 3. 空行分隔
+        tooltip.add(Component.empty());
 
-        // 使用提示
+        // 4. 获取方式
+        tooltip.add(Component.translatable(
+                        "tooltip.kogasa_addiction.ability_ingot.obtain.header")
+                .withStyle(ChatFormatting.YELLOW));
+        for (String key : ability.getObtainKeys()) {
+            tooltip.add(Component.translatable(key).withStyle(ChatFormatting.GRAY));
+        }
+
+        // 5. 空行 + 使用提示
+        tooltip.add(Component.empty());
         tooltip.add(Component.translatable(
                         "tooltip.kogasa_addiction.ability_ingot.usage")
                 .withStyle(ChatFormatting.DARK_GRAY));

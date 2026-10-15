@@ -8,6 +8,8 @@ import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -16,6 +18,8 @@ import net.minecraft.world.item.*;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class KogasaEquipmentHelper {
@@ -381,5 +385,59 @@ public class KogasaEquipmentHelper {
             return 1.0;
         }
         return 1.0 + KogasaAbilityData.getNewsValue(stack);
+    }
+
+    /**
+     * 弓弩穿透等级：成长值达到阈值时返回 1
+     */
+    public static int getBowPierceLevel(ItemStack stack) {
+        double growth = KogasaEquipmentData.getGrowth(stack);
+        return growth >= Config.BOW_PIERCE_GROWTH.get() ? 1 : 0;
+    }
+
+    /**
+     * 弓弩多发数量
+     */
+    public static int getBowArrowCount(ItemStack stack) {
+        double growth = KogasaEquipmentData.getGrowth(stack);
+        if (growth >= Config.BOW_MULTISHOT_3_GROWTH.get()) return 3;
+        if (growth >= Config.BOW_MULTISHOT_2_GROWTH.get()) return 2;
+        return 1;
+    }
+
+    /**
+     * 弩是否解锁自动装填
+     */
+    public static boolean isCrossbowAutoReload(ItemStack stack) {
+        double threshold = Config.CROSSBOW_AUTO_RELOAD_GROWTH.get();
+        if (threshold <= 0.0) return false;
+        return KogasaEquipmentData.getGrowth(stack) >= threshold;
+    }
+
+    /**
+     * 对药水效果应用 Cirno 增强：
+     * - 等级 +2
+     * - 时长 ×1.5
+     * - 缓慢特殊处理：至少 V 级（amplifier = 4）
+     */
+    public static List<MobEffectInstance> applyCirnoPotionBoost(
+            List<MobEffectInstance> original) {
+        List<MobEffectInstance> boosted = new ArrayList<>();
+        int levelBonus = Config.CIRNO_POTION_LEVEL_BONUS.get();
+        float durationMultiplier = Config.CIRNO_POTION_DURATION_MULTIPLIER.get().floatValue();
+
+        for (MobEffectInstance effect : original) {
+            int newAmplifier = effect.getAmplifier() + levelBonus;
+            int newDuration = (int) (effect.getDuration() * durationMultiplier);
+
+            if (effect.getEffect() == MobEffects.MOVEMENT_SLOWDOWN) {
+                newAmplifier = Math.max(newAmplifier, 4);  // 缓慢至少 V
+            }
+
+            boosted.add(new MobEffectInstance(
+                    effect.getEffect(), newDuration, newAmplifier,
+                    effect.isAmbient(), effect.isVisible(), effect.showIcon()));
+        }
+        return boosted;
     }
 }

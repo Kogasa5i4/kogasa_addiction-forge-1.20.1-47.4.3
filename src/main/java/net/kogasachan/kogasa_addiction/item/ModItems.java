@@ -2,6 +2,7 @@ package net.kogasachan.kogasa_addiction.item;
 
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
@@ -87,5 +88,19 @@ public class ModItems {
             "kogasa_boots",
             () -> new KogasaArmorItem(KogasaArmorMaterial.INSTANCE,
                     ArmorItem.Type.BOOTS, new Item.Properties())
+    );
+
+    // 远程
+    public static final RegistryObject<Item> AYA_BOW = ITEMS.register(
+            "aya_bow",
+            () -> new AyaBowItem(new Item.Properties().durability(384))
+    );
+    public static final RegistryObject<Item> AYA_CROSSBOW = ITEMS.register(
+            "aya_crossbow",
+            () -> new AyaCrossbowItem(new Item.Properties().durability(465))
+    );
+    public static final RegistryObject<Item> AYA_ARROW = ITEMS.register(
+            "aya_arrow",
+            () -> new AyaArrowItem(new Item.Properties())
     );
 }

@@ -92,14 +92,16 @@ public class AnvilReinforcementCategory implements IRecipeCategory<AnvilReinforc
         builder.addOutputSlot(108, 1)
                 .addItemStack(recipe.output())
                 .addRichTooltipCallback((slotView, tooltip) -> {
-                    if (recipe.kind() == RecipeKind.ABILITY) {
-                        tooltip.add(Component.translatable(
+                    switch (recipe.kind()) {
+                        case ABILITY -> tooltip.add(Component.translatable(
                                         "jei.kogasa_addiction.hint.ability")
                                 .withStyle(ChatFormatting.AQUA));
-                    } else {
-                        tooltip.add(Component.translatable(
+                        case REINFORCEMENT -> tooltip.add(Component.translatable(
                                         "jei.kogasa_addiction.hint.reinforcement")
                                 .withStyle(ChatFormatting.GOLD));
+                        case AMMO -> tooltip.add(Component.translatable(
+                                        "jei.kogasa_addiction.hint.ammo")
+                                .withStyle(ChatFormatting.LIGHT_PURPLE));
                     }
                 });
     }
@@ -148,9 +150,11 @@ public class AnvilReinforcementCategory implements IRecipeCategory<AnvilReinforc
 
         // 经验消耗
         // 经验成本根据类型选择
-        int cost = recipe.kind() == RecipeKind.ABILITY
-                ? Config.ABILITY_INFUSION_COST.get()
-                : Config.REINFORCEMENT_COST.get();
+        int cost = switch (recipe.kind()) {
+            case ABILITY -> Config.ABILITY_INFUSION_COST.get();
+            case REINFORCEMENT -> Config.REINFORCEMENT_COST.get();
+            case AMMO -> Config.AMMO_INFUSION_COST.get();
+        };
         String experienceString = Component.translatable(
                 "jei.kogasa_addiction.anvil.experience", cost).getString();
 
@@ -171,11 +175,24 @@ public class AnvilReinforcementCategory implements IRecipeCategory<AnvilReinforc
 
     @Override
     public @Nullable ResourceLocation getRegistryName(AnvilReinforcementRecipe recipe) {
-        // 为每个配方返回一个唯一的 ResourceLocation
-        // 可以使用输入物品的注册名 + 材料标签的路径来构造
         ResourceLocation inputId = ForgeRegistries.ITEMS.getKey(recipe.input().getItem());
         if (inputId == null) return null;
+
+        String materialPart = "none";
+        if (!recipe.materials().isEmpty()) {
+            ItemStack first = recipe.materials().get(0);
+            ResourceLocation matId = ForgeRegistries.ITEMS.getKey(first.getItem());
+            if (matId != null) {
+                materialPart = matId.getPath();
+                if (first.getCount() > 1) {
+                    materialPart += "_x" + first.getCount();
+                }
+            }
+        }
+
         return ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID,
-                "anvil_reinforcement/" + inputId.getPath());
+                "anvil/" + recipe.kind().name().toLowerCase()
+                        + "/" + inputId.getPath()
+                        + "/" + materialPart);
     }
 }

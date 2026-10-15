@@ -25,6 +25,9 @@ public class CreativeTabHandler {
             event.accept(ModItems.KOGASA_CHESTPLATE);
             event.accept(ModItems.KOGASA_LEGGINGS);
             event.accept(ModItems.KOGASA_BOOTS);
+            event.accept(ModItems.AYA_BOW);
+            event.accept(ModItems.AYA_CROSSBOW);
+            event.accept(ModItems.AYA_ARROW);
         }
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(ModItems.KOGASA_PICKAXE);

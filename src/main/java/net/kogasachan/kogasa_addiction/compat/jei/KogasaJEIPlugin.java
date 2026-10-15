@@ -13,6 +13,7 @@ import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -116,6 +117,10 @@ public class KogasaJEIPlugin implements IModPlugin {
             recipes.add(new AnvilReinforcementRecipe(
                     input, materials, output, RecipeKind.REINFORCEMENT));
         }
+
+        // ===== 弓弩强化配方：16 支箭 =====
+        registerBowArrowRecipe(recipes, ModItems.AYA_BOW.get());
+        registerBowArrowRecipe(recipes, ModItems.AYA_CROSSBOW.get());
     }
 
     @Override
@@ -133,11 +138,14 @@ public class KogasaJEIPlugin implements IModPlugin {
     public void registerRecipes(@NotNull IRecipeRegistration registration) {
         List<AnvilReinforcementRecipe> recipes = new ArrayList<>();
 
-        // ========== 1. 能力配方（4 个，排前面） ==========
+        // 1. 能力配方（4 个）
         registerAbilityRecipes(recipes);
 
-        // ========== 2. 强化配方（9 个） ==========
+        // 2. 强化配方（11 个）
         registerReinforcementRecipes(recipes);
+
+        // 3. 弹药配方（8 个）
+        registerAmmoRecipes(recipes);
 
         KogasaAddiction.LOGGER.info("Registered {} JEI anvil recipes", recipes.size());
         registration.addRecipes(AnvilReinforcementCategory.RECIPE_TYPE, recipes);
@@ -148,5 +156,99 @@ public class KogasaJEIPlugin implements IModPlugin {
         if (!ModList.get().isLoaded("jei")) return;
         // 将铁砧注册为“铁砧强化”类别的催化剂
         registration.addRecipeCatalyst(new ItemStack(Items.ANVIL), AnvilReinforcementCategory.RECIPE_TYPE);
+    }
+
+    /**
+     * 弓弩用 16 支箭矢强化
+     */
+    private static void registerBowArrowRecipe(List<AnvilReinforcementRecipe> recipes, Item bowItem) {
+        ItemStack input = new ItemStack(bowItem);
+
+        // 用 ItemTags.ARROWS 里的前几个箭矢作为代表
+        List<ItemStack> arrows = new ArrayList<>();
+        BuiltInRegistries.ITEM.getTagOrEmpty(ItemTags.ARROWS).forEach(holder -> {
+            Item item = holder.value();
+            if (item == Items.AIR) return;
+            ItemStack stack = new ItemStack(item, 16);  // count=16 让 JEI 显示 "16x"
+            arrows.add(stack);
+        });
+        if (arrows.isEmpty()) return;
+
+        ItemStack output = input.copy();
+        KogasaEquipmentData.setReinforcements(output, 1);
+
+        recipes.add(new AnvilReinforcementRecipe(
+                input, arrows, output, RecipeKind.REINFORCEMENT));
+    }
+
+    /**
+     * 弓弩装载弹药
+     */
+    private static void registerAmmoRecipes(List<AnvilReinforcementRecipe> recipes) {
+        // 三种药水 × 两种弓弩
+        registerPotionAmmoRecipes(recipes, ModItems.AYA_BOW.get(),
+                Items.POTION, KogasaAbilityData.PotionKind.REGULAR);
+        registerPotionAmmoRecipes(recipes, ModItems.AYA_BOW.get(),
+                Items.SPLASH_POTION, KogasaAbilityData.PotionKind.SPLASH);
+        registerPotionAmmoRecipes(recipes, ModItems.AYA_BOW.get(),
+                Items.LINGERING_POTION, KogasaAbilityData.PotionKind.LINGERING);
+
+        registerPotionAmmoRecipes(recipes, ModItems.AYA_CROSSBOW.get(),
+                Items.POTION, KogasaAbilityData.PotionKind.REGULAR);
+        registerPotionAmmoRecipes(recipes, ModItems.AYA_CROSSBOW.get(),
+                Items.SPLASH_POTION, KogasaAbilityData.PotionKind.SPLASH);
+        registerPotionAmmoRecipes(recipes, ModItems.AYA_CROSSBOW.get(),
+                Items.LINGERING_POTION, KogasaAbilityData.PotionKind.LINGERING);
+
+        // 烟花 × 两种弓弩
+        registerFireworkAmmoRecipe(recipes, ModItems.AYA_BOW.get());
+        registerFireworkAmmoRecipe(recipes, ModItems.AYA_CROSSBOW.get());
+    }
+
+    private static void registerPotionAmmoRecipes(List<AnvilReinforcementRecipe> recipes,
+                                                  Item weaponItem, Item potionItem,
+                                                  KogasaAbilityData.PotionKind kind) {
+        ItemStack input = new ItemStack(weaponItem);
+        ItemStack output = input.copy();
+
+        // 用代表药水 ID 构造输出（tooltip 会说明"任意药水"）
+        KogasaAbilityData.setPotionAmmo(output,
+                ResourceLocation.fromNamespaceAndPath("minecraft", "healing"), kind);
+
+        // 材料：列举常用的几种药水
+        List<ItemStack> potions = new ArrayList<>();
+        for (var potion : List.of(
+                net.minecraft.world.item.alchemy.Potions.HEALING,
+                net.minecraft.world.item.alchemy.Potions.SWIFTNESS,
+                net.minecraft.world.item.alchemy.Potions.STRENGTH,
+                net.minecraft.world.item.alchemy.Potions.HARMING,
+                net.minecraft.world.item.alchemy.Potions.SLOWNESS,
+                net.minecraft.world.item.alchemy.Potions.POISON)) {
+            ItemStack stack = new ItemStack(potionItem);
+            net.minecraft.world.item.alchemy.PotionUtils.setPotion(stack, potion);
+            potions.add(stack);
+        }
+
+        recipes.add(new AnvilReinforcementRecipe(
+                input, potions, output, RecipeKind.AMMO));
+    }
+
+    private static void registerFireworkAmmoRecipe(List<AnvilReinforcementRecipe> recipes,
+                                                   Item weaponItem) {
+        ItemStack input = new ItemStack(weaponItem);
+        ItemStack output = input.copy();
+
+        // 用空的烟花 NBT 标记
+        CompoundTag emptyFireworkNbt = new CompoundTag();
+        CompoundTag fireworkTag = new CompoundTag();
+        fireworkTag.putByte("Flight", (byte) 1);
+        emptyFireworkNbt.put("Fireworks", fireworkTag);
+        KogasaAbilityData.setFireworkAmmo(output, emptyFireworkNbt);
+
+        // 材料：烟花火箭
+        List<ItemStack> fireworks = List.of(new ItemStack(Items.FIREWORK_ROCKET));
+
+        recipes.add(new AnvilReinforcementRecipe(
+                input, fireworks, output, RecipeKind.AMMO));
     }
 }

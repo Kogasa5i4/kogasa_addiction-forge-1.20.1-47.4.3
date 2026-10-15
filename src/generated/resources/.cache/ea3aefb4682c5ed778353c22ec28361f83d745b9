@@ -1,4 +1,7 @@
-// 1.20.1	2026-10-13T22:40:26.9572097	Item Models: kogasa_addiction
+// 1.20.1	2026-10-15T12:56:39.0751712	Item Models: kogasa_addiction
+a91dc6f457e68420fc9c65e99b0db7521b607e62 assets/kogasa_addiction/models/item/aya_arrow.json
+6d875daa7cf6eb4aeb3f90ee88b69435e6fca444 assets/kogasa_addiction/models/item/aya_bow.json
+f0d3c0df32f7175aeee87d2a54d364ed6559586c assets/kogasa_addiction/models/item/aya_crossbow.json
 f8f1ed43191af03450f7e31b95d54ffe19f92235 assets/kogasa_addiction/models/item/aya_ingot.json
 cd32a30f4ba2bc14b8d9741e8a675bd9d630a9be assets/kogasa_addiction/models/item/cirno_ingot.json
 24a221de8262e37fca8cba8a1ff15564ece0b4bb assets/kogasa_addiction/models/item/kogasa_axe.json

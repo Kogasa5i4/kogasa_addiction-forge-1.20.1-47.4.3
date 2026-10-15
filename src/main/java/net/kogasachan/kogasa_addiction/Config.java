@@ -60,6 +60,11 @@ public class Config {
             .comment("强化消耗的经验等级。")
             .defineInRange("reinforcementCost", 1, 0, Integer.MAX_VALUE);
 
+    public static final ForgeConfigSpec.IntValue AMMO_INFUSION_COST = BUILDER
+            .comment("Experience level cost to infuse special ammo into an aya bow/crossbow.")
+            .comment("在铁砧中为文之弓/弩装载特殊弹药消耗的经验等级。")
+            .defineInRange("ammoInfusionCost", 3, 0, 100);
+
     public static final ForgeConfigSpec.DoubleValue WEAPON_ABSORBED_RATIO = BUILDER
             .comment("Absorbed value ratio for weapons and tools.")
             .comment("强化时吸收的武器/工具属性比例。")
@@ -147,16 +152,6 @@ public class Config {
             .comment("吸收值是否参与倍率放大")
             .define("absorbedValueIncludedInMultiplier", true);
 
-    public static final ForgeConfigSpec.DoubleValue KNOCKBACK_BASE_RESISTANCE = BUILDER
-            .comment("Base knockback resistance. Default 0.05 (half of netherite).")
-            .comment("基础击退抗性。默认 0.05（下界合金的一半）。")
-            .defineInRange("knockbackBaseResistance", 0.05, 0.0, Double.MAX_VALUE);
-
-    public static final ForgeConfigSpec.DoubleValue KNOCKBACK_MAX_PER_PIECE = BUILDER
-            .comment("Asymptotic max knockback resistance per armor piece.")
-            .comment("每件护甲的最大击退抗性（成长值越高越接近这个值）")
-            .defineInRange("knockbackMaxPerPiece", 0.25, 0.01, Double.MAX_VALUE);
-
     public static final ForgeConfigSpec.IntValue DURABILITY_FIXED_PER_REINFORCEMENT = BUILDER
             .comment("Fixed durability added per reinforcement.")
             .comment("每次强化增加的固定耐久值")
@@ -167,10 +162,22 @@ public class Config {
             .comment("每次强化因强化次数而增加的耐久值比例。0.1 = +10%。")
             .defineInRange("durabilityRatioPerReinforcement", 0.2, 0.0, Double.MAX_VALUE);
 
+    static {
+        BUILDER.push("equipment.tool");
+    }
+
     public static final ForgeConfigSpec.DoubleValue MINING_SPEED_RATIO_PER_REINFORCEMENT = BUILDER
             .comment("Mining speed ratio added per reinforcement. 0.5 = +50% per level.")
             .comment("每次强化增加的挖掘速度倍率。0.5 = 每级 +50%。")
             .defineInRange("miningSpeedRatioPerReinforcement", 1.5, 0.0, 10.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.push("equipment.weapon");
+    }
 
     public static final ForgeConfigSpec.DoubleValue ATTACK_SPEED_CAP = BUILDER
             .comment("Attack speed cap (bare-hand speed). Default 4.0.")
@@ -186,6 +193,52 @@ public class Config {
 
     static {
         BUILDER.pop();
+    }
+
+    static {
+        BUILDER.push("equipment.armor");
+    }
+
+    public static final ForgeConfigSpec.DoubleValue KNOCKBACK_BASE_RESISTANCE = BUILDER
+            .comment("Base knockback resistance. Default 0.05 (half of netherite).")
+            .comment("基础击退抗性。默认 0.05（下界合金的一半）。")
+            .defineInRange("knockbackBaseResistance", 0.05, 0.0, Double.MAX_VALUE);
+
+    public static final ForgeConfigSpec.DoubleValue KNOCKBACK_MAX_PER_PIECE = BUILDER
+            .comment("Asymptotic max knockback resistance per armor piece.")
+            .comment("每件护甲的最大击退抗性（成长值越高越接近这个值）")
+            .defineInRange("knockbackMaxPerPiece", 0.25, 0.01, Double.MAX_VALUE);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.push("equipment.ranged");
+    }
+
+    public static final ForgeConfigSpec.DoubleValue BOW_PIERCE_GROWTH = BUILDER
+            .comment("Growth required for bows/crossbows to gain Pierce I.")
+            .comment("弓弩获得穿透 I 所需的成长值。")
+            .defineInRange("bowPierceGrowth", 0.5, 0.0, Double.MAX_VALUE);
+
+    public static final ForgeConfigSpec.DoubleValue BOW_MULTISHOT_2_GROWTH = BUILDER
+            .comment("Growth required for 2-arrow multishot.")
+            .comment("解锁双发所需的成长值。")
+            .defineInRange("bowMultishot2Growth", 1.5, 0.0, Double.MAX_VALUE);
+
+    public static final ForgeConfigSpec.DoubleValue BOW_MULTISHOT_3_GROWTH = BUILDER
+            .comment("Growth required for 3-arrow multishot.")
+            .comment("解锁三发所需的成长值。")
+            .defineInRange("bowMultishot3Growth", 2.5, 0.0, Double.MAX_VALUE);
+
+    public static final ForgeConfigSpec.DoubleValue CROSSBOW_AUTO_RELOAD_GROWTH = BUILDER
+            .comment("Growth required for crossbow auto-reload. 0 = disabled.")
+            .comment("弩自动装填所需的成长值。0 = 禁用。")
+            .defineInRange("crossbowAutoReloadGrowth", 2.0, 0.0, Double.MAX_VALUE);
+
+    static {
+        BUILDER.pop(2);
     }
 
     static {
@@ -330,6 +383,144 @@ public class Config {
 
     static {
         BUILDER.pop(2);
+    }
+
+    // ============================================================
+    // 远程武器
+    // ============================================================
+    static {
+        BUILDER.push("ranged");
+    }
+
+    // ===== 通用 =====
+    public static final ForgeConfigSpec.DoubleValue RANGED_MULTISHOT_SPREAD = BUILDER
+            .comment("Multishot spread angle in degrees. 8 = ±4° for 3 arrows.")
+            .comment("多发散射角度（度）。8 = 三发时 ±4°。")
+            .defineInRange("multishotSpread", 8.0, 0.0, 45.0);
+
+    static {
+        BUILDER.push("ranged.aya");
+    }
+    // ===== AYA 远程能力 =====
+    public static final ForgeConfigSpec.BooleanValue ENABLE_AYA_RANGED = BUILDER
+            .comment("Enable Aya ranged ability (Speed + Haste on projectile hit).")
+            .comment("启用文文远程能力（命中时给射手迅捷 + 急迫）。")
+            .define("enableAyaRanged", true);
+
+    public static final ForgeConfigSpec.IntValue AYA_SPEED_DURATION_TICKS = BUILDER
+            .comment("Speed effect duration in ticks. 60 = 3s.")
+            .comment("迅捷持续时间（tick）。60 = 3秒。")
+            .defineInRange("ayaSpeedDurationTicks", 60, 1, 72000);
+
+    public static final ForgeConfigSpec.IntValue AYA_SPEED_LEVEL = BUILDER
+            .comment("Speed effect level shown to player. 1 = Speed I.")
+            .comment("迅捷效果等级（玩家看到的）。1 = 迅捷 I。")
+            .defineInRange("ayaSpeedLevel", 1, 1, 10);
+
+    public static final ForgeConfigSpec.IntValue AYA_HASTE_DURATION_TICKS = BUILDER
+            .comment("Haste effect duration in ticks. 60 = 3s.")
+            .comment("急迫持续时间（tick）。60 = 3秒。")
+            .defineInRange("ayaHasteDurationTicks", 60, 1, 72000);
+
+    public static final ForgeConfigSpec.IntValue AYA_HASTE_LEVEL = BUILDER
+            .comment("Haste effect level shown to player. 1 = Haste I.")
+            .comment("急迫效果等级（玩家看到的）。1 = 急迫 I。")
+            .defineInRange("ayaHasteLevel", 1, 1, 10);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.push("ranged.cirno");
+    }
+
+    // ===== CIRNO 远程能力 =====
+    public static final ForgeConfigSpec.BooleanValue ENABLE_CIRNO_RANGED = BUILDER
+            .comment("Enable Cirno ranged ability (enhanced potions + Slowness on plain arrows).")
+            .comment("启用琪露诺远程能力（强化药水 + 无药水箭附加缓慢）。")
+            .define("enableCirnoRanged", true);
+
+    public static final ForgeConfigSpec.IntValue CIRNO_POTION_LEVEL_BONUS = BUILDER
+            .comment("Bonus potion amplifier levels from Cirno ability. 2 = +2 levels.")
+            .comment("琪露诺对药水等级的加成。2 = +2 级。")
+            .defineInRange("cirnoPotionLevelBonus", 2, 0, 10);
+
+    public static final ForgeConfigSpec.DoubleValue CIRNO_POTION_DURATION_MULTIPLIER = BUILDER
+            .comment("Potion duration multiplier from Cirno ability. 1.5 = 150%.")
+            .comment("琪露诺对药水持续时间的倍率。1.5 = 150%。")
+            .defineInRange("cirnoPotionDurationMultiplier", 1.5, 1.0, 10.0);
+
+    public static final ForgeConfigSpec.IntValue CIRNO_SLOWNESS_DURATION_TICKS = BUILDER
+            .comment("Slowness duration on plain arrow hit. 600 = 30s.")
+            .comment("无药水箭命中时对目标施加的缓慢时长（tick）。600 = 30秒。")
+            .defineInRange("cirnoSlownessDurationTicks", 600, 1, 72000);
+
+    public static final ForgeConfigSpec.IntValue CIRNO_SLOWNESS_LEVEL = BUILDER
+            .comment("Slowness level on plain arrow hit. 5 = Slowness V.")
+            .comment("无药水箭命中时对目标施加的缓慢等级（玩家看到的）。5 = 缓慢 V。")
+            .defineInRange("cirnoSlownessLevel", 5, 1, 10);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.push("ranged.kogasa");
+    }
+
+    // ===== KOGASA 远程能力 =====
+    public static final ForgeConfigSpec.BooleanValue ENABLE_KOGASA_RANGED = BUILDER
+            .comment("Enable Kogasa ranged ability (consecutive hit damage bonus).")
+            .comment("启用伞之远程能力（连续命中伤害加成）。")
+            .define("enableKogasaRanged", true);
+
+    public static final ForgeConfigSpec.IntValue KOGASA_STREAK_RESET_TICKS = BUILDER
+            .comment("Time window for consecutive hits in ticks. 60 = 3s.")
+            .comment("连续命中的判定窗口（tick）。60 = 3秒内命中算连续。")
+            .defineInRange("kogasaStreakResetTicks", 60, 1, 72000);
+
+    public static final ForgeConfigSpec.DoubleValue KOGASA_STREAK_BONUS = BUILDER
+            .comment("Damage bonus per consecutive hit. 0.1 = +10% per hit.")
+            .comment("每次连续命中的伤害加成。0.1 = 每次 +10%。")
+            .defineInRange("kogasaStreakBonus", 0.1, 0.0, 100.0);
+
+    public static final ForgeConfigSpec.IntValue KOGASA_STREAK_MAX = BUILDER
+            .comment("Maximum streak count. 0 = unlimited.")
+            .comment("连续命中的最大层数。0 = 无上限。")
+            .defineInRange("kogasaStreakMax", 10, 0, 1000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.push("ranged.koishi");
+    }
+
+    // ===== KOISHI 远程能力 =====
+    public static final ForgeConfigSpec.BooleanValue ENABLE_KOISHI_RANGED = BUILDER
+            .comment("Enable Koishi ranged ability (armor-piercing crit).")
+            .comment("启用恋恋远程能力（穿甲暴击）。")
+            .define("enableKoishiRanged", true);
+
+    public static final ForgeConfigSpec.DoubleValue KOISHI_RANGED_CRIT_CHANCE = BUILDER
+            .comment("Chance for armor-piercing crit. 0.75 = 75%.")
+            .comment("穿甲暴击概率。0.75 = 75%。")
+            .defineInRange("koishiRangedCritChance", 0.75, 0.0, 1.0);
+
+    public static final ForgeConfigSpec.DoubleValue KOISHI_RANGED_CRIT_MULTIPLIER = BUILDER
+            .comment("Damage multiplier on crit. 1.5 = 150%.")
+            .comment("暴击伤害倍率。1.5 = 150%。")
+            .defineInRange("koishiRangedCritMultiplier", 1.5, 1.0, 100.0);
+
+    public static final ForgeConfigSpec.DoubleValue KOISHI_PROJECTILE_IMMUNE_MULTIPLIER = BUILDER
+            .comment("Damage multiplier against projectile-immune targets. 3.0 = 300%.")
+            .comment("对弹射物免疫目标的伤害倍率。3.0 = 300%。")
+            .defineInRange("koishiProjectileImmuneMultiplier", 3.0, 1.0, 100.0);
+
+    static {
+        BUILDER.pop(2);  // ranged
     }
 
     public static final ForgeConfigSpec SPEC = BUILDER.build();

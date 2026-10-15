@@ -5,8 +5,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -185,5 +187,98 @@ public class KogasaAbilityData {
         CompoundTag tag = getTag(stack);
         tag.putDouble(NEWS_VALUE, value);
         saveTag(stack, tag);
+    }
+
+    // ==================== 弹药 ====================
+
+    private static final String AMMO = "Ammo";
+    private static final String AMMO_TYPE = "Type";
+    private static final String AMMO_POTION = "Potion";
+    private static final String AMMO_POTION_KIND = "PotionKind";
+    private static final String AMMO_FIREWORK_NBT = "FireworkNbt";
+
+    public enum AmmoType { POTION, FIREWORK }
+    public enum PotionKind { REGULAR, SPLASH, LINGERING }
+
+    public static boolean hasAmmo(ItemStack stack) {
+        return getTag(stack).contains(AMMO, Tag.TAG_COMPOUND);
+    }
+
+    public static void setPotionAmmo(ItemStack stack, ResourceLocation potionId, PotionKind kind) {
+        CompoundTag tag = getTag(stack);
+        CompoundTag ammo = new CompoundTag();
+        ammo.putString(AMMO_TYPE, "potion");
+        ammo.putString(AMMO_POTION, potionId.toString());
+        ammo.putString(AMMO_POTION_KIND, kind.name().toLowerCase());
+        tag.put(AMMO, ammo);
+        saveTag(stack, tag);
+    }
+
+    public static void setFireworkAmmo(ItemStack stack, CompoundTag fireworkNbt) {
+        CompoundTag tag = getTag(stack);
+        CompoundTag ammo = new CompoundTag();
+        ammo.putString(AMMO_TYPE, "firework");
+        ammo.put(AMMO_FIREWORK_NBT, fireworkNbt.copy());
+        tag.put(AMMO, ammo);
+        saveTag(stack, tag);
+    }
+
+    public static void clearAmmo(ItemStack stack) {
+        CompoundTag tag = getTag(stack);
+        tag.remove(AMMO);
+        saveTag(stack, tag);
+    }
+
+    @Nullable
+    public static AmmoType getAmmoType(ItemStack stack) {
+        CompoundTag tag = getTag(stack);
+        if (!tag.contains(AMMO, Tag.TAG_COMPOUND)) return null;
+        String type = tag.getCompound(AMMO).getString(AMMO_TYPE);
+        return switch (type) {
+            case "potion" -> AmmoType.POTION;
+            case "firework" -> AmmoType.FIREWORK;
+            default -> null;
+        };
+    }
+
+    @Nullable
+    public static ResourceLocation getAmmoPotionId(ItemStack stack) {
+        CompoundTag tag = getTag(stack);
+        if (!tag.contains(AMMO, Tag.TAG_COMPOUND)) return null;
+        String id = tag.getCompound(AMMO).getString(AMMO_POTION);
+        return id.isEmpty() ? null : ResourceLocation.tryParse(id);
+    }
+
+    public static PotionKind getAmmoPotionKind(ItemStack stack) {
+        CompoundTag tag = getTag(stack);
+        if (!tag.contains(AMMO, Tag.TAG_COMPOUND)) return PotionKind.REGULAR;
+        String kind = tag.getCompound(AMMO).getString(AMMO_POTION_KIND);
+        return switch (kind) {
+            case "splash" -> PotionKind.SPLASH;
+            case "lingering" -> PotionKind.LINGERING;
+            default -> PotionKind.REGULAR;
+        };
+    }
+
+    /**
+     * 从 NBT 重建烟花 ItemStack
+     */
+    public static ItemStack getFireworkStack(ItemStack stack) {
+        CompoundTag tag = getTag(stack);
+        if (!tag.contains(AMMO, Tag.TAG_COMPOUND)) return ItemStack.EMPTY;
+        CompoundTag nbt = tag.getCompound(AMMO).getCompound(AMMO_FIREWORK_NBT);
+        if (nbt.isEmpty()) return ItemStack.EMPTY;
+        ItemStack firework = new ItemStack(net.minecraft.world.item.Items.FIREWORK_ROCKET);
+        firework.setTag(nbt.copy());
+        return firework;
+    }
+
+    /**
+     * 总槽位占用 = 能力数量 + 弹药占用
+     */
+    public static int getUsedSlots(ItemStack stack) {
+        int abilities = getAbilities(stack).size();
+        int ammo = hasAmmo(stack) ? 1 : 0;
+        return abilities + ammo;
     }
 }

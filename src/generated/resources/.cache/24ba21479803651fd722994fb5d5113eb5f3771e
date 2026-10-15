@@ -1,8 +1,9 @@
-// 1.20.1	2026-10-12T10:59:31.0291914	Tags for minecraft:item mod id kogasa_addiction
+// 1.20.1	2026-10-15T12:56:39.0729887	Tags for minecraft:item mod id kogasa_addiction
 ac6cd982a9d8bc7978fbdd68445d82e2c44eaa0c data/forge/tags/items/armors/boots.json
 c6ada436f71c803fd28c7585f16b0cd33e9151f9 data/forge/tags/items/armors/chestplates.json
 cf51110fcdea595c270dcd09d9b7a299bd21109f data/forge/tags/items/armors/helmets.json
 032ea3f7af784d51389f17628f0f11cc1a32c589 data/forge/tags/items/armors/leggings.json
+c0cd33ffa613b33a62d6204c6f5c26629e0a46dc data/minecraft/tags/items/arrows.json
 cf3d339be01c52a5cca14c355dd1dacd31ee0615 data/minecraft/tags/items/axes.json
 43c3cb3c3aa783b78da9c41b9052a9ab77d56253 data/minecraft/tags/items/hoes.json
 6a0c9ce846a1d11d11c84007110de9c67dfbd3eb data/minecraft/tags/items/pickaxes.json

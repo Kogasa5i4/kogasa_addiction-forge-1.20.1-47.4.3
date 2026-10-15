@@ -1,11 +1,12 @@
 package net.kogasachan.kogasa_addiction.datagen;
 
+import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.item.ModItems;
+import net.kogasachan.kogasa_addiction.recipe.AyaArrowTippingRecipe;
+import net.kogasachan.kogasa_addiction.recipe.ModRecipes;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.*;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.jetbrains.annotations.NotNull;
@@ -105,5 +106,38 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('I', ModItems.KOGASA_INGOT.get())
                 .unlockedBy("has_ingot", has(ModItems.KOGASA_INGOT.get()))
                 .save(writer);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.AYA_BOW.get())
+                .pattern(" #X")
+                .pattern("# X")
+                .pattern(" #X")
+                .define('#', ModItems.AYA_INGOT.get())
+                .define('X', Items.STRING)
+                .unlockedBy("has_aya_ingot", has(ModItems.AYA_INGOT.get()))
+                .save(writer);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.AYA_CROSSBOW.get())
+                .pattern("#X#")
+                .pattern("&Y&")
+                .pattern(" # ")
+                .define('#', Items.STICK)
+                .define('&', Items.STRING)
+                .define('X', ModItems.AYA_INGOT.get())
+                .define('Y', Items.TRIPWIRE_HOOK)
+                .unlockedBy("has_aya_ingot", has(ModItems.AYA_INGOT.get()))
+                .save(writer);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.AYA_ARROW.get(), 4)
+                .pattern("X")
+                .pattern("#")
+                .pattern("Y")
+                .define('X', ModItems.AYA_INGOT.get())
+                .define('#', Items.STICK)
+                .define('Y', Items.FEATHER)
+                .unlockedBy("has_aya_ingot", has(ModItems.AYA_INGOT.get()))
+                .save(writer);
+
+        SpecialRecipeBuilder.special(ModRecipes.AYA_ARROW_TIPPING_SERIALIZER.get())
+                .save(writer, KogasaAddiction.MODID + ":aya_arrow_tipping");
     }
 }

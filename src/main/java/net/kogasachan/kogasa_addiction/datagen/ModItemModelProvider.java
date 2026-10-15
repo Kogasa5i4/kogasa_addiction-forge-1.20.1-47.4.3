@@ -3,6 +3,7 @@ package net.kogasachan.kogasa_addiction.datagen;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.minecraft.data.PackOutput;
+import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
@@ -38,5 +39,50 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.KOGASA_CHESTPLATE.get());
         basicItem(ModItems.KOGASA_LEGGINGS.get());
         basicItem(ModItems.KOGASA_BOOTS.get());
+
+        // 4. 远程武器和专属箭矢。
+        // 第一版先复用原版贴图与拉弓/装填状态模型，不要求现在就制作专属贴图。
+        withExistingParent("aya_arrow", mcLoc("item/arrow"));
+
+        ItemModelBuilder bow = withExistingParent("aya_bow", mcLoc("item/bow"));
+        bow.override()
+                .predicate(mcLoc("pulling"), 1.0F)
+                .model(getExistingFile(mcLoc("item/bow_pulling_0")))
+                .end();
+        bow.override()
+                .predicate(mcLoc("pull"), 0.65F)
+                .predicate(mcLoc("pulling"), 1.0F)
+                .model(getExistingFile(mcLoc("item/bow_pulling_1")))
+                .end();
+        bow.override()
+                .predicate(mcLoc("pull"), 0.9F)
+                .predicate(mcLoc("pulling"), 1.0F)
+                .model(getExistingFile(mcLoc("item/bow_pulling_2")))
+                .end();
+
+        ItemModelBuilder crossbow = withExistingParent("aya_crossbow", mcLoc("item/crossbow"));
+        crossbow.override()
+                .predicate(mcLoc("pulling"), 1.0F)
+                .model(getExistingFile(mcLoc("item/crossbow_pulling_0")))
+                .end();
+        crossbow.override()
+                .predicate(mcLoc("pull"), 0.58F)
+                .predicate(mcLoc("pulling"), 1.0F)
+                .model(getExistingFile(mcLoc("item/crossbow_pulling_1")))
+                .end();
+        crossbow.override()
+                .predicate(mcLoc("pull"), 1.0F)
+                .predicate(mcLoc("pulling"), 1.0F)
+                .model(getExistingFile(mcLoc("item/crossbow_pulling_2")))
+                .end();
+        crossbow.override()
+                .predicate(mcLoc("charged"), 1.0F)
+                .model(getExistingFile(mcLoc("item/crossbow_arrow")))
+                .end();
+        crossbow.override()
+                .predicate(mcLoc("charged"), 1.0F)
+                .predicate(mcLoc("firework"), 1.0F)
+                .model(getExistingFile(mcLoc("item/crossbow_firework")))
+                .end();
     }
 }

@@ -8,10 +8,12 @@ import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.item.KogasaAbilityIngotItem;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -37,8 +39,29 @@ public class KogasaAnvilHandler {
             return;
         }
 
-        // ========== 分支 2：强化（右侧是同类型装备） ==========
+        // ========== 分支 2：弓弩弹药装载 ==========
+        if (isRangedWeapon(left)) {
+            if (handleAmmoInfusion(event, left, right)) return;
+        }
+
+        // 同一种可损坏装备的原版合并优先于自定义强化：
+        // 若耐久修复或右侧附魔合并有意义，就让原版铁砧继续计算。
+        if (shouldUseVanillaCombination(left, right)) return;
+
+        // ========== 分支 3：强化（右侧是同类型装备） ==========
         handleReinforcement(event, left, right);
+    }
+
+    /**
+     * 判断是否应交由原版铁砧处理同物品合并。
+     * 当左侧需要修复、右侧带有损坏耐久，或右侧带有附魔时，优先保留原版合并行为。
+     */
+    private static boolean shouldUseVanillaCombination(ItemStack left, ItemStack right) {
+        if (left.isEmpty() || right.isEmpty()) return false;
+        if (left.getItem() != right.getItem()) return false;
+        if (!left.isDamageableItem()) return false;
+
+        return left.isDamaged() || right.isDamaged() || right.isEnchanted();
     }
 
     /**
@@ -78,27 +101,56 @@ public class KogasaAnvilHandler {
         int re = KogasaEquipmentData.getReinforcements(left);
         int maxRe = KogasaEquipmentHelper.getEffectiveMaxReinforcements(left);
 
-        TagKey<Item> matchTag = KogasaEquipmentHelper.getMatchingTag(left);
-        if (matchTag == null || !right.is(matchTag)) return;
+        // ===== 判断材料是否有效 =====
+        boolean isBowOrCrossbow = left.getItem() instanceof BowItem
+                || left.getItem() instanceof CrossbowItem;
+        boolean isArrowMaterial = isBowOrCrossbow && right.is(ItemTags.ARROWS);
 
-        ResourceLocation rightId = ForgeRegistries.ITEMS.getKey(right.getItem());
-        if (rightId == null) return;
+        String materialId;
+        if (isBowOrCrossbow) {
+            // 弓弩的强化：弓弩本体 或 16 支箭矢
+            if (isArrowMaterial) {
+                if (right.getCount() < 16) return;
+                ResourceLocation arrowId = ForgeRegistries.ITEMS.getKey(right.getItem());
+                if (arrowId == null) return;
+                materialId = "arrow:" + arrowId;
+                // 箭矢不限制重复，跳过 hasUsedMaterial 检查
+            } else if (right.getItem() instanceof BowItem
+                    || right.getItem() instanceof CrossbowItem) {
+                ResourceLocation rightId = ForgeRegistries.ITEMS.getKey(right.getItem());
+                if (rightId == null) return;
+                materialId = rightId.toString();
+                if (KogasaEquipmentData.hasUsedMaterial(left, materialId)) {
+                    event.setOutput(ItemStack.EMPTY);
+                    return;
+                }
+            } else {
+                return;
+            }
+        } else {
+            // 非弓弩走原有逻辑
+            TagKey<Item> matchTag = KogasaEquipmentHelper.getMatchingTag(left);
+            if (matchTag == null || !right.is(matchTag)) return;
 
-        if (KogasaEquipmentData.hasUsedMaterial(left, rightId.toString())) {
-            event.setOutput(ItemStack.EMPTY);
-            event.setCost(0);
-            return;
+            ResourceLocation rightId = ForgeRegistries.ITEMS.getKey(right.getItem());
+            if (rightId == null) return;
+            materialId = rightId.toString();
+            if (KogasaEquipmentData.hasUsedMaterial(left, materialId)) {
+                event.setOutput(ItemStack.EMPTY);
+                return;
+            }
         }
 
+        // ===== 强化上限检查 =====
         if (re >= maxRe) {
             event.setOutput(ItemStack.EMPTY);
-            event.setCost(0);
             return;
         }
 
+        // ===== 应用强化 =====
         ItemStack result = left.copy();
         KogasaEquipmentData.setReinforcements(result, re + 1);
-        KogasaEquipmentData.addUsedMaterial(result, rightId.toString());
+        KogasaEquipmentData.addUsedMaterial(result, materialId);
 
         double baseValue = KogasaEquipmentHelper.getEquipmentBaseValue(right);
         double ratio = KogasaEquipmentHelper.getAbsorbedRatio(right);
@@ -109,6 +161,59 @@ public class KogasaAnvilHandler {
 
         event.setOutput(result);
         event.setCost(Config.REINFORCEMENT_COST.get());
-        event.setMaterialCost(1);
+        event.setMaterialCost(isArrowMaterial ? 16 : 1);
+    }
+
+    private static boolean isRangedWeapon(ItemStack stack) {
+        return stack.getItem() instanceof BowItem
+                || stack.getItem() instanceof CrossbowItem;
+    }
+
+    private static boolean handleAmmoInfusion(AnvilUpdateEvent event,
+                                              ItemStack left, ItemStack right) {
+        // 槽位检查
+        int used = KogasaAbilityData.getUsedSlots(left);
+        int max = KogasaAbilityData.getMaxAbilitySlots(left);
+        if (used >= max) {
+            event.setOutput(ItemStack.EMPTY);
+            event.setCost(0);
+            return true;
+        }
+
+        // ===== 药水（三种） =====
+        if (right.getItem() instanceof PotionItem) {
+            ResourceLocation potionId = ForgeRegistries.POTIONS.getKey(
+                    PotionUtils.getPotion(right));
+            if (potionId == null) return false;
+
+            KogasaAbilityData.PotionKind kind =
+                    right.getItem() instanceof LingeringPotionItem
+                            ? KogasaAbilityData.PotionKind.LINGERING
+                            : right.getItem() instanceof SplashPotionItem
+                            ? KogasaAbilityData.PotionKind.SPLASH
+                            : KogasaAbilityData.PotionKind.REGULAR;
+
+            ItemStack result = left.copy();
+            KogasaAbilityData.setPotionAmmo(result, potionId, kind);
+            event.setOutput(result);
+            event.setCost(Config.AMMO_INFUSION_COST.get());
+            event.setMaterialCost(1);
+            return true;
+        }
+
+        // ===== 烟花 =====
+        if (right.is(Items.FIREWORK_ROCKET)) {
+            CompoundTag nbt = right.getTag();
+            if (nbt == null || !nbt.contains("Fireworks")) return false;
+
+            ItemStack result = left.copy();
+            KogasaAbilityData.setFireworkAmmo(result, nbt.copy());
+            event.setOutput(result);
+            event.setCost(Config.AMMO_INFUSION_COST.get());
+            event.setMaterialCost(1);
+            return true;
+        }
+
+        return false;
     }
 }

@@ -14,6 +14,7 @@ public class ModConfigCache {
     public static int growthUnlockReinforcements = 3;
     public static double cirnoIngotDropChance = 0.09;
     public static int kogasaIngotSearchHeight = 8;
+    public static float rangedMultishotSpread = 8.0f;
 
     @SubscribeEvent
     public static void onConfigLoad(ModConfigEvent.Loading event) {
@@ -31,5 +32,6 @@ public class ModConfigCache {
         growthUnlockReinforcements = Config.GROWTH_UNLOCK_REINFORCEMENTS.get();
         cirnoIngotDropChance = Config.CIRNO_INGOT_DROP_CHANCE.get();
         kogasaIngotSearchHeight = Config.KOGASA_INGOT_SEARCH_HEIGHT.get();
+        rangedMultishotSpread = Config.RANGED_MULTISHOT_SPREAD.get().floatValue();
     }
 }

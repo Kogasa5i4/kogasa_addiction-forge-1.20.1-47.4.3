@@ -99,7 +99,7 @@ public class KogasaGrowthHandler {
         player.getInventory().setChanged();
     }
 
-    private static void addGrowth(ItemStack stack, Player player) {
+    public static void addGrowth(ItemStack stack, Player player) {
         if (!KogasaEquipmentData.isGrowthUnlocked(stack)) return;
 
         double growth = KogasaEquipmentData.getGrowth(stack);

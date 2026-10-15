@@ -78,12 +78,6 @@ public class KogasaAnvilHandler {
         int re = KogasaEquipmentData.getReinforcements(left);
         int maxRe = KogasaEquipmentHelper.getEffectiveMaxReinforcements(left);
 
-        if (re >= maxRe) {
-            event.setOutput(ItemStack.EMPTY);
-            event.setCost(0);
-            return;
-        }
-
         TagKey<Item> matchTag = KogasaEquipmentHelper.getMatchingTag(left);
         if (matchTag == null || !right.is(matchTag)) return;
 
@@ -91,6 +85,12 @@ public class KogasaAnvilHandler {
         if (rightId == null) return;
 
         if (KogasaEquipmentData.hasUsedMaterial(left, rightId.toString())) {
+            event.setOutput(ItemStack.EMPTY);
+            event.setCost(0);
+            return;
+        }
+
+        if (re >= maxRe) {
             event.setOutput(ItemStack.EMPTY);
             event.setCost(0);
             return;

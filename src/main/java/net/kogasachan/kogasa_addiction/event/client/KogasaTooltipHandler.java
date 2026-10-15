@@ -67,25 +67,13 @@ public class KogasaTooltipHandler {
                             "tooltip.kogasa_addiction.reinforcement", re, maxRe)
                     .withStyle(ChatFormatting.GOLD));
 
-            // ===== 倍率信息 =====
-            double reMult = KogasaEquipmentHelper.getReinforcementMultiplier(stack);
+            // 成长倍率
             double growthMult = KogasaEquipmentHelper.getGrowthMultiplier(stack);
-            double totalMult = KogasaEquipmentHelper.getTotalMultiplier(stack);
-
-            tooltip.add(Component.translatable(
-                            "tooltip.kogasa_addiction.multiplier.reinforcement",
-                            String.format("%.2f", reMult))
-                    .withStyle(ChatFormatting.YELLOW));
 
             tooltip.add(Component.translatable(
                             "tooltip.kogasa_addiction.multiplier.growth",
                             String.format("%.2f", growthMult))
                     .withStyle(ChatFormatting.YELLOW));
-
-            tooltip.add(Component.translatable(
-                            "tooltip.kogasa_addiction.multiplier.total",
-                            String.format("%.3f", totalMult))
-                    .withStyle(ChatFormatting.GOLD));
 
             // 已吸收装备
             if (used.isEmpty()) {
@@ -164,14 +152,6 @@ public class KogasaTooltipHandler {
                         .withStyle(ChatFormatting.DARK_GRAY));
             }
 
-            if (KogasaAbilityData.hasAbility(stack, KogasaAbility.KOGASA)) {
-                double reMult = KogasaEquipmentHelper.getReinforcementMultiplier(stack);
-                tooltip.add(Component.translatable(
-                                "tooltip.kogasa_addiction.kogasa.multiplier",
-                                String.format("%.2f", reMult))
-                        .withStyle(ChatFormatting.GOLD));
-            }
-
             if (KogasaAbilityData.hasAbility(stack, KogasaAbility.AYA)) {
                 double news = KogasaAbilityData.getNewsValue(stack);
                 int killed = KogasaAbilityData.getKilledMobCount(stack);
@@ -208,6 +188,21 @@ public class KogasaTooltipHandler {
                                 String.format("%.0f%%", chance),
                                 String.format("%.1f", mult))
                         .withStyle(ChatFormatting.LIGHT_PURPLE));
+            }
+
+            if (KogasaAbilityData.hasAbility(stack, KogasaAbility.KOGASA)) {
+                double reMult = KogasaEquipmentHelper.getReinforcementMultiplier(stack);
+                double totalMult = KogasaEquipmentHelper.getTotalMultiplier(stack);
+
+                tooltip.add(Component.translatable(
+                                "tooltip.kogasa_addiction.multiplier.reinforcement",
+                                String.format("%.2f", reMult))
+                        .withStyle(ChatFormatting.YELLOW));
+
+                tooltip.add(Component.translatable(
+                                "tooltip.kogasa_addiction.multiplier.total",
+                                String.format("%.3f", totalMult))
+                        .withStyle(ChatFormatting.GOLD));
             }
         } else {
             tooltip.add(Component.translatable("tooltip.kogasa_addiction.hint.alt")

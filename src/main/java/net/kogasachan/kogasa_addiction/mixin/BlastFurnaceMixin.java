@@ -23,9 +23,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(AbstractFurnaceBlockEntity.class)
 public class BlastFurnaceMixin {
 
-    @Unique
-    private static final int MAX_UPWARD_SEARCH = ModConfigCache.kogasaIngotSearchHeight;
-
     /**
      * @author Kogasa Chan
      * @reason 高炉燃烧时概率产出伞之锭，优先输出到相邻容器
@@ -79,7 +76,7 @@ public class BlastFurnaceMixin {
 
         // 3. 上方搜索空气
         BlockPos searchPos = pos.above();
-        for (int i = 0; i < MAX_UPWARD_SEARCH; i++) {
+        for (int i = 0; i < ModConfigCache.kogasaIngotSearchHeight; i++) {
             if (kogasa_addiction_forge_1_20_1_47_4_3$canPlaceItemAt(level, searchPos)) {
                 kogasa_addiction_forge_1_20_1_47_4_3$spawnItem(level, searchPos, drop);
                 return;
@@ -123,7 +120,7 @@ public class BlastFurnaceMixin {
         ItemEntity itemEntity = new ItemEntity(
                 level,
                 pos.getX() + 0.5,
-                pos.getY() + 1,
+                pos.getY() + 0.5,
                 pos.getZ() + 0.5,
                 stack
         );

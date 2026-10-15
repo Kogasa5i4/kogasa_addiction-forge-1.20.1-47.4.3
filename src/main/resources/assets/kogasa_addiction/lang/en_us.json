@@ -1,6 +1,6 @@
 {
   "ability.kogasa_addiction.aya": "Traditional Reporter of Fantasy",
-  "ability.kogasa_addiction.aya.desc": "Accumulate growth by first kills, first mined blocks, first damage taken. Independent multiplier.",
+  "ability.kogasa_addiction.aya.desc": "Accumulate growth by first kills, first mined blocks, first damage taken.",
   "ability.kogasa_addiction.cirno": "Ice Fairy",
   "ability.kogasa_addiction.cirno.desc": "Can revive by consuming growth when durability runs out. Attacks apply Slowness IV, but you may also get Slowness.",
   "ability.kogasa_addiction.kogasa": "Merry Forgotten Umbrella",
@@ -29,7 +29,7 @@
   "commands.kogasa_addiction.info.enchants.header": "§eCurrent Enchantments (§f%s§e):",
   "commands.kogasa_addiction.info.growth": "§eGrowth: §f%s (§a%s§f)",
   "commands.kogasa_addiction.info.growth_enchant": "§eGrowth Enchants: §f%s",
-  "commands.kogasa_addiction.info.header": "§6=== %s ===",
+  "commands.kogasa_addiction.info.header": "§6=== %s §6===",
   "commands.kogasa_addiction.info.materials.header": "§eAbsorbed Materials (§f%s§e):",
   "commands.kogasa_addiction.info.materials.none": "§7No materials absorbed yet",
   "commands.kogasa_addiction.info.news_records": "§eRecords: Kills §f%s§e / Blocks §f%s§e / Damage §f%s",

@@ -126,7 +126,7 @@ public class Config {
     public static final ForgeConfigSpec.IntValue MAX_GROWTH_ENCHANTS = BUILDER
             .comment("Maximum number of enchantments granted by growth.")
             .comment("通过成长获得的最大附魔数量。")
-            .defineInRange("maxGrowthEnchants", 100, 0, Integer.MAX_VALUE);
+            .defineInRange("maxGrowthEnchants", 50, 0, Integer.MAX_VALUE);
 
     public static final ForgeConfigSpec.BooleanValue ALLOW_MAX_LEVEL_ENCHANTS = BUILDER
             .comment("If true, granted enchantments get a random level from 1 to max. If false, always level 1.")

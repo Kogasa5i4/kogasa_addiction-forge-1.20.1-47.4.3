@@ -1,6 +1,6 @@
 {
   "ability.kogasa_addiction.aya": "传统的幻想记者",
-  "ability.kogasa_addiction.aya.desc": "首次击杀生物、挖掘方块、受到伤害时累积成长，独立乘算",
+  "ability.kogasa_addiction.aya.desc": "首次击杀生物、挖掘方块、受到伤害时累积新闻值，为装备提供加成",
   "ability.kogasa_addiction.cirno": "冰之小妖精",
   "ability.kogasa_addiction.cirno.desc": "耐久耗尽可消耗成长值复活；攻击附加缓慢 IV，但自身有概率缓慢",
   "ability.kogasa_addiction.kogasa": "愉快的遗忘之伞",
@@ -29,7 +29,7 @@
   "commands.kogasa_addiction.info.enchants.header": "§e当前附魔 (§f%s§e):",
   "commands.kogasa_addiction.info.growth": "§e成长：§f%s (§a%s§f)",
   "commands.kogasa_addiction.info.growth_enchant": "§e成长附魔次数：§f%s",
-  "commands.kogasa_addiction.info.header": "§6=== %s ===",
+  "commands.kogasa_addiction.info.header": "§6=== %s §6===",
   "commands.kogasa_addiction.info.materials.header": "§e已吸收材料 (§f%s§e):",
   "commands.kogasa_addiction.info.materials.none": "§7尚未吸收任何材料",
   "commands.kogasa_addiction.info.news_records": "§e记录：击杀 §f%s§e / 挖掘 §f%s§e / 受伤 §f%s",

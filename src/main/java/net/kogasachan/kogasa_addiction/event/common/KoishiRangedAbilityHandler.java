@@ -81,10 +81,6 @@ public class KoishiRangedAbilityHandler {
      */
     private static DamageSource createArmorBypassingSource(ServerPlayer player) {
         ServerLevel level = (ServerLevel) player.level();
-        DamageType type = level.registryAccess()
-                .registryOrThrow(Registries.DAMAGE_TYPE)
-                .getHolderOrThrow(GENERIC_KILL)
-                .value();
         return new DamageSource(
                 level.registryAccess()
                         .registryOrThrow(Registries.DAMAGE_TYPE)

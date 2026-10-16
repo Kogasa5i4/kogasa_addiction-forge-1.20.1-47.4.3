@@ -19,7 +19,6 @@ public class ModRecipeProvider extends RecipeProvider {
 
     @Override
     protected void buildRecipes(@NotNull Consumer<FinishedRecipe> writer) {
-        var ingot = Ingredient.of(ModItems.KOGASA_INGOT.get());
 
         // 剑
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.KOGASA_SWORD.get())

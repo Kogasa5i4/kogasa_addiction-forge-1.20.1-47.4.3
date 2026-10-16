@@ -237,6 +237,16 @@ public class Config {
             .comment("弩自动装填所需的成长值。0 = 禁用。")
             .defineInRange("crossbowAutoReloadGrowth", 2.0, 0.0, Double.MAX_VALUE);
 
+    public static final ForgeConfigSpec.DoubleValue NO_CONSUME_ARROW_START_GROWTH = BUILDER
+            .comment("Growth required to start arrow-saving chance. 1.0 = 100% growth.")
+            .comment("开始概率不消耗箭矢的成长值阈值。1.0 = 100% 成长。")
+            .defineInRange("noConsumeArrowStartGrowth", 1.0, 0.0, Double.MAX_VALUE);
+
+    public static final ForgeConfigSpec.DoubleValue NO_CONSUME_ARROW_FULL_GROWTH = BUILDER
+            .comment("Growth required for 100% arrow-saving chance. 2.0 = 200% growth.")
+            .comment("达到 100% 不消耗箭矢的成长值。2.0 = 200% 成长。")
+            .defineInRange("noConsumeArrowFullGrowth", 2.0, 0.0, Double.MAX_VALUE);
+
     static {
         BUILDER.pop(2);
     }

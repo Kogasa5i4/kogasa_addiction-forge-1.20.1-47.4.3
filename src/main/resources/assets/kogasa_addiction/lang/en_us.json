@@ -86,6 +86,7 @@
   "kogasa_addiction.ponder.kogasa_ingot.header": "Obtaining Kogasa Ingot",
   "kogasa_addiction.ponder.kogasa_ingot.text_1": "Obtain Kogasa Ingot by burning items in a Blast Furnace",
   "message.kogasa_addiction.cirno_revive": "❄ Cirno's power protected the equipment, but at cost of what? (-%s growth)",
+  "message.kogasa_addiction.first_join_reward": "✦ You received a gift from the Forgotten Umbrella. Hold Alt to see its ability",
   "message.kogasa_addiction.growth_enchant": "✦ The equipment has awakened a new enchantment",
   "message.kogasa_addiction.growth_enchant.max": "✦ The equipment has reached its enchantment limit",
   "message.kogasa_addiction.koishi_ingot.earned": "Release of the Id: Bonus got!",

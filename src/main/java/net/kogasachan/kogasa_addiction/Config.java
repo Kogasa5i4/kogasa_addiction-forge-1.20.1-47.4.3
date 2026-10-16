@@ -14,6 +14,11 @@ public class Config {
             .comment("在挖掘工具的工具提示中显示当前挖掘速度。")
             .define("showMiningSpeed", true);
 
+    public static final ForgeConfigSpec.BooleanValue ENABLE_FIRST_JOIN_REWARD = BUILDER
+            .comment("Give players a random Kogasa equipment with a random ability on their first join.")
+            .comment("玩家首次进入世界时获得一件随机 Kogasa 装备，附带随机能力。")
+            .define("enableFirstJoinReward", true);
+
     static {
         BUILDER.pop();
     }

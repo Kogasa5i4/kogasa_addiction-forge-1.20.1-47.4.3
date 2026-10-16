@@ -138,6 +138,14 @@ public class KogasaCommands {
                         // /kogasa clearammo
                         .then(Commands.literal("clearammo")
                                 .executes(KogasaCommands::clearAmmo))
+                        // /kogasa resetfirstjoin
+                        .then(Commands.literal("resetfirstjoin")
+                                .executes(ctx -> {
+                                    ServerPlayer player = ctx.getSource().getPlayerOrException();
+                                    player.getPersistentData().remove("KogasaFirstJoinReward");
+                                    // 下次登录/执行 /kogasa givefirstjoin 时发放
+                                    return 1;
+                                }))
         );
     }
 

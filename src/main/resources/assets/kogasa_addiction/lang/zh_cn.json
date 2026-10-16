@@ -86,6 +86,7 @@
   "kogasa_addiction.ponder.kogasa_ingot.header": "获取伞之锭",
   "kogasa_addiction.ponder.kogasa_ingot.text_1": "在高炉中烧炼物品来获取伞之锭",
   "message.kogasa_addiction.cirno_revive": "❄ 琪露诺的力量守护了装备，但是代价是什么呢？（消耗 %s 成长值）",
+  "message.kogasa_addiction.first_join_reward": "✦ 你收到了一件来自遗忘之伞的礼物，按 Alt 查看它的能力",
   "message.kogasa_addiction.growth_enchant": "✦ 装备觉醒了新的附魔力量",
   "message.kogasa_addiction.growth_enchant.max": "✦ 装备的附魔已达到极限",
   "message.kogasa_addiction.koishi_ingot.earned": "本我的解放：获得奖励！",

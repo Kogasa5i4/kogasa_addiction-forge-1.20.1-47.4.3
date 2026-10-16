@@ -66,6 +66,14 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
             boolean ammoInfinite = player.getAbilities().instabuild
                     || (ammo.getItem() instanceof ArrowItem arrowItem
                     && arrowItem.isInfinite(ammo, stack, player));
+            // ===== 概率不消耗箭矢 =====
+            boolean noConsume = false;
+            if (!ammoInfinite && !player.getAbilities().instabuild) {
+                double chance = KogasaEquipmentHelper.getNoConsumeArrowChance(stack);
+                if (chance > 0.0 && player.getRandom().nextDouble() < chance) {
+                    noConsume = true;
+                }
+            }
 
             // ===== 烟花分支：消耗箭矢，发射烟花 =====
             var ammoType = KogasaAbilityData.getAmmoType(stack);
@@ -184,6 +192,10 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
 
                 if (power == 1.0F) arrow.setCritArrow(true);
 
+                if (noConsume) {
+                    arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
+                }
+
                 if (ammoInfinite) arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                 level.addFreshEntity(arrow);
             }
@@ -197,7 +209,7 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
             stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(player.getUsedItemHand()));
 
             // 箭矢消耗（多发也只消耗 1 支）
-            if (!ammoInfinite && !player.getAbilities().instabuild) {
+            if (!noConsume && !ammoInfinite && !player.getAbilities().instabuild) {
                 ammo.shrink(1);
             }
 

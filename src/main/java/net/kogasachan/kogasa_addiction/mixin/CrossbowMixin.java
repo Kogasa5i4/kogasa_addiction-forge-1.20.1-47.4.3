@@ -5,6 +5,7 @@ import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.entity.projectile.AyaArrowEntity;
 import net.kogasachan.kogasa_addiction.event.server.KogasaGrowthHandler;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
+import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.kogasachan.kogasa_addiction.util.ModConfigCache;
@@ -26,6 +27,7 @@ import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -46,6 +48,10 @@ public class CrossbowMixin {
         if (level.isClientSide) return;
         if (!(stack.getItem() instanceof IKogasaEquipment)) return;
         if (!(shooter instanceof Player player)) return;
+
+        if (stack.getTag() != null) {
+            stack.getTag().remove("KogasaNoConsume");
+        }
 
         KogasaGrowthHandler.addGrowth(stack, player);
     }
@@ -154,6 +160,10 @@ public class CrossbowMixin {
             }
         }
 
+        if (pCrossbowStack.getOrCreateTag().getBoolean("KogasaNoConsume")) {
+            arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
+        }
+
         // 7. 默认：原版放行
         return level.addFreshEntity(entity);
     }
@@ -167,5 +177,57 @@ public class CrossbowMixin {
         double multiplier = KogasaEquipmentData.getMultiplier(stack);
         int modified = (int) (original / Math.sqrt(multiplier));
         cir.setReturnValue(Math.max(modified, 1));
+    }
+
+    // ========== 4. 装填时触发不消耗 ==========
+    @Unique
+    private static final String TAG_NO_CONSUME = "KogasaNoConsume";
+
+    /**
+     * HEAD：清除旧标记，记录装填前的箭矢数量
+     */
+    @Inject(method = "tryLoadProjectiles", at = @At("HEAD"))
+    private static void kogasa$beforeLoad(LivingEntity shooter, ItemStack crossbow,
+                                          CallbackInfoReturnable<Boolean> cir) {
+        // 清除上一次的标记
+        if (crossbow.getTag() != null) {
+            crossbow.getTag().remove(TAG_NO_CONSUME);
+        }
+    }
+
+    /**
+     * RETURN：如果装填成功且触发不消耗，补回箭矢
+     */
+    @Inject(method = "tryLoadProjectiles", at = @At("RETURN"))
+    private static void kogasa$afterLoad(LivingEntity shooter, ItemStack crossbow,
+                                         CallbackInfoReturnable<Boolean> cir) {
+        if (!cir.getReturnValue()) return;
+        if (!(shooter instanceof Player player)) return;
+        if (player.level().isClientSide) return;
+        if (!crossbow.is(ModItems.AYA_CROSSBOW.get())) return;
+        if (player.getAbilities().instabuild) return;
+
+        // 计算概率
+        double chance = KogasaEquipmentHelper.getNoConsumeArrowChance(crossbow);
+        if (chance <= 0.0) return;
+        if (player.getRandom().nextDouble() >= chance) return;
+
+        // 获取装填的箭矢数量
+        List<ItemStack> charged = CrossbowItem.getChargedProjectiles(crossbow);
+        if (charged.isEmpty()) return;
+
+        // 补回箭矢：用装填的箭矢类型和数量
+        ItemStack firstCharged = charged.get(0);
+        if (firstCharged.isEmpty()) return;
+
+        ItemStack restored = firstCharged.copy();
+        restored.setCount(charged.size());
+
+        if (!player.getInventory().add(restored)) {
+            player.drop(restored, false);
+        }
+
+        // 标记弩：发射时箭矢不可拾取
+        crossbow.getOrCreateTag().putBoolean(TAG_NO_CONSUME, true);
     }
 }

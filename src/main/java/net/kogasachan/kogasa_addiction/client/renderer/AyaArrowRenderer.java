@@ -1,5 +1,6 @@
 package net.kogasachan.kogasa_addiction.client.renderer;
 
+import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.entity.projectile.AyaArrowEntity;
 import net.minecraft.client.renderer.entity.ArrowRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -8,11 +9,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class AyaArrowRenderer extends ArrowRenderer<AyaArrowEntity> {
 
-    private static final ResourceLocation TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(
-                    "minecraft",
-                    "textures/entity/projectiles/arrow.png"
-            );
+    public static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "textures/entity/projectiles/aya_arrow.png");
 
     public AyaArrowRenderer(EntityRendererProvider.Context context) {
         super(context);

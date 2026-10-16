@@ -254,6 +254,31 @@ public class KogasaTooltipHandler {
                                     "tooltip.kogasa_addiction.ranged.multishot", arrowCount)
                             .withStyle(ChatFormatting.AQUA));
                 }
+
+                // ===== 概率不消耗箭矢 =====
+                double noConsumeChance = KogasaEquipmentHelper.getNoConsumeArrowChance(stack);
+                if (noConsumeChance > 0.0) {
+                    if (noConsumeChance >= 1.0) {
+                        tooltip.add(Component.translatable(
+                                        "tooltip.kogasa_addiction.ranged.no_consume.max")
+                                .withStyle(ChatFormatting.GOLD));
+                    } else {
+                        tooltip.add(Component.translatable(
+                                        "tooltip.kogasa_addiction.ranged.no_consume",
+                                        String.format("%.0f%%", noConsumeChance * 100))
+                                .withStyle(ChatFormatting.GOLD));
+                    }
+                } else {
+                    // 未解锁：显示还差多少成长值
+                    double start = Config.NO_CONSUME_ARROW_START_GROWTH.get();
+                    if (start > 0) {
+                        tooltip.add(Component.translatable(
+                                        "tooltip.kogasa_addiction.ranged.no_consume.locked",
+                                        String.format("%.0f%%", start * 100),
+                                        String.format("%.0f%%", growth * 100))
+                                .withStyle(ChatFormatting.DARK_GRAY));
+                    }
+                }
             }
         } else {
             tooltip.add(Component.translatable("tooltip.kogasa_addiction.hint.alt")

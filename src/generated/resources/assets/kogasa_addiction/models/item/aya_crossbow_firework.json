@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/crossbow_firework",
+  "textures": {
+    "layer0": "kogasa_addiction:item/aya_crossbow_firework"
+  }
+}

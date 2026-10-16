@@ -30,6 +30,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -303,37 +304,54 @@ public class KogasaCommands {
         int re = KogasaEquipmentData.getReinforcements(held);
         int maxRe = KogasaEquipmentHelper.getEffectiveMaxReinforcements(held);
         double growth = KogasaEquipmentData.getGrowth(held);
+        double maxGrowth = Config.MAX_GROWTH.get();
         double absorbed = KogasaEquipmentData.getAbsorbedValue(held);
         int growthEnchants = KogasaEquipmentData.getGrowthEnchantsGranted(held);
         List<String> usedMaterials = KogasaEquipmentData.getUsedMaterials(held);
+        boolean isRanged = isRangedWeapon(held);
 
-        // 标题
+        // ===== 标题 =====
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.info.header",
                 held.getHoverName()), false);
 
-        // 强化
+        // ===== 强化 =====
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.info.reinforcement",
                 re, maxRe), false);
 
-        // 成长
+        // ===== 成长 =====
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.info.growth",
                 String.format("%.4f", growth),
-                String.format("%.2f%%", growth * 100)), false);
+                String.format("%.2f%%", growth * 100),
+                String.format("%.2f%%", maxGrowth * 100)), false);
 
-        // 吸收值
+        // ===== 倍率 =====
+        double reMult = KogasaEquipmentHelper.getReinforcementMultiplier(held);
+        double growthMult = KogasaEquipmentHelper.getGrowthMultiplier(held);
+        double newsMult = 1.0 + (KogasaAbilityData.hasAbility(held, KogasaAbility.AYA)
+                ? KogasaAbilityData.getNewsValue(held) : 0.0);
+        double totalMult = reMult * growthMult * newsMult;
+
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.info.multiplier",
+                String.format("%.2f", reMult),
+                String.format("%.2f", growthMult),
+                String.format("%.2f", newsMult),
+                String.format("%.3f", totalMult)), false);
+
+        // ===== 吸收值 =====
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.info.absorbed",
                 String.format("%.2f", absorbed)), false);
 
-        // 成长附魔次数
+        // ===== 成长附魔次数 =====
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.info.growth_enchant",
                 growthEnchants), false);
 
-        // 已吸收材料
+        // ===== 已吸收材料 =====
         if (usedMaterials.isEmpty()) {
             ctx.getSource().sendSuccess(() -> Component.translatable(
                     "commands.kogasa_addiction.info.materials.none"), false);
@@ -342,43 +360,48 @@ public class KogasaCommands {
                     "commands.kogasa_addiction.info.materials.header",
                     usedMaterials.size()), false);
             for (String id : usedMaterials) {
-                ctx.getSource().sendSuccess(() -> Component.literal("  §7- " + id), false);
+                Component name = getMaterialDisplayName(id);
+                ctx.getSource().sendSuccess(() -> Component.literal("  §7- §f")
+                        .append(name), false);
             }
         }
 
-        // 当前附魔
+        // ===== 当前附魔 =====
         Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(held);
         if (!enchants.isEmpty()) {
             ctx.getSource().sendSuccess(() -> Component.translatable(
                     "commands.kogasa_addiction.info.enchants.header",
                     enchants.size()), false);
             for (Map.Entry<Enchantment, Integer> entry : enchants.entrySet()) {
-                String name = entry.getKey().getFullname(entry.getValue()).getString();
-                ctx.getSource().sendSuccess(() -> Component.literal("  §7- " + name), false);
+                Component name = entry.getKey().getFullname(entry.getValue());
+                ctx.getSource().sendSuccess(() -> Component.literal("  §7- §f")
+                        .append(name), false);
             }
         }
 
-        // 能力
+        // ===== 能力 =====
         List<KogasaAbility> abilities = KogasaAbilityData.getAbilities(held);
         int maxSlots = KogasaAbilityData.getMaxAbilitySlots(held);
+        int usedSlots = KogasaAbilityData.getUsedSlots(held);
 
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.info.abilities.header",
-                abilities.size(), maxSlots), false);
+                usedSlots, maxSlots), false);
 
         if (abilities.isEmpty()) {
             ctx.getSource().sendSuccess(() -> Component.translatable(
                     "commands.kogasa_addiction.info.abilities.none"), false);
         } else {
             for (KogasaAbility ability : abilities) {
-                ctx.getSource().sendSuccess(() -> Component.literal(
-                        "  §7- " + ability.getDisplayName().getString()), false);
+                ctx.getSource().sendSuccess(() -> Component.literal("  §7- §f")
+                        .append(ability.getDisplayName()), false);
             }
         }
 
-        // AYA 新闻值（仅当有 AYA 能力）
+        // ===== AYA 新闻值 =====
         if (KogasaAbilityData.hasAbility(held, KogasaAbility.AYA)) {
             double news = KogasaAbilityData.getNewsValue(held);
+            double maxNews = Config.MAX_NEWS_VALUE.get();
             int killed = KogasaAbilityData.getKilledMobCount(held);
             int mined = KogasaAbilityData.getMinedBlockCount(held);
             int damaged = KogasaAbilityData.getDamageTakenCount(held);
@@ -386,37 +409,86 @@ public class KogasaCommands {
             ctx.getSource().sendSuccess(() -> Component.translatable(
                     "commands.kogasa_addiction.info.news_value",
                     String.format("%.4f", news),
-                    String.format("%.2f%%", news * 100)), false);
+                    String.format("%.2f%%", news * 100),
+                    String.format("%.2f%%", maxNews * 100)), false);
             ctx.getSource().sendSuccess(() -> Component.translatable(
                     "commands.kogasa_addiction.info.news_records",
                     killed, mined, damaged), false);
         }
 
-        // 弹药（仅远程武器）
-        if (isRangedWeapon(held) && KogasaAbilityData.hasAmmo(held)) {
-            var ammoType = KogasaAbilityData.getAmmoType(held);
-            if (ammoType == KogasaAbilityData.AmmoType.POTION) {
-                ResourceLocation potionId = KogasaAbilityData.getAmmoPotionId(held);
-                var kind = KogasaAbilityData.getAmmoPotionKind(held);
-                if (potionId != null) {
-                    String desc = potionId + " [" + kind.name().toLowerCase() + "]";
-                    ctx.getSource().sendSuccess(() -> Component.translatable(
-                            "commands.kogasa_addiction.info.ammo.potion", desc), false);
-                }
-            } else if (ammoType == KogasaAbilityData.AmmoType.FIREWORK) {
-                ctx.getSource().sendSuccess(() -> Component.translatable(
-                        "commands.kogasa_addiction.info.ammo.firework"), false);
-            }
-        }
-
-        // 远程武器专属：穿透、多发
-        if (isRangedWeapon(held)) {
+        // ===== 远程武器 =====
+        if (isRanged) {
+            // 穿透进度
             int pierce = KogasaEquipmentHelper.getBowPierceLevel(held);
+            if (pierce > 0) {
+                ctx.getSource().sendSuccess(() -> Component.translatable(
+                        "commands.kogasa_addiction.info.ranged.pierce.unlocked", pierce), false);
+            } else {
+                double threshold = Config.BOW_PIERCE_GROWTH.get();
+                ctx.getSource().sendSuccess(() -> Component.translatable(
+                        "commands.kogasa_addiction.info.ranged.pierce.locked",
+                        String.format("%.2f%%", threshold * 100),
+                        String.format("%.2f%%", growth * 100)), false);
+            }
+
+            // 多发进度
             int arrows = KogasaEquipmentHelper.getBowArrowCount(held);
-            ctx.getSource().sendSuccess(() -> Component.translatable(
-                    "commands.kogasa_addiction.info.ranged.pierce", pierce), false);
-            ctx.getSource().sendSuccess(() -> Component.translatable(
-                    "commands.kogasa_addiction.info.ranged.multishot", arrows), false);
+            if (arrows >= 3) {
+                ctx.getSource().sendSuccess(() -> Component.translatable(
+                        "commands.kogasa_addiction.info.ranged.multishot.max"), false);
+            } else if (arrows == 2) {
+                double threshold = Config.BOW_MULTISHOT_3_GROWTH.get();
+                ctx.getSource().sendSuccess(() -> Component.translatable(
+                        "commands.kogasa_addiction.info.ranged.multishot.progress",
+                        arrows,
+                        String.format("%.2f%%", threshold * 100),
+                        String.format("%.2f%%", growth * 100)), false);
+            } else {
+                double threshold = Config.BOW_MULTISHOT_2_GROWTH.get();
+                ctx.getSource().sendSuccess(() -> Component.translatable(
+                        "commands.kogasa_addiction.info.ranged.multishot.progress",
+                        arrows,
+                        String.format("%.2f%%", threshold * 100),
+                        String.format("%.2f%%", growth * 100)), false);
+            }
+
+            // 弹药
+            if (KogasaAbilityData.hasAmmo(held)) {
+                var ammoType = KogasaAbilityData.getAmmoType(held);
+                if (ammoType == KogasaAbilityData.AmmoType.POTION) {
+                    ResourceLocation potionId = KogasaAbilityData.getAmmoPotionId(held);
+                    var kind = KogasaAbilityData.getAmmoPotionKind(held);
+                    if (potionId != null) {
+                        Component potionName = getPotionDisplayName(potionId, kind);
+                        ctx.getSource().sendSuccess(() -> Component.translatable(
+                                        "commands.kogasa_addiction.info.ammo.potion")
+                                .append(potionName), false);
+                    }
+                } else if (ammoType == KogasaAbilityData.AmmoType.FIREWORK) {
+                    ctx.getSource().sendSuccess(() -> Component.translatable(
+                            "commands.kogasa_addiction.info.ammo.firework"), false);
+                }
+            } else {
+                ctx.getSource().sendSuccess(() -> Component.translatable(
+                        "commands.kogasa_addiction.info.ammo.none"), false);
+            }
+
+            // 不消耗箭矢概率
+            double noConsume = KogasaEquipmentHelper.getNoConsumeArrowChance(held);
+            if (noConsume >= 1.0) {
+                ctx.getSource().sendSuccess(() -> Component.translatable(
+                        "commands.kogasa_addiction.info.ranged.no_consume.max"), false);
+            } else if (noConsume > 0) {
+                final String pct = String.format("%.0f%%", noConsume * 100);
+                ctx.getSource().sendSuccess(() -> Component.translatable(
+                        "commands.kogasa_addiction.info.ranged.no_consume", pct), false);
+            } else {
+                double start = Config.NO_CONSUME_ARROW_START_GROWTH.get();
+                final String need = String.format("%.0f%%", start * 100);
+                final String cur = String.format("%.0f%%", growth * 100);
+                ctx.getSource().sendSuccess(() -> Component.translatable(
+                        "commands.kogasa_addiction.info.ranged.no_consume.locked", need, cur), false);
+            }
         }
 
         return 1;
@@ -813,5 +885,40 @@ public class KogasaCommands {
     private static boolean isRangedWeapon(ItemStack stack) {
         return stack.getItem() instanceof BowItem
                 || stack.getItem() instanceof CrossbowItem;
+    }
+
+    private static Component getMaterialDisplayName(String id) {
+        String actualId = id;
+        boolean isArrow = false;
+        if (id.startsWith("arrow:")) {
+            actualId = id.substring("arrow:".length());
+            isArrow = true;
+        }
+        ResourceLocation loc = ResourceLocation.tryParse(actualId);
+        if (loc == null) return Component.literal(id);
+
+        var item = ForgeRegistries.ITEMS.getValue(loc);
+        if (item == null || item == Items.AIR) return Component.literal(id);
+
+        Component name = new ItemStack(item).getHoverName();
+        if (isArrow) {
+            return Component.translatable(
+                    "tooltip.kogasa_addiction.reinforcement.entry.arrow", name);
+        }
+        return name;
+    }
+
+    private static Component getPotionDisplayName(ResourceLocation potionId,
+                                                  KogasaAbilityData.PotionKind kind) {
+        var potion = ForgeRegistries.POTIONS.getValue(potionId);
+        if (potion == null) return Component.literal(potionId.toString());
+
+        ItemStack potionStack = switch (kind) {
+            case REGULAR -> new ItemStack(Items.POTION);
+            case SPLASH -> new ItemStack(Items.SPLASH_POTION);
+            case LINGERING -> new ItemStack(Items.LINGERING_POTION);
+        };
+        PotionUtils.setPotion(potionStack, potion);
+        return potionStack.getHoverName();
     }
 }

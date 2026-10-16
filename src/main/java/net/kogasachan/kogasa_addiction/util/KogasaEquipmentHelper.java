@@ -440,4 +440,21 @@ public class KogasaEquipmentHelper {
         }
         return boosted;
     }
+
+    /**
+     * 不消耗箭矢的概率。
+     * growth < start       → 0.0
+     * growth >= full       → 1.0
+     * 其余                 → 线性插值
+     */
+    public static double getNoConsumeArrowChance(ItemStack stack) {
+        double growth = KogasaEquipmentData.getGrowth(stack);
+        double start = Config.NO_CONSUME_ARROW_START_GROWTH.get();
+        double full = Config.NO_CONSUME_ARROW_FULL_GROWTH.get();
+
+        if (growth < start) return 0.0;
+        if (full <= start) return 1.0;
+        if (growth >= full) return 1.0;
+        return (growth - start) / (full - start);
+    }
 }

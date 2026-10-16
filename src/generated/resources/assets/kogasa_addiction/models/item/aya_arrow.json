@@ -1,3 +1,6 @@
 {
-  "parent": "minecraft:item/arrow"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "kogasa_addiction:item/aya_arrow"
+  }
 }

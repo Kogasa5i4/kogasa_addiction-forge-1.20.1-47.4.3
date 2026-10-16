@@ -3,7 +3,7 @@
   "category": "equipment",
   "key": {
     "#": {
-      "item": "minecraft:stick"
+      "item": "minecraft:iron_ingot"
     },
     "&": {
       "item": "minecraft:string"
@@ -16,9 +16,9 @@
     }
   },
   "pattern": [
-    "#X#",
+    "X#X",
     "&Y&",
-    " # "
+    " X "
   ],
   "result": {
     "item": "kogasa_addiction:aya_crossbow"

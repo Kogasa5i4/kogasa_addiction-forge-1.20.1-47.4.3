@@ -117,10 +117,10 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(writer);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.AYA_CROSSBOW.get())
-                .pattern("#X#")
+                .pattern("X#X")
                 .pattern("&Y&")
-                .pattern(" # ")
-                .define('#', Items.STICK)
+                .pattern(" X ")
+                .define('#', Items.IRON_INGOT)
                 .define('&', Items.STRING)
                 .define('X', ModItems.AYA_INGOT.get())
                 .define('Y', Items.TRIPWIRE_HOOK)

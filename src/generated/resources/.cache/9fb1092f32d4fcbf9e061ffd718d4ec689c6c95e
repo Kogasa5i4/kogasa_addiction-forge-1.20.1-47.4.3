@@ -1,4 +1,4 @@
-// 1.20.1	2026-10-15T20:33:23.2105716	Recipes
+// 1.20.1	2026-10-16T21:19:33.9740802	Recipes
 151b688352987f5a3d8b6c8ff85801acc9055b0e data/kogasa_addiction/advancements/recipes/combat/aya_arrow.json
 5daa2936e48776ef927e4026627edd86d138846c data/kogasa_addiction/advancements/recipes/combat/aya_bow.json
 2ebfd07af5ccef5e702f7dd07ab71bd370c4422a data/kogasa_addiction/advancements/recipes/combat/aya_crossbow.json
@@ -14,7 +14,7 @@ b9dc814f9033553936cdc791f941bba89f18d00f data/kogasa_addiction/advancements/reci
 e9816357b135209a8378595fce68f558b612e5f6 data/kogasa_addiction/recipes/aya_arrow.json
 7e82be3c2956ef5eaf53d392f08f9d0135f7c52e data/kogasa_addiction/recipes/aya_arrow_tipping.json
 e9ae623f5f9ff4c619ca23685cf44c231278510f data/kogasa_addiction/recipes/aya_bow.json
-148754f510d250bf2f3a778562b509bd17850a47 data/kogasa_addiction/recipes/aya_crossbow.json
+5c3e423d3c915918f6b00f0c42cfed547ff4b4ac data/kogasa_addiction/recipes/aya_crossbow.json
 a51f3b596150feab0faa3eb7926a1e01042714b7 data/kogasa_addiction/recipes/kogasa_axe.json
 b2e24a96b8a67a18c567d2c58f885283b2c533f1 data/kogasa_addiction/recipes/kogasa_boots.json
 3719ba93df540296851ae0a3fc57147281792c1a data/kogasa_addiction/recipes/kogasa_chestplate.json

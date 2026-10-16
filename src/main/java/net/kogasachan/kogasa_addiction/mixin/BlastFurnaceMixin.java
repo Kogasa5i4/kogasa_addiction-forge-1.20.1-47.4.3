@@ -20,6 +20,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Optional;
+
 @Mixin(AbstractFurnaceBlockEntity.class)
 public class BlastFurnaceMixin {
 
@@ -55,13 +57,13 @@ public class BlastFurnaceMixin {
             BlockEntity be = level.getBlockEntity(targetPos);
             if (be == null) continue;
 
-            IItemHandler handler = be.getCapability(
+            Optional<IItemHandler> resolved = be.getCapability(
                     ForgeCapabilities.ITEM_HANDLER,
                     dir.getOpposite()
-            ).orElse(null);
+            ).resolve();
 
-            if (handler == null) continue;
-            if (kogasa_addiction_forge_1_20_1_47_4_3$insertFully(handler, drop)) return;
+            if (resolved.isEmpty()) continue;
+            if (kogasa_addiction_forge_1_20_1_47_4_3$insertFully(resolved.get(), drop)) return;
         }
 
         // 2. 六个面有空气/流体 → 掉落

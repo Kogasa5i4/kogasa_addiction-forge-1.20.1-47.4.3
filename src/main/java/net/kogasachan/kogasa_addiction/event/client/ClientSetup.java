@@ -3,6 +3,7 @@ package net.kogasachan.kogasa_addiction.event.client;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.client.renderer.AyaArrowRenderer;
 import net.kogasachan.kogasa_addiction.entity.ModEntities;
+import net.kogasachan.kogasa_addiction.item.AyaBowItem;
 import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
@@ -39,14 +40,14 @@ public class ClientSetup {
     // ==================== 弓 ====================
 
     private static void registerBowProperties() {
-        // pull：拉弓进度 0.0 ~ 1.0
+        // pull：拉弓进度 0.0 ~ 1.0（跟随成长/强化缩短拉满时间）
         ItemProperties.register(ModItems.AYA_BOW.get(),
                 ResourceLocation.fromNamespaceAndPath("minecraft", "pull"),
                 (stack, level, entity, seed) -> {
                     if (entity == null) return 0.0F;
                     if (entity.getUseItem() != stack) return 0.0F;
-                    return (float) (stack.getUseDuration()
-                            - entity.getUseItemRemainingTicks()) / 20.0F;
+                    int charge = stack.getUseDuration() - entity.getUseItemRemainingTicks();
+                    return AyaBowItem.getCustomPowerForTime(stack, charge);
                 });
 
         // pulling：是否正在拉弓（0 或 1）

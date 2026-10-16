@@ -18,8 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(CrossbowItem.class)
-public abstract class CrossbowAutoReloadMixin {
-
+public class CrossbowAutoReloadMixin {
     @Invoker("isCharged")
     public static boolean invokeIsCharged(ItemStack stack) {
         throw new AssertionError();

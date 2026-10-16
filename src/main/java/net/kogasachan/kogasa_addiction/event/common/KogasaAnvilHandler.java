@@ -1,4 +1,4 @@
-package net.kogasachan.kogasa_addiction.event.server;
+package net.kogasachan.kogasa_addiction.event.common;
 
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
@@ -171,15 +171,6 @@ public class KogasaAnvilHandler {
 
     private static boolean handleAmmoInfusion(AnvilUpdateEvent event,
                                               ItemStack left, ItemStack right) {
-        // 槽位检查
-        int used = KogasaAbilityData.getUsedSlots(left);
-        int max = KogasaAbilityData.getMaxAbilitySlots(left);
-        if (used >= max) {
-            event.setOutput(ItemStack.EMPTY);
-            event.setCost(0);
-            return true;
-        }
-
         // ===== 药水（三种） =====
         if (right.getItem() instanceof PotionItem) {
             ResourceLocation potionId = ForgeRegistries.POTIONS.getKey(

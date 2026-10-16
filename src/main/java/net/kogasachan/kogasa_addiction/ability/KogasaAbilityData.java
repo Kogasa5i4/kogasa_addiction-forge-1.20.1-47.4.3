@@ -274,11 +274,9 @@ public class KogasaAbilityData {
     }
 
     /**
-     * 总槽位占用 = 能力数量 + 弹药占用
+     * 已占用的能力槽数量
      */
     public static int getUsedSlots(ItemStack stack) {
-        int abilities = getAbilities(stack).size();
-        int ammo = hasAmmo(stack) ? 1 : 0;
-        return abilities + ammo;
+        return getAbilities(stack).size();
     }
 }

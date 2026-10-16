@@ -274,8 +274,8 @@ public class KogasaTooltipHandler {
                     if (start > 0) {
                         tooltip.add(Component.translatable(
                                         "tooltip.kogasa_addiction.ranged.no_consume.locked",
-                                        String.format("%.0f%%", start * 100),
-                                        String.format("%.0f%%", growth * 100))
+                                        String.format("%.0f%%", growth * 100),   // ← 当前值
+                                        String.format("%.0f%%", start * 100))    // ← 目标值
                                 .withStyle(ChatFormatting.DARK_GRAY));
                     }
                 }

@@ -3,7 +3,7 @@ package net.kogasachan.kogasa_addiction.item;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.entity.projectile.AyaArrowEntity;
-import net.kogasachan.kogasa_addiction.event.server.KogasaGrowthHandler;
+import net.kogasachan.kogasa_addiction.event.common.KogasaGrowthHandler;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.kogasachan.kogasa_addiction.util.ModConfigCache;
@@ -224,7 +224,7 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
      * multiplier = 1.0 → 20 tick（原版）
      * multiplier = 4.0 → 10 tick（快一倍）
      */
-    private static float getCustomPowerForTime(ItemStack stack, int charge) {
+    public static float getCustomPowerForTime(ItemStack stack, int charge) {
         double multiplier = KogasaEquipmentData.getMultiplier(stack);
         float maxCharge = (float) (20.0 / Math.sqrt(multiplier));
         float f = charge / maxCharge;

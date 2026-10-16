@@ -11,7 +11,7 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
-import net.kogasachan.kogasa_addiction.event.server.KogasaGrowthHandler;
+import net.kogasachan.kogasa_addiction.event.common.KogasaGrowthHandler;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
@@ -484,10 +484,10 @@ public class KogasaCommands {
                         "commands.kogasa_addiction.info.ranged.no_consume", pct), false);
             } else {
                 double start = Config.NO_CONSUME_ARROW_START_GROWTH.get();
-                final String need = String.format("%.0f%%", start * 100);
                 final String cur = String.format("%.0f%%", growth * 100);
+                final String need = String.format("%.0f%%", start * 100);
                 ctx.getSource().sendSuccess(() -> Component.translatable(
-                        "commands.kogasa_addiction.info.ranged.no_consume.locked", need, cur), false);
+                        "commands.kogasa_addiction.info.ranged.no_consume.locked", cur, need), false);
             }
         }
 

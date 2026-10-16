@@ -1,4 +1,4 @@
-package net.kogasachan.kogasa_addiction.event.mod;
+package net.kogasachan.kogasa_addiction.event.common;
 
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.network.PacketHandler;

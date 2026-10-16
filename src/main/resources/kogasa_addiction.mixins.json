@@ -7,6 +7,7 @@
     "BlastFurnaceMixin",
     "CrossbowAutoReloadMixin",
     "CrossbowMixin",
+    "CrossbowNoConsumeMixin",
     "IceBlockMixin"
   ],
   "minVersion": "0.8"

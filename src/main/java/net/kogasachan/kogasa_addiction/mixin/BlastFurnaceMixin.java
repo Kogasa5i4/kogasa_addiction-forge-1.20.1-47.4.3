@@ -39,15 +39,14 @@ public class BlastFurnaceMixin {
 
         ItemStack drop = new ItemStack(ModItems.KOGASA_INGOT.get());
 
-        // 朝向：前左右后上下
         Direction facing = state.getValue(AbstractFurnaceBlock.FACING);
         Direction[] faces = {
-                facing,
-                facing.getClockWise(),
-                facing.getCounterClockWise(),
-                facing.getOpposite(),
-                Direction.UP,
-                Direction.DOWN
+                facing,                       // 前
+                facing.getClockWise(),        // 左
+                facing.getCounterClockWise(), // 右
+                facing.getOpposite(),         // 后
+                Direction.UP,                 // 上
+                Direction.DOWN                // 下
         };
 
         // 1. 插入六个面的容器

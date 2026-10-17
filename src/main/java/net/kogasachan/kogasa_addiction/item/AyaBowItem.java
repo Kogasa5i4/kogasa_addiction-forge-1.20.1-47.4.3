@@ -22,7 +22,6 @@ import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionUtils;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -48,7 +47,7 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
         if (!(entity instanceof Player player)) return;
 
         boolean infinity = player.getAbilities().instabuild
-                || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
+                || stack.getEnchantmentLevel(Enchantments.INFINITY_ARROWS) > 0;
         ItemStack ammo = player.getProjectile(stack);
 
         int charge = this.getUseDuration(stack) - timeLeft;
@@ -160,11 +159,11 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
                 }
 
                 // 原版附魔
-                int powerEnch = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
+                int powerEnch = stack.getEnchantmentLevel(Enchantments.POWER_ARROWS);
                 if (powerEnch > 0) arrow.setBaseDamage(arrow.getBaseDamage() + powerEnch * 0.5 + 0.5);
-                int punch = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
+                int punch = stack.getEnchantmentLevel(Enchantments.PUNCH_ARROWS);
                 if (punch > 0) arrow.setKnockback(punch);
-                if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
+                if (stack.getEnchantmentLevel(Enchantments.FLAMING_ARROWS) > 0) {
                     arrow.setSecondsOnFire(100);
                 }
 

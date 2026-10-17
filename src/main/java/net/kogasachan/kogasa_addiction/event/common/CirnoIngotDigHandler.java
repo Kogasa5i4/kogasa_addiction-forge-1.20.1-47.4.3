@@ -6,7 +6,6 @@ import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -28,7 +27,7 @@ public class CirnoIngotDigHandler {
 
         // 精准采集 → 掉落冰本体，不给锭
         ItemStack tool = player.getMainHandItem();
-        if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
+        if (tool.getEnchantmentLevel(Enchantments.SILK_TOUCH) > 0) {
             return;
         }
 

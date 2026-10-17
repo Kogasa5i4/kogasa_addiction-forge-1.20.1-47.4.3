@@ -473,8 +473,8 @@ public class Config {
 
     public static final ForgeConfigSpec.IntValue CIRNO_SLOWNESS_LEVEL = BUILDER
             .comment("Slowness level on plain arrow hit. 5 = Slowness V.")
-            .comment("无药水箭命中时对目标施加的缓慢等级（玩家看到的）。5 = 缓慢 V。")
-            .defineInRange("cirnoSlownessLevel", 5, 1, 10);
+            .comment("无药水箭命中时对目标施加的缓慢等级。5 = 缓慢 V。")
+            .defineInRange("cirnoSlownessLevel", 5, 1, 256);
 
     static {
         BUILDER.pop();
@@ -487,23 +487,23 @@ public class Config {
     // ===== KOGASA 远程能力 =====
     public static final ForgeConfigSpec.BooleanValue ENABLE_KOGASA_RANGED = BUILDER
             .comment("Enable Kogasa ranged ability (consecutive hit damage bonus).")
-            .comment("启用伞之远程能力（连续命中伤害加成）。")
+            .comment("启用小伞远程能力（连续命中伤害加成）。")
             .define("enableKogasaRanged", true);
 
-    public static final ForgeConfigSpec.IntValue KOGASA_STREAK_RESET_TICKS = BUILDER
-            .comment("Time window for consecutive hits in ticks. 60 = 3s.")
-            .comment("连续命中的判定窗口（tick）。60 = 3秒内命中算连续。")
-            .defineInRange("kogasaStreakResetTicks", 60, 1, 72000);
+    public static final ForgeConfigSpec.IntValue KOGASA_STREAK_RESET_SECONDS = BUILDER
+            .comment("Time window for consecutive hits in seconds. 3 = 3s.")
+            .comment("连续命中的判定窗口（秒）。3 = 3秒内命中算连续。")
+            .defineInRange("kogasaStreakResetSeconds", 3, 1, Integer.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue KOGASA_STREAK_BONUS = BUILDER
             .comment("Damage bonus per consecutive hit. 0.1 = +10% per hit.")
             .comment("每次连续命中的伤害加成。0.1 = 每次 +10%。")
-            .defineInRange("kogasaStreakBonus", 0.1, 0.0, 100.0);
+            .defineInRange("kogasaStreakBonus", 0.1, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.IntValue KOGASA_STREAK_MAX = BUILDER
             .comment("Maximum streak count. 0 = unlimited.")
             .comment("连续命中的最大层数。0 = 无上限。")
-            .defineInRange("kogasaStreakMax", 10, 0, 1000);
+            .defineInRange("kogasaStreakMax", 10, 0, Integer.MAX_VALUE);
 
     static {
         BUILDER.pop();
@@ -527,12 +527,12 @@ public class Config {
     public static final ForgeConfigSpec.DoubleValue KOISHI_RANGED_CRIT_MULTIPLIER = BUILDER
             .comment("Damage multiplier on crit. 1.5 = 150%.")
             .comment("暴击伤害倍率。1.5 = 150%。")
-            .defineInRange("koishiRangedCritMultiplier", 1.5, 1.0, 100.0);
+            .defineInRange("koishiRangedCritMultiplier", 1.5, 1.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue KOISHI_PROJECTILE_IMMUNE_MULTIPLIER = BUILDER
             .comment("Damage multiplier against projectile-immune targets. 3.0 = 300%.")
             .comment("对弹射物免疫目标的伤害倍率。3.0 = 300%。")
-            .defineInRange("koishiProjectileImmuneMultiplier", 3.0, 1.0, 100.0);
+            .defineInRange("koishiProjectileImmuneMultiplier", 3.0, 1.0, Double.MAX_VALUE);
 
     static {
         BUILDER.pop(2);

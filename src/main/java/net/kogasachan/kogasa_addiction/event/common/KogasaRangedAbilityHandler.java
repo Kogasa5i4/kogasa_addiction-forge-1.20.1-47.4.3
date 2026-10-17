@@ -39,7 +39,7 @@ public class KogasaRangedAbilityHandler {
         long now = player.level().getGameTime();
         CompoundTag data = player.getPersistentData();
         long lastHit = data.getLong(LAST_HIT_TIME_KEY);
-        int resetTicks = Config.KOGASA_STREAK_RESET_TICKS.get();
+        int resetTicks = Config.KOGASA_STREAK_RESET_SECONDS.get() * 20;
 
         int streak;
         if (now - lastHit <= resetTicks) {

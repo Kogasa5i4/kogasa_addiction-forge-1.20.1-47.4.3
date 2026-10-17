@@ -168,7 +168,7 @@ public class Config {
             .defineInRange("durabilityRatioPerReinforcement", 0.2, 0.0, Double.MAX_VALUE);
 
     static {
-        BUILDER.push("equipment.tool");
+        BUILDER.push("tool");
     }
 
     public static final ForgeConfigSpec.DoubleValue MINING_SPEED_RATIO_PER_REINFORCEMENT = BUILDER
@@ -181,7 +181,7 @@ public class Config {
     }
 
     static {
-        BUILDER.push("equipment.weapon");
+        BUILDER.push("weapon");
     }
 
     public static final ForgeConfigSpec.DoubleValue ATTACK_SPEED_CAP = BUILDER
@@ -201,7 +201,7 @@ public class Config {
     }
 
     static {
-        BUILDER.push("equipment.armor");
+        BUILDER.push("armor");
     }
 
     public static final ForgeConfigSpec.DoubleValue KNOCKBACK_BASE_RESISTANCE = BUILDER
@@ -219,7 +219,7 @@ public class Config {
     }
 
     static {
-        BUILDER.push("equipment.ranged");
+        BUILDER.push("ranged");
     }
 
     public static final ForgeConfigSpec.DoubleValue BOW_PIERCE_GROWTH = BUILDER
@@ -272,7 +272,7 @@ public class Config {
             .defineInRange("growthForSecondAbilitySlot", 0.5, 0.0, Double.MAX_VALUE);
 
     static {
-        BUILDER.push("ability.aya");
+        BUILDER.push("aya");
     }
 
     // ===== Aya 能力 =====
@@ -289,18 +289,18 @@ public class Config {
     public static final ForgeConfigSpec.BooleanValue ENABLE_AYA_INGOT = BUILDER
             .comment("Enable obtaining Aya Ingot by shooting. " +
                     "You can either shoot a screenshot or shoot a bullet.")
-            .comment("是否允许通过进行Shoot操作获取文之锭。" +
-                    "Shoot操作包括“拍摄”与“射击”。")
+            .comment("是否允许通过进行摄击获取文之锭。" +
+                    "摄击也就是“拍摄”或“射击”的意思。")
             .define("enableAyaIngot", true);
 
     public static final ForgeConfigSpec.DoubleValue SHOOT_INGOT_CHANCE = BUILDER
             .comment("Chance to get an Aya Ingot per shoot. 0.1 = 10%.")
-            .comment("每次进行Shoot操作获得文之锭的概率。0.1 = 10%。")
+            .comment("每次进行摄击获得文之锭的概率。0.1 = 10%。")
             .defineInRange("shootIngotChance", 0.1, 0.0, 1.0);
 
     public static final ForgeConfigSpec.IntValue SHOOT_COOLDOWN_SECONDS = BUILDER
             .comment("Cooldown in seconds between shoot attempts. 10 = 10s.")
-            .comment("两次Shoot操作之间的冷却（秒）。10 = 10秒。")
+            .comment("两次摄击之间的冷却（秒）。10 = 10秒。")
             .defineInRange("shootCooldownSeconds", 10, 0, Integer.MAX_VALUE);
 
     static {
@@ -308,7 +308,7 @@ public class Config {
     }
 
     static {
-        BUILDER.push("ability.cirno");
+        BUILDER.push("cirno");
     }
 
     // ===== Cirno - 攻击缓慢 =====
@@ -363,7 +363,7 @@ public class Config {
     }
 
     static {
-        BUILDER.push("ability.koishi");
+        BUILDER.push("koishi");
     }
 
     // ===== Koishi 能力 =====
@@ -387,7 +387,7 @@ public class Config {
     }
 
     static {
-        BUILDER.push("ability.kogasa");
+        BUILDER.push("kogasa");
     }
 
     // ===== Kogasa 能力 =====
@@ -414,7 +414,7 @@ public class Config {
             .defineInRange("multishotSpread", 8.0, 0.0, 45.0);
 
     static {
-        BUILDER.push("ranged.aya");
+        BUILDER.push("aya");
     }
     // ===== AYA 远程能力 =====
     public static final ForgeConfigSpec.BooleanValue ENABLE_AYA_RANGED = BUILDER
@@ -447,7 +447,7 @@ public class Config {
     }
 
     static {
-        BUILDER.push("ranged.cirno");
+        BUILDER.push("cirno");
     }
 
     // ===== CIRNO 远程能力 =====
@@ -481,7 +481,7 @@ public class Config {
     }
 
     static {
-        BUILDER.push("ranged.kogasa");
+        BUILDER.push("kogasa");
     }
 
     // ===== KOGASA 远程能力 =====
@@ -510,7 +510,7 @@ public class Config {
     }
 
     static {
-        BUILDER.push("ranged.koishi");
+        BUILDER.push("koishi");
     }
 
     // ===== KOISHI 远程能力 =====
@@ -535,7 +535,7 @@ public class Config {
             .defineInRange("koishiProjectileImmuneMultiplier", 3.0, 1.0, 100.0);
 
     static {
-        BUILDER.pop(2);  // ranged
+        BUILDER.pop(2);
     }
 
     public static final ForgeConfigSpec SPEC = BUILDER.build();

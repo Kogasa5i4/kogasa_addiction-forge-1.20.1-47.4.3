@@ -33,9 +33,9 @@ public class AyaRangedAbilityHandler {
         if (weapon.isEmpty()) return;
         if (!KogasaAbilityData.hasAbility(weapon, KogasaAbility.AYA)) return;
 
-        int speedDuration = Config.AYA_SPEED_DURATION_TICKS.get();
+        int speedDuration = Config.AYA_SPEED_DURATION_SECONDS.get() * 20;
         int speedAmplifier = Config.AYA_SPEED_LEVEL.get() - 1;
-        int hasteDuration = Config.AYA_HASTE_DURATION_TICKS.get();
+        int hasteDuration = Config.AYA_HASTE_DURATION_SECONDS.get() * 20;
         int hasteAmplifier = Config.AYA_HASTE_LEVEL.get() - 1;
 
         player.addEffect(new MobEffectInstance(

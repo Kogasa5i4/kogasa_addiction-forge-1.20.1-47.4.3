@@ -138,13 +138,6 @@ public class KogasaGrowthHandler {
         int granted = KogasaEquipmentData.getGrowthEnchantsGranted(stack);
         if (shouldHave <= granted) return;
 
-        // 预检查：如果所有已有附魔都达到 maxLevel+1，不再触发机制
-        if (isFullyMaxed(stack)) {
-            // granted 仍然推进到 shouldHave，但不播放任何音效
-            KogasaEquipmentData.setGrowthEnchantsGranted(stack, shouldHave);
-            return;
-        }
-
         for (int i = granted; i < shouldHave; i++) {
             boolean success = grantOrUpgradeEnchant(stack, player);
 
@@ -189,7 +182,7 @@ public class KogasaGrowthHandler {
     /**
      * 授予或升级一个附魔
      * - 物品无附魔：随机授予一个新附魔
-     * - 物品有附魔：随机选一个未达 maxLevel+1 的附魔 +1
+     * - 物品有附魔：随机选一个未达 maxLevel+1 的附魔 +1，如果都满级则随机授予一个新附魔
      * - 没有可升级的：返回 false
      */
     public static boolean grantOrUpgradeEnchant(ItemStack stack, Player player) {
@@ -218,7 +211,8 @@ public class KogasaGrowthHandler {
 
         int level;
         if (Config.ALLOW_MAX_LEVEL_ENCHANTS.get()) {
-            level = 1 + player.getRandom().nextInt(newEnch.getMaxLevel());
+            int maxLevel = Math.max(1, newEnch.getMaxLevel());
+            level = 1 + player.getRandom().nextInt(maxLevel);
         } else {
             level = 1;
         }

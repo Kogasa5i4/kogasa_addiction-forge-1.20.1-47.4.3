@@ -152,8 +152,13 @@ public class KogasaTooltipHandler {
             }
             // 槽位满且未解锁第 2 槽 → 显示解锁提示（只在有能力时显示）
             if (abilities.size() >= maxSlots && maxSlots < 2) {
+                String secondSlotGrowth = String.format(
+                        java.util.Locale.ROOT,
+                        "%.0f%%",
+                        Config.GROWTH_FOR_SECOND_ABILITY_SLOT.get() * 100.0);
                 tooltip.add(Component.translatable(
-                                "tooltip.kogasa_addiction.abilities.full_hint")
+                                "tooltip.kogasa_addiction.abilities.full_hint",
+                                secondSlotGrowth)
                         .withStyle(ChatFormatting.DARK_GRAY));
             }
 
@@ -175,24 +180,54 @@ public class KogasaTooltipHandler {
             }
 
             if (KogasaAbilityData.hasAbility(stack, KogasaAbility.CIRNO)) {
-                double cost = Config.CIRNO_REVIVE_GROWTH_COST.get();
-                boolean canRevive = growth >= cost;
+                if (!Config.CIRNO_REVIVE_ENABLED.get()) {
+                    tooltip.add(Component.translatable(
+                                    "tooltip.kogasa_addiction.cirno.revive_disabled")
+                            .withStyle(ChatFormatting.DARK_GRAY));
+                } else {
+                    double cost = Config.CIRNO_REVIVE_GROWTH_COST.get();
+                    boolean canRevive = growth >= cost;
 
-                MutableComponent reviveLine = Component.translatable(
-                        "tooltip.kogasa_addiction.cirno.revive_status",
-                        String.format("%.2f", cost));
-                reviveLine.withStyle(canRevive ? ChatFormatting.GREEN : ChatFormatting.RED);
-                tooltip.add(reviveLine);
+                    MutableComponent reviveLine = Component.translatable(
+                            "tooltip.kogasa_addiction.cirno.revive_status",
+                            String.format(java.util.Locale.ROOT, "%.2f", cost));
+                    reviveLine.withStyle(canRevive ? ChatFormatting.GREEN : ChatFormatting.RED);
+                    tooltip.add(reviveLine);
+                }
             }
 
             if (KogasaAbilityData.hasAbility(stack, KogasaAbility.KOISHI)) {
-                double chance = Config.KOISHI_CRIT_CHANCE.get() * 100;
-                double mult = Config.KOISHI_CRIT_MULTIPLIER.get();
-                tooltip.add(Component.translatable(
-                                "tooltip.kogasa_addiction.koishi.crit_info",
-                                String.format("%.0f%%", chance),
-                                String.format("%.1f", mult))
-                        .withStyle(ChatFormatting.LIGHT_PURPLE));
+                boolean isRangedWeapon = stack.getItem() instanceof BowItem
+                        || stack.getItem() instanceof CrossbowItem;
+                if (isRangedWeapon) {
+                    if (Config.ENABLE_KOISHI_RANGED.get()) {
+                        double chance = Config.KOISHI_RANGED_CRIT_CHANCE.get() * 100;
+                        double mult = Config.KOISHI_RANGED_CRIT_MULTIPLIER.get();
+                        double specialTargetMult = Config.KOISHI_PROJECTILE_IMMUNE_MULTIPLIER.get();
+                        tooltip.add(Component.translatable(
+                                        "tooltip.kogasa_addiction.koishi.ranged_crit_info",
+                                        String.format(java.util.Locale.ROOT, "%.0f%%", chance),
+                                        String.format(java.util.Locale.ROOT, "%.2f", mult))
+                                .withStyle(ChatFormatting.LIGHT_PURPLE));
+                        tooltip.add(Component.translatable(
+                                        "tooltip.kogasa_addiction.koishi.ranged_special_targets",
+                                        String.format(java.util.Locale.ROOT, "%.2f", specialTargetMult),
+                                        String.format(java.util.Locale.ROOT, "%.2f", specialTargetMult * specialTargetMult))
+                                .withStyle(ChatFormatting.GRAY));
+                    } else {
+                        tooltip.add(Component.translatable(
+                                        "tooltip.kogasa_addiction.koishi.ranged_disabled")
+                                .withStyle(ChatFormatting.DARK_GRAY));
+                    }
+                } else {
+                    double chance = Config.KOISHI_CRIT_CHANCE.get() * 100;
+                    double mult = Config.KOISHI_CRIT_MULTIPLIER.get();
+                    tooltip.add(Component.translatable(
+                                    "tooltip.kogasa_addiction.koishi.crit_info",
+                                    String.format(java.util.Locale.ROOT, "%.0f%%", chance),
+                                    String.format(java.util.Locale.ROOT, "%.2f", mult))
+                            .withStyle(ChatFormatting.LIGHT_PURPLE));
+                }
             }
 
             if (KogasaAbilityData.hasAbility(stack, KogasaAbility.KOGASA)) {

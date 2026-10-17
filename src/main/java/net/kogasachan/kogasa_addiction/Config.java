@@ -33,8 +33,8 @@ public class Config {
             .define("enableKogasaIngot", true);
 
     public static final ForgeConfigSpec.DoubleValue KOGASA_INGOT_CHANCE = BUILDER
-            .comment("Chance per burning tick (1/20 seconds) to produce a kogasa ingot. 0.01 = 1%.\n" +
-                    "每游戏刻（1/20秒）伞之锭掉落的概率，0.01 = 1%。")
+            .comment("Chance per server tick (20 ticks per second) to produce a Kogasa Ingot while the blast furnace is lit. Default 0.001 = 0.1%; 0.01 = 1%.\n" +
+                    "高炉燃烧时每游戏刻（每秒 20 刻）产出伞之锭的概率。默认值 0.001 = 0.1%；0.01 = 1%。")
             .defineInRange("kogasaIngotChance", 0.001, 0.0, 1.0);
 
     public static final ForgeConfigSpec.IntValue KOGASA_INGOT_SEARCH_HEIGHT = BUILDER
@@ -51,8 +51,8 @@ public class Config {
     }
 
     public static final ForgeConfigSpec.BooleanValue ENABLE_KOGASA_EQUIPMENT = BUILDER
-            .comment("Enable Kogasa equipment system.\n" +
-                    "启用装备强化系统。")
+            .comment("Enable custom anvil reinforcement and ability infusion for Kogasa equipment.\n" +
+                    "启用本模组装备的自定义铁砧强化与能力注入配方。")
             .define("enableKogasaEquipment", true);
 
     public static final ForgeConfigSpec.IntValue MAX_REINFORCEMENTS = BUILDER
@@ -104,8 +104,8 @@ public class Config {
             .defineInRange("growthPerUse", 0.0001, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue MAX_GROWTH = BUILDER
-            .comment("Maximum growth. 1.0 = 100%.\n" +
-                    "最大成长幅度。1.0 = 100%.")
+            .comment("Maximum stored growth value. 1.0 means +100% growth bonus (growth multiplier x2.0); default 3.0 means +300% bonus (growth multiplier x4.0).\n" +
+                    "最大成长值。1.0 表示 +100% 成长加成（成长倍率 ×2.0）；默认 3.0 表示 +300% 加成（成长倍率 ×4.0）。")
             .defineInRange("maxGrowth", 3, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.BooleanValue ENABLE_EXTRA_SLOTS = BUILDER
@@ -114,8 +114,8 @@ public class Config {
             .define("enableExtraSlots", true);
 
     public static final ForgeConfigSpec.DoubleValue GROWTH_PER_EXTRA_SLOT = BUILDER
-            .comment("Growth required to unlock one extra reinforcement slot. 0.01 = 1% growth.")
-            .comment("解锁一个额外强化槽所需的成长值。0.01 = 1%。")
+            .comment("Growth required to unlock one extra reinforcement slot. 0.01 = 1% growth.\n" +
+                    "解锁一个额外强化槽所需的成长值。0.01 = 1%。")
             .defineInRange("growthPerExtraSlot", 0.1, 0.0001, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.IntValue MAX_EXTRA_SLOTS = BUILDER
@@ -152,9 +152,8 @@ public class Config {
     }
 
     public static final ForgeConfigSpec.BooleanValue ABSORBED_VALUE_INCLUDED_IN_MULTIPLIER = BUILDER
-            .comment("If true, absorbed value is multiplied by reinforcement/growth multiplier. " +
-                    "If false, absorbed value is added after multiplication.")
-            .comment("吸收值是否参与倍率放大")
+            .comment("If true, absorbed value is scaled by reinforcement/growth multipliers; if false, it is added after those multipliers.\n" +
+                    "为 true 时，吸收值会受到强化/成长倍率放大；为 false 时，吸收值在这些倍率计算后再直接加算。")
             .define("absorbedValueIncludedInMultiplier", true);
 
     public static final ForgeConfigSpec.IntValue DURABILITY_FIXED_PER_REINFORCEMENT = BUILDER
@@ -172,8 +171,8 @@ public class Config {
     }
 
     public static final ForgeConfigSpec.DoubleValue MINING_SPEED_RATIO_PER_REINFORCEMENT = BUILDER
-            .comment("Mining speed ratio added per reinforcement. 0.5 = +50% per level.\n" +
-                    "每次强化增加的挖掘速度倍率。0.5 = 每级 +50%。")
+            .comment("Mining speed bonus ratio per reinforcement. 0.5 = +50% per level; the default 1.5 = +150% per level.\n" +
+                    "每级强化增加的挖掘速度加成比例。0.5 = 每级 +50%；默认值 1.5 = 每级 +150%。")
             .defineInRange("miningSpeedRatioPerReinforcement", 1.5, 0.0, 10.0);
 
     static {
@@ -190,11 +189,8 @@ public class Config {
             .defineInRange("attackSpeedCap", 4.0, 1.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue ATTACK_SPEED_GROWTH_RATIO = BUILDER
-            .comment("""
-                    Attack speed growth ratio. progress = min(growth * ratio, 1.0).\s
-                    1.0 means max growth reaches bare-hand speed (4.0).\s
-                    攻速成长比例。进度为min(成长值 * 此倍率, 1.0).\s
-                    1.0时等同于空手攻速（4.0）。""")
+            .comment("Attack speed growth ratio. progress = min((growth + Aya news value) * ratio, 1.0). A progress of 1.0 reaches the configured bare-hand attack speed cap.\n" +
+                    "攻速成长比例。进度 = min((成长值 + 文文新闻值) × 此倍率, 1.0)；进度达到 1.0 时，攻速达到配置的空手攻速上限。")
             .defineInRange("attackSpeedGrowthRatio", 1.0, 0.01, Double.MAX_VALUE);
 
     static {
@@ -211,8 +207,8 @@ public class Config {
             .defineInRange("knockbackBaseResistance", 0.05, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue KNOCKBACK_MAX_PER_PIECE = BUILDER
-            .comment("Asymptotic max knockback resistance per armor piece.\n" +
-                    "每件护甲的最大击退抗性（成长值越高越接近这个值）")
+            .comment("Asymptotic knockback-resistance cap per armor piece. Growth and Aya news value approach this cap; each reinforcement raises the cap by 50%, up to 1.0.\n" +
+                    "每件护甲的渐近击退抗性上限。成长值与文文新闻值越高，实际抗性越接近上限；每次强化会将该上限提高 50%，但最高不超过 1.0。")
             .defineInRange("knockbackMaxPerPiece", 0.25, 0.01, Double.MAX_VALUE);
 
     static {
@@ -288,21 +284,18 @@ public class Config {
             .defineInRange("maxNewsValue", 1.0, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.BooleanValue ENABLE_AYA_INGOT = BUILDER
-            .comment("""
-                    Enable obtaining Aya Ingot by shooting.\s
-                    You can either shoot a screenshot or shoot a bullet.\s
-                    是否允许通过进行摄击获取文之锭。\s
-                    摄击也就是“拍摄”或“射击”的意思。""")
+            .comment("Enable Aya Ingot rewards from taking a screenshot or releasing a bow shot.\n" +
+                    "是否启用截图或使用弓发射箭矢时获得文之锭的奖励。")
             .define("enableAyaIngot", true);
 
     public static final ForgeConfigSpec.DoubleValue SHOOT_INGOT_CHANCE = BUILDER
-            .comment("Chance to get an Aya Ingot per shoot. 0.1 = 10%.\n" +
-                    "每次进行摄击获得文之锭的概率。0.1 = 10%。")
+            .comment("Chance to receive an Aya Ingot per eligible screenshot or bow-shot attempt. 0.1 = 10%; attempts during the shared cooldown are ignored.\n" +
+                    "每次符合条件的截图或弓射击尝试获得文之锭的概率。0.1 = 10%；共用冷却期间的尝试会被忽略。")
             .defineInRange("shootIngotChance", 0.1, 0.0, 1.0);
 
     public static final ForgeConfigSpec.IntValue SHOOT_COOLDOWN_SECONDS = BUILDER
-            .comment("Cooldown in seconds between shoot attempts. 10 = 10s.\n" +
-                    "两次摄击之间的冷却（秒）。10 = 10秒。")
+            .comment("Shared cooldown in seconds for screenshot and bow-shot reward attempts. 10 = 10 seconds; 0 disables the cooldown.\n" +
+                    "截图与弓射击奖励共用的冷却时间（秒）。10 = 10 秒；0 表示不启用冷却。")
             .defineInRange("shootCooldownSeconds", 10, 0, Integer.MAX_VALUE);
 
     static {
@@ -345,8 +338,8 @@ public class Config {
             .defineInRange("cirnoSelfSlowLevel", 1, 1, 10);
 
     public static final ForgeConfigSpec.DoubleValue CIRNO_INGOT_DROP_CHANCE = BUILDER
-            .comment("Chance to get a Cirno Ingot when harvesting ice without Silk Touch. 0.09 = 9%.\n" +
-                    "非精准采集采掘冰时掉落琪露诺锭的概率。0.09 = 9%。")
+            .comment("Chance to get a Cirno Ingot from qualifying ice events: mining without Silk Touch, Frosted Ice melting, or explosion-caused ice destruction. 0.09 = 9%.\n" +
+                    "符合条件的冰类事件掉落琪露诺锭的概率：未使用精准采集挖掘、霜冰融化或爆炸破坏冰类方块。0.09 = 9%。")
             .defineInRange("cirnoIngotDropChance", 0.09, 0.0, 1.0);
 
     // ===== Cirno - 复活 =====
@@ -518,8 +511,8 @@ public class Config {
 
     // ===== KOISHI 远程能力 =====
     public static final ForgeConfigSpec.BooleanValue ENABLE_KOISHI_RANGED = BUILDER
-            .comment("Enable Koishi ranged ability (armor-piercing crit).\n" +
-                    "启用恋恋远程能力（穿甲暴击）。")
+            .comment("Enable Koishi ranged effects: armor-piercing critical hits and special-target damage multipliers.\n" +
+                    "启用恋恋远程效果：穿甲暴击与特殊目标伤害倍率。")
             .define("enableKoishiRanged", true);
 
     public static final ForgeConfigSpec.DoubleValue KOISHI_RANGED_CRIT_CHANCE = BUILDER
@@ -533,8 +526,8 @@ public class Config {
             .defineInRange("koishiRangedCritMultiplier", 1.5, 1.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue KOISHI_PROJECTILE_IMMUNE_MULTIPLIER = BUILDER
-            .comment("Damage multiplier against projectile-immune targets. 3.0 = 300%.\n" +
-                    "对弹射物免疫目标的伤害倍率。3.0 = 300%。")
+            .comment("Extra damage multiplier for Koishi ranged attacks: applies once to Endermen and Withers below 50% health, and twice to Ender Dragons (3.0 means x9 against Ender Dragons).\n" +
+                    "恋恋远程攻击的特殊目标额外倍率：对末影人及生命值低于 50% 的凋灵应用一次；对末影龙应用两次（3.0 对末影龙相当于 ×9）。")
             .defineInRange("koishiProjectileImmuneMultiplier", 3.0, 1.0, Double.MAX_VALUE);
 
     static {

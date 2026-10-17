@@ -29,7 +29,7 @@ public class AyaIngotHandler {
 
         if (!Config.ENABLE_AYA_INGOT.get()) return;
 
-        // 冷却检查（与截图共用冷却配置，但使用独立的时间戳）
+        // 冷却检查：与截图奖励共用同一个时间戳与冷却配置
         long lastTime = serverPlayer.getPersistentData().getLong(NBT_COOLDOWN_KEY);
         long now = serverPlayer.level().getGameTime();
         int cooldown = Config.SHOOT_COOLDOWN_SECONDS.get() * 20;

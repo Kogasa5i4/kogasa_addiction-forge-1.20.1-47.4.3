@@ -11,7 +11,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class AyaArrowEntity extends Arrow {
 
-    /** Aya 箭矢自带的基础穿透等级 */
+    /**
+     * Aya 箭矢自带的基础穿透等级
+     */
     private static final byte BASE_PIERCE_LEVEL = 1;
 
     public AyaArrowEntity(EntityType<? extends AyaArrowEntity> entityType, Level level) {

@@ -77,7 +77,7 @@ public class CrossbowMixin {
 
         // 3. 穿透
         int basePierce = arrow instanceof AyaArrowEntity
-                ? ((AyaArrowEntity) arrow).getPierceLevel() : 0;
+                ? arrow.getPierceLevel() : 0;
         int bowPierce = KogasaEquipmentHelper.getBowPierceLevel(pCrossbowStack);
         int totalPierce = basePierce + bowPierce;
         if (totalPierce > 0) {
@@ -115,9 +115,13 @@ public class CrossbowMixin {
                         : (i - (fireworkCount - 1) / 2.0F) * spread;
                 float yaw = pShooter.getYRot() + yawOffset;
                 float pitch = pShooter.getXRot();
-                float fx = -Mth.sin(yaw * ((float)Math.PI / 180F)) * Mth.cos(pitch * ((float)Math.PI / 180F));
-                float fy = -Mth.sin(pitch * ((float)Math.PI / 180F));
-                float fz = Mth.cos(yaw * ((float)Math.PI / 180F)) * Mth.cos(pitch * ((float)Math.PI / 180F));
+                float fx = -Mth.sin(yaw * ((float) Math.PI / 180F)) * Mth.cos(pitch * ((float) Math.PI / 180F));
+                float fy = -Mth.sin(pitch * ((float) Math.PI / 180F));
+                float fz = Mth.cos(yaw * ((float) Math.PI / 180F)) * Mth.cos(pitch * ((float) Math.PI / 180F));
+
+                if (KogasaAbilityData.hasAbility(pCrossbowStack, KogasaAbility.KOISHI)) {
+                    rocket.getPersistentData().putBoolean("KogasaKoishiArrow", true);
+                }
 
                 rocket.shoot(fx, fy, fz, pVelocity * 1.5F * (float) speedFactor, pInaccuracy);
                 level.addFreshEntity(rocket);
@@ -157,6 +161,10 @@ public class CrossbowMixin {
         // 7. 不消耗：设置拾取模式为不可拾取
         if (pCrossbowStack.getOrCreateTag().getBoolean("KogasaNoConsume")) {
             arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
+        }
+
+        if (KogasaAbilityData.hasAbility(pCrossbowStack, KogasaAbility.KOISHI)) {
+            arrow.getPersistentData().putBoolean("KogasaKoishiArrow", true);
         }
 
         // 8. 默认：原版放行

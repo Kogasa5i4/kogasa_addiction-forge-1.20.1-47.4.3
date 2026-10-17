@@ -1,4 +1,4 @@
-// 1.20.1	2026-10-17T12:33:11.984329	Advancements
+// 1.20.1	2026-10-17T15:15:07.3868421	Advancements
 b72e3e4706795d24507a45c7a7db0664b63393a3 data/kogasa_addiction/advancements/aya_full_set.json
 062c5bec5079f3ad77995e9e2b9a7c4fc97116e0 data/kogasa_addiction/advancements/cirno_64_ingots.json
 d284aee7b8a3376d383f1f3f6546fb07d6d5b1b4 data/kogasa_addiction/advancements/cirno_revive.json
@@ -14,7 +14,7 @@ d99a7662f2421853f585be75c6b510e6a1d58f7d data/kogasa_addiction/advancements/moon
 f0afd0ff4e8335e59ce2f9d2fa37a5f0b7a9d82f data/kogasa_addiction/advancements/obtain_hoe.json
 d5b5a414d060780b27e2628ad6f1dfb4b8230de1 data/kogasa_addiction/advancements/obtain_kogasa_ingot.json
 a0bbf8bf4cf0356fa516ae2ec480e2b5d2eb0804 data/kogasa_addiction/advancements/reporter_master.json
-8e1e81c3e91f2d8cb51f6175873d39e263892309 data/kogasa_addiction/advancements/reporter_novice.json
+273c2c1b8c296d84d179e30f78ce8e2a596d3bd2 data/kogasa_addiction/advancements/reporter_novice.json
 efdad91c3d2c5c7525d4bb32649e8a88df4054cf data/kogasa_addiction/advancements/root.json
 dc688baa86910b606b3e5012b430f87a184fab3a data/kogasa_addiction/advancements/seven_slots.json
 975bf510e1fd83a55f10e1f65f42d4f1d99179c3 data/kogasa_addiction/advancements/six_slots.json

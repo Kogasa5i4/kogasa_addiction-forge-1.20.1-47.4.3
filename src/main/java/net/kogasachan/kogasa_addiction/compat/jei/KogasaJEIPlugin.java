@@ -95,6 +95,8 @@ public class KogasaJEIPlugin implements IModPlugin {
         equipmentTags.put(ModItems.KOGASA_CHESTPLATE.get(), Tags.Items.ARMORS_CHESTPLATES);
         equipmentTags.put(ModItems.KOGASA_LEGGINGS.get(), Tags.Items.ARMORS_LEGGINGS);
         equipmentTags.put(ModItems.KOGASA_BOOTS.get(), Tags.Items.ARMORS_BOOTS);
+        equipmentTags.put(ModItems.AYA_BOW.get(), Tags.Items.TOOLS_BOWS);
+        equipmentTags.put(ModItems.AYA_CROSSBOW.get(), Tags.Items.TOOLS_CROSSBOWS);
 
         for (Map.Entry<Item, TagKey<Item>> entry : equipmentTags.entrySet()) {
             Item kogasaItem = entry.getKey();
@@ -105,7 +107,7 @@ public class KogasaJEIPlugin implements IModPlugin {
             BuiltInRegistries.ITEM.getTagOrEmpty(tag).forEach(holder -> {
                 Item item = holder.value();
                 if (item == Items.AIR) return;
-                if (item instanceof IKogasaEquipment) return;
+                if (item instanceof IKogasaEquipment) return; // 防止用自己强化自己
                 materials.add(new ItemStack(item));
             });
             if (materials.isEmpty()) continue;

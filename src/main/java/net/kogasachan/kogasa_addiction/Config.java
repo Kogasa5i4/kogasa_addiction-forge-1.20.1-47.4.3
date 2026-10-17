@@ -416,6 +416,7 @@ public class Config {
     static {
         BUILDER.push("aya");
     }
+
     // ===== AYA 远程能力 =====
     public static final ForgeConfigSpec.BooleanValue ENABLE_AYA_RANGED = BUILDER
             .comment("Enable Aya ranged ability (Speed + Haste on projectile hit).")

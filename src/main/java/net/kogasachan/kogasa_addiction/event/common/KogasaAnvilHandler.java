@@ -98,6 +98,12 @@ public class KogasaAnvilHandler {
      */
     private static void handleReinforcement(AnvilUpdateEvent event,
                                             ItemStack left, ItemStack right) {
+        if (left.getItem() == right.getItem()) {
+            event.setOutput(ItemStack.EMPTY);
+            event.setCost(0);
+            return;
+        }
+
         int re = KogasaEquipmentData.getReinforcements(left);
         int maxRe = KogasaEquipmentHelper.getEffectiveMaxReinforcements(left);
 

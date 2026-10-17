@@ -2,10 +2,17 @@ package net.kogasachan.kogasa_addiction.datagen;
 
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistrySetBuilder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.TagsProvider;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.damagesource.DamageScaling;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.ForgeAdvancementProvider;
 import net.minecraftforge.data.event.GatherDataEvent;
@@ -13,6 +20,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID,
@@ -46,5 +54,22 @@ public class DataGenerators {
         generator.addProvider(event.includeServer(),
                 new ForgeAdvancementProvider(output, event.getLookupProvider(),
                         existingFileHelper, List.of(new ModAdvancementGenerator())));
+
+        // 伤害类型
+        RegistrySetBuilder builder = new RegistrySetBuilder();
+        builder.add(Registries.DAMAGE_TYPE, (context) -> {
+            context.register(
+                    ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "koishi_ranged")),
+                    new DamageType("koishi_ranged", DamageScaling.NEVER, 0.0F)
+            );
+        });
+
+        // 1. 生成伤害类型 JSON
+        generator.addProvider(event.includeServer(),
+                new DatapackBuiltinEntriesProvider(output, lookupProvider, builder, Set.of(KogasaAddiction.MODID)));
+
+        // 2. 用自定义 Provider 生成 Tag JSON（跳过 TagsProvider 的报错）
+        generator.addProvider(event.includeServer(),
+                new ModDamageTypeTagDataProvider(output));
     }
 }

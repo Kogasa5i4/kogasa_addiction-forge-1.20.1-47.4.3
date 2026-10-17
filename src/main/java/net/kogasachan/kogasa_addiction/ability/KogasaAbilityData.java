@@ -197,8 +197,9 @@ public class KogasaAbilityData {
     private static final String AMMO_POTION_KIND = "PotionKind";
     private static final String AMMO_FIREWORK_NBT = "FireworkNbt";
 
-    public enum AmmoType { POTION, FIREWORK }
-    public enum PotionKind { REGULAR, SPLASH, LINGERING }
+    public enum AmmoType {POTION, FIREWORK}
+
+    public enum PotionKind {REGULAR, SPLASH, LINGERING}
 
     public static boolean hasAmmo(ItemStack stack) {
         return getTag(stack).contains(AMMO, Tag.TAG_COMPOUND);

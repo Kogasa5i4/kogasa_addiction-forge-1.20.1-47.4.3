@@ -100,9 +100,13 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
                     // 用 lookAngle 计算带散射的发射方向
                     float yaw = player.getYRot() + yawOffset;
                     float pitch = player.getXRot();
-                    float f = -Mth.sin(yaw * ((float)Math.PI / 180F)) * Mth.cos(pitch * ((float)Math.PI / 180F));
-                    float f1 = -Mth.sin(pitch * ((float)Math.PI / 180F));
-                    float f2 = Mth.cos(yaw * ((float)Math.PI / 180F)) * Mth.cos(pitch * ((float)Math.PI / 180F));
+                    float f = -Mth.sin(yaw * ((float) Math.PI / 180F)) * Mth.cos(pitch * ((float) Math.PI / 180F));
+                    float f1 = -Mth.sin(pitch * ((float) Math.PI / 180F));
+                    float f2 = Mth.cos(yaw * ((float) Math.PI / 180F)) * Mth.cos(pitch * ((float) Math.PI / 180F));
+
+                    if (KogasaAbilityData.hasAbility(stack, KogasaAbility.KOISHI)) {
+                        rocket.getPersistentData().putBoolean("KogasaKoishiArrow", true);
+                    }
 
                     rocket.shoot(f, f1, f2, power * 1.5F, 1.0F);
                     level.addFreshEntity(rocket);
@@ -151,7 +155,7 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
 
                 // ===== 穿透叠加：Aya 箭矢自带 1 + 弓弩成长穿透 =====
                 int basePierce = arrow instanceof AyaArrowEntity
-                        ? ((AyaArrowEntity) arrow).getPierceLevel() : 0;
+                        ? arrow.getPierceLevel() : 0;
                 int bowPierce = KogasaEquipmentHelper.getBowPierceLevel(stack);
                 int totalPierce = basePierce + bowPierce;
                 if (totalPierce > 0) {
@@ -196,6 +200,11 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
                 }
 
                 if (ammoInfinite) arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
+
+                if (KogasaAbilityData.hasAbility(stack, KogasaAbility.KOISHI)) {
+                    arrow.getPersistentData().putBoolean("KogasaKoishiArrow", true);
+                }
+
                 level.addFreshEntity(arrow);
             }
 

@@ -1,0 +1,30 @@
+{
+  "parent": "kogasa_addiction:obtain_kogasa_ingot",
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.kogasa_addiction.start_growth.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "kogasa_addiction:kogasa_pickaxe",
+      "nbt": "{Damage:0}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.kogasa_addiction.start_growth.title"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

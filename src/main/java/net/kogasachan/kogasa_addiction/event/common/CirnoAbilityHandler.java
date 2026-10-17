@@ -5,6 +5,7 @@ import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
+import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -95,6 +96,7 @@ public class CirnoAbilityHandler {
                 Component.translatable("message.kogasa_addiction.cirno_revive",
                         String.format("%.2f", cost)).withStyle(net.minecraft.ChatFormatting.AQUA),
                 true);
+        KogasaAdvancementHelper.grant(player, "cirno_revive");
     }
 
     private static boolean isCirnoEquipment(ItemStack stack) {

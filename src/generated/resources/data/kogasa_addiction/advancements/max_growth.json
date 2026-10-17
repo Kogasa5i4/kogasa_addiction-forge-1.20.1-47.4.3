@@ -1,0 +1,33 @@
+{
+  "parent": "kogasa_addiction:start_growth",
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.kogasa_addiction.max_growth.description"
+    },
+    "frame": "challenge",
+    "hidden": false,
+    "icon": {
+      "item": "kogasa_addiction:kogasa_axe",
+      "nbt": "{Damage:0}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.kogasa_addiction.max_growth.title"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ],
+  "rewards": {
+    "experience": 50
+  },
+  "sends_telemetry_event": true
+}

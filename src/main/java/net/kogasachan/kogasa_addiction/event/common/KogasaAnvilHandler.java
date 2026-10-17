@@ -90,6 +90,7 @@ public class KogasaAnvilHandler {
         event.setOutput(result);
         event.setCost(Config.ABILITY_INFUSION_COST.get());
         event.setMaterialCost(1);
+        event.setCanceled(true);
     }
 
     /**

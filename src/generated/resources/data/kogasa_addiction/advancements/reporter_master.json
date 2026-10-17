@@ -1,0 +1,32 @@
+{
+  "parent": "kogasa_addiction:reporter_novice",
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.kogasa_addiction.reporter_master.description"
+    },
+    "frame": "challenge",
+    "hidden": false,
+    "icon": {
+      "item": "kogasa_addiction:aya_ingot"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.kogasa_addiction.reporter_master.title"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ],
+  "rewards": {
+    "experience": 723
+  },
+  "sends_telemetry_event": true
+}

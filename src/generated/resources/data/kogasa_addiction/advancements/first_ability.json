@@ -1,0 +1,29 @@
+{
+  "parent": "kogasa_addiction:ingot_collector",
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.kogasa_addiction.first_ability.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "kogasa_addiction:kogasa_ingot"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.kogasa_addiction.first_ability.title"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

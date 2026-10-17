@@ -1,0 +1,30 @@
+{
+  "parent": "kogasa_addiction:start_growth",
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.kogasa_addiction.wind_god_girl.description"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "item": "kogasa_addiction:aya_crossbow",
+      "nbt": "{Damage:0}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.kogasa_addiction.wind_god_girl.title"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -5,6 +5,7 @@ import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
+import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -47,6 +48,7 @@ public class AyaAbilityHandler {
         if (KogasaAbilityData.tryAddKilledMob(held, mobId.toString())) {
             KogasaAbilityData.addNewsValue(held, Config.NEWS_VALUE_PER_RECORD.get());
             player.getInventory().setChanged();
+            KogasaAdvancementHelper.checkAndGrant(player, held);
         }
     }
 
@@ -65,6 +67,7 @@ public class AyaAbilityHandler {
         if (KogasaAbilityData.tryAddMinedBlock(held, blockId.toString())) {
             KogasaAbilityData.addNewsValue(held, Config.NEWS_VALUE_PER_RECORD.get());
             serverPlayer.getInventory().setChanged();
+            KogasaAdvancementHelper.checkAndGrant(serverPlayer, held);
         }
     }
 
@@ -88,6 +91,7 @@ public class AyaAbilityHandler {
         if (KogasaAbilityData.tryAddDamageTaken(held, damageId)) {
             KogasaAbilityData.addNewsValue(held, Config.NEWS_VALUE_PER_RECORD.get());
             player.getInventory().setChanged();
+            KogasaAdvancementHelper.checkAndGrant(player, held);
         }
     }
 

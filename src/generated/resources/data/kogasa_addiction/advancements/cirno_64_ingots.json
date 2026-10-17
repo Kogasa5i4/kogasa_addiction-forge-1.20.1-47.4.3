@@ -1,0 +1,44 @@
+{
+  "parent": "kogasa_addiction:ingot_collector",
+  "criteria": {
+    "has_64_cirno": {
+      "conditions": {
+        "items": [
+          {
+            "count": {
+              "min": 64
+            },
+            "items": [
+              "kogasa_addiction:cirno_ingot"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.kogasa_addiction.cirno_64_ingots.description"
+    },
+    "frame": "challenge",
+    "hidden": true,
+    "icon": {
+      "item": "kogasa_addiction:cirno_ingot"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.kogasa_addiction.cirno_64_ingots.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_64_cirno"
+    ]
+  ],
+  "rewards": {
+    "experience": 81
+  },
+  "sends_telemetry_event": true
+}

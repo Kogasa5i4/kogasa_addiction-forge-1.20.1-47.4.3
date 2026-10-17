@@ -3,9 +3,11 @@ package net.kogasachan.kogasa_addiction.event.common;
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
+import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -113,6 +115,10 @@ public class KogasaGrowthHandler {
         // 只在成长值真的增加时才检查附魔解锁
         if (growth > oldGrowth) {
             checkGrowthEnchant(stack, player);
+        }
+
+        if (player instanceof ServerPlayer sp) {
+            KogasaAdvancementHelper.checkAndGrant(sp, stack);
         }
     }
 

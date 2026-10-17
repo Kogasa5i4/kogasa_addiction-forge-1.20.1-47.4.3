@@ -1,0 +1,32 @@
+{
+  "parent": "kogasa_addiction:wind_god_girl",
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.kogasa_addiction.moon_veteran.description"
+    },
+    "frame": "challenge",
+    "hidden": false,
+    "icon": {
+      "item": "minecraft:arrow"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.kogasa_addiction.moon_veteran.title"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ],
+  "rewards": {
+    "experience": 100
+  },
+  "sends_telemetry_event": true
+}

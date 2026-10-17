@@ -1,0 +1,29 @@
+{
+  "parent": "kogasa_addiction:first_ability",
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.kogasa_addiction.reporter_novice.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "kogasa_addiction:aya_arrow"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.kogasa_addiction.reporter_novice.title"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

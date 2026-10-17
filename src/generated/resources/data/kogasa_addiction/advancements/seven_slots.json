@@ -1,0 +1,32 @@
+{
+  "parent": "kogasa_addiction:six_slots",
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.kogasa_addiction.seven_slots.description"
+    },
+    "frame": "challenge",
+    "hidden": true,
+    "icon": {
+      "item": "minecraft:damaged_anvil"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.kogasa_addiction.seven_slots.title"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ],
+  "rewards": {
+    "experience": 500
+  },
+  "sends_telemetry_event": true
+}

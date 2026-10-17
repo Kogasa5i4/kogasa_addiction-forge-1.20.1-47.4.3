@@ -1,0 +1,29 @@
+{
+  "parent": "kogasa_addiction:first_upgrade",
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.kogasa_addiction.six_slots.description"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "item": "minecraft:chipped_anvil"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.kogasa_addiction.six_slots.title"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

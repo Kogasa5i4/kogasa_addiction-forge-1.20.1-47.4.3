@@ -7,10 +7,12 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.common.data.ForgeAdvancementProvider;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID,
@@ -39,5 +41,10 @@ public class DataGenerators {
         // 物品模型
         generator.addProvider(event.includeClient(),
                 new ModItemModelProvider(output, existingFileHelper));
+
+        // 进度
+        generator.addProvider(event.includeServer(),
+                new ForgeAdvancementProvider(output, event.getLookupProvider(),
+                        existingFileHelper, List.of(new ModAdvancementGenerator())));
     }
 }

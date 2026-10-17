@@ -1,0 +1,38 @@
+{
+  "parent": "kogasa_addiction:root",
+  "criteria": {
+    "obtain_kogasa_ingot": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "kogasa_addiction:kogasa_ingot"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.kogasa_addiction.obtain_kogasa_ingot.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "minecraft:blast_furnace"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.kogasa_addiction.obtain_kogasa_ingot.title"
+    }
+  },
+  "requirements": [
+    [
+      "obtain_kogasa_ingot"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

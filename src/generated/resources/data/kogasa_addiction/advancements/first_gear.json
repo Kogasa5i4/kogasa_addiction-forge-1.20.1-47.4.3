@@ -1,0 +1,79 @@
+{
+  "parent": "kogasa_addiction:obtain_kogasa_ingot",
+  "criteria": {
+    "first_gear": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "kogasa_addiction:kogasa_sword"
+            ]
+          },
+          {
+            "items": [
+              "kogasa_addiction:kogasa_pickaxe"
+            ]
+          },
+          {
+            "items": [
+              "kogasa_addiction:kogasa_axe"
+            ]
+          },
+          {
+            "items": [
+              "kogasa_addiction:kogasa_shovel"
+            ]
+          },
+          {
+            "items": [
+              "kogasa_addiction:kogasa_hoe"
+            ]
+          },
+          {
+            "items": [
+              "kogasa_addiction:kogasa_helmet"
+            ]
+          },
+          {
+            "items": [
+              "kogasa_addiction:kogasa_chestplate"
+            ]
+          },
+          {
+            "items": [
+              "kogasa_addiction:kogasa_leggings"
+            ]
+          },
+          {
+            "items": [
+              "kogasa_addiction:kogasa_boots"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.kogasa_addiction.first_gear.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "kogasa_addiction:kogasa_sword",
+      "nbt": "{Damage:0}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.kogasa_addiction.first_gear.title"
+    }
+  },
+  "requirements": [
+    [
+      "first_gear"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

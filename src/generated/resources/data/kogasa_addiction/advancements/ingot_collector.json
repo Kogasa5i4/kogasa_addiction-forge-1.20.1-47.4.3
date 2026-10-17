@@ -1,0 +1,83 @@
+{
+  "parent": "kogasa_addiction:obtain_kogasa_ingot",
+  "criteria": {
+    "has_aya": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "kogasa_addiction:aya_ingot"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_cirno": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "kogasa_addiction:cirno_ingot"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_kogasa": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "kogasa_addiction:kogasa_ingot"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_koishi": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "kogasa_addiction:koishi_ingot"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.kogasa_addiction.ingot_collector.description"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "item": "kogasa_addiction:koishi_ingot"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.kogasa_addiction.ingot_collector.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_kogasa"
+    ],
+    [
+      "has_aya"
+    ],
+    [
+      "has_cirno"
+    ],
+    [
+      "has_koishi"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

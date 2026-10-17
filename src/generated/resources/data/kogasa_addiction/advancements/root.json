@@ -1,0 +1,38 @@
+{
+  "criteria": {
+    "has_blast_furnace": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:blast_furnace"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "background": "minecraft:textures/block/deepslate_bricks.png",
+    "description": {
+      "translate": "advancements.kogasa_addiction.root.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "kogasa_addiction:kogasa_ingot"
+    },
+    "show_toast": false,
+    "title": {
+      "translate": "advancements.kogasa_addiction.root.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_blast_furnace"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

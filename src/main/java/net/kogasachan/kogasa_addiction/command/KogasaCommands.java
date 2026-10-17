@@ -11,6 +11,7 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
+import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
 import net.kogasachan.kogasa_addiction.event.common.KogasaGrowthHandler;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
@@ -175,6 +176,7 @@ public class KogasaCommands {
                 "commands.kogasa_addiction.grow.success",
                 String.format("%.4f", oldV),
                 String.format("%.4f", newV)), true);
+        KogasaAdvancementHelper.checkAndGrant(player, held);
         return 1;
     }
 
@@ -268,6 +270,7 @@ public class KogasaCommands {
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.reinforce.success",
                 oldRe, newRe, String.format("%.2f", absorbValue)), true);
+        KogasaAdvancementHelper.checkAndGrant(player, held);
         return 1;
     }
 
@@ -653,6 +656,7 @@ public class KogasaCommands {
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.addability.success",
                 ability.getDisplayName()), true);
+        KogasaAdvancementHelper.checkAndGrant(player, held);
         return 1;
     }
 
@@ -773,6 +777,7 @@ public class KogasaCommands {
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.setnewsvalue.success",
                 String.format("%.4f", v)), true);
+        KogasaAdvancementHelper.checkAndGrant(player, held);
         return 1;
     }
 
@@ -812,6 +817,7 @@ public class KogasaCommands {
                 "commands.kogasa_addiction.setammo.potion.success",
                 potionId.toString(),
                 kind.name().toLowerCase()), true);
+        KogasaAdvancementHelper.checkAndGrant(player, held);
         return 1;
     }
 
@@ -859,6 +865,7 @@ public class KogasaCommands {
 
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.setammo.firework.success"), true);
+        KogasaAdvancementHelper.checkAndGrant(player, held);
         return 1;
     }
 

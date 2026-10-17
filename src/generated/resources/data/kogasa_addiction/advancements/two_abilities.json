@@ -1,0 +1,29 @@
+{
+  "parent": "kogasa_addiction:first_ability",
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.kogasa_addiction.two_abilities.description"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "item": "kogasa_addiction:koishi_ingot"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.kogasa_addiction.two_abilities.title"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

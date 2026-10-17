@@ -1,0 +1,6 @@
+{
+  "name": "book.kogasa_addiction.category.commands.name",
+  "description": "book.kogasa_addiction.category.commands.desc",
+  "icon": "minecraft:command_block",
+  "sortnum": 5
+}

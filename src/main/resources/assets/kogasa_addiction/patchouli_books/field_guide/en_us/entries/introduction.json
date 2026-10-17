@@ -1,0 +1,16 @@
+{
+  "name": "book.kogasa_addiction.entry.introduction.name",
+  "category": "kogasa_addiction:basics",
+  "icon": "kogasa_addiction:kogasa_ingot",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.introduction.page1"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.introduction.page2"
+    }
+  ]
+}

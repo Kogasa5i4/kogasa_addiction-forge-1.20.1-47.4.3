@@ -1,0 +1,16 @@
+{
+  "name": "book.kogasa_addiction.entry.growth.name",
+  "category": "kogasa_addiction:growth",
+  "icon": "kogasa_addiction:kogasa_sword",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.growth.page1"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.growth.page2"
+    }
+  ]
+}

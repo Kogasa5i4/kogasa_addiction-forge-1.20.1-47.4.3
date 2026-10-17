@@ -1,6 +1,5 @@
 package net.kogasachan.kogasa_addiction.item;
 
-import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -47,17 +46,8 @@ public class KogasaAbilityIngotItem extends Item {
         tooltip.add(Component.translatable(
                         "tooltip.kogasa_addiction.ability_ingot.obtain.header")
                 .withStyle(ChatFormatting.YELLOW));
-        boolean sourceDisabled = (ability == KogasaAbility.AYA && !Config.ENABLE_AYA_INGOT.get())
-                || (ability == KogasaAbility.KOGASA && !Config.ENABLE_KOGASA_INGOT.get());
-        if (sourceDisabled) {
-            String disabledKey = ability == KogasaAbility.AYA
-                    ? "tooltip.kogasa_addiction.ability_ingot.obtain.aya.disabled"
-                    : "tooltip.kogasa_addiction.ability_ingot.obtain.kogasa.disabled";
-            tooltip.add(Component.translatable(disabledKey).withStyle(ChatFormatting.DARK_GRAY));
-        } else {
-            for (String key : ability.getObtainKeys()) {
-                tooltip.add(createObtainLine(key));
-            }
+        for (String key : ability.getObtainKeys()) {
+            tooltip.add(Component.translatable(key).withStyle(ChatFormatting.GRAY));
         }
 
         // 5. 空行 + 使用提示
@@ -67,42 +57,5 @@ public class KogasaAbilityIngotItem extends Item {
                 .withStyle(ChatFormatting.DARK_GRAY));
 
         super.appendHoverText(stack, level, tooltip, flag);
-    }
-
-    /** Build acquisition hints from the active config so the tooltip stays accurate after config changes. */
-    private Component createObtainLine(String key) {
-        Component result = switch (ability) {
-            case AYA -> {
-                String chance = formatPercent(Config.SHOOT_INGOT_CHANCE.get());
-                int cooldownSeconds = Config.SHOOT_COOLDOWN_SECONDS.get();
-                Component cooldown = cooldownSeconds <= 0
-                        ? Component.translatable("tooltip.kogasa_addiction.cooldown.none")
-                        : Component.translatable("tooltip.kogasa_addiction.cooldown.seconds", cooldownSeconds);
-                yield Component.translatable(key, chance, cooldown);
-            }
-            case CIRNO -> Component.translatable(
-                    key, formatPercent(Config.CIRNO_INGOT_DROP_CHANCE.get()));
-            case KOGASA -> Component.translatable(
-                    key, formatPercent(Config.KOGASA_INGOT_CHANCE.get()));
-            case KOISHI -> {
-                if (key.endsWith(".2")) {
-                    yield Component.translatable(
-                            key, Config.KOISHI_GHAST_KILLS_REQUIRED.get());
-                }
-                yield Component.translatable(key);
-            }
-        };
-
-        // 👇 统一在这里加上灰色样式
-        return result.copy().withStyle(ChatFormatting.GRAY);
-    }
-
-    private static String formatPercent(double chance) {
-        String percent = String.format(java.util.Locale.ROOT, "%.2f", chance * 100.0)
-                .replaceAll("\\.?0+$", "");
-        if (chance > 0.0 && Double.parseDouble(percent) == 0.0) {
-            return "<0.01%";
-        }
-        return percent + "%";
     }
 }

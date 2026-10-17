@@ -1,0 +1,16 @@
+{
+  "name": "book.kogasa_addiction.entry.koishi_ability.name",
+  "category": "kogasa_addiction:abilities",
+  "icon": "kogasa_addiction:koishi_ingot",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.koishi_ability.page1"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.koishi_ability.page2"
+    }
+  ]
+}

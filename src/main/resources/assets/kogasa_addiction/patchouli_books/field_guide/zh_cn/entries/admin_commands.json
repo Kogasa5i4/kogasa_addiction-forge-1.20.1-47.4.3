@@ -1,0 +1,16 @@
+{
+  "name": "book.kogasa_addiction.entry.admin_commands.name",
+  "category": "kogasa_addiction:commands",
+  "icon": "minecraft:command_block",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.admin_commands.page1"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.admin_commands.page2"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "book.kogasa_addiction.entry.quick_start.name",
+  "category": "kogasa_addiction:basics",
+  "icon": "kogasa_addiction:kogasa_sword",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.quick_start.page1"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.quick_start.page2"
+    }
+  ]
+}

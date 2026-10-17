@@ -1,0 +1,16 @@
+{
+  "name": "book.kogasa_addiction.entry.ability_slots.name",
+  "category": "kogasa_addiction:growth",
+  "icon": "kogasa_addiction:kogasa_ingot",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.ability_slots.page1"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.ability_slots.page2"
+    }
+  ]
+}

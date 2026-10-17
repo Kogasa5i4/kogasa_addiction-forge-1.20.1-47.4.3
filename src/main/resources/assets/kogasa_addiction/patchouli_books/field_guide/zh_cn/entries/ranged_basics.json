@@ -1,0 +1,21 @@
+{
+  "name": "book.kogasa_addiction.entry.ranged_basics.name",
+  "category": "kogasa_addiction:ranged",
+  "icon": "kogasa_addiction:aya_bow",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.ranged_basics.page1"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.ranged_basics.page2"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "kogasa_addiction:aya_bow",
+      "text": "book.kogasa_addiction.entry.ranged_basics.page3"
+    }
+  ]
+}

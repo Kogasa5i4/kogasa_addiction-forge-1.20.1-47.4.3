@@ -1,0 +1,20 @@
+{
+  "name": "book.kogasa_addiction.entry.reinforcement.name",
+  "category": "kogasa_addiction:growth",
+  "icon": "minecraft:anvil",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.reinforcement.page1"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.reinforcement.page2"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.reinforcement.page3"
+    }
+  ]
+}

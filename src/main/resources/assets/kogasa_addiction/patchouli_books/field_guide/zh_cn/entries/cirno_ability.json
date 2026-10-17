@@ -1,0 +1,16 @@
+{
+  "name": "book.kogasa_addiction.entry.cirno_ability.name",
+  "category": "kogasa_addiction:abilities",
+  "icon": "kogasa_addiction:cirno_ingot",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.cirno_ability.page1"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.cirno_ability.page2"
+    }
+  ]
+}

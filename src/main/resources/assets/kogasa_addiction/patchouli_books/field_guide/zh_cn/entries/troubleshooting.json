@@ -1,0 +1,20 @@
+{
+  "name": "book.kogasa_addiction.entry.troubleshooting.name",
+  "category": "kogasa_addiction:commands",
+  "icon": "minecraft:book",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.troubleshooting.page1"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.troubleshooting.page2"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.troubleshooting.page3"
+    }
+  ]
+}

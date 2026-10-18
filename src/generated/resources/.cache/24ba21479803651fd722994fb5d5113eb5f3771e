@@ -1,11 +1,11 @@
-// 1.20.1	2026-10-16T17:23:07.336556	Tags for minecraft:item mod id kogasa_addiction
-ac6cd982a9d8bc7978fbdd68445d82e2c44eaa0c data/forge/tags/items/armors/boots.json
-c6ada436f71c803fd28c7585f16b0cd33e9151f9 data/forge/tags/items/armors/chestplates.json
-cf51110fcdea595c270dcd09d9b7a299bd21109f data/forge/tags/items/armors/helmets.json
-032ea3f7af784d51389f17628f0f11cc1a32c589 data/forge/tags/items/armors/leggings.json
+// 1.20.1	2026-10-18T21:07:17.5169154	Tags for minecraft:item mod id kogasa_addiction
+ac80d08e703cd45351f860189d466e77e042a1f6 data/forge/tags/items/armors/boots.json
+cc1c91a9151b7ae6bfd75b0e92e04b6ca96100e7 data/forge/tags/items/armors/chestplates.json
+0a57fb99d40191df2e841f18aefb34800bb54deb data/forge/tags/items/armors/helmets.json
+5f10d6d8ea85caaf45920673ef132049a7f2ee4f data/forge/tags/items/armors/leggings.json
 39619684228b5e25cd37d739baad6e610b0e0b99 data/forge/tags/items/tools/bows.json
 6133f881281101de0e60d99e1a15db1b6184d56c data/forge/tags/items/tools/crossbows.json
-8fc5dbab9959b98c1eb463286e6560db697ce618 data/kogasa_addiction/tags/items/ability_ingots.json
+c9f901e2e1ec60d112f82d0c32ff9e21212506e1 data/kogasa_addiction/tags/items/ability_ingots.json
 c0cd33ffa613b33a62d6204c6f5c26629e0a46dc data/minecraft/tags/items/arrows.json
 cf3d339be01c52a5cca14c355dd1dacd31ee0615 data/minecraft/tags/items/axes.json
 43c3cb3c3aa783b78da9c41b9052a9ab77d56253 data/minecraft/tags/items/hoes.json

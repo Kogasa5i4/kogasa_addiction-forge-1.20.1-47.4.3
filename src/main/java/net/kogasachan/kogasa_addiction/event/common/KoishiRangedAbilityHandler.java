@@ -45,8 +45,6 @@ public class KoishiRangedAbilityHandler {
 
     @SubscribeEvent
     public static void onProjectileImpact(ProjectileImpactEvent event) {
-        if (!Config.ENABLE_KOISHI_RANGED.get()) return;
-
         // 仅处理箭矢命中实体
         if (!(event.getProjectile() instanceof AbstractArrow arrow)) return;
         if (!(event.getRayTraceResult() instanceof EntityHitResult hitResult)) return;
@@ -58,19 +56,29 @@ public class KoishiRangedAbilityHandler {
         if (!(owner instanceof ServerPlayer player)) return;
 
         ItemStack weapon = resolveWeapon(player);
-        if (weapon.isEmpty() || !KogasaAbilityData.hasAbility(weapon, KogasaAbility.KOISHI)) return;
+        if (weapon.isEmpty()) return;
+        boolean hasKoishi = Config.ENABLE_KOISHI_RANGED.get()
+                && KogasaAbilityData.hasAbility(weapon, KogasaAbility.KOISHI);
+        boolean hasTenshi = KogasaAbilityData.hasAbility(weapon, KogasaAbility.TENSHI);
+        if (!hasKoishi && !hasTenshi) return;
 
         // ===== 开始接管命中 =====
         // 1. 取消原版事件，移除箭矢
         event.setImpactResult(ProjectileImpactEvent.ImpactResult.SKIP_ENTITY);
         arrow.discard();
 
-        // 2. 计算基础伤害
+        // 2. 计算基础伤害。天子单独使用时只保留基础箭矢伤害，不继承恋恋的暴击、穿甲和特殊目标倍率。
         double speed = arrow.getDeltaMovement().length();
         float damage = (float) (speed * arrow.getBaseDamage());
+        if (!hasKoishi) {
+            livingTarget.hurt(player.damageSources().arrow(arrow, player), damage);
+            arrow.level().playSound(null, arrow.blockPosition(), SoundEvents.ARROW_HIT,
+                    SoundSource.PLAYERS, 1.0F, 1.2F);
+            return;
+        }
         if (arrow.isCritArrow()) damage *= 1.5F;
 
-        // 3. KOISHI 的 75% 暴击判定
+        // 3. KOISHI 的暴击判定
         float chance = Config.KOISHI_RANGED_CRIT_CHANCE.get().floatValue();
         boolean isCrit = player.getRandom().nextFloat() < chance;
         if (isCrit) {

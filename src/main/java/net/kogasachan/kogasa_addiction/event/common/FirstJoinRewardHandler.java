@@ -35,10 +35,10 @@ public class FirstJoinRewardHandler {
             ModItems.KOGASA_AXE,
             ModItems.KOGASA_SHOVEL,
             ModItems.KOGASA_HOE,
-            ModItems.KOGASA_HELMET,
-            ModItems.KOGASA_CHESTPLATE,
-            ModItems.KOGASA_LEGGINGS,
-            ModItems.KOGASA_BOOTS,
+            ModItems.TENSHI_HELMET,
+            ModItems.TENSHI_CHESTPLATE,
+            ModItems.TENSHI_LEGGINGS,
+            ModItems.TENSHI_BOOTS,
             ModItems.AYA_BOW,
             ModItems.AYA_CROSSBOW
     );

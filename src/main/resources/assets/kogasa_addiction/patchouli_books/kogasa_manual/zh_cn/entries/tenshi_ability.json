@@ -1,0 +1,20 @@
+{
+  "name": "book.kogasa_addiction.entry.tenshi_ability.name",
+  "category": "kogasa_addiction:abilities",
+  "icon": "kogasa_addiction:tenshi_ingot",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.tenshi_ability.page1"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.tenshi_ability.page2"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.tenshi_ability.page3"
+    }
+  ]
+}

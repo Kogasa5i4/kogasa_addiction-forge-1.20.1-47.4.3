@@ -3,16 +3,16 @@
   "category": "equipment",
   "key": {
     "I": {
-      "item": "kogasa_addiction:kogasa_ingot"
+      "item": "kogasa_addiction:tenshi_ingot"
     }
   },
   "pattern": [
-    "III",
     "I I",
-    "I I"
+    "III",
+    "III"
   ],
   "result": {
-    "item": "kogasa_addiction:kogasa_leggings"
+    "item": "kogasa_addiction:tenshi_chestplate"
   },
   "show_notification": true
 }

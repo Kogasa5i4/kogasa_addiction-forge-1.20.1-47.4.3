@@ -27,7 +27,7 @@ public class BlastFurnaceMixin {
 
     /**
      * @author Kogasa Chan
-     * @reason 高炉燃烧时概率产出伞之锭，优先输出到相邻容器
+     * @reason 高炉燃烧时概率产出小伞锭，优先输出到相邻容器
      */
     @Inject(method = "serverTick", at = @At("HEAD"))
     private static void kogasa$produceIngot(Level level, BlockPos pos, BlockState state,

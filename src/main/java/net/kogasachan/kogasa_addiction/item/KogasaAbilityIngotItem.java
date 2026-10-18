@@ -91,6 +91,8 @@ public class KogasaAbilityIngotItem extends Item {
                 }
                 yield Component.translatable(key);
             }
+            case TENSHI -> Component.translatable(key,
+                    Config.TENSHI_INGOT_HEIGHT.get(), formatPercent(Config.TENSHI_INGOT_CHANCE.get()));
         };
         return result.copy().withStyle(ChatFormatting.GRAY);
     }

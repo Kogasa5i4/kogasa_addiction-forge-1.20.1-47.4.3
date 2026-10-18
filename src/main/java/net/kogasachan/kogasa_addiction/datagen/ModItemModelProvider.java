@@ -21,6 +21,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.AYA_INGOT.get());
         basicItem(ModItems.CIRNO_INGOT.get());
         basicItem(ModItems.KOISHI_INGOT.get());
+        basicItem(ModItems.TENSHI_INGOT.get());
 
         // 2. 工具与武器
         withExistingParent("kogasa_sword", mcLoc("item/handheld"))
@@ -35,10 +36,10 @@ public class ModItemModelProvider extends ItemModelProvider {
                 .texture("layer0", modLoc("item/kogasa_hoe"));
 
         // 3. 护甲
-        basicItem(ModItems.KOGASA_HELMET.get());
-        basicItem(ModItems.KOGASA_CHESTPLATE.get());
-        basicItem(ModItems.KOGASA_LEGGINGS.get());
-        basicItem(ModItems.KOGASA_BOOTS.get());
+        basicItem(ModItems.TENSHI_HELMET.get());
+        basicItem(ModItems.TENSHI_CHESTPLATE.get());
+        basicItem(ModItems.TENSHI_LEGGINGS.get());
+        basicItem(ModItems.TENSHI_BOOTS.get());
 
         // 4. 远程武器和箭矢
         basicItem(ModItems.AYA_ARROW.get());

@@ -48,6 +48,18 @@
         ]
       },
       "trigger": "minecraft:inventory_changed"
+    },
+    "has_tenshi": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "kogasa_addiction:tenshi_ingot"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
     }
   },
   "display": {
@@ -58,7 +70,7 @@
     "frame": "goal",
     "hidden": false,
     "icon": {
-      "item": "kogasa_addiction:koishi_ingot"
+      "item": "kogasa_addiction:tenshi_ingot"
     },
     "show_toast": true,
     "title": {
@@ -77,6 +89,9 @@
     ],
     [
       "has_koishi"
+    ],
+    [
+      "has_tenshi"
     ]
   ],
   "sends_telemetry_event": true

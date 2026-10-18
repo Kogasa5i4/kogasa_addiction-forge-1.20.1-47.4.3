@@ -39,7 +39,7 @@ public class ModAdvancementGenerator implements ForgeAdvancementProvider.Advance
                 .addCriterion("has_blast_furnace", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BLAST_FURNACE))
                 .save(writer, modRoot, existingFileHelper);
 
-        // ===== 1. 获得伞之锭 =====
+        // ===== 1. 获得小伞锭 =====
         Advancement obtain_kogasa_ingot = Advancement.Builder.advancement()
                 .display(new DisplayInfo(
                         new ItemStack(Items.BLAST_FURNACE),
@@ -51,10 +51,10 @@ public class ModAdvancementGenerator implements ForgeAdvancementProvider.Advance
                 .addCriterion("obtain_kogasa_ingot", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.KOGASA_INGOT.get()))
                 .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "obtain_kogasa_ingot"), existingFileHelper);
 
-        // ===== 2. 四重存在：四种锭 =====
+        // ===== 2. 幻想乡元素周期律：五种能力锭 =====
         Advancement ingot_collector = Advancement.Builder.advancement()
                 .display(new DisplayInfo(
-                        new ItemStack(ModItems.KOISHI_INGOT.get()),
+                        new ItemStack(ModItems.TENSHI_INGOT.get()),
                         Component.translatable("advancements.kogasa_addiction.ingot_collector.title"),
                         Component.translatable("advancements.kogasa_addiction.ingot_collector.description"),
                         null, FrameType.GOAL, true, true, false
@@ -64,9 +64,10 @@ public class ModAdvancementGenerator implements ForgeAdvancementProvider.Advance
                 .addCriterion("has_aya", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.AYA_INGOT.get()))
                 .addCriterion("has_cirno", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.CIRNO_INGOT.get()))
                 .addCriterion("has_koishi", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.KOISHI_INGOT.get()))
+                .addCriterion("has_tenshi", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.TENSHI_INGOT.get()))
                 .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "ingot_collector"), existingFileHelper);
 
-        // ===== 3. 初出高炉：获得任意伞之装备 =====
+        // ===== 3. 初出高炉：获得任意模组装备 =====
         Advancement first_gear = Advancement.Builder.advancement()
                 .display(new DisplayInfo(
                         new ItemStack(ModItems.KOGASA_SWORD.get()),
@@ -78,12 +79,12 @@ public class ModAdvancementGenerator implements ForgeAdvancementProvider.Advance
                 .addCriterion("first_gear", InventoryChangeTrigger.TriggerInstance.hasItems(
                         ModItems.KOGASA_SWORD.get(), ModItems.KOGASA_PICKAXE.get(),
                         ModItems.KOGASA_AXE.get(), ModItems.KOGASA_SHOVEL.get(), ModItems.KOGASA_HOE.get(),
-                        ModItems.KOGASA_HELMET.get(), ModItems.KOGASA_CHESTPLATE.get(),
-                        ModItems.KOGASA_LEGGINGS.get(), ModItems.KOGASA_BOOTS.get()
+                        ModItems.TENSHI_HELMET.get(), ModItems.TENSHI_CHESTPLATE.get(),
+                        ModItems.TENSHI_LEGGINGS.get(), ModItems.TENSHI_BOOTS.get()
                 ))
                 .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "first_gear"), existingFileHelper);
 
-        // ===== 4. 初级奉献：获得伞之锄 =====
+        // ===== 4. 初级奉献：获得小伞锄 =====
         Advancement obtain_hoe = Advancement.Builder.advancement()
                 .display(new DisplayInfo(
                         new ItemStack(ModItems.KOGASA_HOE.get()),
@@ -95,10 +96,10 @@ public class ModAdvancementGenerator implements ForgeAdvancementProvider.Advance
                 .addCriterion("obtain_hoe", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.KOGASA_HOE.get()))
                 .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "obtain_hoe"), existingFileHelper);
 
-        // ===== 5. 锻造能手：获得全套伞之装备 =====
+        // ===== 5. 锻造能手：收集模组工具、武器与天子护甲 =====
         Advancement full_set = Advancement.Builder.advancement()
                 .display(new DisplayInfo(
-                        new ItemStack(ModItems.KOGASA_CHESTPLATE.get()),
+                        new ItemStack(ModItems.TENSHI_CHESTPLATE.get()),
                         Component.translatable("advancements.kogasa_addiction.full_set.title"),
                         Component.translatable("advancements.kogasa_addiction.full_set.description"),
                         null, FrameType.GOAL, true, true, false
@@ -109,10 +110,10 @@ public class ModAdvancementGenerator implements ForgeAdvancementProvider.Advance
                 .addCriterion("axe", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.KOGASA_AXE.get()))
                 .addCriterion("shovel", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.KOGASA_SHOVEL.get()))
                 .addCriterion("hoe", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.KOGASA_HOE.get()))
-                .addCriterion("helmet", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.KOGASA_HELMET.get()))
-                .addCriterion("chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.KOGASA_CHESTPLATE.get()))
-                .addCriterion("leggings", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.KOGASA_LEGGINGS.get()))
-                .addCriterion("boots", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.KOGASA_BOOTS.get()))
+                .addCriterion("helmet", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.TENSHI_HELMET.get()))
+                .addCriterion("chestplate", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.TENSHI_CHESTPLATE.get()))
+                .addCriterion("leggings", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.TENSHI_LEGGINGS.get()))
+                .addCriterion("boots", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.TENSHI_BOOTS.get()))
                 .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "full_set"), existingFileHelper);
 
         // ===== 6. 求“升”之路：第一次锻造升级 =====
@@ -276,7 +277,7 @@ public class ModAdvancementGenerator implements ForgeAdvancementProvider.Advance
                 .rewards(AdvancementRewards.Builder.experience(611))
                 .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "high_stats"), existingFileHelper);
 
-        // ===== 19. 幻想风靡：获得全套文之装备（弓、弩、箭） =====
+        // ===== 19. 幻想风靡：获得全套文文装备（弓、弩、箭） =====
         Advancement aya_full_set = Advancement.Builder.advancement()
                 .display(new DisplayInfo(
                         new ItemStack(ModItems.AYA_BOW.get()),

@@ -69,38 +69,38 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_ingot", has(ModItems.KOGASA_INGOT.get()))
                 .save(writer);
 
-        // 头盔
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.KOGASA_HELMET.get())
+        // 天子头盔
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.TENSHI_HELMET.get())
                 .pattern("III")
                 .pattern("I I")
-                .define('I', ModItems.KOGASA_INGOT.get())
-                .unlockedBy("has_ingot", has(ModItems.KOGASA_INGOT.get()))
+                .define('I', ModItems.TENSHI_INGOT.get())
+                .unlockedBy("has_ingot", has(ModItems.TENSHI_INGOT.get()))
                 .save(writer);
 
-        // 胸甲
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.KOGASA_CHESTPLATE.get())
+        // 天子胸甲
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.TENSHI_CHESTPLATE.get())
                 .pattern("I I")
                 .pattern("III")
                 .pattern("III")
-                .define('I', ModItems.KOGASA_INGOT.get())
-                .unlockedBy("has_ingot", has(ModItems.KOGASA_INGOT.get()))
+                .define('I', ModItems.TENSHI_INGOT.get())
+                .unlockedBy("has_ingot", has(ModItems.TENSHI_INGOT.get()))
                 .save(writer);
 
-        // 护腿
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.KOGASA_LEGGINGS.get())
+        // 天子护腿
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.TENSHI_LEGGINGS.get())
                 .pattern("III")
                 .pattern("I I")
                 .pattern("I I")
-                .define('I', ModItems.KOGASA_INGOT.get())
-                .unlockedBy("has_ingot", has(ModItems.KOGASA_INGOT.get()))
+                .define('I', ModItems.TENSHI_INGOT.get())
+                .unlockedBy("has_ingot", has(ModItems.TENSHI_INGOT.get()))
                 .save(writer);
 
-        // 靴子
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.KOGASA_BOOTS.get())
+        // 天子靴子
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.TENSHI_BOOTS.get())
                 .pattern("I I")
                 .pattern("I I")
-                .define('I', ModItems.KOGASA_INGOT.get())
-                .unlockedBy("has_ingot", has(ModItems.KOGASA_INGOT.get()))
+                .define('I', ModItems.TENSHI_INGOT.get())
+                .unlockedBy("has_ingot", has(ModItems.TENSHI_INGOT.get()))
                 .save(writer);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.AYA_BOW.get())

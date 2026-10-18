@@ -14,7 +14,7 @@
     },
     {
       "type": "patchouli:text",
-      "title": "book.kogasa_addiction.entry.reinforcement.page3"
+      "text": "book.kogasa_addiction.entry.reinforcement.page3"
     }
   ]
 }

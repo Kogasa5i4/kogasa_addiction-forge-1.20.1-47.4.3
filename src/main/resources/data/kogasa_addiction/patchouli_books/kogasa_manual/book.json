@@ -1,13 +1,17 @@
 {
-  "name": "book.kogasa_addiction.kogasa_manual.name",
-  "landing_text": "book.kogasa_addiction.kogasa_manual.landing",
-  "subtitle": "book.kogasa_addiction.kogasa_manual.subtitle",
-  "version": "0",
-  "creative_tab": "minecraft:tools_and_utilities",
-  "book_texture": "patchouli:textures/gui/book_cyan.png",
-  "show_toasts": false,
-  "use_resource_pack": true,
-  "i18n": true,
+  "advancement_namespaces": [
+    "kogasa_addiction"
+  ],
   "allow_extensions": true,
-  "text_overflow_mode": "resize"
+  "book_texture": "patchouli:textures/gui/book_cyan.png",
+  "creative_tab": "minecraft:tools_and_utilities",
+  "i18n": true,
+  "landing_text": "book.kogasa_addiction.kogasa_manual.landing",
+  "name": "book.kogasa_addiction.kogasa_manual.name",
+  "show_progress": false,
+  "show_toasts": false,
+  "subtitle": "book.kogasa_addiction.kogasa_manual.subtitle",
+  "text_overflow_mode": "resize",
+  "use_resource_pack": true,
+  "version": "0"
 }

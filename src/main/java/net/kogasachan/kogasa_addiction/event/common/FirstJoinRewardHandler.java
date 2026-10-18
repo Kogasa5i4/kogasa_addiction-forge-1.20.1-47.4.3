@@ -8,6 +8,7 @@ import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -16,7 +17,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -26,9 +29,6 @@ public class FirstJoinRewardHandler {
 
     private static final String NBT_KEY = "KogasaFirstJoinReward";
 
-    /**
-     * 用 Supplier 包一层，避免在类加载时调用 RegistryObject.get()
-     */
     private static final List<Supplier<Item>> EQUIPMENT_POOL = List.of(
             ModItems.KOGASA_SWORD,
             ModItems.KOGASA_PICKAXE,
@@ -52,30 +52,36 @@ public class FirstJoinRewardHandler {
         CompoundTag data = player.getPersistentData();
         if (data.getBoolean(NBT_KEY)) return;
 
-        // ===== 随机装备（此时注册表已完成） =====
+        // ===== 1. 随机装备 =====
         Supplier<Item> chosenSupplier =
                 EQUIPMENT_POOL.get(player.getRandom().nextInt(EQUIPMENT_POOL.size()));
         Item chosen = chosenSupplier.get();
         ItemStack stack = new ItemStack(chosen);
 
-        // ===== 随机能力 =====
+        // 随机能力
         KogasaAbility[] abilities = KogasaAbility.values();
         KogasaAbility ability = abilities[player.getRandom().nextInt(abilities.length)];
         KogasaAbilityData.addAbility(stack, ability);
 
-        // ===== 发放 =====
-        if (!player.getInventory().add(stack)) {
-            player.drop(stack, false);
-            ItemEntity drop = new ItemEntity(player.level(),
-                    player.getX(), player.getY() + 0.5, player.getZ(), stack);
-            drop.setPickUpDelay(0);
-            player.level().addFreshEntity(drop);
+        giveItemToPlayer(player, stack);
+
+        // ===== 2. 发放帕秋莉手册（软依赖） =====
+        if (ModList.get().isLoaded("patchouli")) {
+            Item guideBookItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.fromNamespaceAndPath("patchouli", "guide_book"));
+            if (guideBookItem != null) {
+                ItemStack bookStack = new ItemStack(guideBookItem);
+                CompoundTag bookNbt = new CompoundTag();
+                // 指定是哪本书，格式为：命名空间:书ID
+                bookNbt.putString("patchouli:book", KogasaAddiction.MODID + ":kogasa_manual");
+                bookStack.setTag(bookNbt);
+
+                giveItemToPlayer(player, bookStack);
+            }
         }
 
-        // ===== 标记已领取 =====
+        // ===== 3. 标记已领取与反馈 =====
         data.putBoolean(NBT_KEY, true);
 
-        // ===== 音效 + 提示 =====
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.7F, 1.4F);
 
@@ -88,5 +94,17 @@ public class FirstJoinRewardHandler {
                 player.getName().getString(),
                 chosen,
                 ability.getId());
+    }
+
+    /**
+     * 发放物品，背包满则掉落在玩家脚下
+     */
+    private static void giveItemToPlayer(ServerPlayer player, ItemStack stack) {
+        if (!player.getInventory().add(stack)) {
+            ItemEntity drop = new ItemEntity(player.level(),
+                    player.getX(), player.getY() + 0.5, player.getZ(), stack);
+            drop.setPickUpDelay(0);
+            player.level().addFreshEntity(drop);
+        }
     }
 }

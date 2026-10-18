@@ -20,7 +20,7 @@ public class AyaIngotHandler {
     private static final String NBT_COOLDOWN_KEY = "LastAyaShootTime";
 
     /**
-     * 射箭/射弩时概率获得文之锭（shoot 双关）
+     * 射箭/射弩时概率获得文文锭（shoot 双关）
      */
     @SubscribeEvent
     public static void onArrowLoose(ArrowLooseEvent event) {
@@ -43,7 +43,7 @@ public class AyaIngotHandler {
             return;  // 未命中静默（射箭本身有音效，再加提示会吵）
         }
 
-        // 发放文之锭
+        // 发放文文锭
         ItemStack ingot = new ItemStack(ModItems.AYA_INGOT.get());
         if (!serverPlayer.getInventory().add(ingot)) {
             serverPlayer.drop(ingot, false);

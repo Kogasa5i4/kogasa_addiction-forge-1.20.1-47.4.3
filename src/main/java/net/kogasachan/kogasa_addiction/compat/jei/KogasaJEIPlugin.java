@@ -8,7 +8,9 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
+import net.kogasachan.kogasa_addiction.datagen.ModItemTagsProvider;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
+import net.kogasachan.kogasa_addiction.item.KogasaAbilityIngotItem;
 import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
@@ -60,25 +62,26 @@ public class KogasaJEIPlugin implements IModPlugin {
      * 使用剑作为输入代表，tooltip 说明适用于所有 Kogasa 装备
      */
     private static void registerAbilityRecipes(List<AnvilReinforcementRecipe> recipes) {
-        // 用 LinkedHashMap 保证顺序：kogasa → aya → cirno → koishi
-        Map<Item, KogasaAbility> abilityIngots = new LinkedHashMap<>();
-        abilityIngots.put(ModItems.KOGASA_INGOT.get(), KogasaAbility.KOGASA);
-        abilityIngots.put(ModItems.AYA_INGOT.get(), KogasaAbility.AYA);
-        abilityIngots.put(ModItems.CIRNO_INGOT.get(), KogasaAbility.CIRNO);
-        abilityIngots.put(ModItems.KOISHI_INGOT.get(), KogasaAbility.KOISHI);
-
         ItemStack sampleEquipment = new ItemStack(ModItems.KOGASA_SWORD.get());
 
-        for (Map.Entry<Item, KogasaAbility> entry : abilityIngots.entrySet()) {
-            ItemStack input = sampleEquipment.copy();
-            List<ItemStack> materials = List.of(new ItemStack(entry.getKey()));
+        // 1. 遍历标签内所有物品
+        BuiltInRegistries.ITEM.getTagOrEmpty(ModItemTagsProvider.ABILITY_INGOTS).forEach(holder -> {
+            Item ingotItem = holder.value();
 
-            ItemStack output = input.copy();
-            KogasaAbilityData.addAbility(output, entry.getValue());
+            // 2. 过滤：只处理属于我们能力锭类的物品
+            if (ingotItem instanceof KogasaAbilityIngotItem abilityIngot) {
+                KogasaAbility ability = abilityIngot.getAbility();
 
-            recipes.add(new AnvilReinforcementRecipe(
-                    input, materials, output, RecipeKind.ABILITY));
-        }
+                ItemStack input = sampleEquipment.copy();
+                List<ItemStack> materials = List.of(new ItemStack(ingotItem));
+
+                ItemStack output = input.copy();
+                KogasaAbilityData.addAbility(output, ability);
+
+                recipes.add(new AnvilReinforcementRecipe(
+                        input, materials, output, RecipeKind.ABILITY));
+            }
+        });
     }
 
     /**
@@ -91,10 +94,10 @@ public class KogasaJEIPlugin implements IModPlugin {
         equipmentTags.put(ModItems.KOGASA_AXE.get(), ItemTags.AXES);
         equipmentTags.put(ModItems.KOGASA_SHOVEL.get(), ItemTags.SHOVELS);
         equipmentTags.put(ModItems.KOGASA_HOE.get(), ItemTags.HOES);
-        equipmentTags.put(ModItems.KOGASA_HELMET.get(), Tags.Items.ARMORS_HELMETS);
-        equipmentTags.put(ModItems.KOGASA_CHESTPLATE.get(), Tags.Items.ARMORS_CHESTPLATES);
-        equipmentTags.put(ModItems.KOGASA_LEGGINGS.get(), Tags.Items.ARMORS_LEGGINGS);
-        equipmentTags.put(ModItems.KOGASA_BOOTS.get(), Tags.Items.ARMORS_BOOTS);
+        equipmentTags.put(ModItems.TENSHI_HELMET.get(), Tags.Items.ARMORS_HELMETS);
+        equipmentTags.put(ModItems.TENSHI_CHESTPLATE.get(), Tags.Items.ARMORS_CHESTPLATES);
+        equipmentTags.put(ModItems.TENSHI_LEGGINGS.get(), Tags.Items.ARMORS_LEGGINGS);
+        equipmentTags.put(ModItems.TENSHI_BOOTS.get(), Tags.Items.ARMORS_BOOTS);
         equipmentTags.put(ModItems.AYA_BOW.get(), Tags.Items.TOOLS_BOWS);
         equipmentTags.put(ModItems.AYA_CROSSBOW.get(), Tags.Items.TOOLS_CROSSBOWS);
 

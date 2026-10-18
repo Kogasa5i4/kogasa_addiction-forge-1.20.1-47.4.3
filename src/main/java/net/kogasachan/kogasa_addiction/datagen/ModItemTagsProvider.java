@@ -41,10 +41,10 @@ public class ModItemTagsProvider extends ItemTagsProvider {
         this.tag(ItemTags.HOES).add(ModItems.KOGASA_HOE.get());
 
         // ===== 护甲：加入 Forge 通用标签 =====
-        this.tag(Tags.Items.ARMORS_HELMETS).add(ModItems.KOGASA_HELMET.get());
-        this.tag(Tags.Items.ARMORS_CHESTPLATES).add(ModItems.KOGASA_CHESTPLATE.get());
-        this.tag(Tags.Items.ARMORS_LEGGINGS).add(ModItems.KOGASA_LEGGINGS.get());
-        this.tag(Tags.Items.ARMORS_BOOTS).add(ModItems.KOGASA_BOOTS.get());
+        this.tag(Tags.Items.ARMORS_HELMETS).add(ModItems.TENSHI_HELMET.get());
+        this.tag(Tags.Items.ARMORS_CHESTPLATES).add(ModItems.TENSHI_CHESTPLATE.get());
+        this.tag(Tags.Items.ARMORS_LEGGINGS).add(ModItems.TENSHI_LEGGINGS.get());
+        this.tag(Tags.Items.ARMORS_BOOTS).add(ModItems.TENSHI_BOOTS.get());
 
         // ===== 箭矢：加入原版标签 =====
         this.tag(ItemTags.ARROWS)
@@ -59,6 +59,7 @@ public class ModItemTagsProvider extends ItemTagsProvider {
                 .add(ModItems.KOGASA_INGOT.get())
                 .add(ModItems.AYA_INGOT.get())
                 .add(ModItems.CIRNO_INGOT.get())
-                .add(ModItems.KOISHI_INGOT.get());
+                .add(ModItems.KOISHI_INGOT.get())
+                .add(ModItems.TENSHI_INGOT.get());
     }
 }

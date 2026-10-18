@@ -6,7 +6,7 @@
         "items": [
           {
             "items": [
-              "kogasa_addiction:kogasa_ingot"
+              "kogasa_addiction:tenshi_ingot"
             ]
           }
         ]
@@ -15,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "kogasa_addiction:kogasa_helmet"
+        "recipe": "kogasa_addiction:tenshi_helmet"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -28,7 +28,7 @@
   ],
   "rewards": {
     "recipes": [
-      "kogasa_addiction:kogasa_helmet"
+      "kogasa_addiction:tenshi_helmet"
     ]
   },
   "sends_telemetry_event": false

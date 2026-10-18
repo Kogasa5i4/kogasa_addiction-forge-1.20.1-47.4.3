@@ -52,7 +52,7 @@ public class ScreenshotTakenPacket {
                 return;
             }
 
-            // 4. 命中：发放文之锭
+            // 4. 命中：发放文文锭
             ItemStack ingot = new ItemStack(ModItems.AYA_INGOT.get());
             if (!player.getInventory().add(ingot)) {
                 player.drop(ingot, false);

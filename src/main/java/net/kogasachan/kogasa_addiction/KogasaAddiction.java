@@ -3,6 +3,7 @@ package net.kogasachan.kogasa_addiction;
 import com.mojang.logging.LogUtils;
 import net.kogasachan.kogasa_addiction.entity.ModEntities;
 import net.kogasachan.kogasa_addiction.item.ModItems;
+import net.kogasachan.kogasa_addiction.migration.ItemIdMigration;
 import net.kogasachan.kogasa_addiction.recipe.ModRecipes;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;

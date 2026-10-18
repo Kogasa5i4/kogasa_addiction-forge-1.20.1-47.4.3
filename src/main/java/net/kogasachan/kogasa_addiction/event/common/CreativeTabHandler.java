@@ -17,14 +17,15 @@ public class CreativeTabHandler {
             event.accept(ModItems.AYA_INGOT);
             event.accept(ModItems.CIRNO_INGOT);
             event.accept(ModItems.KOISHI_INGOT);
+            event.accept(ModItems.TENSHI_INGOT);
         }
         if (event.getTabKey() == CreativeModeTabs.COMBAT) {
             event.accept(ModItems.KOGASA_SWORD);
             event.accept(ModItems.KOGASA_AXE);
-            event.accept(ModItems.KOGASA_HELMET);
-            event.accept(ModItems.KOGASA_CHESTPLATE);
-            event.accept(ModItems.KOGASA_LEGGINGS);
-            event.accept(ModItems.KOGASA_BOOTS);
+            event.accept(ModItems.TENSHI_HELMET);
+            event.accept(ModItems.TENSHI_CHESTPLATE);
+            event.accept(ModItems.TENSHI_LEGGINGS);
+            event.accept(ModItems.TENSHI_BOOTS);
             event.accept(ModItems.AYA_BOW);
             event.accept(ModItems.AYA_CROSSBOW);
             event.accept(ModItems.AYA_ARROW);

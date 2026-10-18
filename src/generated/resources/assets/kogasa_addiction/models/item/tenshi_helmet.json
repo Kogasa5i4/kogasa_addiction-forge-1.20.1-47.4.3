@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "kogasa_addiction:item/kogasa_boots"
+    "layer0": "kogasa_addiction:item/tenshi_helmet"
   }
 }

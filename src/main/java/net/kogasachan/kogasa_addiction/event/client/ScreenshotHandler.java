@@ -15,7 +15,7 @@ public class ScreenshotHandler {
     public static void onScreenshot(ScreenshotEvent event) {
         // 可选：在这里检查截图内容（event.getImage()），决定是否"有效"
 
-        // 发送网络包到服务端，请求发放"文之锭"
+        // 发送网络包到服务端，请求发放"文文锭"
         PacketHandler.INSTANCE.sendToServer(new ScreenshotTakenPacket());
     }
 }

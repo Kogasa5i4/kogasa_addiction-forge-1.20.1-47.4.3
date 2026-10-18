@@ -40,6 +40,12 @@ public class ModItems {
                     new Item.Properties().fireResistant())
     );
 
+    public static final RegistryObject<Item> TENSHI_INGOT = ITEMS.register(
+            "tenshi_ingot",
+            () -> new KogasaAbilityIngotItem(KogasaAbility.TENSHI,
+                    new Item.Properties().fireResistant())
+    );
+
     // 工具/武器
     public static final RegistryObject<Item> KOGASA_SWORD = ITEMS.register(
             "kogasa_sword",
@@ -68,24 +74,24 @@ public class ModItems {
     );
 
     // 护甲
-    public static final RegistryObject<Item> KOGASA_HELMET = ITEMS.register(
-            "kogasa_helmet",
-            () -> new KogasaArmorItem(KogasaArmorMaterial.INSTANCE,
+    public static final RegistryObject<Item> TENSHI_HELMET = ITEMS.register(
+            "tenshi_helmet",
+            () -> new KogasaArmorItem(TenshiArmorMaterial.INSTANCE,
                     ArmorItem.Type.HELMET, new Item.Properties())
     );
-    public static final RegistryObject<Item> KOGASA_CHESTPLATE = ITEMS.register(
-            "kogasa_chestplate",
-            () -> new KogasaArmorItem(KogasaArmorMaterial.INSTANCE,
+    public static final RegistryObject<Item> TENSHI_CHESTPLATE = ITEMS.register(
+            "tenshi_chestplate",
+            () -> new KogasaArmorItem(TenshiArmorMaterial.INSTANCE,
                     ArmorItem.Type.CHESTPLATE, new Item.Properties())
     );
-    public static final RegistryObject<Item> KOGASA_LEGGINGS = ITEMS.register(
-            "kogasa_leggings",
-            () -> new KogasaArmorItem(KogasaArmorMaterial.INSTANCE,
+    public static final RegistryObject<Item> TENSHI_LEGGINGS = ITEMS.register(
+            "tenshi_leggings",
+            () -> new KogasaArmorItem(TenshiArmorMaterial.INSTANCE,
                     ArmorItem.Type.LEGGINGS, new Item.Properties())
     );
-    public static final RegistryObject<Item> KOGASA_BOOTS = ITEMS.register(
-            "kogasa_boots",
-            () -> new KogasaArmorItem(KogasaArmorMaterial.INSTANCE,
+    public static final RegistryObject<Item> TENSHI_BOOTS = ITEMS.register(
+            "tenshi_boots",
+            () -> new KogasaArmorItem(TenshiArmorMaterial.INSTANCE,
                     ArmorItem.Type.BOOTS, new Item.Properties())
     );
 

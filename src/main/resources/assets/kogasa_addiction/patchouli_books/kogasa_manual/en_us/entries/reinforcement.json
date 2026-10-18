@@ -2,7 +2,7 @@
   "name": "book.kogasa_addiction.entry.reinforcement.name",
   "category": "kogasa_addiction:growth",
   "icon": "minecraft:anvil",
-  "sortnum": 1,
+  "sortnum": 2,
   "pages": [
     {
       "type": "patchouli:text",

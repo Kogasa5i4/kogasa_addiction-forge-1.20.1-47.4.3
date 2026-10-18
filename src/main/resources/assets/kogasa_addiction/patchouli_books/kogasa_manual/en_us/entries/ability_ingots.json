@@ -2,7 +2,7 @@
   "name": "book.kogasa_addiction.entry.ability_ingots.name",
   "category": "kogasa_addiction:equipment",
   "icon": "kogasa_addiction:aya_ingot",
-  "sortnum": 1,
+  "sortnum": 3,
   "pages": [
     {
       "type": "patchouli:text",

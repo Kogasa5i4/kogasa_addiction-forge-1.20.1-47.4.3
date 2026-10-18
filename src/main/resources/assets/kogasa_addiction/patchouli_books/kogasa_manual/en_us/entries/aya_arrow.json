@@ -1,8 +1,8 @@
 {
   "name": "book.kogasa_addiction.entry.aya_arrow.name",
-  "category": "kogasa_addiction:ranged",
+  "category": "kogasa_addiction:equipment",
   "icon": "kogasa_addiction:aya_arrow",
-  "sortnum": 1,
+  "sortnum": 2,
   "pages": [
     {
       "type": "patchouli:text",
@@ -11,6 +11,11 @@
     {
       "type": "patchouli:text",
       "text": "book.kogasa_addiction.entry.aya_arrow.page2"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "kogasa_addiction:aya_arrow",
+      "text": "book.kogasa_addiction.entry.aya_arrow.page3"
     }
   ]
 }

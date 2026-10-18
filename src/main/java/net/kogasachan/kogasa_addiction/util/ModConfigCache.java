@@ -9,8 +9,8 @@ import net.minecraftforge.fml.event.config.ModConfigEvent;
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModConfigCache {
 
-    public static boolean enableBlastFurnaceIngot = true;
-    public static float blastFurnaceIngotChance = 0.001f;
+    public static boolean enableKogasaIngot = true;
+    public static float kogasaIngotChance = 0.001f;
     public static int growthUnlockReinforcements = 3;
     public static double cirnoIngotDropChance = 0.09;
     public static int kogasaIngotSearchHeight = 8;
@@ -27,8 +27,8 @@ public class ModConfigCache {
     }
 
     private static void refresh() {
-        enableBlastFurnaceIngot = Config.ENABLE_KOGASA_INGOT.get();
-        blastFurnaceIngotChance = Config.KOGASA_INGOT_CHANCE.get().floatValue();
+        enableKogasaIngot = Config.ENABLE_KOGASA_INGOT.get();
+        kogasaIngotChance = Config.KOGASA_INGOT_CHANCE.get().floatValue();
         growthUnlockReinforcements = Config.GROWTH_UNLOCK_REINFORCEMENTS.get();
         cirnoIngotDropChance = Config.CIRNO_INGOT_DROP_CHANCE.get();
         kogasaIngotSearchHeight = Config.KOGASA_INGOT_SEARCH_HEIGHT.get();

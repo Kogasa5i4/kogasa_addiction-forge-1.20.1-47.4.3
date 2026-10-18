@@ -1,0 +1,16 @@
+{
+  "name": "book.kogasa_addiction.entry.growth_enchant.name",
+  "category": "kogasa_addiction:growth",
+  "icon": "minecraft:enchanting_table",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.growth_enchant.page1"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.growth_enchant.page2"
+    }
+  ]
+}

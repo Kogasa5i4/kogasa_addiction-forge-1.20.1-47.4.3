@@ -1,0 +1,25 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "patchouli"
+        }
+      ],
+      "recipe": {
+        "type": "patchouli:shapeless_book_recipe",
+        "ingredients": [
+          {
+            "tag": "kogasa_addiction:ability_ingots"
+          },
+          {
+            "item": "minecraft:book"
+          }
+        ],
+        "book": "kogasa_addiction:kogasa_manual"
+      }
+    }
+  ]
+}

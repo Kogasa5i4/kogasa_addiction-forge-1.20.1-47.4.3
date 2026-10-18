@@ -33,11 +33,11 @@ public class BlastFurnaceMixin {
     private static void kogasa$produceIngot(Level level, BlockPos pos, BlockState state,
                                             AbstractFurnaceBlockEntity blockEntity,
                                             CallbackInfo ci) {
-        if (!ModConfigCache.enableBlastFurnaceIngot) return;
+        if (!ModConfigCache.enableKogasaIngot) return;
         if (level.isClientSide) return;
         if (!(blockEntity instanceof BlastFurnaceBlockEntity)) return;
         if (!blockEntity.isLit()) return;
-        if (level.random.nextFloat() >= ModConfigCache.blastFurnaceIngotChance) return;
+        if (level.random.nextFloat() >= ModConfigCache.kogasaIngotChance) return;
 
         ItemStack drop = new ItemStack(ModItems.KOGASA_INGOT.get());
 

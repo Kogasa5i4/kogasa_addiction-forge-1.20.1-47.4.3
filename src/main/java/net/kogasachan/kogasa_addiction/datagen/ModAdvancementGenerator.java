@@ -6,15 +6,15 @@ import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.advancements.FrameType;
-import net.minecraft.advancements.critereon.ImpossibleTrigger;
-import net.minecraft.advancements.critereon.InventoryChangeTrigger;
-import net.minecraft.advancements.critereon.ItemPredicate;
-import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.advancements.critereon.*;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemEntityPropertyCondition;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.ForgeAdvancementProvider;
 import org.jetbrains.annotations.NotNull;
@@ -320,5 +320,40 @@ public class ModAdvancementGenerator implements ForgeAdvancementProvider.Advance
                 .addCriterion("has_64_cirno", InventoryChangeTrigger.TriggerInstance.hasItems(has64Cirno))
                 .rewards(AdvancementRewards.Builder.experience(81))
                 .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "cirno_64_ingots"), existingFileHelper);
+
+        // ===== 22. 天之女、地之神、人之心：在 300 格以上获取天子锭（隐藏） =====
+        LootItemCondition heightCondition = LootItemEntityPropertyCondition
+                .hasProperties(LootContext.EntityTarget.THIS, EntityPredicate.Builder.entity()
+                        .located(LocationPredicate.Builder.location()
+                                .setY(MinMaxBounds.Doubles.atLeast(300)).build()
+                        ))
+                .build();
+
+        ContextAwarePredicate playerPredicate = ContextAwarePredicate.create(heightCondition);
+
+        ItemPredicate[] tenshiIngotPredicate = new ItemPredicate[]{ItemPredicate.Builder.item()
+                .of(ModItems.TENSHI_INGOT.get())
+                .build()};
+
+        InventoryChangeTrigger.TriggerInstance tenshiHeightTrigger =
+                new InventoryChangeTrigger.TriggerInstance(
+                        playerPredicate,
+                        MinMaxBounds.Ints.ANY,
+                        MinMaxBounds.Ints.ANY,
+                        MinMaxBounds.Ints.ANY,
+                        tenshiIngotPredicate
+                );
+
+        Advancement tenshi_height_challenge = Advancement.Builder.advancement()
+                .display(new DisplayInfo(
+                        new ItemStack(ModItems.TENSHI_INGOT.get()),
+                        Component.translatable("advancements.kogasa_addiction.tenshi_height_challenge.title"),
+                        Component.translatable("advancements.kogasa_addiction.tenshi_height_challenge.description"),
+                        null, FrameType.CHALLENGE, true, true, true
+                ))
+                .parent(ResourceLocation.fromNamespaceAndPath("minecraft", "adventure/trade_at_world_height")) // 星际商人
+                .addCriterion("get_tenshi_ingot_at_height", tenshiHeightTrigger)
+                .rewards(AdvancementRewards.Builder.experience(1050))
+                .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "tenshi_height_challenge"), existingFileHelper);
     }
 }

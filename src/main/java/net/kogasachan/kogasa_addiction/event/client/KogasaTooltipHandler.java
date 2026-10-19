@@ -17,6 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraftforge.api.distmarker.Dist;
@@ -243,6 +244,72 @@ public class KogasaTooltipHandler {
                                 "tooltip.kogasa_addiction.multiplier.total",
                                 String.format("%.3f", totalMult))
                         .withStyle(ChatFormatting.GOLD));
+            }
+
+            // ===== 天子能力 =====
+            if (KogasaAbilityData.hasAbility(stack, KogasaAbility.TENSHI)) {
+                boolean isArmor = stack.getItem() instanceof ArmorItem;
+                boolean isWeapon = stack.getItem() instanceof SwordItem
+                        || stack.getItem() instanceof DiggerItem
+                        || stack.getItem() instanceof BowItem
+                        || stack.getItem() instanceof CrossbowItem;
+
+                // 2. 护甲专属描述与动态状态
+                if (isArmor) {
+                    double threshold = Config.TENSHI_DOMAIN_THRESHOLD.get();
+
+                    // 动态：读取玩家当前蓄力状态
+                    net.minecraft.client.player.LocalPlayer player = net.minecraft.client.Minecraft.getInstance().player;
+                    if (player != null) {
+                        boolean hasTenshiArmor = false;
+                        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+                            if (KogasaAbilityData.hasAbility(player.getItemBySlot(slot), KogasaAbility.TENSHI)) {
+                                hasTenshiArmor = true;
+                                break;
+                            }
+                        }
+
+                        if (hasTenshiArmor) {
+                            double charge = player.getPersistentData().getDouble("KogasaTenshiCharge");
+                            boolean isReady = player.getPersistentData().getBoolean("KogasaTenshiBurstReady");
+                            int resistance = (int) Math.min(5, Math.floor(charge / (threshold / 4.0)));
+
+                            if (isReady) {
+                                tooltip.add(Component.translatable("tooltip.kogasa_addiction.tenshi.ready")
+                                        .withStyle(ChatFormatting.AQUA));
+                            } else {
+                                tooltip.add(Component.translatable("tooltip.kogasa_addiction.tenshi.charge",
+                                                String.format(java.util.Locale.ROOT, "%.1f", charge),
+                                                String.format(java.util.Locale.ROOT, "%.1f", threshold),
+                                                resistance)
+                                    .withStyle(ChatFormatting.DARK_AQUA));
+                            }
+                        }
+                    }
+                }
+
+                // 3. 武器专属描述
+                if (isWeapon) {
+                    // 动态：显示玩家当前身上的正面 Buff
+                    net.minecraft.client.player.LocalPlayer player = net.minecraft.client.Minecraft.getInstance().player;
+                    if (player != null) {
+                        List<Component> buffs = player.getActiveEffects().stream()
+                                .filter(e -> e.getEffect().isBeneficial())
+                                .<Component>map(e -> Component.translatable(e.getEffect().getDescriptionId())
+                                        .append(" ")
+                                        .append(Component.translatable("enchantment.level." + (e.getAmplifier() + 1))))
+                                .toList();
+
+                        if (!buffs.isEmpty()) {
+                            MutableComponent buffLine = Component.literal("");
+                            for (Component buff : buffs) {
+                                buffLine.append(buff).append(" ");
+                            }
+                            tooltip.add(Component.translatable("tooltip.kogasa_addiction.tenshi.buffs", buffLine)
+                                    .withStyle(ChatFormatting.AQUA));
+                        }
+                    }
+                }
             }
 
             if (KogasaAbilityData.hasAmmo(stack)) {

@@ -24,29 +24,6 @@ public class Config {
     }
 
     static {
-        BUILDER.push("kogasa_ingot");
-    }
-
-    public static final ForgeConfigSpec.BooleanValue ENABLE_KOGASA_INGOT = BUILDER
-            .comment("Enable blast furnace to produce kogasa ingots while burning.\n" +
-                    "允许小伞锭从燃烧的高炉中掉落。")
-            .define("enableKogasaIngot", true);
-
-    public static final ForgeConfigSpec.DoubleValue KOGASA_INGOT_CHANCE = BUILDER
-            .comment("Chance per server tick (20 ticks per second) to produce a Kogasa Ingot while the blast furnace is lit. Default 0.001 = 0.1%; 0.01 = 1%.\n" +
-                    "高炉燃烧时每游戏刻（每秒 20 刻）产出小伞锭的概率。默认值 0.001 = 0.1%；0.01 = 1%。")
-            .defineInRange("kogasaIngotChance", 0.001, 0.0, 1.0);
-
-    public static final ForgeConfigSpec.IntValue KOGASA_INGOT_SEARCH_HEIGHT = BUILDER
-            .comment("Maximum upward search height for kogasa ingot drop position.\n" +
-                    "小伞锭产出时向上搜索空气的最大高度。")
-            .defineInRange("kogasaIngotSearchHeight", 8, 1, 320);
-
-    static {
-        BUILDER.pop();
-    }
-
-    static {
         BUILDER.push("reinforcement");
     }
 
@@ -386,6 +363,21 @@ public class Config {
     }
 
     // ===== Kogasa 能力 =====
+    public static final ForgeConfigSpec.BooleanValue ENABLE_KOGASA_INGOT = BUILDER
+            .comment("Enable blast furnace to produce kogasa ingots while burning.\n" +
+                    "允许小伞锭从燃烧的高炉中掉落。")
+            .define("enableKogasaIngot", true);
+
+    public static final ForgeConfigSpec.DoubleValue KOGASA_INGOT_CHANCE = BUILDER
+            .comment("Chance per server tick (20 ticks per second) to produce a Kogasa Ingot while the blast furnace is lit. Default 0.001 = 0.1%; 0.01 = 1%.\n" +
+                    "高炉燃烧时每游戏刻（每秒 20 刻）产出小伞锭的概率。默认值 0.001 = 0.1%；0.01 = 1%。")
+            .defineInRange("kogasaIngotChance", 0.001, 0.0, 1.0);
+
+    public static final ForgeConfigSpec.IntValue KOGASA_INGOT_SEARCH_HEIGHT = BUILDER
+            .comment("Maximum upward search height for kogasa ingot drop position.\n" +
+                    "小伞锭产出时向上搜索空气的最大高度。")
+            .defineInRange("kogasaIngotSearchHeight", 8, 1, 320);
+
     public static final ForgeConfigSpec.DoubleValue KOGASA_REINFORCEMENT_MULTIPLIER_PER_LEVEL = BUILDER
             .comment("Kogasa reinforcement overall multiplier bonus per reinforcement. 0.1 = +10% per level.\n" +
                     "强化装备每次强化增加的总体倍率。0.1 = 每级 +10%。")
@@ -395,42 +387,40 @@ public class Config {
         BUILDER.pop(2);
     }
 
-    // ============================================================
-    // 天子能力与天子锭获取
-    // ============================================================
     static {
         BUILDER.push("tenshi");
     }
 
-    public static final ForgeConfigSpec.IntValue TENSHI_INGOT_HEIGHT = BUILDER
-            .comment("Minimum Y level for a player placing a beacon-base block to trigger a Tenshi Ingot reward.",
-                    "玩家放置信标基座方块时触发天子锭奖励所需的最低 Y 高度。")
-            .defineInRange("tenshiIngotMinimumHeight", 128, -64, 320);
+    // ===== Tenshi 能力=====
+    public static final ForgeConfigSpec.IntValue TENSHI_INGOT_MIN_Y = BUILDER
+            .comment("The minimum Y level required to obtain a Tenshi Ingot by placing beacon base blocks.")
+            .comment("放置信标基座方块获取天子锭的最低 Y 轴高度。")
+            .defineInRange("tenshiIngotMinY", 128, 0, 320);
 
     public static final ForgeConfigSpec.DoubleValue TENSHI_INGOT_CHANCE = BUILDER
-            .comment("Chance to consume a placed beacon-base block without drops and grant one Tenshi Ingot. 0.105 = 10.5%.",
-                    "放置信标基座方块后使其消失且不掉落、并获得一个天子锭的概率。0.105 = 10.5%。")
+            .comment("Chance to get a Tenshi Ingot. 0.105 = 10.5%.")
+            .comment("放置信标基座方块获取天子锭的概率。0.105 = 10.5%。")
             .defineInRange("tenshiIngotChance", 0.105, 0.0, 1.0);
 
-    public static final ForgeConfigSpec.IntValue TENSHI_DAMAGE_THRESHOLD = BUILDER
-            .comment("Accumulated damage required to charge the next-hit bonus. The resistance step is ceil(threshold / 4).",
-                    "触发下一次攻击额外伤害所需的累计受伤值。抗性每级所需数值为该阈值的四分之一向上取整。")
-            .defineInRange("tenshiDamageThreshold", 20, 1, 1000000);
+    public static final ForgeConfigSpec.DoubleValue TENSHI_DOMAIN_THRESHOLD = BUILDER
+            .comment("Damage required to charge the 'State of No-Thought, No-Mind'.")
+            .comment("无念无想的境界所需的蓄力伤害值（默认20）。")
+            .defineInRange("tenshiDomainThreshold", 20.0, 1.0, Double.MAX_VALUE);
 
-    public static final ForgeConfigSpec.DoubleValue TENSHI_RETALIATION_RATIO = BUILDER
-            .comment("Extra damage added to the next hit as a ratio of the target's maximum health. 0.1 = 10%.",
-                    "下一次命中额外增加目标最大生命值的比例。0.1 = 10%。")
-            .defineInRange("tenshiRetaliationMaxHealthRatio", 0.1, 0.0, 100.0);
+    public static final ForgeConfigSpec.DoubleValue TENSHI_BURST_DAMAGE_RATIO = BUILDER
+            .comment("Percentage of target's max health dealt as extra damage when burst triggers. 0.1 = 10%.")
+            .comment("境界蓄满后，下一次命中造成目标最大生命值的额外伤害比例。0.1 = 10%。")
+            .defineInRange("tenshiBurstDamageRatio", 0.1, 0.0, 1.0);
 
     public static final ForgeConfigSpec.IntValue TENSHI_DEBUFF_DURATION_SECONDS = BUILDER
-            .comment("Duration of Slowness and Mining Fatigue applied by Tenshi attacks, in seconds.",
-                    "天子攻击施加缓慢和挖掘疲劳的持续时间（秒）。")
-            .defineInRange("tenshiDebuffDurationSeconds", 1, 1, 60);
+            .comment("Duration of Slowness and Mining Fatigue applied on hit (in seconds).")
+            .comment("攻击命中时施加的缓慢与挖掘疲劳持续时间（秒）。")
+            .defineInRange("tenshiDebuffDurationSeconds", 5, 1, Integer.MAX_VALUE);
 
-    public static final ForgeConfigSpec.DoubleValue TENSHI_FLYING_DAMAGE_MULTIPLIER = BUILDER
-            .comment("Damage multiplier against non-boss flying mobs. 2.0 = double damage.",
-                    "对非 Boss 飞行生物的伤害倍率。2.0 = 双倍伤害。")
-            .defineInRange("tenshiFlyingDamageMultiplier", 2.0, 1.0, 100.0);
+    public static final ForgeConfigSpec.DoubleValue TENSHI_FLYING_MOB_MULTIPLIER = BUILDER
+            .comment("Damage multiplier against non-boss flying mobs. 2.0 = 200%.")
+            .comment("对非Boss飞行生物的伤害倍率。2.0 = 200%。")
+            .defineInRange("tenshiFlyingMobMultiplier", 2.0, 1.0, Double.MAX_VALUE);
 
     static {
         BUILDER.pop();

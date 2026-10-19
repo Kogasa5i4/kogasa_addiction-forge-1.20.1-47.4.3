@@ -24,5 +24,17 @@ public class PacketHandler {
                 .decoder(ScreenshotTakenPacket::new)
                 .consumerMainThread(ScreenshotTakenPacket::handle)
                 .add();
+
+        INSTANCE.messageBuilder(TenshiSyncPacket.class, packetId++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(TenshiSyncPacket::encode)
+                .decoder(TenshiSyncPacket::new)
+                .consumerMainThread(TenshiSyncPacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(TenshiBeaconBlockPlacePacket.class, packetId++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(TenshiBeaconBlockPlacePacket::encode)
+                .decoder(TenshiBeaconBlockPlacePacket::new)
+                .consumerMainThread(TenshiBeaconBlockPlacePacket::handle)
+                .add();
     }
 }

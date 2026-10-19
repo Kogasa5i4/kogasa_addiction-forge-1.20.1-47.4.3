@@ -30,6 +30,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -500,6 +501,56 @@ public class KogasaCommands {
                 ctx.getSource().sendSuccess(() -> Component.translatable(
                         "commands.kogasa_addiction.info.ranged.no_consume.locked", cur, need), false);
             }
+        }
+
+        // ===== 天子能力状态 =====
+        boolean hasTenshiArmor = false;
+        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+            ItemStack armor = player.getItemBySlot(slot);
+            if (armor.getItem() instanceof IKogasaEquipment && KogasaAbilityData.hasAbility(armor, KogasaAbility.TENSHI)) {
+                hasTenshiArmor = true;
+                break;
+            }
+        }
+
+        if (hasTenshiArmor) {
+            double threshold = Config.TENSHI_DOMAIN_THRESHOLD.get();
+            double ratio = Config.TENSHI_BURST_DAMAGE_RATIO.get() * 100.0;
+            double charge = player.getPersistentData().getDouble("KogasaTenshiCharge");
+            boolean isReady = player.getPersistentData().getBoolean("KogasaTenshiBurstReady");
+            int resistanceLevel = (int) Math.min(5, Math.floor(charge / (threshold / 4.0)));
+
+            // 输出护甲蓄力状态 (传入：当前值, 阈值, 抗性等级, 爆发百分比)
+            ctx.getSource().sendSuccess(() -> Component.translatable(
+                    "commands.kogasa_addiction.info.tenshi.armor",
+                    String.format("%.1f", charge),
+                    String.format("%.1f", threshold),
+                    resistanceLevel,
+                    String.format("%.0f%%", ratio)
+            ), false);
+
+            // 如果蓄满，额外提示一下（这里复用了你之前的 ready 键，或者不需要可以删）
+            if (isReady) {
+                ctx.getSource().sendSuccess(() -> Component.translatable(
+                        "commands.kogasa_addiction.info.tenshi.ready"), false);
+            }
+        }
+
+        // 检查武器是否带有天子能力
+        if (held.getItem() instanceof IKogasaEquipment && KogasaAbilityData.hasAbility(held, KogasaAbility.TENSHI) && isRangedWeapon(held)) {
+            int debuffSecs = Config.TENSHI_DEBUFF_DURATION_SECONDS.get();
+            double flyingMult = Config.TENSHI_FLYING_MOB_MULTIPLIER.get();
+
+            // 输出武器命中状态 (传入：Debuff秒数, 飞行生物倍率)
+            ctx.getSource().sendSuccess(() -> Component.translatable(
+                    "commands.kogasa_addiction.info.tenshi.weapon",
+                    debuffSecs,
+                    String.format("%.1f", flyingMult)
+            ), false);
+
+            // 输出 Buff 说明
+            ctx.getSource().sendSuccess(() -> Component.translatable(
+                    "commands.kogasa_addiction.info.tenshi.buff"), false);
         }
 
         return 1;

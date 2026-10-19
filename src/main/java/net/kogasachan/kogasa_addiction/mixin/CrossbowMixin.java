@@ -123,6 +123,10 @@ public class CrossbowMixin {
                     rocket.getPersistentData().putBoolean("KogasaKoishiArrow", true);
                 }
 
+                if (KogasaAbilityData.hasAbility(pCrossbowStack, KogasaAbility.TENSHI)) {
+                    rocket.getPersistentData().putBoolean("KogasaTenshiArrow", true);
+                }
+
                 rocket.shoot(fx, fy, fz, pVelocity * 1.5F * (float) speedFactor, pInaccuracy);
                 level.addFreshEntity(rocket);
             }
@@ -165,6 +169,10 @@ public class CrossbowMixin {
 
         if (KogasaAbilityData.hasAbility(pCrossbowStack, KogasaAbility.KOISHI)) {
             arrow.getPersistentData().putBoolean("KogasaKoishiArrow", true);
+        }
+
+        if (KogasaAbilityData.hasAbility(pCrossbowStack, KogasaAbility.TENSHI)) {
+            arrow.getPersistentData().putBoolean("KogasaTenshiArrow", true);
         }
 
         // 8. 默认：原版放行

@@ -108,6 +108,10 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
                         rocket.getPersistentData().putBoolean("KogasaKoishiArrow", true);
                     }
 
+                    if (KogasaAbilityData.hasAbility(stack, KogasaAbility.TENSHI)) {
+                        rocket.getPersistentData().putBoolean("KogasaTenshiArrow", true);
+                    }
+
                     rocket.shoot(f, f1, f2, power * 1.5F, 1.0F);
                     level.addFreshEntity(rocket);
                 }
@@ -203,6 +207,10 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
 
                 if (KogasaAbilityData.hasAbility(stack, KogasaAbility.KOISHI)) {
                     arrow.getPersistentData().putBoolean("KogasaKoishiArrow", true);
+                }
+
+                if (KogasaAbilityData.hasAbility(stack, KogasaAbility.TENSHI)) {
+                    arrow.getPersistentData().putBoolean("KogasaTenshiArrow", true);
                 }
 
                 level.addFreshEntity(arrow);

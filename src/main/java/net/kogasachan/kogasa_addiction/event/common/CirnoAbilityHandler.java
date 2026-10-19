@@ -85,7 +85,7 @@ public class CirnoAbilityHandler {
         if (growth < cost) return;
 
         // 复活：清空天子能力的无念无想记录，再消耗成长值并恢复耐久。
-//        TenshiAbilityHandler.clearDamageRecord(player);
+        TenshiAbilityHandler.clearCharge(player);
         KogasaEquipmentData.setGrowth(stack, growth - cost);
         stack.setDamageValue((int) (max * 0.99));
         player.getInventory().setChanged();

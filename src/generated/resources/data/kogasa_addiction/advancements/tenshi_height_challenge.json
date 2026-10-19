@@ -1,0 +1,56 @@
+{
+  "parent": "minecraft:adventure/trade_at_world_height",
+  "criteria": {
+    "get_tenshi_ingot_at_height": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "kogasa_addiction:tenshi_ingot"
+            ]
+          }
+        ],
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "position": {
+                  "y": {
+                    "min": 300.0
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.kogasa_addiction.tenshi_height_challenge.description"
+    },
+    "frame": "challenge",
+    "hidden": true,
+    "icon": {
+      "item": "kogasa_addiction:tenshi_ingot"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.kogasa_addiction.tenshi_height_challenge.title"
+    }
+  },
+  "requirements": [
+    [
+      "get_tenshi_ingot_at_height"
+    ]
+  ],
+  "rewards": {
+    "experience": 1050
+  },
+  "sends_telemetry_event": true
+}

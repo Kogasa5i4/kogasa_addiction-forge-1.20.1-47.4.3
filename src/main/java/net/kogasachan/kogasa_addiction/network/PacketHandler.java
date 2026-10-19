@@ -25,16 +25,16 @@ public class PacketHandler {
                 .consumerMainThread(ScreenshotTakenPacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(TenshiSyncPacket.class, packetId++, NetworkDirection.PLAY_TO_CLIENT)
-                .encoder(TenshiSyncPacket::encode)
-                .decoder(TenshiSyncPacket::new)
-                .consumerMainThread(TenshiSyncPacket::handle)
+        INSTANCE.messageBuilder(TenshiAbilityPacket.class, packetId++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(TenshiAbilityPacket::encode)
+                .decoder(TenshiAbilityPacket::new)
+                .consumerMainThread(TenshiAbilityPacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(TenshiBeaconBlockPlacePacket.class, packetId++, NetworkDirection.PLAY_TO_CLIENT)
-                .encoder(TenshiBeaconBlockPlacePacket::encode)
-                .decoder(TenshiBeaconBlockPlacePacket::new)
-                .consumerMainThread(TenshiBeaconBlockPlacePacket::handle)
+        INSTANCE.messageBuilder(TenshiBeaconBlockReplacementPacket.class, packetId++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(TenshiBeaconBlockReplacementPacket::encode)
+                .decoder(TenshiBeaconBlockReplacementPacket::new)
+                .consumerMainThread(TenshiBeaconBlockReplacementPacket::handle)
                 .add();
     }
 }

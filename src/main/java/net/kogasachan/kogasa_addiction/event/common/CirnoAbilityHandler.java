@@ -4,6 +4,7 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbilityHelper;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
@@ -30,7 +31,7 @@ public class CirnoAbilityHandler {
         if (!(event.getSource().getEntity() instanceof ServerPlayer player)) return;
 
         ItemStack held = player.getMainHandItem();
-        if (!isCirnoEquipment(held)) return;
+        if (!KogasaAbilityHelper.isEquipmentWithAbility(held, KogasaAbility.CIRNO)) return;
 
         LivingEntity target = event.getEntity();
 
@@ -98,10 +99,5 @@ public class CirnoAbilityHandler {
                         String.format("%.2f", cost)).withStyle(net.minecraft.ChatFormatting.AQUA),
                 true);
         KogasaAdvancementHelper.grant(player, "cirno_revive");
-    }
-
-    private static boolean isCirnoEquipment(ItemStack stack) {
-        if (!(stack.getItem() instanceof IKogasaEquipment)) return false;
-        return KogasaAbilityData.hasAbility(stack, KogasaAbility.CIRNO);
     }
 }

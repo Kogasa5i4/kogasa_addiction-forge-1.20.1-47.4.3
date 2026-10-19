@@ -4,6 +4,7 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbilityHelper;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -32,7 +33,7 @@ public class KogasaRangedAbilityHandler {
         Entity owner = arrow.getOwner();
         if (!(owner instanceof ServerPlayer player)) return;
 
-        ItemStack weapon = resolveWeapon(player);
+        ItemStack weapon = KogasaAbilityHelper.getHeldKogasaEquipment(player);
         if (weapon.isEmpty()) return;
         if (!KogasaAbilityData.hasAbility(weapon, KogasaAbility.KOGASA)) return;
 
@@ -57,13 +58,5 @@ public class KogasaRangedAbilityHandler {
         double bonus = Config.KOGASA_STREAK_BONUS.get();
         float multiplier = 1.0F + (float) (streak * bonus);
         event.setAmount(event.getAmount() * multiplier);
-    }
-
-    private static ItemStack resolveWeapon(ServerPlayer player) {
-        ItemStack main = player.getMainHandItem();
-        if (main.getItem() instanceof IKogasaEquipment) return main;
-        ItemStack off = player.getOffhandItem();
-        if (off.getItem() instanceof IKogasaEquipment) return off;
-        return ItemStack.EMPTY;
     }
 }

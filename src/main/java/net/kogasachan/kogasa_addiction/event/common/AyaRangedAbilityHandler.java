@@ -4,6 +4,7 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbilityHelper;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -29,7 +30,7 @@ public class AyaRangedAbilityHandler {
         Entity owner = arrow.getOwner();
         if (!(owner instanceof ServerPlayer player)) return;
 
-        ItemStack weapon = resolveWeapon(player);
+        ItemStack weapon = KogasaAbilityHelper.getHeldKogasaEquipment(player);
         if (weapon.isEmpty()) return;
         if (!KogasaAbilityData.hasAbility(weapon, KogasaAbility.AYA)) return;
 
@@ -42,13 +43,5 @@ public class AyaRangedAbilityHandler {
                 MobEffects.MOVEMENT_SPEED, speedDuration, speedAmplifier, false, true));
         player.addEffect(new MobEffectInstance(
                 MobEffects.DIG_SPEED, hasteDuration, hasteAmplifier, false, true));
-    }
-
-    private static ItemStack resolveWeapon(ServerPlayer player) {
-        ItemStack main = player.getMainHandItem();
-        if (main.getItem() instanceof IKogasaEquipment) return main;
-        ItemStack off = player.getOffhandItem();
-        if (off.getItem() instanceof IKogasaEquipment) return off;
-        return ItemStack.EMPTY;
     }
 }

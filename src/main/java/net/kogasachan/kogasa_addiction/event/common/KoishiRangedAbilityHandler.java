@@ -4,6 +4,7 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbilityHelper;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -51,7 +52,7 @@ public class KoishiRangedAbilityHandler {
         Entity owner = arrow.getOwner();
         if (!(owner instanceof ServerPlayer player)) return;
 
-        ItemStack weapon = resolveWeapon(player);
+        ItemStack weapon = KogasaAbilityHelper.getHeldKogasaEquipment(player);
         if (weapon.isEmpty()) return;
 
         boolean hasKoishi = Config.ENABLE_KOISHI_RANGED.get()
@@ -140,13 +141,5 @@ public class KoishiRangedAbilityHandler {
                 level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(KOISHI_RANGED),
                 player, player
         );
-    }
-
-    private static ItemStack resolveWeapon(ServerPlayer player) {
-        ItemStack main = player.getMainHandItem();
-        if (main.getItem() instanceof IKogasaEquipment) return main;
-        ItemStack off = player.getOffhandItem();
-        if (off.getItem() instanceof IKogasaEquipment) return off;
-        return ItemStack.EMPTY;
     }
 }

@@ -4,6 +4,7 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbilityHelper;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -28,7 +29,7 @@ public class KoishiAbilityHandler {
         if (player == null) return;
 
         ItemStack held = player.getMainHandItem();
-        if (!isKoishiEquipment(held)) return;
+        if (!KogasaAbilityHelper.isEquipmentWithAbility(held, KogasaAbility.KOISHI)) return;
 
         // 75% 概率造成 1.5 倍伤害
         if (player.getRandom().nextFloat() >= Config.KOISHI_CRIT_CHANCE.get().floatValue()) {
@@ -69,10 +70,5 @@ public class KoishiAbilityHandler {
             return owner;
         }
         return null;
-    }
-
-    private static boolean isKoishiEquipment(ItemStack stack) {
-        if (!(stack.getItem() instanceof IKogasaEquipment)) return false;
-        return KogasaAbilityData.hasAbility(stack, KogasaAbility.KOISHI);
     }
 }

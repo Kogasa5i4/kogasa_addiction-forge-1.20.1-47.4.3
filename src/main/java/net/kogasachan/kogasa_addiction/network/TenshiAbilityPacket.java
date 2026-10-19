@@ -5,16 +5,16 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 import java.util.function.Supplier;
 
-public class TenshiSyncPacket {
+public class TenshiAbilityPacket {
     private final double charge;
     private final boolean isReady;
 
-    public TenshiSyncPacket(double charge, boolean isReady) {
+    public TenshiAbilityPacket(double charge, boolean isReady) {
         this.charge = charge;
         this.isReady = isReady;
     }
 
-    public TenshiSyncPacket(FriendlyByteBuf buf) {
+    public TenshiAbilityPacket(FriendlyByteBuf buf) {
         this.charge = buf.readDouble();
         this.isReady = buf.readBoolean();
     }

@@ -3,7 +3,7 @@ package net.kogasachan.kogasa_addiction.event.common;
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.item.ModItems;
-import net.kogasachan.kogasa_addiction.network.TenshiBeaconBlockPlacePacket;
+import net.kogasachan.kogasa_addiction.network.TenshiBeaconBlockReplacementPacket;
 import net.kogasachan.kogasa_addiction.network.PacketHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -44,7 +44,7 @@ public class TenshiIngotHandler {
         // 取消方块放置（相当于方块被破坏且不掉落）
         PacketHandler.INSTANCE.send(
                 PacketDistributor.PLAYER.with(() -> player),
-                new TenshiBeaconBlockPlacePacket(pos)
+                new TenshiBeaconBlockReplacementPacket(pos)
         );
         event.setCanceled(true);
 

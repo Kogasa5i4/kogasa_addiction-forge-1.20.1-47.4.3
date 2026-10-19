@@ -4,6 +4,7 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbilityHelper;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -35,7 +36,7 @@ public class CirnoRangedAbilityHandler {
         }
         if (player == null) return;
 
-        ItemStack weapon = resolveWeapon(player);
+        ItemStack weapon = KogasaAbilityHelper.getHeldKogasaEquipment(player);
         if (weapon.isEmpty()) return;
         if (!KogasaAbilityData.hasAbility(weapon, KogasaAbility.CIRNO)) return;
 
@@ -48,13 +49,5 @@ public class CirnoRangedAbilityHandler {
             event.getEntity().addEffect(new MobEffectInstance(
                     MobEffects.MOVEMENT_SLOWDOWN, duration, amplifier, false, true));
         }
-    }
-
-    private static ItemStack resolveWeapon(ServerPlayer player) {
-        ItemStack main = player.getMainHandItem();
-        if (main.getItem() instanceof IKogasaEquipment) return main;
-        ItemStack off = player.getOffhandItem();
-        if (off.getItem() instanceof IKogasaEquipment) return off;
-        return ItemStack.EMPTY;
     }
 }

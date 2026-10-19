@@ -62,7 +62,7 @@ public class KogasaEquipmentHelper {
         if (item instanceof DiggerItem digger) {
             double baseDamage = 1.0 + digger.getAttackDamage();
             double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
-            float baseSpeed = getDiggerAttackSpeed(stack);
+            float baseSpeed = (float) getBaseAttackSpeed(stack);
             return buildHandModifiers(stack, baseDamage, absorbed, baseSpeed);
         }
 
@@ -150,19 +150,6 @@ public class KogasaEquipmentHelper {
     }
 
     /**
-     * DiggerItem 的攻击速度按注册名后缀区分
-     */
-    private static float getDiggerAttackSpeed(ItemStack stack) {
-        var id = ForgeRegistries.ITEMS.getKey(stack.getItem());
-        if (id == null) return -2.8F;
-        String path = id.getPath();
-        if (path.endsWith("_axe")) return -3.2F;
-        if (path.endsWith("_hoe")) return -3.0F;
-        if (path.endsWith("_shovel")) return -3.0F;
-        return -2.8F; // 镐
-    }
-
-    /**
      * 耐久上限
      */
     public static int getMaxDamage(ItemStack stack, int baseMaxDamage) {
@@ -214,8 +201,7 @@ public class KogasaEquipmentHelper {
      */
     public static double getAttackSpeedModifier(ItemStack stack, double baseSpeed) {
         double growth = KogasaEquipmentData.getGrowth(stack);
-        double news = KogasaAbilityData.hasAbility(stack, KogasaAbility.AYA)
-                ? KogasaAbilityData.getNewsValue(stack) : 0.0;
+        double news = getAyaNews(stack);
         double ratio = Config.ATTACK_SPEED_GROWTH_RATIO.get();
 
         // progress 加上 news 的贡献
@@ -267,8 +253,7 @@ public class KogasaEquipmentHelper {
      */
     public static boolean isAttackSpeedCapped(ItemStack stack) {
         double growth = KogasaEquipmentData.getGrowth(stack);
-        double news = KogasaAbilityData.hasAbility(stack, KogasaAbility.AYA)
-                ? KogasaAbilityData.getNewsValue(stack) : 0.0;
+        double news = getAyaNews(stack);
         double ratio = Config.ATTACK_SPEED_GROWTH_RATIO.get();
         return (growth + news) * ratio >= 1.0;
     }
@@ -279,8 +264,7 @@ public class KogasaEquipmentHelper {
     public static double getKnockbackResistance(ItemStack stack) {
         int re = KogasaEquipmentData.getReinforcements(stack);
         double growth = KogasaEquipmentData.getGrowth(stack);
-        double news = KogasaAbilityData.hasAbility(stack, KogasaAbility.AYA)
-                ? KogasaAbilityData.getNewsValue(stack) : 0.0;
+        double news = getAyaNews(stack);
         double base = Config.KNOCKBACK_BASE_RESISTANCE.get();
         double max = Config.KNOCKBACK_MAX_PER_PIECE.get();
 
@@ -456,5 +440,13 @@ public class KogasaEquipmentHelper {
         if (full <= start) return 1.0;
         if (growth >= full) return 1.0;
         return (growth - start) / (full - start);
+    }
+
+    /**
+     * 有 AYA 能力时返回新闻值，否则 0.0
+     */
+    private static double getAyaNews(ItemStack stack) {
+        return KogasaAbilityData.hasAbility(stack, KogasaAbility.AYA)
+                ? KogasaAbilityData.getNewsValue(stack) : 0.0;
     }
 }

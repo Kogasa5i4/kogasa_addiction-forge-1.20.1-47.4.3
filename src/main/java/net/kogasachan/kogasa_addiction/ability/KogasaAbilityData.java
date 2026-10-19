@@ -12,16 +12,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 能力 NBT 数据结构：
- * {
- * "Abilities": ["aya", "koishi"],           // 已拥有能力 ID 列表
- * "NewsValue": 0.15,                        // 新闻值
- * "AyaKilledMobs": ["minecraft:zombie"],    // 已记录生物 ID
- * "AyaMinedBlocks": ["minecraft:stone"],    // 已记录方块 ID
- * "AyaDamagesTaken": ["minecraft:mob_attack"] // 已记录伤害类型 ID
- * }
- */
 public class KogasaAbilityData {
 
     private static final String ROOT = "KogasaAbilities";
@@ -87,7 +77,7 @@ public class KogasaAbilityData {
     }
 
     /**
-     * 移除能力（仅调试命令用）
+     * 移除能力
      */
     public static boolean removeAbility(ItemStack stack, KogasaAbility ability) {
         List<KogasaAbility> current = getAbilities(stack);
@@ -104,7 +94,7 @@ public class KogasaAbilityData {
     }
 
     /**
-     * 清空所有能力（调试命令用）
+     * 清空所有能力
      */
     public static void clearAbilities(ItemStack stack) {
         CompoundTag tag = getTag(stack);

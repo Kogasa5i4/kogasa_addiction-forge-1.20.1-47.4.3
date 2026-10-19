@@ -8,9 +8,9 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public record TenshiBeaconBlockPlacePacket(BlockPos pos) {
+public record TenshiBeaconBlockReplacementPacket(BlockPos pos) {
 
-    public TenshiBeaconBlockPlacePacket(FriendlyByteBuf buf) {
+    public TenshiBeaconBlockReplacementPacket(FriendlyByteBuf buf) {
         this(buf.readBlockPos());
     }
 
@@ -18,8 +18,7 @@ public record TenshiBeaconBlockPlacePacket(BlockPos pos) {
         buf.writeBlockPos(pos);
     }
 
-    public static void handle(TenshiBeaconBlockPlacePacket msg, Supplier<NetworkEvent.Context> ctx) {
-        // consumerMainThread 已保证在主线程；这里只做分发，避免专用服务器加载客户端类
+    public static void handle(TenshiBeaconBlockReplacementPacket msg, Supplier<NetworkEvent.Context> ctx) {
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
                 () -> () -> ClientPacketHandler.cancelBlockPlace(msg.pos()));
         ctx.get().setPacketHandled(true);

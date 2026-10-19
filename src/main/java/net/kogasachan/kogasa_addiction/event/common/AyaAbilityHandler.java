@@ -4,6 +4,7 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbilityHelper;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
 import net.minecraft.resources.ResourceKey;
@@ -40,15 +41,13 @@ public class AyaAbilityHandler {
         if (player == null) return;
 
         ItemStack held = player.getMainHandItem();
-        if (!isAyaEquipment(held)) return;
+        if (!KogasaAbilityHelper.isEquipmentWithAbility(held, KogasaAbility.AYA)) return;
 
         ResourceLocation mobId = ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType());
         if (mobId == null) return;
 
         if (KogasaAbilityData.tryAddKilledMob(held, mobId.toString())) {
-            KogasaAbilityData.addNewsValue(held, Config.NEWS_VALUE_PER_RECORD.get());
-            player.getInventory().setChanged();
-            KogasaAdvancementHelper.checkAndGrant(player, held);
+            onNewRecord(player, held);
         }
     }
 
@@ -59,15 +58,13 @@ public class AyaAbilityHandler {
         if (!(player instanceof ServerPlayer serverPlayer)) return;
 
         ItemStack held = player.getMainHandItem();
-        if (!isAyaEquipment(held)) return;
+        if (!KogasaAbilityHelper.isEquipmentWithAbility(held, KogasaAbility.AYA)) return;
 
         ResourceLocation blockId = ForgeRegistries.BLOCKS.getKey(event.getState().getBlock());
         if (blockId == null) return;
 
         if (KogasaAbilityData.tryAddMinedBlock(held, blockId.toString())) {
-            KogasaAbilityData.addNewsValue(held, Config.NEWS_VALUE_PER_RECORD.get());
-            serverPlayer.getInventory().setChanged();
-            KogasaAdvancementHelper.checkAndGrant(serverPlayer, held);
+            onNewRecord(serverPlayer, held);
         }
     }
 
@@ -77,7 +74,7 @@ public class AyaAbilityHandler {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
 
         ItemStack held = player.getMainHandItem();
-        if (!isAyaEquipment(held)) return;
+        if (!KogasaAbilityHelper.isEquipmentWithAbility(held, KogasaAbility.AYA)) return;
 
         // 获取伤害类型的注册名
         ResourceKey<DamageType> damageKey = event.getSource()
@@ -89,15 +86,14 @@ public class AyaAbilityHandler {
         String damageId = damageKey.location().toString();
 
         if (KogasaAbilityData.tryAddDamageTaken(held, damageId)) {
-            KogasaAbilityData.addNewsValue(held, Config.NEWS_VALUE_PER_RECORD.get());
-            player.getInventory().setChanged();
-            KogasaAdvancementHelper.checkAndGrant(player, held);
+            onNewRecord(player, held);
         }
     }
 
-    // ========== 辅助 ==========
-    private static boolean isAyaEquipment(ItemStack stack) {
-        if (!(stack.getItem() instanceof IKogasaEquipment)) return false;
-        return KogasaAbilityData.hasAbility(stack, KogasaAbility.AYA);
+    // ========== 首次获得记录 ==========
+    private static void onNewRecord(ServerPlayer player, ItemStack held) {
+        KogasaAbilityData.addNewsValue(held, Config.NEWS_VALUE_PER_RECORD.get());
+        player.getInventory().setChanged();
+        KogasaAdvancementHelper.checkAndGrant(player, held);
     }
 }

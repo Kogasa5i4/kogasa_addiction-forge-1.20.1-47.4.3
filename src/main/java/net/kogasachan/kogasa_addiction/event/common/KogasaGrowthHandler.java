@@ -39,7 +39,7 @@ public class KogasaGrowthHandler {
         Player player = event.getEntity();
         ItemStack main = player.getMainHandItem();
         if (main.getItem() instanceof IKogasaEquipment) {
-            addGrowth(main, player);
+            if (!player.level().isClientSide) addGrowth(main, player);
             player.getInventory().setChanged();
         }
     }
@@ -52,7 +52,7 @@ public class KogasaGrowthHandler {
         if (player == null) return;
         ItemStack main = player.getMainHandItem();
         if (main.getItem() instanceof IKogasaEquipment) {
-            addGrowth(main, player);
+            if (!player.level().isClientSide) addGrowth(main, player);
             player.getInventory().setChanged();
         }
     }
@@ -68,7 +68,7 @@ public class KogasaGrowthHandler {
                 EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
             ItemStack armor = player.getItemBySlot(slot);
             if (armor.getItem() instanceof IKogasaEquipment) {
-                addGrowth(armor, player);
+                if (!player.level().isClientSide) addGrowth(armor, player);
                 player.getInventory().setChanged();
             }
         }
@@ -97,7 +97,7 @@ public class KogasaGrowthHandler {
         ItemStack main = player.getMainHandItem();
         if (!(main.getItem() instanceof IKogasaEquipment)) return;
 
-        addGrowth(main, player);
+        if (!player.level().isClientSide) addGrowth(main, player);
         player.getInventory().setChanged();
     }
 

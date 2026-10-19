@@ -4,9 +4,10 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbilityHelper;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.network.PacketHandler;
-import net.kogasachan.kogasa_addiction.network.TenshiSyncPacket;
+import net.kogasachan.kogasa_addiction.network.TenshiAbilityPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,69 +34,52 @@ public class TenshiAbilityHandler {
     private static final String NBT_CHARGE = "KogasaTenshiCharge";
     private static final String NBT_READY = "KogasaTenshiBurstReady";
 
-    /**
-     * 检查玩家是否穿有天子护甲
-     */
-    private static boolean hasTenshiArmor(Player player) {
-        for (EquipmentSlot slot : new EquipmentSlot[]{
-                EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
-            ItemStack armor = player.getItemBySlot(slot);
-            if (armor.getItem() instanceof IKogasaEquipment &&
-                    KogasaAbilityData.hasAbility(armor, KogasaAbility.TENSHI)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     // ==================== 1. 蓄力与爆发逻辑 ====================
 
     @SubscribeEvent
-    public static void onLivingDamage(LivingDamageEvent event) {
+    public static void onLivingDamage$defence(LivingDamageEvent event) {
         // ===== 防御端：玩家受伤蓄力 =====
         if (event.getEntity() instanceof ServerPlayer player) {
-            if (!hasTenshiArmor(player)) return;
+            if (KogasaAbilityHelper.hasAbilityInArmor(player, KogasaAbility.TENSHI)) {
+                double threshold = Math.max(0.0, Config.TENSHI_DOMAIN_THRESHOLD.get());
+                double currentCharge = player.getPersistentData().getDouble(NBT_CHARGE);
+                boolean isReady = player.getPersistentData().getBoolean(NBT_READY);
 
-            double threshold = Config.TENSHI_DOMAIN_THRESHOLD.get();
-            double currentCharge = player.getPersistentData().getDouble(NBT_CHARGE);
-            boolean isReady = player.getPersistentData().getBoolean(NBT_READY);
+                if (!isReady && threshold > 0.0 && currentCharge < threshold) {
+                    double damage = Math.max(0.0, event.getAmount());
+                    currentCharge = Math.min(threshold, currentCharge + damage);
 
-            // 如果已经蓄满，不再继续积累伤害
-            if (!isReady && currentCharge < threshold) {
-                double damage = event.getAmount();
-                double remaining = threshold - currentCharge;
+                    player.getPersistentData().putDouble(NBT_CHARGE, currentCharge);
 
-                // 单次溢出不计入：只取剩余所需的部分
-                double toAdd = Math.min(damage, remaining);
-                currentCharge += toAdd;
+                    if (currentCharge >= threshold) {
+                        isReady = true;
+                        player.getPersistentData().putBoolean(NBT_READY, true);
 
-                player.getPersistentData().putDouble(NBT_CHARGE, currentCharge);
+                        // 仅在首次蓄满时播放提示
+                        player.level().playSound(
+                                null, player.getX(), player.getY(), player.getZ(),
+                                SoundEvents.RESPAWN_ANCHOR_CHARGE,
+                                SoundSource.PLAYERS, 1.0F, 1.2F);
 
-                // 如果达到阈值，标记为“蓄满”
-                if (currentCharge >= threshold) {
-                    player.getPersistentData().putBoolean(NBT_READY, true);
+                        player.displayClientMessage(
+                                Component.translatable("message.kogasa_addiction.tenshi_ability")
+                                        .withStyle(ChatFormatting.GOLD),
+                                true);
+                    }
+
                     PacketHandler.INSTANCE.send(
-                        net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
-                        new TenshiSyncPacket(currentCharge, true)
-                    );
-                    // 播放提示音效和文字
-                    player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                            SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.PLAYERS, 1.0F, 1.2F);
-                    player.displayClientMessage(
-                            Component.translatable("message.kogasa_addiction.tenshi_ability")
-                                    .withStyle(ChatFormatting.GOLD), true);
+                            net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
+                            new TenshiAbilityPacket(currentCharge, isReady));
                 }
             }
-
-            PacketHandler.INSTANCE.send(
-                    net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
-                    new TenshiSyncPacket(currentCharge, false)
-            );
         }
+    }
 
+    @SubscribeEvent
+    public static void onLivingDamage$attack(LivingDamageEvent event) {
         // ===== 攻击端：下一次命中爆发 =====
         if (event.getSource().getEntity() instanceof ServerPlayer attacker) {
-            if (!hasTenshiArmor(attacker)) return;
+            if (!KogasaAbilityHelper.hasAbilityInArmor(attacker, KogasaAbility.TENSHI)) return;
             if (!attacker.getPersistentData().getBoolean(NBT_READY)) return;
 
             LivingEntity target = event.getEntity();
@@ -116,11 +100,14 @@ public class TenshiAbilityHandler {
                         target.getX(), target.getY() + 1.0, target.getZ(), 5, 0.5, 0.5, 0.5, 0.1);
             }
         }
+    }
 
+    @SubscribeEvent
+    public static void onLivingDamage$special(LivingDamageEvent event) {
         // ===== 攻击端：全人类的绯想天（命中特效） =====
         if (event.getSource().getEntity() instanceof ServerPlayer attacker) {
             // 检查攻击者是否穿有天子护甲（或者手持带有天子能力的武器）
-            if (!hasTenshiArmor(attacker) && !hasTenshiWeapon(attacker)) return;
+            if (!KogasaAbilityHelper.hasAbilityInArmor(attacker, KogasaAbility.TENSHI) && !KogasaAbilityHelper.hasAbilityInMainHand(attacker, KogasaAbility.TENSHI)) return;
 
             LivingEntity target = event.getEntity();
             if (target == attacker) return;
@@ -135,7 +122,6 @@ public class TenshiAbilityHandler {
             if (isNonBossFlyingMob(target)) {
                 float multiplier = Config.TENSHI_FLYING_MOB_MULTIPLIER.get().floatValue();
                 event.setAmount(event.getAmount() * multiplier);
-                // 可选：播放命中特效
             }
 
             // 3. 随机获得原版增益效果（叠加机制）
@@ -152,23 +138,32 @@ public class TenshiAbilityHandler {
         if (event.phase != TickEvent.Phase.END) return;
         if (!(event.player instanceof ServerPlayer player)) return;
 
-        // 如果没穿天子护甲，清空蓄力并移除自身加的抗性
-        if (!hasTenshiArmor(player)) {
+        // 每 100 tick 检查一次即可，没必要每 tick 都算
+        if (player.tickCount % 100 != 0) return;
+
+        if (!KogasaAbilityHelper.hasAbilityInArmor(player, KogasaAbility.TENSHI)) {
             clearCharge(player);
             return;
         }
 
+        double threshold = Config.TENSHI_DOMAIN_THRESHOLD.get();
         double currentCharge = player.getPersistentData().getDouble(NBT_CHARGE);
-        if (currentCharge > 0) {
-            double threshold = Config.TENSHI_DOMAIN_THRESHOLD.get();
-            // 每达到四分之一阈值获得1级，最高5级(如果阈值20则每5点1级)
-            int resistanceLevel = (int) Math.min(5, Math.floor(currentCharge / (threshold / 4.0)));
+        int desiredLevel = currentCharge > 0
+                ? (int) Math.min(5, Math.floor(currentCharge / (threshold / 4.0)))
+                : 0;
 
-            if (resistanceLevel > 0) {
-                // 持续时间设置短一点（40 tick），每 tick 刷新，确保不会常驻
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE,
-                        40, resistanceLevel - 1, false, false, true));
-            }
+        if (desiredLevel <= 0) return;
+
+        MobEffectInstance current = player.getEffect(MobEffects.DAMAGE_RESISTANCE);
+        int currentAmp = current != null ? current.getAmplifier() : -1;
+
+        // 只有等级不符，或剩余时间快不够了，才刷新
+        if (currentAmp != desiredLevel - 1 || current.getDuration() < 30) {
+            player.addEffect(new MobEffectInstance(
+                    MobEffects.DAMAGE_RESISTANCE,
+                    120,                 // 持续 6 秒，够撑到下一次检查
+                    desiredLevel - 1,
+                    false, false, true));
         }
     }
 
@@ -189,18 +184,9 @@ public class TenshiAbilityHandler {
         if (player instanceof ServerPlayer sp) {
             PacketHandler.INSTANCE.send(
                     net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> sp),
-                    new TenshiSyncPacket(0, false)
+                    new TenshiAbilityPacket(0, false)
             );
         }
-    }
-
-    /**
-     * 检查主手武器是否带有天子能力
-     */
-    private static boolean hasTenshiWeapon(Player player) {
-        ItemStack main = player.getMainHandItem();
-        return main.getItem() instanceof IKogasaEquipment &&
-                KogasaAbilityData.hasAbility(main, KogasaAbility.TENSHI);
     }
 
     /**

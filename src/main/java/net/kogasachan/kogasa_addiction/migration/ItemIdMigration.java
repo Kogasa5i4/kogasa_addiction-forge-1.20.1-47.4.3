@@ -4,6 +4,7 @@ import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.MissingMappingsEvent;
@@ -18,6 +19,7 @@ public final class ItemIdMigration {
     private ItemIdMigration() {
     }
 
+    @SubscribeEvent
     public static void onMissingMappings(MissingMappingsEvent event) {
         for (MissingMappingsEvent.Mapping<Item> mapping : event.getMappings(ForgeRegistries.Keys.ITEMS, KogasaAddiction.MODID)) {
             ResourceLocation oldId = mapping.getKey();

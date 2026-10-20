@@ -5,8 +5,8 @@ import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.MissingMappingsEvent;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.MissingMappingsEvent;
 
 /**
  * Maps the old Kogasa armor registry names to their new Tenshi names.

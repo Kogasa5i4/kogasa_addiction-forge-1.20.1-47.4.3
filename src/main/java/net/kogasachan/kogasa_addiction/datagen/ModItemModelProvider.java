@@ -45,6 +45,9 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.AYA_ARROW.get());
         registerBow();
         registerCrossbow();
+
+        // 5. Fumo
+        basicItem(ModItems.FUMO.get());
     }
 
     // ==================== 弓 ====================

@@ -49,27 +49,27 @@ public class ModItems {
     // 工具/武器
     public static final RegistryObject<Item> KOGASA_SWORD = ITEMS.register(
             "kogasa_sword",
-            () -> new KogasaSwordItem(KogasaTier.INSTANCE, 3, -2.4F,
+            () -> new IKogasaEquipment.KogasaSwordItem(KogasaTier.INSTANCE, 3, -2.4F,
                     new Item.Properties())
     );
     public static final RegistryObject<Item> KOGASA_PICKAXE = ITEMS.register(
             "kogasa_pickaxe",
-            () -> new KogasaPickaxeItem(KogasaTier.INSTANCE, 1, -2.8F,
+            () -> new IKogasaEquipment.KogasaPickaxeItem(KogasaTier.INSTANCE, 1, -2.8F,
                     new Item.Properties())
     );
     public static final RegistryObject<Item> KOGASA_AXE = ITEMS.register(
             "kogasa_axe",
-            () -> new KogasaAxeItem(KogasaTier.INSTANCE, 6.0F, -3.2F,
+            () -> new IKogasaEquipment.KogasaAxeItem(KogasaTier.INSTANCE, 6.0F, -3.2F,
                     new Item.Properties())
     );
     public static final RegistryObject<Item> KOGASA_SHOVEL = ITEMS.register(
             "kogasa_shovel",
-            () -> new KogasaShovelItem(KogasaTier.INSTANCE, 1.5F, -3.0F,
+            () -> new IKogasaEquipment.KogasaShovelItem(KogasaTier.INSTANCE, 1.5F, -3.0F,
                     new Item.Properties())
     );
     public static final RegistryObject<Item> KOGASA_HOE = ITEMS.register(
             "kogasa_hoe",
-            () -> new KogasaHoeItem(KogasaTier.INSTANCE, 0, -3.0F,
+            () -> new IKogasaEquipment.KogasaHoeItem(KogasaTier.INSTANCE, 0, -3.0F,
                     new Item.Properties())
     );
 
@@ -107,5 +107,12 @@ public class ModItems {
     public static final RegistryObject<Item> AYA_ARROW = ITEMS.register(
             "aya_arrow",
             () -> new AyaArrowItem(new Item.Properties())
+    );
+
+    // fumo
+    public static final RegistryObject<Item> FUMO = ITEMS.register(
+            "fumo",
+            () -> new FumoItem(FumoTier.INSTANCE, 5, -2.0F,
+                    new Item.Properties())
     );
 }

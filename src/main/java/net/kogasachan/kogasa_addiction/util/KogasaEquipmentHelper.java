@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
+import net.kogasachan.kogasa_addiction.item.FumoItem;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -238,6 +239,7 @@ public class KogasaEquipmentHelper {
      * 按注册名返回物品的基础攻速修饰符
      */
     public static double getBaseAttackSpeed(ItemStack stack) {
+        if (stack.getItem() instanceof FumoItem fumo) return -2.0;
         var id = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem());
         if (id == null) return -2.8;
         String path = id.getPath();
@@ -326,6 +328,7 @@ public class KogasaEquipmentHelper {
      */
     public static TagKey<Item> getMatchingTag(ItemStack stack) {
         Item item = stack.getItem();
+        if (item instanceof FumoItem fumoItem) {return Tags.Items.TOOLS;}
         // 用注册名判断，避免为每种类型创建单独的类判断
         ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
         if (id == null) return null;

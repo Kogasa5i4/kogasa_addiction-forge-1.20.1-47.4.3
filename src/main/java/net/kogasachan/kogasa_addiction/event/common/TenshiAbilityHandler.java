@@ -23,6 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -37,7 +38,7 @@ public class TenshiAbilityHandler {
     // ==================== 1. 蓄力与爆发逻辑 ====================
 
     @SubscribeEvent
-    public static void onLivingDamage$defence(LivingDamageEvent event) {
+    public static void onLivingHurt$defence(LivingHurtEvent event) {
         // ===== 防御端：玩家受伤蓄力 =====
         if (event.getEntity() instanceof ServerPlayer player) {
             if (KogasaAbilityHelper.hasAbilityInArmor(player, KogasaAbility.TENSHI)) {
@@ -76,7 +77,7 @@ public class TenshiAbilityHandler {
     }
 
     @SubscribeEvent
-    public static void onLivingDamage$attack(LivingDamageEvent event) {
+    public static void onLivingHurt$attack(LivingHurtEvent event) {
         // ===== 攻击端：下一次命中爆发 =====
         if (event.getSource().getEntity() instanceof ServerPlayer attacker) {
             if (!KogasaAbilityHelper.hasAbilityInArmor(attacker, KogasaAbility.TENSHI)) return;
@@ -103,7 +104,7 @@ public class TenshiAbilityHandler {
     }
 
     @SubscribeEvent
-    public static void onLivingDamage$special(LivingDamageEvent event) {
+    public static void onLivingHurt$special(LivingHurtEvent event) {
         // ===== 攻击端：全人类的绯想天（命中特效） =====
         if (event.getSource().getEntity() instanceof ServerPlayer attacker) {
             // 检查攻击者是否穿有天子护甲（或者手持带有天子能力的武器）

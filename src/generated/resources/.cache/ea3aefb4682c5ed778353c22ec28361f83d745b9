@@ -1,4 +1,4 @@
-// 1.20.1	2026-10-18T21:07:17.5179207	Item Models: kogasa_addiction
+// 1.20.1	2026-10-20T14:20:25.799996	Item Models: kogasa_addiction
 933253198cbb8329436810759500e3425f231513 assets/kogasa_addiction/models/item/aya_arrow.json
 392cf2c1b45307b8b952110ba9b6e3b2af246530 assets/kogasa_addiction/models/item/aya_bow.json
 e45a9858338f36ac25bf7455ddcfb0fc984aa71c assets/kogasa_addiction/models/item/aya_bow_pulling_0.json
@@ -12,6 +12,7 @@ c2cb2bbed63887bdf1e2d82a321961072bb460c0 assets/kogasa_addiction/models/item/aya
 592a84e06b31911fc4c3ae164a9f008075d03a22 assets/kogasa_addiction/models/item/aya_crossbow_pulling_2.json
 f8f1ed43191af03450f7e31b95d54ffe19f92235 assets/kogasa_addiction/models/item/aya_ingot.json
 cd32a30f4ba2bc14b8d9741e8a675bd9d630a9be assets/kogasa_addiction/models/item/cirno_ingot.json
+243bd7f0c3eecb60a32029d97cd77933570738fa assets/kogasa_addiction/models/item/fumo.json
 24a221de8262e37fca8cba8a1ff15564ece0b4bb assets/kogasa_addiction/models/item/kogasa_axe.json
 4ca7c34082bd6a7ac8fd4bddd46692a4b825b92c assets/kogasa_addiction/models/item/kogasa_hoe.json
 307c714f0e887a8d7271f63c4ddb1ae697a222af assets/kogasa_addiction/models/item/kogasa_ingot.json

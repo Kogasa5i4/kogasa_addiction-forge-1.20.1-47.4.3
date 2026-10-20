@@ -28,6 +28,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AyaBowItem extends BowItem implements IKogasaEquipment {
@@ -134,7 +135,7 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
             float velocityMultiplier = (float) Math.sqrt(multiplier);
 
             // 药水效果：如果是药水弹药，缓存效果列表
-            List<MobEffectInstance> potionEffects = new java.util.ArrayList<>();
+            List<MobEffectInstance> potionEffects = new ArrayList<>();
             if (ammoType == KogasaAbilityData.AmmoType.POTION) {
                 ResourceLocation potionId = KogasaAbilityData.getAmmoPotionId(stack);
                 if (potionId != null) {

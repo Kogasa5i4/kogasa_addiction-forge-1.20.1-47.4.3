@@ -1,0 +1,42 @@
+{
+  "parent": "kogasa_addiction:first_gear",
+  "criteria": {
+    "obtain_fumo": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "kogasa_addiction:fumo"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.kogasa_addiction.fumofumo.description"
+    },
+    "frame": "challenge",
+    "hidden": true,
+    "icon": {
+      "item": "kogasa_addiction:fumo",
+      "nbt": "{Damage:0}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.kogasa_addiction.fumofumo.title"
+    }
+  },
+  "requirements": [
+    [
+      "obtain_fumo"
+    ]
+  ],
+  "rewards": {
+    "experience": 99
+  },
+  "sends_telemetry_event": true
+}

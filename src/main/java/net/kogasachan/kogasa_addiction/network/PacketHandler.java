@@ -36,5 +36,11 @@ public class PacketHandler {
                 .decoder(TenshiBeaconBlockReplacementPacket::new)
                 .consumerMainThread(TenshiBeaconBlockReplacementPacket::handle)
                 .add();
+
+        INSTANCE.messageBuilder(KeyStatePacket.class, packetId++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(KeyStatePacket::encode)
+                .decoder(KeyStatePacket::new)
+                .consumerMainThread(KeyStatePacket::handle)
+                .add();
     }
 }

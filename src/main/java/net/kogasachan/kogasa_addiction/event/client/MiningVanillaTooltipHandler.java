@@ -50,7 +50,7 @@ public class MiningVanillaTooltipHandler {
                 speed = KogasaEquipmentHelper.getDisplayAttackSpeed(stack);
                 capped = KogasaEquipmentHelper.isAttackSpeedCapped(stack);
             } else {
-                double baseSpeed = getVanillaBaseSpeed(stack);
+                double baseSpeed = KogasaEquipmentHelper.getBaseAttackSpeed(stack);
                 speed = 4.0 + baseSpeed;
             }
 
@@ -100,22 +100,6 @@ public class MiningVanillaTooltipHandler {
             }
         }
         return -1;
-    }
-
-    /**
-     * 获取非 Kogasa 物品的原版基础攻速修饰符
-     */
-    private static double getVanillaBaseSpeed(ItemStack stack) {
-        Item item = stack.getItem();
-        if (item instanceof SwordItem) return -2.4;
-        if (item instanceof HoeItem) return -3.0;
-        // DiggerItem：用注册名后缀判断
-        var id = ForgeRegistries.ITEMS.getKey(item);
-        if (id == null) return -2.8;
-        String path = id.getPath();
-        if (path.endsWith("_axe")) return -3.2;
-        if (path.endsWith("_shovel")) return -3.0;
-        return -2.8; // 镐
     }
 
     /**

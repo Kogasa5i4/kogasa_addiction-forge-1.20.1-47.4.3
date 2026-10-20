@@ -299,7 +299,7 @@ public class ModAdvancementGenerator implements ForgeAdvancementProvider.Advance
                         Component.translatable("advancements.kogasa_addiction.kappa_tech.description"),
                         null, FrameType.TASK, true, true, false
                 ))
-                .parent(aya_full_set) // 改为幻想风靡的后置
+                .parent(aya_full_set)
                 .addCriterion("impossible", new ImpossibleTrigger.TriggerInstance())
                 .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "kappa_tech"), existingFileHelper);
 
@@ -355,5 +355,19 @@ public class ModAdvancementGenerator implements ForgeAdvancementProvider.Advance
                 .addCriterion("get_tenshi_ingot_at_height", tenshiHeightTrigger)
                 .rewards(AdvancementRewards.Builder.experience(1050))
                 .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "tenshi_height_challenge"), existingFileHelper);
+
+        // ===== 23. fumofumo：获得 Fumo（隐藏） =====
+        Advancement fumofumo = Advancement.Builder.advancement()
+                .display(new DisplayInfo(
+                        new ItemStack(ModItems.FUMO.get()),
+                        Component.translatable("advancements.kogasa_addiction.fumofumo.title"),
+                        Component.translatable("advancements.kogasa_addiction.fumofumo.description"),
+                        null, FrameType.CHALLENGE, true, true, true
+                ))
+                .parent(first_gear)
+                .addCriterion("obtain_fumo",
+                        InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.FUMO.get()))
+                .rewards(AdvancementRewards.Builder.experience(99))
+                .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "fumofumo"), existingFileHelper);
     }
 }

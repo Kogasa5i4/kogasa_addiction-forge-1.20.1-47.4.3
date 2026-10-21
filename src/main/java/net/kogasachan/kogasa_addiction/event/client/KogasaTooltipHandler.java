@@ -8,6 +8,7 @@ import net.kogasachan.kogasa_addiction.event.common.TimestopHandler;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
+import net.kogasachan.kogasa_addiction.util.KogasaNumberFormatHelper;
 import net.kogasachan.kogasa_addiction.util.ModConfigCache;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -26,6 +27,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +61,7 @@ public class KogasaTooltipHandler {
                 double damage = KogasaEquipmentHelper.getDisplayAttackDamage(stack);
                 Component newLine = Component.translatable(
                                 "tooltip.kogasa_addiction.vanilla_attack_damage",
-                                String.format("%.1f", damage))
+                                KogasaNumberFormatHelper.formatTrimmed(damage, 1))
                         .withStyle(line.getStyle()) // 继承原样式
                         .withStyle(ChatFormatting.DARK_GREEN);
                 tooltip.set(i, newLine);
@@ -79,7 +81,7 @@ public class KogasaTooltipHandler {
 
             tooltip.add(Component.translatable(
                             "tooltip.kogasa_addiction.multiplier.growth",
-                            String.format("%.2f", growthMult))
+                            KogasaNumberFormatHelper.formatTrimmed(growthMult, 2))
                     .withStyle(ChatFormatting.YELLOW));
 
             // 已吸收装备
@@ -99,7 +101,7 @@ public class KogasaTooltipHandler {
             // 吸收值
             if (absorbed > 0) {
                 tooltip.add(Component.translatable(
-                                "tooltip.kogasa_addiction.absorbed", String.format("%.1f", absorbed))
+                                "tooltip.kogasa_addiction.absorbed", KogasaNumberFormatHelper.formatTrimmed(absorbed, 1))
                         .withStyle(ChatFormatting.LIGHT_PURPLE));
             }
         } else {
@@ -110,7 +112,7 @@ public class KogasaTooltipHandler {
         // ===== 成长信息（Ctrl，仅解锁后显示） =====
         if (re >= ModConfigCache.growthUnlockReinforcements) {
             if (Screen.hasControlDown()) {
-                String percent = String.format("%.2f%%", growth * 100);
+                String percent = KogasaNumberFormatHelper.formatPercentTrimmed(growth, 2);
                 tooltip.add(Component.translatable(
                                 "tooltip.kogasa_addiction.growth", percent)
                         .withStyle(ChatFormatting.GREEN));
@@ -154,10 +156,7 @@ public class KogasaTooltipHandler {
             }
             // 槽位满且未解锁第 2 槽 → 显示解锁提示（只在有能力时显示）
             if (abilities.size() >= maxSlots && maxSlots < 2) {
-                String secondSlotGrowth = String.format(
-                        java.util.Locale.ROOT,
-                        "%.0f%%",
-                        Config.GROWTH_FOR_SECOND_ABILITY_SLOT.get() * 100.0);
+                String secondSlotGrowth = KogasaNumberFormatHelper.formatPercentTrimmed(Config.GROWTH_FOR_SECOND_ABILITY_SLOT.get(), 0);
                 tooltip.add(Component.translatable(
                                 "tooltip.kogasa_addiction.abilities.full_hint",
                                 secondSlotGrowth)
@@ -172,8 +171,8 @@ public class KogasaTooltipHandler {
 
                 tooltip.add(Component.translatable(
                                 "tooltip.kogasa_addiction.aya.news_value",
-                                String.format("%.2f%%", news * 100),
-                                String.format("×%.3f", 1.0 + news))
+                                KogasaNumberFormatHelper.formatPercentTrimmed(news, 2),
+                                "×" + KogasaNumberFormatHelper.formatTrimmed(1.0 + news, 3))
                         .withStyle(ChatFormatting.GOLD));
                 tooltip.add(Component.translatable(
                                 "tooltip.kogasa_addiction.aya.records",
@@ -192,7 +191,7 @@ public class KogasaTooltipHandler {
 
                     MutableComponent reviveLine = Component.translatable(
                             "tooltip.kogasa_addiction.cirno.revive_status",
-                            String.format(java.util.Locale.ROOT, "%.2f", cost));
+                            KogasaNumberFormatHelper.formatTrimmed(cost, 2));
                     reviveLine.withStyle(canRevive ? ChatFormatting.GREEN : ChatFormatting.RED);
                     tooltip.add(reviveLine);
                 }
@@ -203,18 +202,17 @@ public class KogasaTooltipHandler {
                         || stack.getItem() instanceof CrossbowItem;
                 if (isRangedWeapon) {
                     if (Config.ENABLE_KOISHI_RANGED.get()) {
-                        double chance = Config.KOISHI_RANGED_CRIT_CHANCE.get() * 100;
                         double mult = Config.KOISHI_RANGED_CRIT_MULTIPLIER.get();
                         double specialTargetMult = Config.KOISHI_PROJECTILE_IMMUNE_MULTIPLIER.get();
                         tooltip.add(Component.translatable(
                                         "tooltip.kogasa_addiction.koishi.ranged_crit_info",
-                                        String.format(java.util.Locale.ROOT, "%.0f%%", chance),
-                                        String.format(java.util.Locale.ROOT, "%.2f", mult))
+                                        KogasaNumberFormatHelper.formatPercentTrimmed(Config.KOISHI_RANGED_CRIT_CHANCE.get(), 0),
+                                        KogasaNumberFormatHelper.formatTrimmed(mult, 2))
                                 .withStyle(ChatFormatting.LIGHT_PURPLE));
                         tooltip.add(Component.translatable(
                                         "tooltip.kogasa_addiction.koishi.ranged_special_targets",
-                                        String.format(java.util.Locale.ROOT, "%.2f", specialTargetMult),
-                                        String.format(java.util.Locale.ROOT, "%.2f", specialTargetMult * specialTargetMult))
+                                        KogasaNumberFormatHelper.formatTrimmed(specialTargetMult, 2),
+                                        KogasaNumberFormatHelper.formatTrimmed(specialTargetMult * specialTargetMult, 2))
                                 .withStyle(ChatFormatting.GRAY));
                     } else {
                         tooltip.add(Component.translatable(
@@ -222,12 +220,11 @@ public class KogasaTooltipHandler {
                                 .withStyle(ChatFormatting.DARK_GRAY));
                     }
                 } else {
-                    double chance = Config.KOISHI_CRIT_CHANCE.get() * 100;
                     double mult = Config.KOISHI_CRIT_MULTIPLIER.get();
                     tooltip.add(Component.translatable(
                                     "tooltip.kogasa_addiction.koishi.crit_info",
-                                    String.format(java.util.Locale.ROOT, "%.0f%%", chance),
-                                    String.format(java.util.Locale.ROOT, "%.2f", mult))
+                                    KogasaNumberFormatHelper.formatPercentTrimmed(Config.KOISHI_CRIT_CHANCE.get(), 0),
+                                    KogasaNumberFormatHelper.formatTrimmed(mult, 2))
                             .withStyle(ChatFormatting.LIGHT_PURPLE));
                 }
             }
@@ -238,12 +235,12 @@ public class KogasaTooltipHandler {
 
                 tooltip.add(Component.translatable(
                                 "tooltip.kogasa_addiction.multiplier.reinforcement",
-                                String.format("%.2f", reMult))
+                                KogasaNumberFormatHelper.formatTrimmed(reMult, 2))
                         .withStyle(ChatFormatting.YELLOW));
 
                 tooltip.add(Component.translatable(
                                 "tooltip.kogasa_addiction.multiplier.total",
-                                String.format("%.3f", totalMult))
+                                KogasaNumberFormatHelper.formatTrimmed(totalMult, 3))
                         .withStyle(ChatFormatting.GOLD));
             }
 
@@ -291,8 +288,8 @@ public class KogasaTooltipHandler {
                                         .withStyle(ChatFormatting.AQUA));
                             } else {
                                 tooltip.add(Component.translatable("tooltip.kogasa_addiction.tenshi.charge",
-                                                String.format(java.util.Locale.ROOT, "%.1f", charge),
-                                                String.format(java.util.Locale.ROOT, "%.1f", threshold),
+                                                KogasaNumberFormatHelper.formatTrimmed(charge, 1),
+                                                KogasaNumberFormatHelper.formatTrimmed(threshold, 1),
                                                 resistance)
                                     .withStyle(ChatFormatting.DARK_AQUA));
                             }
@@ -379,7 +376,7 @@ public class KogasaTooltipHandler {
                     } else {
                         tooltip.add(Component.translatable(
                                         "tooltip.kogasa_addiction.ranged.no_consume",
-                                        String.format("%.0f%%", noConsumeChance * 100))
+                                        KogasaNumberFormatHelper.formatPercentTrimmed(noConsumeChance, 0))
                                 .withStyle(ChatFormatting.GOLD));
                     }
                 } else {
@@ -388,8 +385,8 @@ public class KogasaTooltipHandler {
                     if (start > 0) {
                         tooltip.add(Component.translatable(
                                         "tooltip.kogasa_addiction.ranged.no_consume.locked",
-                                        String.format("%.0f%%", growth * 100),   // ← 当前值
-                                        String.format("%.0f%%", start * 100))    // ← 目标值
+                                        KogasaNumberFormatHelper.formatPercentTrimmed(growth, 0),
+                                        KogasaNumberFormatHelper.formatPercentTrimmed(start, 0))
                                 .withStyle(ChatFormatting.DARK_GRAY));
                     }
                 }
@@ -405,6 +402,10 @@ public class KogasaTooltipHandler {
      */
     private static Component getItemDisplayName(String id) {
         // 处理 "arrow:" 前缀：剥掉后按物品 ID 解析
+        return getComponent(id);
+    }
+
+    @NotNull public static Component getComponent(String id) {
         String actualId = id;
         boolean isArrow = false;
         if (id.startsWith("arrow:")) {
@@ -562,14 +563,5 @@ public class KogasaTooltipHandler {
         }
 
         return line.withStyle(ChatFormatting.GRAY);
-    }
-
-    private static String formatDuration(int totalSeconds) {
-        if (totalSeconds < 60) {
-            return totalSeconds + "s";
-        }
-        int minutes = totalSeconds / 60;
-        int seconds = totalSeconds % 60;
-        return String.format("%d:%02d", minutes, seconds);
     }
 }

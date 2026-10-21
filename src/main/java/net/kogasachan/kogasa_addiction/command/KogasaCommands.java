@@ -11,11 +11,13 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
+import net.kogasachan.kogasa_addiction.event.client.KogasaTooltipHandler;
 import net.kogasachan.kogasa_addiction.event.common.KogasaGrowthHandler;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
+import net.kogasachan.kogasa_addiction.util.KogasaNumberFormatHelper;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -175,8 +177,8 @@ public class KogasaCommands {
         final double newV = newValue;
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.grow.success",
-                String.format("%.4f", oldV),
-                String.format("%.4f", newV)), true);
+                KogasaNumberFormatHelper.formatTrimmed(oldV, 4),
+                KogasaNumberFormatHelper.formatTrimmed(newV, 4)), true);
         KogasaAdvancementHelper.checkAndGrant(player, held);
         return 1;
     }
@@ -270,7 +272,7 @@ public class KogasaCommands {
         final int cost = materialCost;
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.reinforce.success",
-                oldRe, newRe, String.format("%.2f", absorbValue)), true);
+                oldRe, newRe, KogasaNumberFormatHelper.formatTrimmed(absorbValue, 2)), true);
         KogasaAdvancementHelper.checkAndGrant(player, held);
         return 1;
     }
@@ -335,9 +337,9 @@ public class KogasaCommands {
         // ===== 成长 =====
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.info.growth",
-                String.format("%.4f", growth),
-                String.format("%.2f%%", growth * 100),
-                String.format("%.2f%%", maxGrowth * 100)), false);
+                KogasaNumberFormatHelper.formatTrimmed(growth, 4),
+                KogasaNumberFormatHelper.formatPercentTrimmed(growth, 2),
+                KogasaNumberFormatHelper.formatPercentTrimmed(maxGrowth, 2)), false);
 
         // ===== 倍率 =====
         double reMult = KogasaEquipmentHelper.getReinforcementMultiplier(held);
@@ -348,15 +350,15 @@ public class KogasaCommands {
 
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.info.multiplier",
-                String.format("%.2f", reMult),
-                String.format("%.2f", growthMult),
-                String.format("%.2f", newsMult),
-                String.format("%.3f", totalMult)), false);
+                KogasaNumberFormatHelper.formatTrimmed(reMult, 2),
+                KogasaNumberFormatHelper.formatTrimmed(growthMult, 2),
+                KogasaNumberFormatHelper.formatTrimmed(newsMult, 2),
+                KogasaNumberFormatHelper.formatTrimmed(totalMult, 3)), false);
 
         // ===== 吸收值 =====
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.info.absorbed",
-                String.format("%.2f", absorbed)), false);
+                KogasaNumberFormatHelper.formatTrimmed(absorbed, 2)), false);
 
         // ===== 成长附魔次数 =====
         ctx.getSource().sendSuccess(() -> Component.translatable(
@@ -420,9 +422,9 @@ public class KogasaCommands {
 
             ctx.getSource().sendSuccess(() -> Component.translatable(
                     "commands.kogasa_addiction.info.news_value",
-                    String.format("%.4f", news),
-                    String.format("%.2f%%", news * 100),
-                    String.format("%.2f%%", maxNews * 100)), false);
+                    KogasaNumberFormatHelper.formatTrimmed(news, 4),
+                    KogasaNumberFormatHelper.formatPercentTrimmed(news, 2),
+                    KogasaNumberFormatHelper.formatPercentTrimmed(maxNews, 2)), false);
             ctx.getSource().sendSuccess(() -> Component.translatable(
                     "commands.kogasa_addiction.info.news_records",
                     killed, mined, damaged), false);
@@ -439,8 +441,8 @@ public class KogasaCommands {
                 double threshold = Config.BOW_PIERCE_GROWTH.get();
                 ctx.getSource().sendSuccess(() -> Component.translatable(
                         "commands.kogasa_addiction.info.ranged.pierce.locked",
-                        String.format("%.2f%%", threshold * 100),
-                        String.format("%.2f%%", growth * 100)), false);
+                        KogasaNumberFormatHelper.formatPercentTrimmed(threshold, 2),
+                        KogasaNumberFormatHelper.formatPercentTrimmed(growth, 2)), false);
             }
 
             // 多发进度
@@ -453,15 +455,15 @@ public class KogasaCommands {
                 ctx.getSource().sendSuccess(() -> Component.translatable(
                         "commands.kogasa_addiction.info.ranged.multishot.progress",
                         arrows,
-                        String.format("%.2f%%", threshold * 100),
-                        String.format("%.2f%%", growth * 100)), false);
+                        KogasaNumberFormatHelper.formatPercentTrimmed(threshold, 2),
+                        KogasaNumberFormatHelper.formatPercentTrimmed(growth, 2)), false);
             } else {
                 double threshold = Config.BOW_MULTISHOT_2_GROWTH.get();
                 ctx.getSource().sendSuccess(() -> Component.translatable(
                         "commands.kogasa_addiction.info.ranged.multishot.progress",
                         arrows,
-                        String.format("%.2f%%", threshold * 100),
-                        String.format("%.2f%%", growth * 100)), false);
+                        KogasaNumberFormatHelper.formatPercentTrimmed(threshold, 2),
+                        KogasaNumberFormatHelper.formatPercentTrimmed(growth, 2)), false);
             }
 
             // 弹药
@@ -491,13 +493,13 @@ public class KogasaCommands {
                 ctx.getSource().sendSuccess(() -> Component.translatable(
                         "commands.kogasa_addiction.info.ranged.no_consume.max"), false);
             } else if (noConsume > 0) {
-                final String pct = String.format("%.0f%%", noConsume * 100);
+                final String pct = KogasaNumberFormatHelper.formatPercentTrimmed(noConsume, 0);
                 ctx.getSource().sendSuccess(() -> Component.translatable(
                         "commands.kogasa_addiction.info.ranged.no_consume", pct), false);
             } else {
                 double start = Config.NO_CONSUME_ARROW_START_GROWTH.get();
-                final String cur = String.format("%.0f%%", growth * 100);
-                final String need = String.format("%.0f%%", start * 100);
+                final String cur = KogasaNumberFormatHelper.formatPercentTrimmed(growth, 0);
+                final String need = KogasaNumberFormatHelper.formatPercentTrimmed(start, 0);
                 ctx.getSource().sendSuccess(() -> Component.translatable(
                         "commands.kogasa_addiction.info.ranged.no_consume.locked", cur, need), false);
             }
@@ -523,10 +525,10 @@ public class KogasaCommands {
             // 输出护甲蓄力状态 (传入：当前值, 阈值, 抗性等级, 爆发百分比)
             ctx.getSource().sendSuccess(() -> Component.translatable(
                     "commands.kogasa_addiction.info.tenshi.armor",
-                    String.format("%.1f", charge),
-                    String.format("%.1f", threshold),
+                    KogasaNumberFormatHelper.formatTrimmed(charge, 1),
+                    KogasaNumberFormatHelper.formatTrimmed(threshold, 1),
                     resistanceLevel,
-                    String.format("%.0f%%", ratio)
+                    KogasaNumberFormatHelper.formatPercentTrimmed(ratio, 0)
             ), false);
 
             // 如果蓄满，额外提示一下（这里复用了你之前的 ready 键，或者不需要可以删）
@@ -545,7 +547,7 @@ public class KogasaCommands {
             ctx.getSource().sendSuccess(() -> Component.translatable(
                     "commands.kogasa_addiction.info.tenshi.weapon",
                     debuffSecs,
-                    String.format("%.1f", flyingMult)
+                    KogasaNumberFormatHelper.formatTrimmed(flyingMult, 1)
             ), false);
 
             // 输出 Buff 说明
@@ -660,7 +662,7 @@ public class KogasaCommands {
         player.getInventory().setChanged();
 
         final int d = delta;
-        final String growthStr = String.format("%.4f", before);
+        final String growthStr = KogasaNumberFormatHelper.formatTrimmed(before, 4);
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.triggerenchant.success", growthStr, d), true);
         return 1;
@@ -795,8 +797,8 @@ public class KogasaCommands {
         final double b = before, a = after;
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.newsvalue.success",
-                String.format("%.4f", b),
-                String.format("%.4f", a)), true);
+                KogasaNumberFormatHelper.formatTrimmed(b, 4),
+                KogasaNumberFormatHelper.formatTrimmed(a, 4)), true);
         return 1;
     }
 
@@ -827,7 +829,7 @@ public class KogasaCommands {
         final double v = newVal;
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.setnewsvalue.success",
-                String.format("%.4f", v)), true);
+                KogasaNumberFormatHelper.formatTrimmed(v, 4)), true);
         KogasaAdvancementHelper.checkAndGrant(player, held);
         return 1;
     }
@@ -954,24 +956,7 @@ public class KogasaCommands {
     }
 
     private static Component getMaterialDisplayName(String id) {
-        String actualId = id;
-        boolean isArrow = false;
-        if (id.startsWith("arrow:")) {
-            actualId = id.substring("arrow:".length());
-            isArrow = true;
-        }
-        ResourceLocation loc = ResourceLocation.tryParse(actualId);
-        if (loc == null) return Component.literal(id);
-
-        var item = ForgeRegistries.ITEMS.getValue(loc);
-        if (item == null || item == Items.AIR) return Component.literal(id);
-
-        Component name = new ItemStack(item).getHoverName();
-        if (isArrow) {
-            return Component.translatable(
-                    "tooltip.kogasa_addiction.reinforcement.entry.arrow", name);
-        }
-        return name;
+        return KogasaTooltipHandler.getComponent(id);
     }
 
     private static Component getPotionDisplayName(ResourceLocation potionId,

@@ -8,6 +8,7 @@ import net.kogasachan.kogasa_addiction.ability.KogasaAbilityHelper;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
+import net.kogasachan.kogasa_addiction.util.KogasaNumberFormatHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -96,7 +97,7 @@ public class CirnoAbilityHandler {
                 SoundEvents.TOTEM_USE, SoundSource.PLAYERS, 1.0F, 1.0F);
         player.displayClientMessage(
                 Component.translatable("message.kogasa_addiction.cirno_revive",
-                        String.format("%.2f", cost)).withStyle(net.minecraft.ChatFormatting.AQUA),
+                        KogasaNumberFormatHelper.formatTrimmed(cost, 2)).withStyle(net.minecraft.ChatFormatting.AQUA),
                 true);
         KogasaAdvancementHelper.grant(player, "cirno_revive");
     }

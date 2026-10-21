@@ -2,6 +2,7 @@ package net.kogasachan.kogasa_addiction.item;
 
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
+import net.kogasachan.kogasa_addiction.util.KogasaNumberFormatHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
@@ -100,7 +101,7 @@ public class KogasaAbilityIngotItem extends Item {
     }
 
     private static String formatPercent(double chance) {
-        String percent = String.format(java.util.Locale.ROOT, "%.2f", chance * 100.0)
+        String percent = KogasaNumberFormatHelper.formatPercentTrimmed(chance, 2)
                 .replaceAll("\\.?0+$", "");
         if (chance > 0.0 && Double.parseDouble(percent) == 0.0) {
             return "<0.01%";

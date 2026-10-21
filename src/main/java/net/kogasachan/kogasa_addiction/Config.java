@@ -423,7 +423,7 @@ public class Config {
             .defineInRange("tenshiIngotChance", 0.105, 0.0, 1.0);
 
     public static final ForgeConfigSpec.DoubleValue TENSHI_DOMAIN_THRESHOLD = BUILDER
-            .comment("Damage required to charge the 'State of No-Thought, No-Mind'.")
+            .comment("Damage required to charge the 'State of No-Thought, No-Mind' (20 in default).")
             .comment("无念无想的境界所需的蓄力伤害值（默认20）。")
             .defineInRange("tenshiDomainThreshold", 20.0, 1.0, Double.MAX_VALUE);
 
@@ -451,9 +451,9 @@ public class Config {
     }
 
     public static final ForgeConfigSpec.DoubleValue SAKUYA_INGOT_CHANCE = BUILDER
-            .comment("Chance to get a Sakuya Ingot at the start of each day if the coordinate condition is met. 0.333 = 33.3%.")
-            .comment("每天开始时，满足坐标条件获取咲夜锭的概率。0.333 = 33.3%。")
-            .defineInRange("sakuyaIngotChance", 0.333, 0.0, 1.0);
+            .comment("Chance to get a Sakuya Ingot at the start of each day if the coordinate condition is met. 0.1 = 10%.")
+            .comment("每天开始时，满足坐标条件获取咲夜锭的概率。0.1 = 10%。")
+            .defineInRange("sakuyaIngotChance", 1/3D, 0.0, 1.0);
 
     // ===== 咲夜能力 - 时停 =====
     public static final ForgeConfigSpec.IntValue SAKUYA_TIMESTOP_SECONDS_PER_EQUIPMENT = BUILDER

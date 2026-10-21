@@ -48,17 +48,8 @@ public class KogasaAbilityIngotItem extends Item {
         tooltip.add(Component.translatable(
                         "tooltip.kogasa_addiction.ability_ingot.obtain.header")
                 .withStyle(ChatFormatting.YELLOW));
-        boolean sourceDisabled = (ability == KogasaAbility.AYA)
-                || (ability == KogasaAbility.KOGASA);
-        if (sourceDisabled) {
-            String disabledKey = ability == KogasaAbility.AYA
-                    ? "tooltip.kogasa_addiction.ability_ingot.obtain.aya.disabled"
-                    : "tooltip.kogasa_addiction.ability_ingot.obtain.kogasa.disabled";
-            tooltip.add(Component.translatable(disabledKey).withStyle(ChatFormatting.DARK_GRAY));
-        } else {
-            for (String key : ability.getObtainKeys()) {
-                tooltip.add(createObtainLine(key));
-            }
+        for (String key : ability.getObtainKeys()) {
+            tooltip.add(createObtainLine(key));
         }
 
         // 5. 空行 + 使用提示
@@ -101,11 +92,9 @@ public class KogasaAbilityIngotItem extends Item {
     }
 
     private static String formatPercent(double chance) {
-        String percent = KogasaNumberFormatHelper.formatPercentTrimmed(chance, 2)
-                .replaceAll("\\.?0+$", "");
-        if (chance > 0.0 && Double.parseDouble(percent) == 0.0) {
+        if (chance > 0.0 && chance < 0.0001) {
             return "<0.01%";
         }
-        return percent + "%";
+        return KogasaNumberFormatHelper.formatPercentTrimmed(chance, 2);
     }
 }

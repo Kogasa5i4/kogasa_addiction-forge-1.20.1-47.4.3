@@ -76,9 +76,9 @@ public class Config {
             .defineInRange("growthUnlockReinforcements", 3, 0, Integer.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue GROWTH_PER_USE = BUILDER
-            .comment("Growth gained per correct use. 0.0001 = 0.01%.\n" +
-                    "每次成长获得的百分比加成。0.0001 = 0.01%.")
-            .defineInRange("growthPerUse", 0.0001, 0.0, Double.MAX_VALUE);
+            .comment("Growth gained per correct use. 0.001 = 0.1%.\n" +
+                    "每次成长获得的百分比加成。0.001 = 0.1%.")
+            .defineInRange("growthPerUse", 0.001, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue MAX_GROWTH = BUILDER
             .comment("Maximum stored growth value. 1.0 means +100% growth bonus (growth multiplier x2.0); default 3.0 means +300% bonus (growth multiplier x4.0).\n" +
@@ -108,12 +108,12 @@ public class Config {
     public static final ForgeConfigSpec.DoubleValue GROWTH_PER_ENCHANT = BUILDER
             .comment("Growth required to unlock one random enchantment. 0.01 = 1% growth per enchant.\n" +
                     "解锁一个随机附魔所需的成长值。0.01 = 1%。")
-            .defineInRange("growthPerEnchant", 0.01, 0.0001, Double.MAX_VALUE);
+            .defineInRange("growthPerEnchant", 0.02, 0.0001, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.IntValue MAX_GROWTH_ENCHANTS = BUILDER
             .comment("Maximum number of enchantments granted by growth.\n" +
                     "通过成长获得的最大附魔数量。")
-            .defineInRange("maxGrowthEnchants", 256, 0, Integer.MAX_VALUE);
+            .defineInRange("maxGrowthEnchants", 150, 0, Integer.MAX_VALUE);
 
     public static final ForgeConfigSpec.BooleanValue ALLOW_MAX_LEVEL_ENCHANTS = BUILDER
             .comment("If true, granted enchantments get a random level from 1 to max. If false, always level 1.\n" +
@@ -136,7 +136,7 @@ public class Config {
     public static final ForgeConfigSpec.IntValue DURABILITY_FIXED_PER_REINFORCEMENT = BUILDER
             .comment("Fixed durability added per reinforcement.\n" +
                     "每次强化增加的固定耐久值")
-            .defineInRange("durabilityFixedPerReinforcement", 200, 0, Integer.MAX_VALUE);
+            .defineInRange("durabilityFixedPerReinforcement", 500, 0, Integer.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue DURABILITY_RATIO_PER_REINFORCEMENT = BUILDER
             .comment("Durability ratio added per reinforcement. 0.1 = +10% of base.\n" +
@@ -178,7 +178,7 @@ public class Config {
     public static final ForgeConfigSpec.DoubleValue KNOCKBACK_MAX_PER_PIECE = BUILDER
             .comment("Asymptotic knockback-resistance cap per armor piece. Growth and Aya news value approach this cap; each reinforcement raises the cap by 50%, up to 1.0.\n" +
                     "每件护甲的渐近击退抗性上限。成长值与文文新闻值越高，实际抗性越接近上限；每次强化会将该上限提高 50%，但最高不超过 1.0。")
-            .defineInRange("knockbackMaxPerPiece", 0.25, 0.01, Double.MAX_VALUE);
+            .defineInRange("knockbackMaxPerPiece", 0.5, 0.01, Double.MAX_VALUE);
 
     static {
         BUILDER.pop();
@@ -202,6 +202,11 @@ public class Config {
             .comment("Growth required for 3-arrow multishot.\n" +
                     "解锁三发所需的成长值。")
             .defineInRange("bowMultishot3Growth", 2.5, 0.0, Double.MAX_VALUE);
+
+    public static final ForgeConfigSpec.DoubleValue RANGED_MULTISHOT_SPREAD = BUILDER
+            .comment("Multishot spread angle in degrees. 8 = ±4° for 3 arrows.\n" +
+                    "多发散射角度（度）。8 = 三发时 ±4°。")
+            .defineInRange("multishotSpread", 8.0, 0.0, 45.0);
 
     public static final ForgeConfigSpec.DoubleValue CROSSBOW_AUTO_RELOAD_GROWTH = BUILDER
             .comment("Growth required for crossbow auto-reload. 0 = disabled.\n" +
@@ -264,7 +269,6 @@ public class Config {
         BUILDER.push("ability");
     }
 
-    // ===== 能力槽位 =====
     public static final ForgeConfigSpec.IntValue ABILITY_INFUSION_COST = BUILDER
             .comment("Experience level cost to infuse an ability ingot into equipment.\n" +
                     "在铁砧中为装备注入能力锭消耗的经验等级。")
@@ -279,7 +283,6 @@ public class Config {
         BUILDER.push("aya");
     }
 
-    // ===== Aya 能力 =====
     public static final ForgeConfigSpec.DoubleValue NEWS_VALUE_PER_RECORD = BUILDER
             .comment("News value gained per new record (mob/block/damage type).\n" +
                     "每记录一种新生物/方块/伤害类型获得的新闻值。")
@@ -308,7 +311,6 @@ public class Config {
         BUILDER.push("cirno");
     }
 
-    // ===== Cirno - 攻击缓慢 =====
     public static final ForgeConfigSpec.DoubleValue CIRNO_SLOW_CHANCE = BUILDER
             .comment("Chance to apply Slowness to the target when attacking.\n" +
                     "攻击时对目标施加缓慢的概率。")
@@ -344,7 +346,6 @@ public class Config {
                     "符合条件的冰类事件掉落琪露诺锭的概率：未使用精准采集挖掘、霜冰融化或爆炸破坏冰类方块。0.09 = 9%。")
             .defineInRange("cirnoIngotDropChance", 0.09, 0.0, 1.0);
 
-    // ===== Cirno - 复活 =====
     public static final ForgeConfigSpec.BooleanValue CIRNO_REVIVE_ENABLED = BUILDER
             .comment("Enable Cirno ability to revive from durability loss.\n" +
                     "启用琪露诺能力：耐久耗尽时消耗成长值复活。")
@@ -363,7 +364,6 @@ public class Config {
         BUILDER.push("koishi");
     }
 
-    // ===== Koishi 能力 =====
     public static final ForgeConfigSpec.DoubleValue KOISHI_CRIT_CHANCE = BUILDER
             .comment("Koishi crit chance. 0.75 = 75%.\n" +
                     "koishi 暴击概率。0.75 = 75%。")
@@ -387,7 +387,6 @@ public class Config {
         BUILDER.push("kogasa");
     }
 
-    // ===== Kogasa 能力 =====
     public static final ForgeConfigSpec.DoubleValue KOGASA_INGOT_CHANCE = BUILDER
             .comment("Chance per server tick (20 ticks per second) to produce a Kogasa Ingot while the blast furnace is lit. Default 0.001 = 0.1%; 0.01 = 1%.\n" +
                     "高炉燃烧时每游戏刻（每秒 20 刻）产出小伞锭的概率。默认值 0.001 = 0.1%；0.01 = 1%。")
@@ -411,7 +410,6 @@ public class Config {
         BUILDER.push("tenshi");
     }
 
-    // ===== Tenshi 能力=====
     public static final ForgeConfigSpec.IntValue TENSHI_INGOT_MIN_Y = BUILDER
             .comment("The minimum Y level required to obtain a Tenshi Ingot by placing beacon base blocks.")
             .comment("放置信标基座方块获取天子锭的最低 Y 轴高度。")
@@ -455,34 +453,19 @@ public class Config {
             .comment("每天开始时，满足坐标条件获取咲夜锭的概率。0.1 = 10%。")
             .defineInRange("sakuyaIngotChance", 1/3D, 0.0, 1.0);
 
-    // ===== 咲夜能力 - 时停 =====
     public static final ForgeConfigSpec.IntValue SAKUYA_TIMESTOP_SECONDS_PER_EQUIPMENT = BUILDER
             .comment("Timestop duration per piece of Sakuya equipment (in seconds).")
             .comment("每件咲夜能力装备提供的时停时间（秒）。")
             .defineInRange("sakuyaTimestopSecondsPerEquipment", 5, 1, 60);
 
     static {
-        BUILDER.pop(2);
+        BUILDER.pop();
     }
-
-    // ============================================================
-    // 远程武器
-    // ============================================================
-    static {
-        BUILDER.push("ranged");
-    }
-
-    // ===== 通用 =====
-    public static final ForgeConfigSpec.DoubleValue RANGED_MULTISHOT_SPREAD = BUILDER
-            .comment("Multishot spread angle in degrees. 8 = ±4° for 3 arrows.\n" +
-                    "多发散射角度（度）。8 = 三发时 ±4°。")
-            .defineInRange("multishotSpread", 8.0, 0.0, 45.0);
 
     static {
-        BUILDER.push("aya");
+        BUILDER.push("ranged.aya");
     }
 
-    // ===== AYA 远程能力 =====
     public static final ForgeConfigSpec.BooleanValue ENABLE_AYA_RANGED = BUILDER
             .comment("Enable Aya ranged ability (Speed + Haste on projectile hit).\n" +
                     "启用文文远程能力（命中时给射手迅捷 + 急迫）。")
@@ -516,7 +499,6 @@ public class Config {
         BUILDER.push("cirno");
     }
 
-    // ===== CIRNO 远程能力 =====
     public static final ForgeConfigSpec.BooleanValue ENABLE_CIRNO_RANGED = BUILDER
             .comment("Enable Cirno ranged ability (enhanced potions + Slowness on plain arrows).\n" +
                     "启用琪露诺远程能力（强化药水 + 无药水箭附加缓慢）。")
@@ -550,7 +532,6 @@ public class Config {
         BUILDER.push("kogasa");
     }
 
-    // ===== KOGASA 远程能力 =====
     public static final ForgeConfigSpec.BooleanValue ENABLE_KOGASA_RANGED = BUILDER
             .comment("Enable Kogasa ranged ability (consecutive hit damage bonus).\n" +
                     "启用小伞远程能力（连续命中伤害加成）。")
@@ -579,7 +560,6 @@ public class Config {
         BUILDER.push("koishi");
     }
 
-    // ===== KOISHI 远程能力 =====
     public static final ForgeConfigSpec.BooleanValue ENABLE_KOISHI_RANGED = BUILDER
             .comment("Enable Koishi ranged effects: armor-piercing critical hits and special-target damage multipliers.\n" +
                     "启用恋恋远程效果：穿甲暴击与特殊目标伤害倍率。")
@@ -601,7 +581,7 @@ public class Config {
             .defineInRange("koishiProjectileImmuneMultiplier", 3.0, 1.0, Double.MAX_VALUE);
 
     static {
-        BUILDER.pop(2);
+        BUILDER.pop(3);
     }
 
     public static final ForgeConfigSpec SPEC = BUILDER.build();

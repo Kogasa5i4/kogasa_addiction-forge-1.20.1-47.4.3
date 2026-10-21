@@ -38,72 +38,62 @@ public class KogasaGrowthHandler {
     @SubscribeEvent
     public static void onAttack(AttackEntityEvent event) {
         if (!Config.ENABLE_GROWTH.get()) return;
-        Player player = event.getEntity();
-        ItemStack main = player.getMainHandItem();
-        if (main.getItem() instanceof IKogasaEquipment) {
-            if (!player.level().isClientSide) addGrowth(main, player);
-            player.getInventory().setChanged();
-        }
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+
+        triggerGrowth(player);
     }
 
     // 破坏方块
     @SubscribeEvent
     public static void onBlockBreak(BlockEvent.BreakEvent event) {
         if (!Config.ENABLE_GROWTH.get()) return;
-        Player player = event.getPlayer();
-        if (player == null) return;
-        ItemStack main = player.getMainHandItem();
-        if (main.getItem() instanceof IKogasaEquipment) {
-            if (!player.level().isClientSide) addGrowth(main, player);
-            player.getInventory().setChanged();
-        }
+        if (!(event.getPlayer() instanceof ServerPlayer player)) return;
+
+        triggerGrowth(player);
     }
 
     // 受到伤害
     @SubscribeEvent
     public static void onHurt(LivingHurtEvent event) {
         if (!Config.ENABLE_GROWTH.get()) return;
-        if (!(event.getEntity() instanceof Player player)) return;
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
 
-        for (EquipmentSlot slot : new EquipmentSlot[]{
-                EquipmentSlot.HEAD, EquipmentSlot.CHEST,
-                EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
-            ItemStack armor = player.getItemBySlot(slot);
-            if (armor.getItem() instanceof IKogasaEquipment) {
-                if (!player.level().isClientSide) addGrowth(armor, player);
-                player.getInventory().setChanged();
-            }
-        }
+        triggerGrowth(player);
     }
 
     // 斧锹锄专属
     @SubscribeEvent
     public static void onBlockToolModification(BlockEvent.BlockToolModificationEvent event) {
         if (!Config.ENABLE_GROWTH.get()) return;
-
-        // 模拟操作不触发（客户端预览），只处理真实执行
         if (event.isSimulated()) return;
+        if (!(event.getPlayer() instanceof ServerPlayer player)) return;
 
-        // 根据 ToolAction 筛选
         ToolAction action = event.getToolAction();
-        if (action != ToolActions.HOE_TILL
-                && action != ToolActions.SHOVEL_FLATTEN
-                && action != ToolActions.AXE_STRIP) {
-            return;
-        }
+        boolean isRightClickModification =
+                action == ToolActions.HOE_TILL
+                        || action == ToolActions.SHOVEL_FLATTEN
+                        || action == ToolActions.AXE_STRIP
+                        || action == ToolActions.AXE_SCRAPE
+                        || action == ToolActions.AXE_WAX_OFF;
 
-        // 获取玩家与主手物品
-        Player player = event.getContext().getPlayer();
-        if (player == null) return;
-
-        ItemStack main = player.getMainHandItem();
-        if (!(main.getItem() instanceof IKogasaEquipment)) return;
-
-        if (!player.level().isClientSide) addGrowth(main, player);
-        player.getInventory().setChanged();
+        if (!isRightClickModification) return;
+        triggerGrowth(player);
     }
 
-    public static void addGrowth(ItemStack stack, Player player) {
+    public static void triggerGrowth(ServerPlayer player) {
+        for (EquipmentSlot slot : new EquipmentSlot[]{
+                EquipmentSlot.HEAD, EquipmentSlot.CHEST,
+                EquipmentSlot.LEGS, EquipmentSlot.FEET,
+                EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND}) {
+            ItemStack armor = player.getItemBySlot(slot);
+            if (armor.getItem() instanceof IKogasaEquipment) {
+                addGrowth(armor, player);
+                player.getInventory().setChanged();
+            }
+        }
+    }
+
+    public static void addGrowth(ItemStack stack, ServerPlayer player) {
         if (!KogasaEquipmentData.isGrowthUnlocked(stack)) return;
 
         double growth = KogasaEquipmentData.getGrowth(stack);
@@ -119,9 +109,7 @@ public class KogasaGrowthHandler {
             checkGrowthEnchant(stack, player);
         }
 
-        if (player instanceof ServerPlayer sp) {
-            KogasaAdvancementHelper.checkAndGrant(sp, stack);
-        }
+        KogasaAdvancementHelper.checkAndGrant(player, stack);
     }
 
     /**

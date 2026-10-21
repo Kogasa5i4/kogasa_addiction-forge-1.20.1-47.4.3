@@ -1,8 +1,8 @@
 package net.kogasachan.kogasa_addiction.util;
 
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.math.RoundingMode;
 import java.util.Locale;
 
 public class KogasaNumberFormatHelper {

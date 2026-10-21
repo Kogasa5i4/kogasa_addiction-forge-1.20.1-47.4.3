@@ -1,36 +1,36 @@
-[2110月2026 19:19:26.273] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgedatauserdev, --assetIndex, 5, --assetsDir, E:\.gradle\caches\forge_gradle\assets, --gameDir, ., --fml.forgeVersion, 47.4.3, --fml.mcVersion, 1.20.1, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20230612.114412, --mod, kogasa_addiction, --all, --output, E:\code\kogasa_addiction-forge-1.20.1-47.4.3\src\generated\resources, --existing, E:\code\kogasa_addiction-forge-1.20.1-47.4.3\src\main\resources, --mixin.config, kogasa_addiction.mixins.json]
-[2110月2026 19:19:26.284] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 10.0.9+10.0.9+main.dcd20f30 starting: java version 17.0.11 by Microsoft; OS Windows 11 arch amd64 version 10.0
-[2110月2026 19:19:26.389] [main/INFO] [net.minecraftforge.fml.loading.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgedatauserdev
-[2110月2026 19:19:26.434] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/E:/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.5/9d1c0c3a304ae6697ecd477218fa61b850bf57fc/mixin-0.8.5.jar%23128!/ Service=ModLauncher Env=CLIENT
-[2110月2026 19:19:26.661] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file E:\.gradle\caches\modules-2\files-2.1\net.minecraftforge\javafmllanguage\1.20.1-47.4.3\4080695cecae86c354232f04a2627dd7e4f1149e\javafmllanguage-1.20.1-47.4.3.jar is missing mods.toml file
-[2110月2026 19:19:26.666] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file E:\.gradle\caches\modules-2\files-2.1\net.minecraftforge\lowcodelanguage\1.20.1-47.4.3\29a0368be8b1a5ebc5c52ff7b50cddb265c31c36\lowcodelanguage-1.20.1-47.4.3.jar is missing mods.toml file
-[2110月2026 19:19:26.671] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file E:\.gradle\caches\modules-2\files-2.1\net.minecraftforge\mclanguage\1.20.1-47.4.3\aa997425f691156656d4ba3aa78a50b43d677d91\mclanguage-1.20.1-47.4.3.jar is missing mods.toml file
-[2110月2026 19:19:26.676] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file E:\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlcore\1.20.1-47.4.3\4f943542f1f182a4e269b4f920030b50738f6b81\fmlcore-1.20.1-47.4.3.jar is missing mods.toml file
-[2110月2026 19:19:26.794] [main/INFO] [net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator/]: No dependencies to load found. Skipping!
-[2110月2026 19:19:27.808] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
-[2110月2026 19:19:27.814] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgedatauserdev' with arguments [--gameDir, ., --assetsDir, E:\.gradle\caches\forge_gradle\assets, --assetIndex, 5, --mod, kogasa_addiction, --all, --output, E:\code\kogasa_addiction-forge-1.20.1-47.4.3\src\generated\resources, --existing, E:\code\kogasa_addiction-forge-1.20.1-47.4.3\src\main\resources]
-[2110月2026 19:19:27.900] [main/WARN] [mixin/]: Reference map 'kogasa_addiction.refmap.json' for kogasa_addiction.mixins.json could not be read. If this is a development environment you can ignore this message
-[2110月2026 19:19:28.041] [main/INFO] [mixin/]: Remapping refMap patchouli.refmap.json using E:\code\kogasa_addiction-forge-1.20.1-47.4.3\build\createSrgToMcp\output.srg
-[2110月2026 19:19:28.347] [main/INFO] [net.minecraftforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [kogasa_addiction]
-[2110月2026 19:19:31.625] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Forge mod loading, version 47.4.3, for MC 1.20.1 with MCP 20230612.114412
-[2110月2026 19:19:31.625] [modloading-worker-0/INFO] [net.minecraftforge.common.MinecraftForge/FORGE]: MinecraftForge v47.4.3 Initialized
-[2110月2026 19:19:31.875] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager...
-[2110月2026 19:19:31.878] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager took 2.017 ms
-[2110月2026 19:19:32.118] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/E:/code/kogasa_addiction-forge-1.20.1-47.4.3/build/fg_cache/net/minecraftforge/forge/1.20.1-47.4.3_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.4.3_mapped_parchment_2023.09.03-1.20.1-recomp.jar%23191!/assets/.mcassetsroot' uses unexpected schema
-[2110月2026 19:19:32.118] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/E:/code/kogasa_addiction-forge-1.20.1-47.4.3/build/fg_cache/net/minecraftforge/forge/1.20.1-47.4.3_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.4.3_mapped_parchment_2023.09.03-1.20.1-recomp.jar%23191!/data/.mcassetsroot' uses unexpected schema
-[2110月2026 19:19:32.282] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:block mod id kogasa_addiction
-[2110月2026 19:19:32.366] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:block mod id kogasa_addiction finished after 83 ms
-[2110月2026 19:19:32.366] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:item mod id kogasa_addiction
-[2110月2026 19:19:32.387] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:item mod id kogasa_addiction finished after 20 ms
-[2110月2026 19:19:32.387] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Recipes
-[2110月2026 19:19:32.409] [main/INFO] [net.minecraft.data.DataGenerator/]: Recipes finished after 22 ms
-[2110月2026 19:19:32.409] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Item Models: kogasa_addiction
-[2110月2026 19:19:32.425] [main/INFO] [net.minecraft.data.DataGenerator/]: Item Models: kogasa_addiction finished after 15 ms
-[2110月2026 19:19:32.425] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Advancements
-[2110月2026 19:19:32.481] [main/INFO] [net.minecraft.data.DataGenerator/]: Advancements finished after 56 ms
-[2110月2026 19:19:32.481] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Registries
-[2110月2026 19:19:32.486] [main/INFO] [net.minecraft.data.DataGenerator/]: Registries finished after 4 ms
-[2110月2026 19:19:32.486] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Mod Damage Type Tags
-[2110月2026 19:19:32.487] [main/INFO] [net.minecraft.data.DataGenerator/]: Mod Damage Type Tags finished after 0 ms
-[2110月2026 19:19:32.487] [main/INFO] [net.minecraft.data.DataGenerator/]: All providers took: 206 ms
-[2110月2026 19:19:32.497] [main/INFO] [net.minecraft.data.HashCache/]: Caching: total files: 105, old count: 103, new count: 106, removed stale: 0, written: 3
+[2110月2026 21:29:31.599] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgedatauserdev, --assetIndex, 5, --assetsDir, E:\.gradle\caches\forge_gradle\assets, --gameDir, ., --fml.forgeVersion, 47.4.3, --fml.mcVersion, 1.20.1, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20230612.114412, --mod, kogasa_addiction, --all, --output, E:\code\kogasa_addiction-forge-1.20.1-47.4.3\src\generated\resources, --existing, E:\code\kogasa_addiction-forge-1.20.1-47.4.3\src\main\resources, --mixin.config, kogasa_addiction.mixins.json]
+[2110月2026 21:29:31.603] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 10.0.9+10.0.9+main.dcd20f30 starting: java version 17.0.11 by Microsoft; OS Windows 11 arch amd64 version 10.0
+[2110月2026 21:29:31.715] [main/INFO] [net.minecraftforge.fml.loading.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgedatauserdev
+[2110月2026 21:29:31.759] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/E:/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.5/9d1c0c3a304ae6697ecd477218fa61b850bf57fc/mixin-0.8.5.jar%23128!/ Service=ModLauncher Env=CLIENT
+[2110月2026 21:29:31.984] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file E:\.gradle\caches\modules-2\files-2.1\net.minecraftforge\javafmllanguage\1.20.1-47.4.3\4080695cecae86c354232f04a2627dd7e4f1149e\javafmllanguage-1.20.1-47.4.3.jar is missing mods.toml file
+[2110月2026 21:29:31.990] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file E:\.gradle\caches\modules-2\files-2.1\net.minecraftforge\lowcodelanguage\1.20.1-47.4.3\29a0368be8b1a5ebc5c52ff7b50cddb265c31c36\lowcodelanguage-1.20.1-47.4.3.jar is missing mods.toml file
+[2110月2026 21:29:31.996] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file E:\.gradle\caches\modules-2\files-2.1\net.minecraftforge\mclanguage\1.20.1-47.4.3\aa997425f691156656d4ba3aa78a50b43d677d91\mclanguage-1.20.1-47.4.3.jar is missing mods.toml file
+[2110月2026 21:29:32.002] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file E:\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlcore\1.20.1-47.4.3\4f943542f1f182a4e269b4f920030b50738f6b81\fmlcore-1.20.1-47.4.3.jar is missing mods.toml file
+[2110月2026 21:29:32.130] [main/INFO] [net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator/]: No dependencies to load found. Skipping!
+[2110月2026 21:29:33.274] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
+[2110月2026 21:29:33.279] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgedatauserdev' with arguments [--gameDir, ., --assetsDir, E:\.gradle\caches\forge_gradle\assets, --assetIndex, 5, --mod, kogasa_addiction, --all, --output, E:\code\kogasa_addiction-forge-1.20.1-47.4.3\src\generated\resources, --existing, E:\code\kogasa_addiction-forge-1.20.1-47.4.3\src\main\resources]
+[2110月2026 21:29:33.368] [main/WARN] [mixin/]: Reference map 'kogasa_addiction.refmap.json' for kogasa_addiction.mixins.json could not be read. If this is a development environment you can ignore this message
+[2110月2026 21:29:33.546] [main/INFO] [mixin/]: Remapping refMap patchouli.refmap.json using E:\code\kogasa_addiction-forge-1.20.1-47.4.3\build\createSrgToMcp\output.srg
+[2110月2026 21:29:33.840] [main/INFO] [net.minecraftforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [kogasa_addiction]
+[2110月2026 21:29:37.720] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Forge mod loading, version 47.4.3, for MC 1.20.1 with MCP 20230612.114412
+[2110月2026 21:29:37.721] [modloading-worker-0/INFO] [net.minecraftforge.common.MinecraftForge/FORGE]: MinecraftForge v47.4.3 Initialized
+[2110月2026 21:29:38.031] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager...
+[2110月2026 21:29:38.037] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager took 4.150 ms
+[2110月2026 21:29:38.348] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/E:/code/kogasa_addiction-forge-1.20.1-47.4.3/build/fg_cache/net/minecraftforge/forge/1.20.1-47.4.3_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.4.3_mapped_parchment_2023.09.03-1.20.1-recomp.jar%23191!/assets/.mcassetsroot' uses unexpected schema
+[2110月2026 21:29:38.348] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/E:/code/kogasa_addiction-forge-1.20.1-47.4.3/build/fg_cache/net/minecraftforge/forge/1.20.1-47.4.3_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.4.3_mapped_parchment_2023.09.03-1.20.1-recomp.jar%23191!/data/.mcassetsroot' uses unexpected schema
+[2110月2026 21:29:38.538] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:block mod id kogasa_addiction
+[2110月2026 21:29:38.698] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:block mod id kogasa_addiction finished after 158 ms
+[2110月2026 21:29:38.698] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:item mod id kogasa_addiction
+[2110月2026 21:29:38.709] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:item mod id kogasa_addiction finished after 11 ms
+[2110月2026 21:29:38.709] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Recipes
+[2110月2026 21:29:38.729] [main/INFO] [net.minecraft.data.DataGenerator/]: Recipes finished after 19 ms
+[2110月2026 21:29:38.729] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Item Models: kogasa_addiction
+[2110月2026 21:29:38.748] [main/INFO] [net.minecraft.data.DataGenerator/]: Item Models: kogasa_addiction finished after 17 ms
+[2110月2026 21:29:38.749] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Advancements
+[2110月2026 21:29:38.810] [main/INFO] [net.minecraft.data.DataGenerator/]: Advancements finished after 61 ms
+[2110月2026 21:29:38.810] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Registries
+[2110月2026 21:29:38.815] [main/INFO] [net.minecraft.data.DataGenerator/]: Registries finished after 4 ms
+[2110月2026 21:29:38.815] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Mod Damage Type Tags
+[2110月2026 21:29:38.816] [main/INFO] [net.minecraft.data.DataGenerator/]: Mod Damage Type Tags finished after 1 ms
+[2110月2026 21:29:38.817] [main/INFO] [net.minecraft.data.DataGenerator/]: All providers took: 279 ms
+[2110月2026 21:29:38.826] [main/INFO] [net.minecraft.data.HashCache/]: Caching: total files: 105, old count: 105, new count: 106, removed stale: 0, written: 0

@@ -9,6 +9,7 @@ import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.kogasachan.kogasa_addiction.util.ModConfigCache;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -16,7 +17,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
@@ -45,7 +45,7 @@ public class CrossbowMixin {
                                        CallbackInfo ci) {
         if (level.isClientSide) return;
         if (!(stack.getItem() instanceof IKogasaEquipment)) return;
-        if (!(shooter instanceof Player player)) return;
+        if (!(shooter instanceof ServerPlayer player)) return;
 
         KogasaGrowthHandler.addGrowth(stack, player);
     }

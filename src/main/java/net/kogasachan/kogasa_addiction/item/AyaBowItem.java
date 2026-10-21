@@ -8,12 +8,12 @@ import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.kogasachan.kogasa_addiction.util.ModConfigCache;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
@@ -45,7 +45,7 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
     @Override
     public void releaseUsing(@NotNull ItemStack stack, @NotNull Level level,
                              @NotNull LivingEntity entity, int timeLeft) {
-        if (!(entity instanceof Player player)) return;
+        if (!(entity instanceof ServerPlayer player)) return;
 
         boolean infinity = player.getAbilities().instabuild
                 || stack.getEnchantmentLevel(Enchantments.INFINITY_ARROWS) > 0;

@@ -123,7 +123,7 @@ public class ModItems {
     // 咲夜飞刀（损坏）
     public static final RegistryObject<Item> BROKEN_SAKUYA_KNIFE = ITEMS.register(
             "broken_sakuya_knife",
-            () -> new Item(new Item.Properties().stacksTo(3).fireResistant())
+            () -> new Item(new Item.Properties().stacksTo(6).fireResistant())
     );
 
     // fumo

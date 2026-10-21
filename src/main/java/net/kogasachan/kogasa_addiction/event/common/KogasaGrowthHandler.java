@@ -3,6 +3,7 @@ package net.kogasachan.kogasa_addiction.event.common;
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
+import net.kogasachan.kogasa_addiction.item.SakuyaKnifeItem;
 import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.minecraft.ChatFormatting;
@@ -15,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -141,9 +143,6 @@ public class KogasaGrowthHandler {
         for (int i = granted; i < shouldHave; i++) {
             boolean success = grantOrUpgradeEnchant(stack, player);
 
-            // granted 无条件累加，玩家可以叠数字
-            KogasaEquipmentData.setGrowthEnchantsGranted(stack, i + 1);
-
             if (!success) {
                 // 失败：播放沉闷的失败音效
                 player.level().playSound(null, player.blockPosition(),
@@ -156,6 +155,7 @@ public class KogasaGrowthHandler {
             }
 
             // 成功：播放附魔台音效
+            KogasaEquipmentData.setGrowthEnchantsGranted(stack, i + 1);
             player.level().playSound(null, player.blockPosition(),
                     SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.PLAYERS, 0.8F, 1.0F);
             player.displayClientMessage(
@@ -232,6 +232,13 @@ public class KogasaGrowthHandler {
             if (ench.isCurse()) continue;
             if (!ench.canEnchant(stack)) continue;
             if (existing.containsKey(ench)) continue;  // 已有则跳过
+
+            if (stack.getItem() instanceof SakuyaKnifeItem && ench == Enchantments.RIPTIDE) {
+                continue;
+            }
+
+            if (ench == Enchantments.SILK_TOUCH && !existing.containsKey(Enchantments.SILK_TOUCH)) continue;
+
             candidates.add(ench);
         }
         if (candidates.isEmpty()) return null;

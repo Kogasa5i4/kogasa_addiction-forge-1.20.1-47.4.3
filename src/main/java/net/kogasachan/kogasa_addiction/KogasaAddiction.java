@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 @Mod(KogasaAddiction.MODID)
 public class KogasaAddiction {
     public static final String MODID = "kogasa_addiction";
-    public static final String VERSION = "2.0";
+    public static final String VERSION = "2.5";
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public KogasaAddiction(FMLJavaModLoadingContext context) {

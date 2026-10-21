@@ -154,6 +154,7 @@ public class AnvilReinforcementCategory implements IRecipeCategory<AnvilReinforc
             case ABILITY -> Config.ABILITY_INFUSION_COST.get();
             case REINFORCEMENT -> Config.REINFORCEMENT_COST.get();
             case AMMO -> Config.AMMO_INFUSION_COST.get();
+            case REPAIR -> Config.SAKUYA_KNIFE_REPAIR_COST.get();
         };
         String experienceString = Component.translatable(
                 "jei.kogasa_addiction.anvil.experience", cost).getString();

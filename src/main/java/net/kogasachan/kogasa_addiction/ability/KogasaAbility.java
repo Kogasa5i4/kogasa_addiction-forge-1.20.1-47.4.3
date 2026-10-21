@@ -13,7 +13,8 @@ public enum KogasaAbility {
     CIRNO("cirno", "冰之小妖精"),
     KOISHI("koishi", "紧闭的恋之瞳"),
     KOGASA("kogasa", "愉快的遗忘之伞"),
-    TENSHI("tenshi", "非想非非想天之女");
+    TENSHI("tenshi", "非想非非想天之女"),
+    SAKUYA("sakuya", "完美而潇洒的从者");
 
     public List<String> getObtainKeys() {
         return switch (this) {
@@ -30,6 +31,8 @@ public enum KogasaAbility {
                     "tooltip.kogasa_addiction.ability_ingot.obtain.koishi.2");
             case TENSHI -> List.of(
                     "tooltip.kogasa_addiction.ability_ingot.obtain.tenshi.1");
+            case SAKUYA -> List.of(
+                    "tooltip.kogasa_addiction.ability_ingot.obtain.sakuya.1");
         };
     }
 

@@ -4,6 +4,7 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
+import net.kogasachan.kogasa_addiction.event.common.TimestopHandler;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
@@ -246,13 +247,24 @@ public class KogasaTooltipHandler {
                         .withStyle(ChatFormatting.GOLD));
             }
 
+            if (KogasaAbilityData.hasAbility(stack, KogasaAbility.SAKUYA)) {
+                if (!TimestopHandler.IS_FROZEN) {
+                    tooltip.add(Component.translatable("tooltip.kogasa_addiction.timestop.available")
+                            .withStyle(ChatFormatting.BLUE));
+                } else {
+                    tooltip.add(Component.translatable("tooltip.kogasa_addiction.timestop.unavailable")
+                            .withStyle(ChatFormatting.RED));
+                }
+            }
+
             // ===== 天子能力 =====
             if (KogasaAbilityData.hasAbility(stack, KogasaAbility.TENSHI)) {
                 boolean isArmor = stack.getItem() instanceof ArmorItem;
                 boolean isWeapon = stack.getItem() instanceof SwordItem
                         || stack.getItem() instanceof DiggerItem
                         || stack.getItem() instanceof BowItem
-                        || stack.getItem() instanceof CrossbowItem;
+                        || stack.getItem() instanceof CrossbowItem
+                        || stack.getItem() instanceof TridentItem;
 
                 // 2. 护甲专属描述与动态状态
                 if (isArmor) {

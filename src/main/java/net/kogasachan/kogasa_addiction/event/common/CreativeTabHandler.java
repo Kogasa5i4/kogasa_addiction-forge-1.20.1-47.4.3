@@ -18,6 +18,7 @@ public class CreativeTabHandler {
             event.accept(ModItems.CIRNO_INGOT);
             event.accept(ModItems.KOISHI_INGOT);
             event.accept(ModItems.TENSHI_INGOT);
+            event.accept(ModItems.SAKUYA_INGOT);
         }
         if (event.getTabKey() == CreativeModeTabs.COMBAT) {
             event.accept(ModItems.KOGASA_SWORD);
@@ -29,6 +30,8 @@ public class CreativeTabHandler {
             event.accept(ModItems.AYA_BOW);
             event.accept(ModItems.AYA_CROSSBOW);
             event.accept(ModItems.AYA_ARROW);
+            event.accept(ModItems.SAKUYA_KNIFE);
+            event.accept(ModItems.BROKEN_SAKUYA_KNIFE);
         }
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(ModItems.KOGASA_PICKAXE);

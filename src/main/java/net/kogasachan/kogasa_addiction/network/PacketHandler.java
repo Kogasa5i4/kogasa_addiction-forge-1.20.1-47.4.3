@@ -42,5 +42,11 @@ public class PacketHandler {
                 .decoder(KeyStatePacket::new)
                 .consumerMainThread(KeyStatePacket::handle)
                 .add();
+
+        INSTANCE.messageBuilder(TimestopPacket.class, packetId++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(TimestopPacket::encode)
+                .decoder(TimestopPacket::new)
+                .consumerMainThread(TimestopPacket::handle)
+                .add();
     }
 }

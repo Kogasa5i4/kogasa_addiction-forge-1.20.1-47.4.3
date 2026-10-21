@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": {
+      "item": "minecraft:trident"
+    },
+    "X": {
+      "item": "kogasa_addiction:sakuya_ingot"
+    }
+  },
+  "pattern": [
+    " X ",
+    "X#X",
+    " X "
+  ],
+  "result": {
+    "item": "kogasa_addiction:sakuya_knife"
+  },
+  "show_notification": true
+}

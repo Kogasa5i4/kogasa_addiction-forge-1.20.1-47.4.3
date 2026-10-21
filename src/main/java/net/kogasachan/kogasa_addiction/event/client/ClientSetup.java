@@ -2,6 +2,7 @@ package net.kogasachan.kogasa_addiction.event.client;
 
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.client.renderer.AyaArrowRenderer;
+import net.kogasachan.kogasa_addiction.client.renderer.SakuyaKnifeRenderer;
 import net.kogasachan.kogasa_addiction.entity.ModEntities;
 import net.kogasachan.kogasa_addiction.item.AyaBowItem;
 import net.kogasachan.kogasa_addiction.item.ModItems;
@@ -35,6 +36,10 @@ public class ClientSetup {
                 ModEntities.AYA_ARROW.get(),
                 AyaArrowRenderer::new
         );
+
+        event.registerEntityRenderer(
+                ModEntities.SAKUYA_KNIFE_ENTITY.get(),
+                SakuyaKnifeRenderer::new);
     }
 
     // ==================== 弓 ====================

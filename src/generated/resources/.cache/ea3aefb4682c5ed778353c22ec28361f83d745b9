@@ -1,4 +1,4 @@
-// 1.20.1	2026-10-20T14:20:25.799996	Item Models: kogasa_addiction
+// 1.20.1	2026-10-20T22:57:58.3717028	Item Models: kogasa_addiction
 933253198cbb8329436810759500e3425f231513 assets/kogasa_addiction/models/item/aya_arrow.json
 392cf2c1b45307b8b952110ba9b6e3b2af246530 assets/kogasa_addiction/models/item/aya_bow.json
 e45a9858338f36ac25bf7455ddcfb0fc984aa71c assets/kogasa_addiction/models/item/aya_bow_pulling_0.json
@@ -11,6 +11,7 @@ c2cb2bbed63887bdf1e2d82a321961072bb460c0 assets/kogasa_addiction/models/item/aya
 1ac64b38fc44373ecd471382f38cfe65331737b2 assets/kogasa_addiction/models/item/aya_crossbow_pulling_1.json
 592a84e06b31911fc4c3ae164a9f008075d03a22 assets/kogasa_addiction/models/item/aya_crossbow_pulling_2.json
 f8f1ed43191af03450f7e31b95d54ffe19f92235 assets/kogasa_addiction/models/item/aya_ingot.json
+4eccf59238bf64502e87d29596ddaf7ac4fc4635 assets/kogasa_addiction/models/item/broken_sakuya_knife.json
 cd32a30f4ba2bc14b8d9741e8a675bd9d630a9be assets/kogasa_addiction/models/item/cirno_ingot.json
 243bd7f0c3eecb60a32029d97cd77933570738fa assets/kogasa_addiction/models/item/fumo.json
 24a221de8262e37fca8cba8a1ff15564ece0b4bb assets/kogasa_addiction/models/item/kogasa_axe.json
@@ -20,6 +21,8 @@ cd32a30f4ba2bc14b8d9741e8a675bd9d630a9be assets/kogasa_addiction/models/item/cir
 58774c39febf4f90e783b86b9ee6d95dd6106a61 assets/kogasa_addiction/models/item/kogasa_shovel.json
 a856702e55cbfdf7c9978c320fb5e0e239c3c5ec assets/kogasa_addiction/models/item/kogasa_sword.json
 fdd1dee9ee225ce590d70de97887e3d7f85d36f7 assets/kogasa_addiction/models/item/koishi_ingot.json
+1aee5e015d7c5ab3f5e8ac46f2cdbe5aef97ddc8 assets/kogasa_addiction/models/item/sakuya_ingot.json
+29578612c17450f16b16c53cf92b6b720d2776b6 assets/kogasa_addiction/models/item/sakuya_knife.json
 db0a775360b4665f28716bfb990c3ac8dfc06abf assets/kogasa_addiction/models/item/tenshi_boots.json
 321fd852ae9f2e1ec1cc0f29cb6e373f240743b1 assets/kogasa_addiction/models/item/tenshi_chestplate.json
 ce76d12a17719dc33e3da00f7008bcf78464062a assets/kogasa_addiction/models/item/tenshi_helmet.json

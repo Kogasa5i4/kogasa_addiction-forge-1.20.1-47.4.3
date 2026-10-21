@@ -6,6 +6,7 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.item.FumoItem;
+import net.kogasachan.kogasa_addiction.item.SakuyaKnifeItem;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -71,6 +72,12 @@ public class KogasaEquipmentHelper {
             double baseDamage = 1.0 + hoe.getAttackDamage();
             double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
             return buildHandModifiers(stack, baseDamage, absorbed, -3.0F);
+        }
+
+        if (item instanceof TridentItem trident) {
+            double baseDamage = 1.0 + 8.0;
+            double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
+            return buildHandModifiers(stack, baseDamage, absorbed, -2.9F);
         }
 
         // 其他类型的 Kogasa 装备（暂时没有）
@@ -183,6 +190,9 @@ public class KogasaEquipmentHelper {
         if (item instanceof HoeItem hoe) {
             return hoe.getTier().getAttackDamageBonus();
         }
+        if (item instanceof TridentItem) {
+            return 8.0;
+        }
         return 0;
     }
 
@@ -220,6 +230,8 @@ public class KogasaEquipmentHelper {
             baseDamage = 1.0 + sword.getDamage();
         } else if (item instanceof DiggerItem digger) {
             baseDamage = 1.0 + digger.getAttackDamage();
+        } else if (item instanceof TridentItem) {
+            baseDamage = 1.0 + 8.0;
         }
         double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
         if (Config.ABSORBED_VALUE_INCLUDED_IN_MULTIPLIER.get()) {
@@ -240,6 +252,7 @@ public class KogasaEquipmentHelper {
      */
     public static double getBaseAttackSpeed(ItemStack stack) {
         if (stack.getItem() instanceof FumoItem fumo) return -2.0;
+        if (stack.getItem() instanceof SakuyaKnifeItem sakuyaKnifeItem) return -2.9;
         var id = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem());
         if (id == null) return -2.8;
         String path = id.getPath();
@@ -328,7 +341,8 @@ public class KogasaEquipmentHelper {
      */
     public static TagKey<Item> getMatchingTag(ItemStack stack) {
         Item item = stack.getItem();
-        if (item instanceof FumoItem fumoItem) {return Tags.Items.TOOLS;}
+        if (item instanceof FumoItem fumoItem) return Tags.Items.TOOLS;
+        if (item instanceof SakuyaKnifeItem sakuyaKnifeItem) return Tags.Items.TOOLS_TRIDENTS;
         // 用注册名判断，避免为每种类型创建单独的类判断
         ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
         if (id == null) return null;

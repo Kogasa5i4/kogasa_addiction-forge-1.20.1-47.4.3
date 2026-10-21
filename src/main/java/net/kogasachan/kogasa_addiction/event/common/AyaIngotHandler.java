@@ -27,8 +27,6 @@ public class AyaIngotHandler {
         Player player = event.getEntity();
         if (!(player instanceof ServerPlayer serverPlayer)) return;
 
-        if (!Config.ENABLE_AYA_INGOT.get()) return;
-
         // 冷却检查：与截图奖励共用同一个时间戳与冷却配置
         long lastTime = serverPlayer.getPersistentData().getLong(NBT_COOLDOWN_KEY);
         long now = serverPlayer.level().getGameTime();

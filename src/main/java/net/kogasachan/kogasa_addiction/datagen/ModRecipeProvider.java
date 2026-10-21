@@ -133,6 +133,15 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_aya_ingot", has(ModItems.AYA_INGOT.get()))
                 .save(writer);
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.SAKUYA_KNIFE.get(), 1)
+                .pattern(" X ")
+                .pattern("X#X")
+                .pattern(" X ")
+                .define('X', ModItems.SAKUYA_INGOT.get())
+                .define('#', Items.TRIDENT)
+                .unlockedBy("has_sakuya_ingot", has(ModItems.SAKUYA_INGOT.get()))
+                .save(writer);
+
         SpecialRecipeBuilder.special(ModRecipes.AYA_ARROW_TIPPING_SERIALIZER.get())
                 .save(writer, KogasaAddiction.MODID + ":aya_arrow_tipping");
     }

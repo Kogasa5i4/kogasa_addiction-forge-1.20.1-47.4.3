@@ -65,6 +65,7 @@ public class ModAdvancementGenerator implements ForgeAdvancementProvider.Advance
                 .addCriterion("has_cirno", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.CIRNO_INGOT.get()))
                 .addCriterion("has_koishi", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.KOISHI_INGOT.get()))
                 .addCriterion("has_tenshi", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.TENSHI_INGOT.get()))
+                .addCriterion("has_sakuya", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.SAKUYA_INGOT.get()))
                 .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "ingot_collector"), existingFileHelper);
 
         // ===== 3. 初出高炉：获得任意模组装备 =====
@@ -369,5 +370,17 @@ public class ModAdvancementGenerator implements ForgeAdvancementProvider.Advance
                         InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.FUMO.get()))
                 .rewards(AdvancementRewards.Builder.experience(99))
                 .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "fumofumo"), existingFileHelper);
+
+        // ===== 24. 完美潇洒 =====
+        Advancement perfect_elegant = Advancement.Builder.advancement()
+                .display(new DisplayInfo(
+                        new ItemStack(ModItems.SAKUYA_INGOT.get()),
+                        Component.translatable("advancements.kogasa_addiction.perfect_elegant.title"),
+                        Component.translatable("advancements.kogasa_addiction.perfect_elegant.description"),
+                        null, FrameType.GOAL, true, true, false
+                ))
+                .parent(first_ability)
+                .addCriterion("impossible", new ImpossibleTrigger.TriggerInstance())
+                .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "perfect_elegant"), existingFileHelper);
     }
 }

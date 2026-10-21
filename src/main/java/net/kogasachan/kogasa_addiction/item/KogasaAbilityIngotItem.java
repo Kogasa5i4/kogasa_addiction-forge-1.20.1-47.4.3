@@ -47,8 +47,8 @@ public class KogasaAbilityIngotItem extends Item {
         tooltip.add(Component.translatable(
                         "tooltip.kogasa_addiction.ability_ingot.obtain.header")
                 .withStyle(ChatFormatting.YELLOW));
-        boolean sourceDisabled = (ability == KogasaAbility.AYA && !Config.ENABLE_AYA_INGOT.get())
-                || (ability == KogasaAbility.KOGASA && !Config.ENABLE_KOGASA_INGOT.get());
+        boolean sourceDisabled = (ability == KogasaAbility.AYA)
+                || (ability == KogasaAbility.KOGASA);
         if (sourceDisabled) {
             String disabledKey = ability == KogasaAbility.AYA
                     ? "tooltip.kogasa_addiction.ability_ingot.obtain.aya.disabled"
@@ -93,6 +93,8 @@ public class KogasaAbilityIngotItem extends Item {
             }
             case TENSHI -> Component.translatable(key,
                     Config.TENSHI_INGOT_MIN_Y.get(), formatPercent(Config.TENSHI_INGOT_CHANCE.get()));
+            case SAKUYA -> Component.translatable(key,
+                    formatPercent(Config.SAKUYA_INGOT_CHANCE.get()));
         };
         return result.copy().withStyle(ChatFormatting.GRAY);
     }

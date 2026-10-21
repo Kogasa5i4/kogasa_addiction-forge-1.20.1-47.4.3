@@ -22,6 +22,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.CIRNO_INGOT.get());
         basicItem(ModItems.KOISHI_INGOT.get());
         basicItem(ModItems.TENSHI_INGOT.get());
+        basicItem(ModItems.SAKUYA_INGOT.get());
 
         // 2. 工具与武器
         withExistingParent("kogasa_sword", mcLoc("item/handheld"))
@@ -46,7 +47,11 @@ public class ModItemModelProvider extends ItemModelProvider {
         registerBow();
         registerCrossbow();
 
-        // 5. Fumo
+        // 5. 咲夜飞刀
+        basicItem(ModItems.SAKUYA_KNIFE.get());
+        basicItem(ModItems.BROKEN_SAKUYA_KNIFE.get());
+
+        // 6. Fumo
         basicItem(ModItems.FUMO.get());
     }
 

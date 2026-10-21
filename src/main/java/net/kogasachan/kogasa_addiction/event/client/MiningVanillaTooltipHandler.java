@@ -35,7 +35,8 @@ public class MiningVanillaTooltipHandler {
         // 有攻速属性的物品：剑、镐/斧/铲（DiggerItem）、锄
         boolean hasAttackSpeed = item instanceof SwordItem
                 || item instanceof DiggerItem
-                || item instanceof HoeItem;
+                || item instanceof HoeItem
+                || item instanceof TridentItem;
 
         // 挖掘工具：镐/斧/铲/锄
         boolean isDigger = item instanceof DiggerItem;
@@ -86,7 +87,7 @@ public class MiningVanillaTooltipHandler {
         }
     }
 
-// ========== 辅助方法 ==========
+    // ========== 辅助方法 ==========
 
     /**
      * 找到攻击伤害行的索引

@@ -33,7 +33,6 @@ public class BlastFurnaceMixin {
     private static void kogasa$produceIngot(Level level, BlockPos pos, BlockState state,
                                             AbstractFurnaceBlockEntity blockEntity,
                                             CallbackInfo ci) {
-        if (!ModConfigCache.enableKogasaIngot) return;
         if (level.isClientSide) return;
         if (!(blockEntity instanceof BlastFurnaceBlockEntity)) return;
         if (!blockEntity.isLit()) return;

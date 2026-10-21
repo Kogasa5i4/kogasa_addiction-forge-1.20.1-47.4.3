@@ -46,7 +46,7 @@ public class AyaAbilityHandler {
         if (mobId == null) return;
 
         if (KogasaAbilityData.tryAddKilledMob(held, mobId.toString())) {
-            onNewRecord(player, held);
+            onNewRecord(player, held, 0.1);
         }
     }
 
@@ -63,7 +63,7 @@ public class AyaAbilityHandler {
         if (blockId == null) return;
 
         if (KogasaAbilityData.tryAddMinedBlock(held, blockId.toString())) {
-            onNewRecord(serverPlayer, held);
+            onNewRecord(serverPlayer, held, 1);
         }
     }
 
@@ -85,13 +85,13 @@ public class AyaAbilityHandler {
         String damageId = damageKey.location().toString();
 
         if (KogasaAbilityData.tryAddDamageTaken(held, damageId)) {
-            onNewRecord(player, held);
+            onNewRecord(player, held, 1);
         }
     }
 
     // ========== 首次获得记录 ==========
-    private static void onNewRecord(ServerPlayer player, ItemStack held) {
-        KogasaAbilityData.addNewsValue(held, Config.NEWS_VALUE_PER_RECORD.get());
+    private static void onNewRecord(ServerPlayer player, ItemStack held, double multiplier) {
+        KogasaAbilityData.addNewsValue(held, Config.NEWS_VALUE_PER_RECORD.get() * multiplier);
         player.getInventory().setChanged();
         KogasaAdvancementHelper.checkAndGrant(player, held);
     }

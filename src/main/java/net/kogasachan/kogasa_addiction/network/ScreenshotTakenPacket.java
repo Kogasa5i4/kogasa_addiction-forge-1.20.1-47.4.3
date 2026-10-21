@@ -28,8 +28,6 @@ public class ScreenshotTakenPacket {
             ServerPlayer player = ctx.get().getSender();
             if (player == null) return;
 
-            if (!Config.ENABLE_AYA_INGOT.get()) return;
-
             // 1. 冷却检查
             long lastTime = player.getPersistentData().getLong("LastAyaShootTime");
             long now = player.level().getGameTime();

@@ -46,6 +46,11 @@ public class ModItems {
                     new Item.Properties().fireResistant())
     );
 
+    public static final RegistryObject<Item> SAKUYA_INGOT = ITEMS.register(
+            "sakuya_ingot",
+            () -> new KogasaAbilityIngotItem(KogasaAbility.SAKUYA, new Item.Properties().fireResistant())
+    );
+
     // 工具/武器
     public static final RegistryObject<Item> KOGASA_SWORD = ITEMS.register(
             "kogasa_sword",
@@ -107,6 +112,18 @@ public class ModItems {
     public static final RegistryObject<Item> AYA_ARROW = ITEMS.register(
             "aya_arrow",
             () -> new AyaArrowItem(new Item.Properties())
+    );
+
+    // 咲夜飞刀（正常）
+    public static final RegistryObject<Item> SAKUYA_KNIFE = ITEMS.register(
+            "sakuya_knife",
+            () -> new SakuyaKnifeItem(new Item.Properties().stacksTo(3).fireResistant())
+    );
+
+    // 咲夜飞刀（损坏）
+    public static final RegistryObject<Item> BROKEN_SAKUYA_KNIFE = ITEMS.register(
+            "broken_sakuya_knife",
+            () -> new Item(new Item.Properties().stacksTo(3).fireResistant())
     );
 
     // fumo

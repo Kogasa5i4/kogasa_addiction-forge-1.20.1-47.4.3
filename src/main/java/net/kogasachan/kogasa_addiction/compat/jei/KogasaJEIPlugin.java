@@ -27,10 +27,7 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @JeiPlugin
 public class KogasaJEIPlugin implements IModPlugin {
@@ -152,6 +149,9 @@ public class KogasaJEIPlugin implements IModPlugin {
         // 3. 弹药配方（8 个）
         registerAmmoRecipes(recipes);
 
+        // 4. 修复配方（1个）
+        registerRepairRecipe(recipes);
+
         KogasaAddiction.LOGGER.info("Registered {} JEI anvil recipes", recipes.size());
         registration.addRecipes(AnvilReinforcementCategory.RECIPE_TYPE, recipes);
     }
@@ -255,5 +255,13 @@ public class KogasaJEIPlugin implements IModPlugin {
 
         recipes.add(new AnvilReinforcementRecipe(
                 input, fireworks, output, RecipeKind.AMMO));
+    }
+
+    private static void registerRepairRecipe(List<AnvilReinforcementRecipe> recipes) {
+        recipes.add(new AnvilReinforcementRecipe(
+                new ItemStack(ModItems.BROKEN_SAKUYA_KNIFE.get()),
+                new ArrayList<ItemStack>(Collections.singleton(new ItemStack(ModItems.SAKUYA_INGOT.get()))),
+                new ItemStack(ModItems.SAKUYA_KNIFE.get()),
+                RecipeKind.REPAIR));
     }
 }

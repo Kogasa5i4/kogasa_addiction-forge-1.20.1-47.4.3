@@ -136,12 +136,12 @@ public class Config {
     public static final ForgeConfigSpec.IntValue DURABILITY_FIXED_PER_REINFORCEMENT = BUILDER
             .comment("Fixed durability added per reinforcement.\n" +
                     "每次强化增加的固定耐久值")
-            .defineInRange("durabilityFixedPerReinforcement", 500, 0, 10000);
+            .defineInRange("durabilityFixedPerReinforcement", 200, 0, Integer.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue DURABILITY_RATIO_PER_REINFORCEMENT = BUILDER
             .comment("Durability ratio added per reinforcement. 0.1 = +10% of base.\n" +
                     "每次强化因强化次数而增加的耐久值比例。0.1 = +10%。")
-            .defineInRange("durabilityRatioPerReinforcement", 0.2, 0.0, Double.MAX_VALUE);
+            .defineInRange("durabilityRatioPerReinforcement", 0.25, 0.0, Double.MAX_VALUE);
 
     static {
         BUILDER.push("tool");
@@ -150,20 +150,12 @@ public class Config {
     public static final ForgeConfigSpec.DoubleValue MINING_SPEED_RATIO_PER_REINFORCEMENT = BUILDER
             .comment("Mining speed bonus ratio per reinforcement. 0.5 = +50% per level; the default 1.5 = +150% per level.\n" +
                     "每级强化增加的挖掘速度加成比例。0.5 = 每级 +50%；默认值 1.5 = 每级 +150%。")
-            .defineInRange("miningSpeedRatioPerReinforcement", 1.5, 0.0, 10.0);
-
-    static {
-        BUILDER.pop();
-    }
-
-    static {
-        BUILDER.push("weapon");
-    }
+            .defineInRange("miningSpeedRatioPerReinforcement", 1.5, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue ATTACK_SPEED_CAP = BUILDER
-            .comment("Attack speed cap (bare-hand speed). Default 4.0.\n" +
-                    "攻速封顶值（空手攻速）。默认 4.0。")
-            .defineInRange("attackSpeedCap", 4.0, 1.0, Double.MAX_VALUE);
+            .comment("Attack speed cap. Default 4.0 (bare-hand speed).\n" +
+                    "攻速封顶值。默认 4.0（空手攻速）。")
+            .defineInRange("attackSpeedCap", 4.0, 2.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue ATTACK_SPEED_GROWTH_RATIO = BUILDER
             .comment("Attack speed growth ratio. progress = min((growth + Aya news value) * ratio, 1.0). A progress of 1.0 reaches the configured bare-hand attack speed cap.\n" +
@@ -197,8 +189,8 @@ public class Config {
     }
 
     public static final ForgeConfigSpec.DoubleValue BOW_PIERCE_GROWTH = BUILDER
-            .comment("Growth required for bows/crossbows to gain Pierce I.\n" +
-                    "弓弩获得穿透 I 所需的成长值。")
+            .comment("Growth required for bows/crossbows to gain an extra Pierce I.\n" +
+                    "弓弩获得额外穿透 I 所需的成长值。")
             .defineInRange("bowPierceGrowth", 0.5, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue BOW_MULTISHOT_2_GROWTH = BUILDER
@@ -219,12 +211,50 @@ public class Config {
     public static final ForgeConfigSpec.DoubleValue NO_CONSUME_ARROW_START_GROWTH = BUILDER
             .comment("Growth required to start arrow-saving chance. 1.0 = 100% growth.\n" +
                     "开始概率不消耗箭矢的成长值阈值。1.0 = 100% 成长。")
-            .defineInRange("noConsumeArrowStartGrowth", 1.0, 0.0, Double.MAX_VALUE);
+            .defineInRange("noConsumeArrowStartGrowth", 2.0, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue NO_CONSUME_ARROW_FULL_GROWTH = BUILDER
-            .comment("Growth required for 100% arrow-saving chance. 2.0 = 200% growth.\n" +
-                    "达到 100% 不消耗箭矢的成长值。2.0 = 200% 成长。")
-            .defineInRange("noConsumeArrowFullGrowth", 2.0, 0.0, Double.MAX_VALUE);
+            .comment("Growth required for 100% arrow-saving chance. 1.0 = 100% growth.\n" +
+                    "达到 100% 不消耗箭矢的成长值。1.0 = 100% 成长。")
+            .defineInRange("noConsumeArrowFullGrowth", 3.0, 0.0, Double.MAX_VALUE);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.push("trident");
+    }
+
+    public static final ForgeConfigSpec.DoubleValue SAKUYA_KNIFE_BASE_BREAK_CHANCE = BUILDER
+            .comment("Base chance for the knife to break into a broken state upon pickup. 0.3 = 30%.")
+            .comment("咲夜飞刀拾取时变为损坏状态的基础概率。0.3 = 30%。")
+            .defineInRange("sakuyaKnifeBaseBreakChance", 0.3, 0.0, 1.0);
+
+    public static final ForgeConfigSpec.DoubleValue SAKUYA_KNIFE_BREAK_REDUCTION = BUILDER
+            .comment("Break chance reduction per reinforcement/growth point. 0.01 = 1%.")
+            .comment("每点强化/成长值降低的损坏概率。0.01 = 1%。")
+            .defineInRange("sakuyaKnifeBreakReduction", 0.01, 0.0, 1.0);
+
+    public static final ForgeConfigSpec.IntValue SAKUYA_KNIFE_REPAIR_COST = BUILDER
+            .comment("Experience level cost to repair a broken sakuya knife.\n" +
+                    "在铁砧中修复损坏的咲夜飞刀消耗的经验等级。")
+            .defineInRange("sakuyaKnifeRepairCost", 3, 0, Integer.MAX_VALUE);
+
+    public static final ForgeConfigSpec.DoubleValue SAKUYA_KNIFE_THROW_VELOCITY = BUILDER
+            .comment("Initial throw velocity for Sakuya Knife. Vanilla trident is ~2.5.")
+            .comment("咲夜飞刀的初始投掷速度。原版三叉戟约为2.5。")
+            .defineInRange("sakuyaKnifeThrowVelocity", 3.0, 0.5, Double.MAX_VALUE);
+
+    public static final ForgeConfigSpec.DoubleValue SAKUYA_KNIFE_BASE_DAMAGE = BUILDER
+            .comment("Base damage for Sakuya Knife before multipliers.")
+            .comment("咲夜飞刀在乘数生效前的基础伤害。")
+            .defineInRange("sakuyaKnifeBaseDamage", 8.0, 1.0, Double.MAX_VALUE);
+
+    public static final ForgeConfigSpec.IntValue SAKUYA_KNIFE_BASE_PIERCE = BUILDER
+            .comment("Base pierce level for Sakuya Knife. 0 = no pierce.")
+            .comment("咲夜飞刀的基础穿透等级。0 = 无穿透。")
+            .defineInRange("sakuyaKnifeBasePierce", 2, 0, 127);
 
     static {
         BUILDER.pop(2);
@@ -259,11 +289,6 @@ public class Config {
             .comment("Maximum news value.\n" +
                     "新闻值上限。")
             .defineInRange("maxNewsValue", 1.0, 0.0, Double.MAX_VALUE);
-
-    public static final ForgeConfigSpec.BooleanValue ENABLE_AYA_INGOT = BUILDER
-            .comment("Enable Aya Ingot rewards from taking a screenshot or releasing a bow shot.\n" +
-                    "是否启用截图或使用弓发射箭矢时获得文文锭的奖励。")
-            .define("enableAyaIngot", true);
 
     public static final ForgeConfigSpec.DoubleValue SHOOT_INGOT_CHANCE = BUILDER
             .comment("Chance to receive an Aya Ingot per eligible screenshot or bow-shot attempt. 0.1 = 10%; attempts during the shared cooldown are ignored.\n" +
@@ -302,7 +327,7 @@ public class Config {
     public static final ForgeConfigSpec.IntValue CIRNO_SLOW_LEVEL = BUILDER
             .comment("Slowness level applied to the target. 1 = Slowness I, 4 = Slowness IV.\n" +
                     "对目标施加的缓慢等级。1 = 缓慢 I，4 = 缓慢 IV。")
-            .defineInRange("cirnoSlowLevel", 4, 1, 10);
+            .defineInRange("cirnoSlowLevel", 4, 1, 256);
 
     public static final ForgeConfigSpec.DoubleValue CIRNO_SELF_SLOW_DURATION = BUILDER
             .comment("Slowness duration applied to yourself (in seconds). 5 = 5s.\n" +
@@ -312,7 +337,7 @@ public class Config {
     public static final ForgeConfigSpec.IntValue CIRNO_SELF_SLOW_LEVEL = BUILDER
             .comment("Slowness level applied to yourself. 1 = Slowness I.\n" +
                     "对自己施加的缓慢等级。1 = 缓慢 I。")
-            .defineInRange("cirnoSelfSlowLevel", 1, 1, 10);
+            .defineInRange("cirnoSelfSlowLevel", 1, 1, 256);
 
     public static final ForgeConfigSpec.DoubleValue CIRNO_INGOT_DROP_CHANCE = BUILDER
             .comment("Chance to get a Cirno Ingot from qualifying ice events: mining without Silk Touch, Frosted Ice melting, or explosion-caused ice destruction. 0.09 = 9%.\n" +
@@ -352,7 +377,7 @@ public class Config {
     public static final ForgeConfigSpec.IntValue KOISHI_GHAST_KILLS_REQUIRED = BUILDER
             .comment("Number of Ghasts killed by reflected fireballs to earn one Koishi Ingot.\n" +
                     "反弹火球击杀多少个恶魂获得一个恋恋锭。")
-            .defineInRange("koishiGhastKillsRequired", 2, 1, 100);
+            .defineInRange("koishiGhastKillsRequired", 2, 1, 10);
 
     static {
         BUILDER.pop();
@@ -363,11 +388,6 @@ public class Config {
     }
 
     // ===== Kogasa 能力 =====
-    public static final ForgeConfigSpec.BooleanValue ENABLE_KOGASA_INGOT = BUILDER
-            .comment("Enable blast furnace to produce kogasa ingots while burning.\n" +
-                    "允许小伞锭从燃烧的高炉中掉落。")
-            .define("enableKogasaIngot", true);
-
     public static final ForgeConfigSpec.DoubleValue KOGASA_INGOT_CHANCE = BUILDER
             .comment("Chance per server tick (20 ticks per second) to produce a Kogasa Ingot while the blast furnace is lit. Default 0.001 = 0.1%; 0.01 = 1%.\n" +
                     "高炉燃烧时每游戏刻（每秒 20 刻）产出小伞锭的概率。默认值 0.001 = 0.1%；0.01 = 1%。")
@@ -384,7 +404,7 @@ public class Config {
             .defineInRange("kogasaReinforcementMultiplierPerLevel", 0.1, 0.0, Double.MAX_VALUE);
 
     static {
-        BUILDER.pop(2);
+        BUILDER.pop();
     }
 
     static {
@@ -424,6 +444,25 @@ public class Config {
 
     static {
         BUILDER.pop();
+    }
+
+    static {
+        BUILDER.push("sakuya");
+    }
+
+    public static final ForgeConfigSpec.DoubleValue SAKUYA_INGOT_CHANCE = BUILDER
+            .comment("Chance to get a Sakuya Ingot at the start of each day if the coordinate condition is met. 0.333 = 33.3%.")
+            .comment("每天开始时，满足坐标条件获取咲夜锭的概率。0.333 = 33.3%。")
+            .defineInRange("sakuyaIngotChance", 0.333, 0.0, 1.0);
+
+    // ===== 咲夜能力 - 时停 =====
+    public static final ForgeConfigSpec.IntValue SAKUYA_TIMESTOP_SECONDS_PER_EQUIPMENT = BUILDER
+            .comment("Timestop duration per piece of Sakuya equipment (in seconds).")
+            .comment("每件咲夜能力装备提供的时停时间（秒）。")
+            .defineInRange("sakuyaTimestopSecondsPerEquipment", 5, 1, 60);
+
+    static {
+        BUILDER.pop(2);
     }
 
     // ============================================================

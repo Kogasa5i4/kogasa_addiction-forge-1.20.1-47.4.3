@@ -6,6 +6,8 @@ import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.item.KogasaAbilityIngotItem;
+import net.kogasachan.kogasa_addiction.item.ModItems;
+import net.kogasachan.kogasa_addiction.item.SakuyaKnifeItem;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.minecraft.nbt.CompoundTag;
@@ -14,10 +16,16 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.Map;
 
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class KogasaAnvilHandler {
@@ -28,6 +36,28 @@ public class KogasaAnvilHandler {
 
         ItemStack left = event.getLeft();
         ItemStack right = event.getRight();
+
+        // 检查左侧是否为咲夜飞刀
+        if (left.getItem() instanceof SakuyaKnifeItem) {
+            // 检查右侧材料（附魔书或另一把三叉戟）是否含有激流
+            Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(right);
+            if (enchants.containsKey(Enchantments.RIPTIDE)) {
+                event.setOutput(ItemStack.EMPTY); // 禁止输出
+                event.setCost(0);
+                return;
+            }
+        }
+
+        if (left.is(ModItems.BROKEN_SAKUYA_KNIFE.get()) && right.is(ModItems.SAKUYA_INGOT.get())) {
+            ItemStack result = new ItemStack(ModItems.SAKUYA_KNIFE.get());
+            if (left.getTag() != null && left.hasTag()) {
+                result.setTag(left.getTag().copy());
+            }
+
+            event.setOutput(result);
+            event.setCost(Config.SAKUYA_KNIFE_REPAIR_COST.get());
+            event.setMaterialCost(1);
+        }
 
         // 左侧必须是 Kogasa 套件
         if (!(left.getItem() instanceof IKogasaEquipment)) return;
@@ -111,6 +141,8 @@ public class KogasaAnvilHandler {
         boolean isBowOrCrossbow = left.getItem() instanceof BowItem
                 || left.getItem() instanceof CrossbowItem;
         boolean isArrowMaterial = isBowOrCrossbow && right.is(ItemTags.ARROWS);
+        boolean isKnife = left.getItem() instanceof SakuyaKnifeItem;
+        boolean isMaterialValid = right.is(ItemTags.SWORDS) || right.is(Tags.Items.TOOLS_TRIDENTS);
 
         String materialId;
         if (isBowOrCrossbow) {
@@ -133,8 +165,20 @@ public class KogasaAnvilHandler {
             } else {
                 return;
             }
+        } else if (isKnife && isMaterialValid) {
+            // 三叉戟专属逻辑
+            TagKey<Item> matchTag = KogasaEquipmentHelper.getMatchingTag(left);
+            if ((matchTag == null) || !(right.is(matchTag) || right.is(ItemTags.SWORDS))) return;
+
+            ResourceLocation rightId = ForgeRegistries.ITEMS.getKey(right.getItem());
+            if (rightId == null) return;
+            materialId = rightId.toString();
+            if (KogasaEquipmentData.hasUsedMaterial(left, materialId)) {
+                event.setOutput(ItemStack.EMPTY);
+                return;
+            }
         } else {
-            // 非弓弩走原有逻辑
+            // 非弓弩、三叉戟走原有逻辑
             TagKey<Item> matchTag = KogasaEquipmentHelper.getMatchingTag(left);
             if (matchTag == null || !right.is(matchTag)) return;
 

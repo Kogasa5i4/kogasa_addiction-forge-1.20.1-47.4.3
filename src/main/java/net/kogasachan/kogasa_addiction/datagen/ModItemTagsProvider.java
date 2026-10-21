@@ -54,12 +54,18 @@ public class ModItemTagsProvider extends ItemTagsProvider {
         this.tag(Tags.Items.TOOLS_BOWS).add(ModItems.AYA_BOW.get());
         this.tag(Tags.Items.TOOLS_CROSSBOWS).add(ModItems.AYA_CROSSBOW.get());
 
+        // ==== 咲夜飞刀：加入 Forge 通用标签 =====
+        this.tag(Tags.Items.TOOLS_TRIDENTS).add(ModItems.SAKUYA_KNIFE.get());
+        this.tag(ItemTags.create(ResourceLocation.fromNamespaceAndPath("forge", "tools/knives")))
+                .add(ModItems.SAKUYA_KNIFE.get());
+
         // ===== 能力锭：加入模组专属标签 =====
         this.tag(ABILITY_INGOTS)
                 .add(ModItems.KOGASA_INGOT.get())
                 .add(ModItems.AYA_INGOT.get())
                 .add(ModItems.CIRNO_INGOT.get())
                 .add(ModItems.KOISHI_INGOT.get())
-                .add(ModItems.TENSHI_INGOT.get());
+                .add(ModItems.TENSHI_INGOT.get())
+                .add(ModItems.SAKUYA_INGOT.get());
     }
 }

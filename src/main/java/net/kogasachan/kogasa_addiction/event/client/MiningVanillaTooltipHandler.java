@@ -4,6 +4,7 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
+import net.kogasachan.kogasa_addiction.util.KogasaNumberFormatHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -56,7 +57,7 @@ public class MiningVanillaTooltipHandler {
 
             MutableComponent speedLine = Component.translatable(
                     "tooltip.kogasa_addiction.vanilla_attack_speed",
-                    String.format("%.1f", speed));
+                    KogasaNumberFormatHelper.formatTrimmed(speed, 1));
 
             ChatFormatting color = capped ? ChatFormatting.GOLD : ChatFormatting.DARK_GREEN;
 
@@ -76,7 +77,7 @@ public class MiningVanillaTooltipHandler {
 
             Component miningLine = Component.translatable(
                             "tooltip.kogasa_addiction.mining_speed",
-                            String.format("%.2f", miningSpeed))
+                            KogasaNumberFormatHelper.formatTrimmed(miningSpeed, 2))
                     .withStyle(ChatFormatting.DARK_GREEN);
 
             if (speedInsertIdx >= 0) {

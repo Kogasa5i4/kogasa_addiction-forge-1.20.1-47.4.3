@@ -141,18 +141,15 @@ public class KogasaAnvilHandler {
         boolean isBowOrCrossbow = left.getItem() instanceof BowItem
                 || left.getItem() instanceof CrossbowItem;
         boolean isArrowMaterial = isBowOrCrossbow && right.is(ItemTags.ARROWS);
-        boolean isKnife = left.getItem() instanceof SakuyaKnifeItem;
-        boolean isMaterialValid = right.is(ItemTags.SWORDS) || right.is(Tags.Items.TOOLS_TRIDENTS);
 
         String materialId;
         if (isBowOrCrossbow) {
-            // 弓弩的强化：弓弩本体 或 16 支箭矢
+            // 弓弩：本体或 16 支箭矢
             if (isArrowMaterial) {
                 if (right.getCount() < 16) return;
                 ResourceLocation arrowId = ForgeRegistries.ITEMS.getKey(right.getItem());
                 if (arrowId == null) return;
                 materialId = "arrow:" + arrowId;
-                // 箭矢不限制重复，跳过 hasUsedMaterial 检查
             } else if (right.getItem() instanceof BowItem
                     || right.getItem() instanceof CrossbowItem) {
                 ResourceLocation rightId = ForgeRegistries.ITEMS.getKey(right.getItem());
@@ -165,22 +162,9 @@ public class KogasaAnvilHandler {
             } else {
                 return;
             }
-        } else if (isKnife && isMaterialValid) {
-            // 三叉戟专属逻辑
-            TagKey<Item> matchTag = KogasaEquipmentHelper.getMatchingTag(left);
-            if ((matchTag == null) || !(right.is(matchTag) || right.is(ItemTags.SWORDS))) return;
-
-            ResourceLocation rightId = ForgeRegistries.ITEMS.getKey(right.getItem());
-            if (rightId == null) return;
-            materialId = rightId.toString();
-            if (KogasaEquipmentData.hasUsedMaterial(left, materialId)) {
-                event.setOutput(ItemStack.EMPTY);
-                return;
-            }
         } else {
-            // 非弓弩、三叉戟走原有逻辑
-            TagKey<Item> matchTag = KogasaEquipmentHelper.getMatchingTag(left);
-            if (matchTag == null || !right.is(matchTag)) return;
+            // 非弓弩：tag 优先，后缀 fallback
+            if (!KogasaEquipmentHelper.matchesReinforcementMaterial(left, right)) return;
 
             ResourceLocation rightId = ForgeRegistries.ITEMS.getKey(right.getItem());
             if (rightId == null) return;

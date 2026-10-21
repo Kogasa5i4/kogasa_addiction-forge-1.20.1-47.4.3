@@ -56,8 +56,7 @@ public class ModItemTagsProvider extends ItemTagsProvider {
 
         // ==== 咲夜飞刀：加入 Forge 通用标签 =====
         this.tag(Tags.Items.TOOLS_TRIDENTS).add(ModItems.SAKUYA_KNIFE.get());
-        this.tag(ItemTags.create(ResourceLocation.fromNamespaceAndPath("forge", "tools/knives")))
-                .add(ModItems.SAKUYA_KNIFE.get());
+        this.tag(ModItemTags.KNIVES).add(ModItems.SAKUYA_KNIFE.get());
 
         // ===== 能力锭：加入模组专属标签 =====
         this.tag(ABILITY_INGOTS)

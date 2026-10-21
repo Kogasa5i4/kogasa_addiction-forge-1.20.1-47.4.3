@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
+import net.kogasachan.kogasa_addiction.datagen.ModItemTags;
 import net.kogasachan.kogasa_addiction.item.FumoItem;
 import net.kogasachan.kogasa_addiction.item.SakuyaKnifeItem;
 import net.minecraft.resources.ResourceLocation;
@@ -179,10 +180,10 @@ public class KogasaEquipmentHelper {
         Item item = stack.getItem();
 
         if (item instanceof SwordItem sword) {
-            return sword.getDamage();  // Tier 加成 + 附加伤害
+            return sword.getDamage();
         }
         if (item instanceof DiggerItem digger) {
-            return digger.getAttackDamage();  // Tier 加成 + 附加伤害
+            return digger.getAttackDamage();
         }
         if (item instanceof ArmorItem armor) {
             return armor.getDefense();
@@ -358,6 +359,55 @@ public class KogasaEquipmentHelper {
         if (path.endsWith("_leggings")) return Tags.Items.ARMORS_LEGGINGS;
         if (path.endsWith("_boots")) return Tags.Items.ARMORS_BOOTS;
         return null;
+    }
+
+    /**
+     * 返回装备类型的后缀标识（不含下划线），例如 "sword"、"pickaxe"。
+     * 非标准后缀装备（Fumo、SakuyaKnife）返回 null。
+     */
+    public static String getEquipmentSuffix(ItemStack stack) {
+        Item item = stack.getItem();
+
+        ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
+        if (id == null) return null;
+        String path = id.getPath();
+
+        if (path.endsWith("sword")) return "sword";
+        if (path.endsWith("pickaxe")) return "pickaxe";
+        if (path.endsWith("axe")) return "axe";
+        if (path.endsWith("shovel")) return "shovel";
+        if (path.endsWith("hoe")) return "hoe";
+        if (path.endsWith("helmet")) return "helmet";
+        if (path.endsWith("chestplate")) return "chestplate";
+        if (path.endsWith("leggings")) return "leggings";
+        if (path.endsWith("boots")) return "boots";
+        if (path.endsWith("knife")) return "knife";
+        return null;
+    }
+
+    /**
+     * 判断 right 是否是 left 的有效强化材料。
+     * 先走 tag 匹配；tag 不匹配时退回注册名后缀匹配。
+     * 三叉戟类特例：接受剑或三叉戟（tag 或后缀）。
+     */
+    public static boolean matchesReinforcementMaterial(ItemStack left, ItemStack right) {
+        TagKey<Item> tag = getMatchingTag(left);
+        if (tag != null && right.is(tag)) return true;
+
+        if (left.getItem() instanceof TridentItem) {
+            if (right.is(ItemTags.SWORDS) || right.is(Tags.Items.TOOLS_TRIDENTS) || right.is(ModItemTags.KNIVES)) return true;
+            ResourceLocation rightId = ForgeRegistries.ITEMS.getKey(right.getItem());
+            if (rightId == null) return false;
+            String path = rightId.getPath();
+            return path.endsWith("sword") || path.endsWith("trident") || path.endsWith("knife");
+        }
+
+        String suffix = getEquipmentSuffix(left);
+        if (suffix == null) return false;
+
+        ResourceLocation rightId = ForgeRegistries.ITEMS.getKey(right.getItem());
+        if (rightId == null) return false;
+        return rightId.getPath().endsWith("_" + suffix);
     }
 
     /**

@@ -38,7 +38,7 @@ public class SakuyaKnifeEntity extends ThrownTrident {
     }
 
     @Override
-    protected @NotNull ItemStack getPickupItem() {
+    @NotNull public ItemStack getPickupItem() {
         // 获取最开始扔出去的那把飞刀的 ItemStack
         ItemStack originStack = this.tridentItem;
 
@@ -56,7 +56,7 @@ public class SakuyaKnifeEntity extends ThrownTrident {
 
         // 掷骰子
         if (this.random.nextDouble() < finalChance) {
-            // 触发损坏：生成损坏版飞刀，并完美复制原有 NBT
+            // 触发损坏：生成损坏版飞刀，并复制原有 NBT
             ItemStack broken = new ItemStack(ModItems.BROKEN_SAKUYA_KNIFE.get());
             if (originStack.getTag() != null && originStack.hasTag()) {
                 broken.setTag(originStack.getTag().copy());
@@ -79,7 +79,7 @@ public class SakuyaKnifeEntity extends ThrownTrident {
         // 2. 获取被命中的实体和射手
         Entity target = result.getEntity();
         Entity owner = this.getOwner();
-        if (!(owner instanceof LivingEntity livingOwner)) return;
+        if (!(owner instanceof LivingEntity)) return;
 
         // 3. 获取原始飞刀的 ItemStack
         ItemStack knifeStack = this.tridentItem;

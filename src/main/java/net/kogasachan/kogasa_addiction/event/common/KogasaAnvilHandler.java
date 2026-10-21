@@ -49,10 +49,13 @@ public class KogasaAnvilHandler {
         }
 
         if (left.is(ModItems.BROKEN_SAKUYA_KNIFE.get()) && right.is(ModItems.SAKUYA_INGOT.get())) {
+            if (left.getCount() > 3) return;
+
             ItemStack result = new ItemStack(ModItems.SAKUYA_KNIFE.get());
             if (left.getTag() != null && left.hasTag()) {
                 result.setTag(left.getTag().copy());
             }
+            result.setCount(left.getCount());
 
             event.setOutput(result);
             event.setCost(Config.SAKUYA_KNIFE_REPAIR_COST.get());

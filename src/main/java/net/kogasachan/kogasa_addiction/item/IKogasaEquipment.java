@@ -23,6 +23,7 @@ public interface IKogasaEquipment {
             if (state.is(BlockTags.NEEDS_DIAMOND_TOOL)) return level >= 3;
             if (state.is(BlockTags.NEEDS_IRON_TOOL)) return level >= 2;
             if (state.is(BlockTags.NEEDS_STONE_TOOL)) return level >= 1;
+            if (state.is(Tags.Blocks.NEEDS_WOOD_TOOL) || state.is(Tags.Blocks.NEEDS_GOLD_TOOL)) return level >= 0;
         }
         return vanillaFallback.getAsBoolean();
     }

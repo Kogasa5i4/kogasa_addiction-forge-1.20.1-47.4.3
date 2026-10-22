@@ -16,6 +16,23 @@ public class KogasaEquipmentData {
     private static final String GROWTH = "Growth";
     private static final String ABSORBED_VALUE = "AbsorbedValue";
     private static final String GROWTH_ENCHANTS_GRANTED = "GrowthEnchantsGranted";
+    private static final String KEY_GROWTH_ENCHANT_FAIL_NOTIFIED = "GrowthEnchantFailNotified";
+
+    public static boolean hasGrowthEnchantFailNotified(ItemStack stack) {
+        CompoundTag tag = stack.getTag();
+        return tag != null && tag.getBoolean(KEY_GROWTH_ENCHANT_FAIL_NOTIFIED);
+    }
+
+    public static void setGrowthEnchantFailNotified(ItemStack stack, boolean value) {
+        if (value) {
+            stack.getOrCreateTag().putBoolean(KEY_GROWTH_ENCHANT_FAIL_NOTIFIED, true);
+        } else {
+            CompoundTag tag = stack.getTag();
+            if (tag != null) {
+                tag.remove(KEY_GROWTH_ENCHANT_FAIL_NOTIFIED);
+            }
+        }
+    }
 
     public static double getAbsorbedValue(ItemStack stack) {
         return getTag(stack).getDouble(ABSORBED_VALUE);

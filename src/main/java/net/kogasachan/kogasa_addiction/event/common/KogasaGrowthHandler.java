@@ -130,13 +130,17 @@ public class KogasaGrowthHandler {
             boolean success = grantOrUpgradeEnchant(stack, player);
 
             if (!success) {
-                // 失败：播放沉闷的失败音效
-                player.level().playSound(null, player.blockPosition(),
-                        SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.5F, 1.5F);
-                player.displayClientMessage(
-                        Component.translatable("message.kogasa_addiction.growth_enchant.max")
-                                .withStyle(ChatFormatting.RED),
-                        true);
+                // 只在第一次失败时提示，之后静默
+                if (!KogasaEquipmentData.hasGrowthEnchantFailNotified(stack)) {
+                    KogasaEquipmentData.setGrowthEnchantFailNotified(stack, true);
+
+                    player.level().playSound(null, player.blockPosition(),
+                            SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.5F, 1.5F);
+                    player.displayClientMessage(
+                            Component.translatable("message.kogasa_addiction.growth_enchant.max")
+                                    .withStyle(ChatFormatting.RED),
+                            true);
+                }
                 break;
             }
 
@@ -148,6 +152,7 @@ public class KogasaGrowthHandler {
                     Component.translatable("message.kogasa_addiction.growth_enchant")
                             .withStyle(ChatFormatting.LIGHT_PURPLE),
                     true);
+            KogasaEquipmentData.setGrowthEnchantFailNotified(stack, false);
         }
     }
 

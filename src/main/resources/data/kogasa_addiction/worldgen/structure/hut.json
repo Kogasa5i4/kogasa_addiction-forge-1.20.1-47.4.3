@@ -1,6 +1,6 @@
 {
   "type": "minecraft:jigsaw",
-  "biomes": "#kogasa_addiction:has_structure/hut",
+  "biomes": "#minecraft:is_overworld",
   "step": "surface_structures",
   "terrain_adaptation": "beard_thin",
   "start_pool": "kogasa_addiction:hut/start_pool",

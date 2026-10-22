@@ -87,7 +87,7 @@ public class TimestopHandler {
             return;
         }
 
-        // --- 这里保留你之前的逻辑：冻结非生物实体 ---
+        // --- 冻结非生物实体 ---
         for (ServerLevel level : event.getServer().getAllLevels()) {
             if (level != owner.level()) continue;
             for (Entity entity : level.getAllEntities()) {
@@ -96,6 +96,8 @@ public class TimestopHandler {
                     entity.setDeltaMovement(Vec3.ZERO);
                     entity.setNoGravity(true);
                     entity.setOldPosAndRot();
+                    // 打上时停冻结标记
+                    entity.getPersistentData().putBoolean("KogasaTimeStopFrozen", true);
                 }
             }
         }
@@ -144,5 +146,18 @@ public class TimestopHandler {
         IS_FROZEN = false;
         OWNER_UUID = null;
         TIMESTOP_END_TIME = 0;
+
+        // 恢复被冻结实体的重力
+        net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+        if (server != null) {
+            for (ServerLevel level : server.getAllLevels()) {
+                for (Entity entity : level.getAllEntities()) {
+                    if (entity.getPersistentData().getBoolean("KogasaTimeStopFrozen")) {
+                        entity.setNoGravity(false);
+                        entity.getPersistentData().remove("KogasaTimeStopFrozen");
+                    }
+                }
+            }
+        }
     }
 }

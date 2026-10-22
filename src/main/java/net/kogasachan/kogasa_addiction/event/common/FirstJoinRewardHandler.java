@@ -40,7 +40,8 @@ public class FirstJoinRewardHandler {
             ModItems.TENSHI_LEGGINGS,
             ModItems.TENSHI_BOOTS,
             ModItems.AYA_BOW,
-            ModItems.AYA_CROSSBOW
+            ModItems.AYA_CROSSBOW,
+            ModItems.SAKUYA_KNIFE
     );
 
     @SubscribeEvent

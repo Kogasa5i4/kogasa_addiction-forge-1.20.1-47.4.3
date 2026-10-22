@@ -25,12 +25,25 @@ import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class KogasaGrowthHandler {
+
+    private static volatile Set<ResourceLocation> cachedExactIds;
+    private static volatile List<Pattern> cachedPatterns;
+
+    @SubscribeEvent
+    public static void onConfigReload(ModConfigEvent.Reloading event) {
+        if (event.getConfig().getSpec() == Config.SPEC) {
+            cachedExactIds = null;
+            cachedPatterns = null;
+        }
+    }
 
     // 攻击命中
     @SubscribeEvent
@@ -178,13 +191,12 @@ public class KogasaGrowthHandler {
      */
     public static boolean grantOrUpgradeEnchant(ItemStack stack, Player player) {
         Map<Enchantment, Integer> existing = EnchantmentHelper.getEnchantments(stack);
-        Set<ResourceLocation> blacklist = getEnchantBlacklist();
 
         // 1. 优先：找可升级的已有附魔（排除黑名单）
         List<Enchantment> upgradeable = new ArrayList<>();
         for (Map.Entry<Enchantment, Integer> entry : existing.entrySet()) {
             ResourceLocation id = ForgeRegistries.ENCHANTMENTS.getKey(entry.getKey());
-            if (id != null && blacklist.contains(id)) continue;   // ← 语义 B 的关键行
+            if (isBlacklisted(id)) continue;
             if (entry.getValue() < entry.getKey().getMaxLevel() + 1) {
                 upgradeable.add(entry.getKey());
             }
@@ -221,7 +233,6 @@ public class KogasaGrowthHandler {
      */
     private static Enchantment pickRandomNewEnchantment(ItemStack stack, Player player,
                                                         Map<Enchantment, Integer> existing) {
-        Set<ResourceLocation> blacklist = getEnchantBlacklist();
         List<Enchantment> candidates = new ArrayList<>();
 
         for (Enchantment ench : ForgeRegistries.ENCHANTMENTS) {
@@ -230,7 +241,7 @@ public class KogasaGrowthHandler {
             if (existing.containsKey(ench)) continue;
 
             ResourceLocation id = ForgeRegistries.ENCHANTMENTS.getKey(ench);
-            if (id == null || blacklist.contains(id)) continue;   // ← 黑名单过滤
+            if (isBlacklisted(id)) continue;   // ← 黑名单过滤
 
             if (stack.getItem() instanceof SakuyaKnifeItem && ench == Enchantments.RIPTIDE) {
                 continue;
@@ -242,12 +253,53 @@ public class KogasaGrowthHandler {
         return candidates.get(player.getRandom().nextInt(candidates.size()));
     }
 
-    private static Set<ResourceLocation> getEnchantBlacklist() {
-        Set<ResourceLocation> set = new HashSet<>();
-        for (String s : Config.GROWTH_ENCHANT_BLACKLIST.get()) {
-            ResourceLocation id = ResourceLocation.tryParse(s);
-            if (id != null) set.add(id);
+    private static void rebuildBlacklistCache() {
+        Set<ResourceLocation> exact = new HashSet<>();
+        List<Pattern> patterns = new ArrayList<>();
+
+        for (String raw : Config.GROWTH_ENCHANT_BLACKLIST.get()) {
+            String s = raw.trim();
+            if (s.isEmpty()) continue;
+
+            if (s.indexOf('*') >= 0 || s.indexOf('?') >= 0) {
+                // 含通配符 → 转成正则
+                patterns.add(Pattern.compile(globToRegex(s)));
+            } else {
+                // 无通配符 → 精确 ID
+                ResourceLocation id = ResourceLocation.tryParse(s);
+                if (id != null) exact.add(id);
+            }
         }
-        return set;
+
+        cachedExactIds = exact;
+        cachedPatterns = List.copyOf(patterns);
+    }
+
+    private static String globToRegex(String glob) {
+        StringBuilder sb = new StringBuilder();
+        for (char c : glob.toCharArray()) {
+            switch (c) {
+                case '*' -> sb.append(".*");
+                case '?' -> sb.append('.');
+                case '.', '(', ')', '[', ']', '{', '}', '+', '^', '$', '|', '\\' ->
+                        sb.append('\\').append(c);
+                default -> sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    private static boolean isBlacklisted(ResourceLocation id) {
+        if (id == null) return false;
+        if (cachedExactIds == null || cachedPatterns == null) {
+            rebuildBlacklistCache();
+        }
+        if (cachedExactIds.contains(id)) return true;
+
+        String full = id.toString();
+        for (Pattern p : cachedPatterns) {
+            if (p.matcher(full).matches()) return true;
+        }
+        return false;
     }
 }

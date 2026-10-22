@@ -135,8 +135,12 @@ public class Config {
                     "格式：模组ID:附魔ID，例如 minecraft:riptide")
             .defineListAllowEmpty(
                     "growthEnchantBlacklist",
-                    List.of("minecraft:riptide"),
-                    o -> o instanceof String s && ResourceLocation.tryParse(s) != null);
+                    List.of("minecraft:riptide",
+                            "minecraft:silk_touch",
+                            "*:*curse",
+                            "*:curse*",
+                            "l2complements:*"),
+                    o -> o instanceof String s && !s.isBlank());
 
     static {
         BUILDER.pop();

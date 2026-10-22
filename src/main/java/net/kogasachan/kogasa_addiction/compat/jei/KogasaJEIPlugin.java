@@ -152,6 +152,9 @@ public class KogasaJEIPlugin implements IModPlugin {
         // 4. 修复配方（1个）
         registerRepairRecipe(recipes);
 
+        // 5. 清除配方（2个）
+        registerClearRecipe(recipes);
+
         KogasaAddiction.LOGGER.info("Registered {} JEI anvil recipes", recipes.size());
         registration.addRecipes(AnvilReinforcementCategory.RECIPE_TYPE, recipes);
     }
@@ -260,8 +263,46 @@ public class KogasaJEIPlugin implements IModPlugin {
     private static void registerRepairRecipe(List<AnvilReinforcementRecipe> recipes) {
         recipes.add(new AnvilReinforcementRecipe(
                 new ItemStack(ModItems.BROKEN_SAKUYA_KNIFE.get()),
-                new ArrayList<ItemStack>(Collections.singleton(new ItemStack(ModItems.SAKUYA_INGOT.get()))),
+                new ArrayList<>(Collections.singleton(new ItemStack(ModItems.SAKUYA_INGOT.get()))),
                 new ItemStack(ModItems.SAKUYA_KNIFE.get()),
                 RecipeKind.REPAIR));
+    }
+
+    private static void registerClearRecipe(List<AnvilReinforcementRecipe> recipes) {
+        Item baseSword = ModItems.KOGASA_SWORD.get();
+
+        // 构造输入：带有强化1、成长0.5、KOGASA能力的木剑
+        ItemStack input = new ItemStack(baseSword);
+        KogasaEquipmentData.setReinforcements(input, 1);
+        KogasaEquipmentData.setGrowth(input, 0.5);
+        KogasaEquipmentData.addUsedMaterial(input, "minecraft:wooden_sword");
+        KogasaAbilityData.addAbility(input, KogasaAbility.KOGASA);
+
+        // ==================== 1. 水桶：清除强化 ====================
+        // 构造输出：保留成长和能力，清除强化
+        ItemStack output1 = new ItemStack(baseSword);
+        KogasaEquipmentData.setGrowth(output1, 0.5);
+        KogasaAbilityData.addAbility(output1, KogasaAbility.KOGASA);
+
+        recipes.add(new AnvilReinforcementRecipe(
+                input,
+                new ArrayList<>(List.of(new ItemStack(Items.WATER_BUCKET))),
+                output1,
+                RecipeKind.CLEAR
+        ));
+
+        // ==================== 2. 奶桶：清除能力 ====================
+        // 构造输出：保留成长和强化，清除能力
+        ItemStack output2 = new ItemStack(baseSword);
+        KogasaEquipmentData.setReinforcements(output2, 1);
+        KogasaEquipmentData.setGrowth(output2, 0.5);
+        KogasaEquipmentData.addUsedMaterial(output2, "minecraft:wooden_sword");
+
+        recipes.add(new AnvilReinforcementRecipe(
+                input,
+                new ArrayList<>(List.of(new ItemStack(Items.MILK_BUCKET))),
+                output2,
+                RecipeKind.CLEAR
+        ));
     }
 }

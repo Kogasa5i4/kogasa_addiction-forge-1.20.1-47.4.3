@@ -102,6 +102,12 @@ public class AnvilReinforcementCategory implements IRecipeCategory<AnvilReinforc
                         case AMMO -> tooltip.add(Component.translatable(
                                         "jei.kogasa_addiction.hint.ammo")
                                 .withStyle(ChatFormatting.LIGHT_PURPLE));
+                        case REPAIR -> tooltip.add(Component.translatable(
+                                        "jei.kogasa_addiction.hint.repair")
+                                .withStyle(ChatFormatting.BLUE));
+                        case CLEAR -> tooltip.add(Component.translatable(
+                                        "jei.kogasa_addiction.hint.clear")
+                                .withStyle(ChatFormatting.WHITE));
                     }
                 });
     }
@@ -155,6 +161,7 @@ public class AnvilReinforcementCategory implements IRecipeCategory<AnvilReinforc
             case REINFORCEMENT -> Config.REINFORCEMENT_COST.get();
             case AMMO -> Config.AMMO_INFUSION_COST.get();
             case REPAIR -> Config.SAKUYA_KNIFE_REPAIR_COST.get();
+            case CLEAR -> Config.CLEAR_COST.get();
         };
         String experienceString = Component.translatable(
                 "jei.kogasa_addiction.anvil.experience", cost).getString();

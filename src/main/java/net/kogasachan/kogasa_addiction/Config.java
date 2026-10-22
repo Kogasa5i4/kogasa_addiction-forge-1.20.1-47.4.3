@@ -42,6 +42,11 @@ public class Config {
                     "强化消耗的经验等级。")
             .defineInRange("reinforcementCost", 1, 0, Integer.MAX_VALUE);
 
+    public static final ForgeConfigSpec.IntValue CLEAR_COST = BUILDER
+            .comment("Experience level cost clearing all reinforcements and abilities.\n" +
+                    "清除所有强化和能力消耗的经验等级。")
+            .defineInRange("clearCost", 1, 0, Integer.MAX_VALUE);
+
     public static final ForgeConfigSpec.IntValue AMMO_INFUSION_COST = BUILDER
             .comment("Experience level cost to infuse special ammo into an aya bow/crossbow.\n" +
                     "在铁砧中为文文弓/弩装载特殊弹药消耗的经验等级。")

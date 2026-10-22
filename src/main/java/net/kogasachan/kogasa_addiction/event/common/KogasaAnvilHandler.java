@@ -11,6 +11,7 @@ import net.kogasachan.kogasa_addiction.item.SakuyaKnifeItem;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.*;
@@ -125,13 +126,49 @@ public class KogasaAnvilHandler {
 
     /**
      * 强化：装备 + 同类型装备 → 装备强化 1 级
-     * 原有逻辑，未改动
+     * 水桶清强化，奶桶清能力，保留成长及其他数据
      */
     private static void handleReinforcement(AnvilUpdateEvent event,
                                             ItemStack left, ItemStack right) {
         if (left.getItem() == right.getItem()) {
             event.setOutput(ItemStack.EMPTY);
             event.setCost(0);
+            return;
+        }
+
+        // ===== 清除数据逻辑：水桶清强化，奶桶清能力 =====
+        if (right.is(Items.WATER_BUCKET) || right.is(Items.MILK_BUCKET)) {
+            ItemStack result = left.copy();
+            net.minecraft.nbt.CompoundTag rootTag = result.getTag();
+
+            if (rootTag != null) {
+                if (right.is(Items.WATER_BUCKET)) {
+                    // 水桶：精准移除强化相关字段，保留成长
+                    if (rootTag.contains("KogasaEquipment", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+                        net.minecraft.nbt.CompoundTag equipTag = rootTag.getCompound("KogasaEquipment");
+                        equipTag.remove("Reinforcements");
+                        equipTag.remove("UsedMaterials");
+                        equipTag.remove("AbsorbedValue");
+
+                        // 如果强化清空后连成长也没了，就把这个标签彻底删掉
+                        if (equipTag.isEmpty()) {
+                            rootTag.remove("KogasaEquipment");
+                        }
+                    }
+                } else if (right.is(Items.MILK_BUCKET)) {
+                    // 奶桶：移除能力标签，保留强化和成长
+                    rootTag.remove("KogasaAbilities");
+                }
+
+                // 如果清理后 NBT 完全空了，就清除空标签防止残留
+                if (rootTag.isEmpty()) {
+                    result.setTag(null);
+                }
+            }
+
+            event.setOutput(result);
+            event.setCost(Config.CLEAR_COST.get());
+            event.setMaterialCost(1); // 消耗 1 个水桶或奶桶
             return;
         }
 

@@ -80,6 +80,7 @@ repositories {
         url = "https://maven.blamejared.com/"
     }
     maven { url = "https://maven.createmod.net" }
+    maven { url "https://modmaven.dev/" }
 }
 
 dependencies {
@@ -92,6 +93,9 @@ dependencies {
 
     compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
     runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")
+
+    compileOnly fg.deobf("teamtwilight:twilightforest:${twilight_forest_version}:universal")
+    runtimeOnly fg.deobf("teamtwilight:twilightforest:${twilight_forest_version}:universal")
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 

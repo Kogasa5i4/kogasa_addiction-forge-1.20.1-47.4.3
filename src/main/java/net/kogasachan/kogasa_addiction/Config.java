@@ -1,6 +1,9 @@
 package net.kogasachan.kogasa_addiction;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
+
+import java.util.List;
 
 public class Config {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
@@ -124,6 +127,16 @@ public class Config {
             .comment("If true, granted enchantments get a random level from 1 to max. If false, always level 1.\n" +
                     "为 true 时附魔等级随机 1~上限；为 false 时固定 1 级。")
             .define("allowMaxLevelEnchants", true);
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> GROWTH_ENCHANT_BLACKLIST = BUILDER
+            .comment("Enchantments listed here will not be granted or upgraded by the growth system.",
+                    "此处列出的附魔不会被成长系统授予或升级。",
+                    "Format: modid:enchantment_id, e.g. minecraft:riptide",
+                    "格式：模组ID:附魔ID，例如 minecraft:riptide")
+            .defineListAllowEmpty(
+                    "growthEnchantBlacklist",
+                    List.of("minecraft:riptide"),
+                    o -> o instanceof String s && ResourceLocation.tryParse(s) != null);
 
     static {
         BUILDER.pop();

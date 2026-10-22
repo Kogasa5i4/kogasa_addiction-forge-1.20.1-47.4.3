@@ -8,6 +8,7 @@ import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -26,10 +27,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class KogasaGrowthHandler {
@@ -175,10 +173,13 @@ public class KogasaGrowthHandler {
      */
     public static boolean grantOrUpgradeEnchant(ItemStack stack, Player player) {
         Map<Enchantment, Integer> existing = EnchantmentHelper.getEnchantments(stack);
+        Set<ResourceLocation> blacklist = getEnchantBlacklist();
 
-        // 1. 优先：找可升级的已有附魔
+        // 1. 优先：找可升级的已有附魔（排除黑名单）
         List<Enchantment> upgradeable = new ArrayList<>();
         for (Map.Entry<Enchantment, Integer> entry : existing.entrySet()) {
+            ResourceLocation id = ForgeRegistries.ENCHANTMENTS.getKey(entry.getKey());
+            if (id != null && blacklist.contains(id)) continue;   // ← 语义 B 的关键行
             if (entry.getValue() < entry.getKey().getMaxLevel() + 1) {
                 upgradeable.add(entry.getKey());
             }
@@ -193,7 +194,7 @@ public class KogasaGrowthHandler {
             return true;
         }
 
-        // 2. 兜底：所有已有附魔都满级，授予新附魔
+        // 2. 兜底：授予新附魔
         Enchantment newEnch = pickRandomNewEnchantment(stack, player, existing);
         if (newEnch == null) return false;
 
@@ -215,21 +216,33 @@ public class KogasaGrowthHandler {
      */
     private static Enchantment pickRandomNewEnchantment(ItemStack stack, Player player,
                                                         Map<Enchantment, Integer> existing) {
+        Set<ResourceLocation> blacklist = getEnchantBlacklist();
         List<Enchantment> candidates = new ArrayList<>();
+
         for (Enchantment ench : ForgeRegistries.ENCHANTMENTS) {
             if (ench.isCurse()) continue;
             if (!ench.canEnchant(stack)) continue;
-            if (existing.containsKey(ench)) continue;  // 已有则跳过
+            if (existing.containsKey(ench)) continue;
+
+            ResourceLocation id = ForgeRegistries.ENCHANTMENTS.getKey(ench);
+            if (id == null || blacklist.contains(id)) continue;   // ← 黑名单过滤
 
             if (stack.getItem() instanceof SakuyaKnifeItem && ench == Enchantments.RIPTIDE) {
                 continue;
             }
 
-            if (ench == Enchantments.SILK_TOUCH && !existing.containsKey(Enchantments.SILK_TOUCH)) continue;
-
             candidates.add(ench);
         }
         if (candidates.isEmpty()) return null;
         return candidates.get(player.getRandom().nextInt(candidates.size()));
+    }
+
+    private static Set<ResourceLocation> getEnchantBlacklist() {
+        Set<ResourceLocation> set = new HashSet<>();
+        for (String s : Config.GROWTH_ENCHANT_BLACKLIST.get()) {
+            ResourceLocation id = ResourceLocation.tryParse(s);
+            if (id != null) set.add(id);
+        }
+        return set;
     }
 }

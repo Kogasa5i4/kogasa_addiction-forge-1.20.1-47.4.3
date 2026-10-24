@@ -215,12 +215,10 @@ public class KogasaGrowthHandler {
         Enchantment newEnch = pickRandomNewEnchantment(stack, player, existing);
         if (newEnch == null) return false;
 
-        int level;
+        int level = 1;
         if (Config.ALLOW_MAX_LEVEL_ENCHANTS.get()) {
             int maxLevel = Math.max(1, newEnch.getMaxLevel());
-            level = 1 + player.getRandom().nextInt(maxLevel);
-        } else {
-            level = 1;
+            level += player.getRandom().nextInt(maxLevel);
         }
         Map<Enchantment, Integer> updated = new HashMap<>(existing);
         updated.put(newEnch, level);

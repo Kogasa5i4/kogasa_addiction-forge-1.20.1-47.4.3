@@ -20,7 +20,6 @@ public class SakuyaKnifeEntity extends ThrownTrident {
 
     public SakuyaKnifeEntity(EntityType<? extends SakuyaKnifeEntity> type, Level level) {
         super(type, level);
-        this.setPierceLevel((byte) 2);
     }
 
     public SakuyaKnifeEntity(Level level, LivingEntity shooter, ItemStack stack) {
@@ -75,6 +74,13 @@ public class SakuyaKnifeEntity extends ThrownTrident {
     protected void onHitEntity(@NotNull EntityHitResult result) {
         // 1. 调用父类方法，处理基础的投掷物伤害、击退、着火等效果
         super.onHitEntity(result);
+
+        if (this.getPierceLevel() <= 0) {
+            this.inGround = false;
+            this.setNoGravity(false);
+            // 给一个很小的向下初速度，避免完全静止悬停一瞬
+            this.setDeltaMovement(0, -0.05, 0);
+        }
 
         // 2. 获取被命中的实体和射手
         Entity target = result.getEntity();

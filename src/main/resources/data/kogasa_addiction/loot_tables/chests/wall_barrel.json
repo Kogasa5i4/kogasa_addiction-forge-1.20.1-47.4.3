@@ -1,0 +1,114 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": { "min": 5, "max": 16 },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:diamond_block",
+          "weight": 3
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:emerald_block",
+          "weight": 5
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:netherite_ingot",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:ancient_debris",
+          "weight": 4,
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "min": 1, "max": 2 } }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:netherite_block",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:coal_block",
+          "weight": 6,
+          "functions": [
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "block.minecraft.netherite_block",
+                "italic": false
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:obsidian",
+          "weight": 6,
+          "functions": [
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "block.minecraft.netherite_block",
+                "italic": false
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kogasa_addiction:kogasa_ingot",
+          "weight": 5,
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "min": 3, "max": 5 } }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kogasa_addiction:aya_ingot",
+          "weight": 5,
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "min": 3, "max": 5 } }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kogasa_addiction:koishi_ingot",
+          "weight": 5,
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "min": 3, "max": 5 } }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kogasa_addiction:cirno_ingot",
+          "weight": 5,
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "min": 3, "max": 5 } }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kogasa_addiction:tenshi_ingot",
+          "weight": 5,
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "min": 3, "max": 5 } }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kogasa_addiction:sakuya_ingot",
+          "weight": 5,
+          "functions": [
+            { "function": "minecraft:set_count", "count": { "min": 3, "max": 5 } }
+          ]
+        }
+      ]
+    }
+  ]
+}

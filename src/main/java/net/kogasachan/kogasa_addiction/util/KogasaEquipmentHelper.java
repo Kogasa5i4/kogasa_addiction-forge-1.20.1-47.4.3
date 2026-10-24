@@ -5,7 +5,7 @@ import com.google.common.collect.Multimap;
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
-import net.kogasachan.kogasa_addiction.datagen.ModItemTags;
+import net.kogasachan.kogasa_addiction.datagen.ModItemTagsProvider;
 import net.kogasachan.kogasa_addiction.item.FumoItem;
 import net.kogasachan.kogasa_addiction.item.SakuyaKnifeItem;
 import net.minecraft.resources.ResourceLocation;
@@ -395,7 +395,7 @@ public class KogasaEquipmentHelper {
         if (tag != null && right.is(tag)) return true;
 
         if (left.getItem() instanceof TridentItem) {
-            if (right.is(ItemTags.SWORDS) || right.is(Tags.Items.TOOLS_TRIDENTS) || right.is(ModItemTags.KNIVES)) return true;
+            if (right.is(ItemTags.SWORDS) || right.is(Tags.Items.TOOLS_TRIDENTS) || right.is(ModItemTagsProvider.KNIVES)) return true;
             ResourceLocation rightId = ForgeRegistries.ITEMS.getKey(right.getItem());
             if (rightId == null) return false;
             String path = rightId.getPath();

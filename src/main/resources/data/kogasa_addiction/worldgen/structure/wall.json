@@ -1,6 +1,6 @@
 {
   "type": "minecraft:jigsaw",
-  "biomes": "#minecraft:is_overworld",
+  "biomes": "minecraft:lush_caves",
   "step": "surface_structures",
   "terrain_adaptation": "beard_thin",
   "start_pool": "kogasa_addiction:wall/start_pool",

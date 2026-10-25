@@ -7,10 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.PickaxeItem;
-import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ToolAction;
@@ -22,6 +19,17 @@ import java.util.List;
 public class FumoItem extends PickaxeItem implements IKogasaEquipment {
     public FumoItem(Tier tier, int attackDamageModifier, float attackSpeedModifier, Properties properties) {
         super(tier, attackDamageModifier, attackSpeedModifier, properties);
+    }
+
+    @Override
+    public @NotNull Component getName(@NotNull ItemStack stack) {
+        return super.getName(stack).copy()
+                .withStyle(style -> style.withColor(ChatFormatting.BLUE));
+    }
+
+    @Override
+    public @NotNull Rarity getRarity(@NotNull ItemStack pStack) {
+        return Rarity.EPIC;
     }
 
     @Override

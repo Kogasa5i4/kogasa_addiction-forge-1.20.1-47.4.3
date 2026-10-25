@@ -1,6 +1,7 @@
 package net.kogasachan.kogasa_addiction.item;
 
 import net.kogasachan.kogasa_addiction.entity.projectile.AyaArrowEntity;
+import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -8,6 +9,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ArrowItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
@@ -22,6 +24,17 @@ public class AyaArrowItem extends ArrowItem {
 
     public AyaArrowItem(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public @NotNull Component getName(@NotNull ItemStack stack) {
+        return super.getName(stack).copy()
+                .withStyle(style -> style.withColor(ChatFormatting.GOLD));
+    }
+
+    @Override
+    public @NotNull Rarity getRarity(@NotNull ItemStack pStack) {
+        return Rarity.EPIC;
     }
 
     // ==================== 发射 ====================

@@ -7,6 +7,8 @@ import net.kogasachan.kogasa_addiction.event.common.KogasaGrowthHandler;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.kogasachan.kogasa_addiction.util.ModConfigCache;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -17,10 +19,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
-import net.minecraft.world.item.ArrowItem;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -35,6 +34,17 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
 
     public AyaBowItem(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public @NotNull Component getName(@NotNull ItemStack stack) {
+        return super.getName(stack).copy()
+                .withStyle(style -> style.withColor(ChatFormatting.GOLD));
+    }
+
+    @Override
+    public @NotNull Rarity getRarity(@NotNull ItemStack pStack) {
+        return Rarity.EPIC;
     }
 
     @Override
@@ -131,7 +141,6 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
 
             double multiplier = KogasaEquipmentData.getMultiplier(stack);
             int arrowCount = KogasaEquipmentHelper.getBowArrowCount(stack);
-            int pierceLevel = KogasaEquipmentHelper.getBowPierceLevel(stack);
             float velocityMultiplier = (float) Math.sqrt(multiplier);
 
             // 药水效果：如果是药水弹药，缓存效果列表

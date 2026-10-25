@@ -2,6 +2,8 @@ package net.kogasachan.kogasa_addiction.item;
 
 import com.google.common.collect.Multimap;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -34,6 +36,17 @@ public interface IKogasaEquipment {
         }
 
         @Override
+        public @NotNull Component getName(@NotNull ItemStack stack) {
+            return super.getName(stack).copy()
+                    .withStyle(style -> style.withColor(ChatFormatting.GOLD));
+        }
+
+        @Override
+        public @NotNull Rarity getRarity(@NotNull ItemStack pStack) {
+            return Rarity.EPIC;
+        }
+
+        @Override
         public Multimap<Attribute, AttributeModifier> getAttributeModifiers(
                 EquipmentSlot slot, ItemStack stack) {
             return KogasaEquipmentHelper.getAttributeModifiers(this, slot, stack);
@@ -60,6 +73,17 @@ public interface IKogasaEquipment {
     class KogasaAxeItem extends AxeItem implements IKogasaEquipment {
         public KogasaAxeItem(Tier tier, float damage, float speed, Properties props) {
             super(tier, damage, speed, props);
+        }
+
+        @Override
+        public @NotNull Component getName(@NotNull ItemStack stack) {
+            return super.getName(stack).copy()
+                    .withStyle(style -> style.withColor(ChatFormatting.GOLD));
+        }
+
+        @Override
+        public @NotNull Rarity getRarity(@NotNull ItemStack pStack) {
+            return Rarity.EPIC;
         }
 
         @Override
@@ -92,6 +116,17 @@ public interface IKogasaEquipment {
         }
 
         @Override
+        public @NotNull Component getName(@NotNull ItemStack stack) {
+            return super.getName(stack).copy()
+                    .withStyle(style -> style.withColor(ChatFormatting.GOLD));
+        }
+
+        @Override
+        public @NotNull Rarity getRarity(@NotNull ItemStack pStack) {
+            return Rarity.EPIC;
+        }
+
+        @Override
         public Multimap<Attribute, AttributeModifier> getAttributeModifiers(
                 EquipmentSlot slot, ItemStack stack) {
             return KogasaEquipmentHelper.getAttributeModifiers(this, slot, stack);
@@ -121,6 +156,17 @@ public interface IKogasaEquipment {
         }
 
         @Override
+        public @NotNull Component getName(@NotNull ItemStack stack) {
+            return super.getName(stack).copy()
+                    .withStyle(style -> style.withColor(ChatFormatting.GOLD));
+        }
+
+        @Override
+        public @NotNull Rarity getRarity(@NotNull ItemStack pStack) {
+            return Rarity.EPIC;
+        }
+
+        @Override
         public Multimap<Attribute, AttributeModifier> getAttributeModifiers(
                 EquipmentSlot slot, ItemStack stack) {
             return KogasaEquipmentHelper.getAttributeModifiers(this, slot, stack);
@@ -147,6 +193,17 @@ public interface IKogasaEquipment {
     class KogasaHoeItem extends HoeItem implements IKogasaEquipment {
         public KogasaHoeItem(Tier tier, int damage, float speed, Properties props) {
             super(tier, damage, speed, props);
+        }
+
+        @Override
+        public @NotNull Component getName(@NotNull ItemStack stack) {
+            return super.getName(stack).copy()
+                    .withStyle(style -> style.withColor(ChatFormatting.GOLD));
+        }
+
+        @Override
+        public @NotNull Rarity getRarity(@NotNull ItemStack pStack) {
+            return Rarity.EPIC;
         }
 
         @Override

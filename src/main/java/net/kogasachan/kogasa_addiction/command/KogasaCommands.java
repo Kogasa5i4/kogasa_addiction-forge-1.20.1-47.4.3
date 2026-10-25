@@ -42,6 +42,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +52,20 @@ public class KogasaCommands {
             (ctx, builder) -> {
                 for (KogasaAbility ability : KogasaAbility.values()) {
                     builder.suggest(ability.getId());
+                }
+                return builder.buildFuture();
+            };
+    private static final SuggestionProvider<CommandSourceStack> EXISTING_ENCHANT_SUGGESTIONS =
+            (ctx, builder) -> {
+                try {
+                    ServerPlayer player = ctx.getSource().getPlayerOrException();
+                    ItemStack held = player.getMainHandItem();
+                    for (Enchantment ench : EnchantmentHelper.getEnchantments(held).keySet()) {
+                        ResourceLocation id = ForgeRegistries.ENCHANTMENTS.getKey(ench);
+                        if (id != null) builder.suggest(id.toString());
+                    }
+                } catch (CommandSyntaxException ignored) {
+                    // 非玩家执行时不给建议
                 }
                 return builder.buildFuture();
             };
@@ -150,6 +165,25 @@ public class KogasaCommands {
                                     // 下次登录/执行 /kogasa givefirstjoin 时发放
                                     return 1;
                                 }))
+                        // /kogasa removeenchant <enchantment>
+                        .then(Commands.literal("removeenchant")
+                                .then(Commands.argument("enchantment",
+                                                ResourceArgument.resource(buildContext, Registries.ENCHANTMENT))
+                                        .suggests(EXISTING_ENCHANT_SUGGESTIONS)
+                                        .executes(ctx -> removeEnchant(ctx,
+                                                ResourceArgument.getEnchantment(ctx, "enchantment").value()))))
+                        // /kogasa clearenchants
+                        .then(Commands.literal("clearenchants")
+                                .executes(KogasaCommands::clearEnchants))
+                        // /kogasa setenchantlevel <enchantment> <level>
+                        .then(Commands.literal("setenchantlevel")
+                                .then(Commands.argument("enchantment",
+                                                ResourceArgument.resource(buildContext, Registries.ENCHANTMENT))
+                                        .suggests(EXISTING_ENCHANT_SUGGESTIONS)
+                                        .then(Commands.argument("level", IntegerArgumentType.integer(1, 255))
+                                                .executes(ctx -> setEnchantLevel(ctx,
+                                                        ResourceArgument.getEnchantment(ctx, "enchantment").value(),
+                                                        IntegerArgumentType.getInteger(ctx, "level"))))))
         );
     }
 
@@ -269,7 +303,6 @@ public class KogasaCommands {
         final int oldRe = re;
         final int newRe = re + 1;
         final double absorbValue = absorb;
-        final int cost = materialCost;
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.reinforce.success",
                 oldRe, newRe, KogasaNumberFormatHelper.formatTrimmed(absorbValue, 2)), true);
@@ -922,7 +955,7 @@ public class KogasaCommands {
         return 1;
     }
 
-// ==================== clearammo ====================
+    // ==================== clearammo ====================
 
     private static int clearAmmo(CommandContext<CommandSourceStack> ctx)
             throws CommandSyntaxException {
@@ -945,6 +978,101 @@ public class KogasaCommands {
 
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.clearammo.success"), true);
+        return 1;
+    }
+
+    // ==================== removeenchant ====================
+
+    private static int removeEnchant(CommandContext<CommandSourceStack> ctx,
+                                     Enchantment enchantment)
+            throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        ItemStack held = player.getMainHandItem();
+
+        if (!(held.getItem() instanceof IKogasaEquipment)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.not_kogasa"));
+            return 0;
+        }
+
+        Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(held);
+        if (!enchants.containsKey(enchantment)) {
+            String enchName = enchantment.getFullname(1).getString();
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.removeenchant.not_present", enchName));
+            return 0;
+        }
+
+        enchants.remove(enchantment);
+        EnchantmentHelper.setEnchantments(enchants, held);
+        player.getInventory().setChanged();
+
+        String enchName = enchantment.getFullname(1).getString();
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.removeenchant.success", enchName), true);
+        return 1;
+    }
+
+    // ==================== clearenchants ====================
+
+    private static int clearEnchants(CommandContext<CommandSourceStack> ctx)
+            throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        ItemStack held = player.getMainHandItem();
+
+        if (!(held.getItem() instanceof IKogasaEquipment)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.not_kogasa"));
+            return 0;
+        }
+
+        Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(held);
+        if (enchants.isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.clearenchants.empty"));
+            return 0;
+        }
+
+        final int count = enchants.size();
+        EnchantmentHelper.setEnchantments(new HashMap<>(), held);
+        player.getInventory().setChanged();
+
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.clearenchants.success", count), true);
+        return 1;
+    }
+
+    // ==================== setenchantlevel ====================
+
+    private static int setEnchantLevel(CommandContext<CommandSourceStack> ctx,
+                                       Enchantment enchantment, int level)
+            throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        ItemStack held = player.getMainHandItem();
+
+        if (!(held.getItem() instanceof IKogasaEquipment)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.not_kogasa"));
+            return 0;
+        }
+
+        Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(held);
+        if (!enchants.containsKey(enchantment)) {
+            String enchName = enchantment.getFullname(1).getString();
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.setenchantlevel.not_present", enchName));
+            return 0;
+        }
+
+        final int oldLevel = enchants.get(enchantment);
+        enchants.put(enchantment, level);
+        EnchantmentHelper.setEnchantments(enchants, held);
+        player.getInventory().setChanged();
+
+        String enchName = enchantment.getFullname(level).getString();
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.setenchantlevel.success",
+                enchName, oldLevel, level), true);
         return 1;
     }
 

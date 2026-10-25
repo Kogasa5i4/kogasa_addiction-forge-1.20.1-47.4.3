@@ -4,6 +4,8 @@ import com.google.common.collect.Multimap;
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.entity.projectile.SakuyaKnifeEntity;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -12,6 +14,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TridentItem;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -22,6 +25,17 @@ public class SakuyaKnifeItem extends TridentItem implements IKogasaEquipment {
 
     public SakuyaKnifeItem(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public @NotNull Component getName(@NotNull ItemStack stack) {
+        return super.getName(stack).copy()
+                .withStyle(style -> style.withColor(ChatFormatting.GOLD));
+    }
+
+    @Override
+    public @NotNull Rarity getRarity(@NotNull ItemStack pStack) {
+        return Rarity.EPIC;
     }
 
     @Override

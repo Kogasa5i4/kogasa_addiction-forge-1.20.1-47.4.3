@@ -203,6 +203,8 @@
   "commands.kogasa_addiction.removeenchant.not_present": "There's no enchantment named %s on this item",
   "commands.kogasa_addiction.removeenchant.success": "Successfully removed enchantment: %s",
   "commands.kogasa_addiction.reset.success": "§aReset reinforcement data of the held equipment",
+  "commands.kogasa_addiction.resetgrowthenchant.already_zero": "Growth enchantment counter is already 0",
+  "commands.kogasa_addiction.resetgrowthenchant.success": "Reset growth enchantment counter (was %s)",
   "commands.kogasa_addiction.setammo.firework.success": "§aLoaded firework ammo",
   "commands.kogasa_addiction.setammo.potion.success": "§aLoaded potion ammo: %s [%s]",
   "commands.kogasa_addiction.setenchantlevel.not_present": "There's no enchantment named %s on this item. Please use /kogasa enchant to add it first.",

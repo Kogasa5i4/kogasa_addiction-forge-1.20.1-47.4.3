@@ -1,6 +1,5 @@
 package net.kogasachan.kogasa_addiction;
 
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.util.List;
@@ -139,7 +138,10 @@ public class Config {
                             "minecraft:silk_touch",
                             "*:*curse",
                             "*:curse*",
-                            "l2complements:*"),
+                            "l2complements:*",
+                            "apotheosis:knowledge",
+                            "deeperdarker:catalysis",
+                            "kaleidoscope_end:void_walker"),
                     o -> o instanceof String s && !s.isBlank());
 
     static {
@@ -272,16 +274,6 @@ public class Config {
             .comment("Initial throw velocity for Sakuya Knife. Vanilla trident is ~2.5.")
             .comment("咲夜飞刀的初始投掷速度。原版三叉戟约为2.5。")
             .defineInRange("sakuyaKnifeThrowVelocity", 3.0, 0.5, Double.MAX_VALUE);
-
-    public static final ForgeConfigSpec.DoubleValue SAKUYA_KNIFE_BASE_DAMAGE = BUILDER
-            .comment("Base damage for Sakuya Knife before multipliers.")
-            .comment("咲夜飞刀在乘数生效前的基础伤害。")
-            .defineInRange("sakuyaKnifeBaseDamage", 8.0, 1.0, Double.MAX_VALUE);
-
-    public static final ForgeConfigSpec.IntValue SAKUYA_KNIFE_BASE_PIERCE = BUILDER
-            .comment("Base pierce level for Sakuya Knife. 0 = no pierce.")
-            .comment("咲夜飞刀的基础穿透等级。0 = 无穿透。")
-            .defineInRange("sakuyaKnifeBasePierce", 2, 0, 127);
 
     static {
         BUILDER.pop(2);

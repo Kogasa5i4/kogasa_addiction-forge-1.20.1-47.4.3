@@ -18,11 +18,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
@@ -73,11 +76,18 @@ public class KogasaGrowthHandler {
     }
 
     // 斧锹锄专属
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOW)
     public static void onBlockToolModification(BlockEvent.BlockToolModificationEvent event) {
         if (!Config.ENABLE_GROWTH.get()) return;
         if (event.isSimulated()) return;
+        if (event.getResult() == Event.Result.DENY) return;
+        if (event.isCanceled()) return;
         if (!(event.getPlayer() instanceof ServerPlayer player)) return;
+
+        // 初状态 vs 末状态：一样就说明没有实际修改
+        BlockState before = event.getState();
+        BlockState after = event.getFinalState();
+        if (before == after) return;
 
         ToolAction action = event.getToolAction();
         boolean isRightClickModification =

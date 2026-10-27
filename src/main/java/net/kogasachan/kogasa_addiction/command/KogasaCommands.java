@@ -184,6 +184,9 @@ public class KogasaCommands {
                                                 .executes(ctx -> setEnchantLevel(ctx,
                                                         ResourceArgument.getEnchantment(ctx, "enchantment").value(),
                                                         IntegerArgumentType.getInteger(ctx, "level"))))))
+                        // /kogasa resetgrowthenchant
+                        .then(Commands.literal("resetgrowthenchant")
+                                .executes(KogasaCommands::resetGrowthEnchant))
         );
     }
 
@@ -1071,6 +1074,38 @@ public class KogasaCommands {
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.setenchantlevel.success",
                 enchName, oldLevel, level), true);
+        return 1;
+    }
+
+    // ==================== resetgrowthenchant ====================
+
+    private static int resetGrowthEnchant(CommandContext<CommandSourceStack> ctx)
+            throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        ItemStack held = player.getMainHandItem();
+
+        if (!(held.getItem() instanceof IKogasaEquipment)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.not_kogasa"));
+            return 0;
+        }
+
+        int before = KogasaEquipmentData.getGrowthEnchantsGranted(held);
+        boolean hadFailFlag = KogasaEquipmentData.hasGrowthEnchantFailNotified(held);
+
+        if (before <= 0 && !hadFailFlag) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.resetgrowthenchant.already_zero"));
+            return 0;
+        }
+
+        KogasaEquipmentData.setGrowthEnchantsGranted(held, 0);
+        KogasaEquipmentData.setGrowthEnchantFailNotified(held, false);
+        player.getInventory().setChanged();
+
+        final int b = before;
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.resetgrowthenchant.success", b), true);
         return 1;
     }
 

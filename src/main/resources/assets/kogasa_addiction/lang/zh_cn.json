@@ -203,6 +203,8 @@
   "commands.kogasa_addiction.removeenchant.not_present": "物品上没有附魔 %s",
   "commands.kogasa_addiction.removeenchant.success": "已移除附魔 %s",
   "commands.kogasa_addiction.reset.success": "§a已重置主手装备的强化数据",
+  "commands.kogasa_addiction.resetgrowthenchant.already_zero": "成长附魔计数已经是 0，无需重置",
+  "commands.kogasa_addiction.resetgrowthenchant.success": "已重置成长附魔计数（原值 %s）",
   "commands.kogasa_addiction.setammo.firework.success": "§a已装载烟花弹药",
   "commands.kogasa_addiction.setammo.potion.success": "§a已装载药水弹药：%s [%s]",
   "commands.kogasa_addiction.setenchantlevel.not_present": "物品上没有附魔 %s，请先用 /kogasa enchant 添加",

@@ -18,22 +18,38 @@ public class KogasaGrindstoneHandler {
         if (!(newItem.getItem() instanceof IKogasaEquipment)) return;
 
         ItemStack modified = newItem.copy();
-        boolean dirty = false;
 
         // 砂轮已剥离所有附魔，成长附魔累计数清零，允许重新累积
-        if (KogasaEquipmentData.getGrowthEnchantsGranted(modified) > 0) {
+        if (KogasaEquipmentData.getGrowthEnchantsGranted(newItem) > 0) {
             KogasaEquipmentData.setGrowthEnchantsGranted(modified, 0);
-            dirty = true;
         }
 
         // 失败提示标记一并重置，下次再次卡住时重新提示
-        if (KogasaEquipmentData.hasGrowthEnchantFailNotified(modified)) {
+        if (KogasaEquipmentData.hasGrowthEnchantFailNotified(newItem)) {
             KogasaEquipmentData.setGrowthEnchantFailNotified(modified, false);
-            dirty = true;
         }
 
-        if (dirty) {
-            event.setOutput(modified);
+        event.setOutput(modified);
+    }
+
+    @SubscribeEvent
+    public static void onGrindstoneTake(GrindstoneEvent.OnTakeItem event) {
+        ItemStack newItem = event.getNewTopItem();
+        if (newItem.isEmpty()) return;
+        if (!(newItem.getItem() instanceof IKogasaEquipment)) return;
+
+        ItemStack modified = newItem.copy();
+
+        // 砂轮已剥离所有附魔，成长附魔累计数清零，允许重新累积
+        if (KogasaEquipmentData.getGrowthEnchantsGranted(newItem) > 0) {
+            KogasaEquipmentData.setGrowthEnchantsGranted(modified, 0);
         }
+
+        // 失败提示标记一并重置，下次再次卡住时重新提示
+        if (KogasaEquipmentData.hasGrowthEnchantFailNotified(newItem)) {
+            KogasaEquipmentData.setGrowthEnchantFailNotified(modified, false);
+        }
+
+        event.setNewTopItem(modified);
     }
 }

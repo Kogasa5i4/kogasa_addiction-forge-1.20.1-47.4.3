@@ -58,7 +58,7 @@ public class TenshiIngotHandler {
             player.drop(ingot, false);
         }
 
-        // 聊天栏提示（可选）
+        // 聊天栏提示
         player.displayClientMessage(
                 net.minecraft.network.chat.Component.translatable("message.kogasa_addiction.tenshi_ingot_found")
                         .withStyle(net.minecraft.ChatFormatting.GOLD),

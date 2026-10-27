@@ -7,6 +7,8 @@ import net.kogasachan.kogasa_addiction.entity.ModEntities;
 import net.kogasachan.kogasa_addiction.item.AyaBowItem;
 import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.Items;
@@ -16,15 +18,41 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
+import java.util.Set;
+
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID,
         bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientSetup {
 
+    private static final String SPECIAL_KEY = "item.kogasa_addiction.daiyousei_bomb";
+
     @SubscribeEvent
-    public static void onClientSetup(FMLClientSetupEvent event) {
+    public static void onClientSetup$register(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             registerBowProperties();
             registerCrossbowProperties();
+        });
+    }
+
+    @SubscribeEvent
+    public static void onClientSetup$totem(FMLClientSetupEvent event) {
+        event.enqueueWork(() -> {
+            ItemProperties.register(
+                Items.TOTEM_OF_UNDYING,
+                ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "custom_name_check"),
+                (stack, level, entity, seed) -> {
+                    if (!stack.hasCustomHoverName()) return 0.0F;
+
+                    Component name = stack.getHoverName();
+                    if (name instanceof TranslatableContents tc
+                            && SPECIAL_KEY.equals(tc.getKey())) {
+                        return 1.0F;
+                    } else if (name.getString().equals("大妖精的Bomb")
+                            || name.getString().equals("Daiyousei's Bomb")) {
+                        return 1.0F;
+                    }
+                    return 0.0F;
+                });
         });
     }
 

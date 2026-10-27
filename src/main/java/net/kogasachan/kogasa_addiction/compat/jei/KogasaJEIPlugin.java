@@ -2,6 +2,7 @@ package net.kogasachan.kogasa_addiction.compat.jei;
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.registration.IModIngredientRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -123,47 +124,6 @@ public class KogasaJEIPlugin implements IModPlugin {
         // ===== 弓弩强化配方：16 支箭 =====
         registerBowArrowRecipe(recipes, ModItems.AYA_BOW.get());
         registerBowArrowRecipe(recipes, ModItems.AYA_CROSSBOW.get());
-    }
-
-    @Override
-    public @NotNull ResourceLocation getPluginUid() {
-        return PLUGIN_UID;
-    }
-
-    @Override
-    public void registerCategories(@NotNull IRecipeCategoryRegistration registration) {
-        if (!ModList.get().isLoaded("jei")) return;
-        registration.addRecipeCategories(new AnvilReinforcementCategory(registration.getJeiHelpers().getGuiHelper()));
-    }
-
-    @Override
-    public void registerRecipes(@NotNull IRecipeRegistration registration) {
-        List<AnvilReinforcementRecipe> recipes = new ArrayList<>();
-
-        // 1. 能力配方（4 个）
-        registerAbilityRecipes(recipes);
-
-        // 2. 强化配方（11 个）
-        registerReinforcementRecipes(recipes);
-
-        // 3. 弹药配方（8 个）
-        registerAmmoRecipes(recipes);
-
-        // 4. 修复配方（1个）
-        registerRepairRecipe(recipes);
-
-        // 5. 清除配方（2个）
-        registerClearRecipe(recipes);
-
-        KogasaAddiction.LOGGER.info("Registered {} JEI anvil recipes", recipes.size());
-        registration.addRecipes(AnvilReinforcementCategory.RECIPE_TYPE, recipes);
-    }
-
-    @Override
-    public void registerRecipeCatalysts(@NotNull IRecipeCatalystRegistration registration) {
-        if (!ModList.get().isLoaded("jei")) return;
-        // 将铁砧注册为“铁砧强化”类别的催化剂
-        registration.addRecipeCatalyst(new ItemStack(Items.ANVIL), AnvilReinforcementCategory.RECIPE_TYPE);
     }
 
     /**
@@ -304,5 +264,46 @@ public class KogasaJEIPlugin implements IModPlugin {
                 output2,
                 RecipeKind.CLEAR
         ));
+    }
+
+    @Override
+    public @NotNull ResourceLocation getPluginUid() {
+        return PLUGIN_UID;
+    }
+
+    @Override
+    public void registerCategories(@NotNull IRecipeCategoryRegistration registration) {
+        if (!ModList.get().isLoaded("jei")) return;
+        registration.addRecipeCategories(new AnvilReinforcementCategory(registration.getJeiHelpers().getGuiHelper()));
+    }
+
+    @Override
+    public void registerRecipes(@NotNull IRecipeRegistration registration) {
+        List<AnvilReinforcementRecipe> recipes = new ArrayList<>();
+
+        // 1. 能力配方（4 个）
+        registerAbilityRecipes(recipes);
+
+        // 2. 强化配方（11 个）
+        registerReinforcementRecipes(recipes);
+
+        // 3. 弹药配方（8 个）
+        registerAmmoRecipes(recipes);
+
+        // 4. 修复配方（1个）
+        registerRepairRecipe(recipes);
+
+        // 5. 清除配方（2个）
+        registerClearRecipe(recipes);
+
+        KogasaAddiction.LOGGER.info("Registered {} JEI anvil recipes", recipes.size());
+        registration.addRecipes(AnvilReinforcementCategory.RECIPE_TYPE, recipes);
+    }
+
+    @Override
+    public void registerRecipeCatalysts(@NotNull IRecipeCatalystRegistration registration) {
+        if (!ModList.get().isLoaded("jei")) return;
+        // 将铁砧注册为“铁砧强化”类别的催化剂
+        registration.addRecipeCatalyst(new ItemStack(Items.ANVIL), AnvilReinforcementCategory.RECIPE_TYPE);
     }
 }

@@ -248,12 +248,10 @@ public class KogasaCommands {
         boolean isArrowMaterial = isRanged && material.is(ItemTags.ARROWS);
 
         String materialId;
-        int materialCost = 1;
 
         if (isRanged) {
             if (isArrowMaterial) {
                 materialId = "arrow:" + ForgeRegistries.ITEMS.getKey(material.getItem());
-                materialCost = 16;
                 // 箭矢不限重复
             } else if (material.getItem() instanceof BowItem
                     || material.getItem() instanceof CrossbowItem) {

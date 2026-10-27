@@ -114,6 +114,13 @@ public class KogasaAbilityData {
         return growth >= threshold ? 2 : 1;
     }
 
+    /**
+     * 已占用的能力槽数量
+     */
+    public static int getUsedSlots(ItemStack stack) {
+        return getAbilities(stack).size();
+    }
+
     // ==================== Aya 新闻值 ====================
 
     public static double getNewsValue(ItemStack stack) {
@@ -262,12 +269,5 @@ public class KogasaAbilityData {
         ItemStack firework = new ItemStack(net.minecraft.world.item.Items.FIREWORK_ROCKET);
         firework.setTag(nbt.copy());
         return firework;
-    }
-
-    /**
-     * 已占用的能力槽数量
-     */
-    public static int getUsedSlots(ItemStack stack) {
-        return getAbilities(stack).size();
     }
 }

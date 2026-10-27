@@ -67,16 +67,10 @@ public enum KogasaAbility {
         return id;
     }
 
-    /**
-     * 翻译键：ability.kogasa_addiction.<id>
-     */
     public Component getDisplayName() {
         return Component.translatable("ability.kogasa_addiction." + id);
     }
 
-    /**
-     * 翻译键：ability.kogasa_addiction.<id>.desc
-     */
     public Component getDescription() {
         return Component.translatable("ability.kogasa_addiction." + id + ".desc");
     }

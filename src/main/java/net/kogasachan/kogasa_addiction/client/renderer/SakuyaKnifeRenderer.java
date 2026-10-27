@@ -53,6 +53,6 @@ public class SakuyaKnifeRenderer extends EntityRenderer<SakuyaKnifeEntity> {
 
     @Override
     public @NotNull ResourceLocation getTextureLocation(@NotNull SakuyaKnifeEntity entity) {
-        return ResourceLocation.fromNamespaceAndPath("minecraft", "textures/misc/white.png");// 返回一个任意有效路径即可
+        return ResourceLocation.fromNamespaceAndPath("minecraft", "textures/misc/white.png");// 任意一个有效路径即可
     }
 }

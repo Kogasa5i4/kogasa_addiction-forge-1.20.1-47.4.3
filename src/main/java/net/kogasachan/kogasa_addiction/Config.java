@@ -136,6 +136,7 @@ public class Config {
                     "growthEnchantBlacklist",
                     List.of("minecraft:riptide",
                             "minecraft:silk_touch",
+                            "minecraft:frost_walker",
                             "*:*curse",
                             "*:curse*",
                             "l2complements:*",

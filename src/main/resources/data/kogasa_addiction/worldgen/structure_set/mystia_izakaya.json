@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "kogasa_addiction:mystia_izakaya",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 16,
+    "separation": 4,
+    "salt": 144233985
+  }
+}

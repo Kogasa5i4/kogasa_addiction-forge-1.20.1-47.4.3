@@ -46,7 +46,9 @@ public class KogasaEquipmentData {
     }
 
     public static CompoundTag getTag(ItemStack stack) {
-        return stack.getOrCreateTag().getCompound(ROOT);
+        // 只读访问：写入方会在修改后调用 saveTag。
+        CompoundTag tag = stack.getTag();
+        return tag == null ? new CompoundTag() : tag.getCompound(ROOT);
     }
 
     public static void saveTag(ItemStack stack, CompoundTag tag) {

@@ -120,11 +120,11 @@ public class CrossbowMixin {
                 float fz = Mth.cos(yaw * ((float) Math.PI / 180F)) * Mth.cos(pitch * ((float) Math.PI / 180F));
 
                 if (KogasaAbilityData.hasAbility(pCrossbowStack, KogasaAbility.KOISHI)) {
-                    rocket.getPersistentData().putBoolean("KogasaKoishiArrow", true);
+                    rocket.getPersistentData().putBoolean(KogasaAbilityData.PROJECTILE_KOISHI, true);
                 }
 
                 if (KogasaAbilityData.hasAbility(pCrossbowStack, KogasaAbility.TENSHI)) {
-                    rocket.getPersistentData().putBoolean("KogasaTenshiArrow", true);
+                    rocket.getPersistentData().putBoolean(KogasaAbilityData.PROJECTILE_TENSHI, true);
                 }
 
                 rocket.shoot(fx, fy, fz, pVelocity * 1.5F * (float) speedFactor, pInaccuracy);
@@ -168,11 +168,11 @@ public class CrossbowMixin {
         }
 
         if (KogasaAbilityData.hasAbility(pCrossbowStack, KogasaAbility.KOISHI)) {
-            arrow.getPersistentData().putBoolean("KogasaKoishiArrow", true);
+            arrow.getPersistentData().putBoolean(KogasaAbilityData.PROJECTILE_KOISHI, true);
         }
 
         if (KogasaAbilityData.hasAbility(pCrossbowStack, KogasaAbility.TENSHI)) {
-            arrow.getPersistentData().putBoolean("KogasaTenshiArrow", true);
+            arrow.getPersistentData().putBoolean(KogasaAbilityData.PROJECTILE_TENSHI, true);
         }
 
         // 8. 默认：原版放行

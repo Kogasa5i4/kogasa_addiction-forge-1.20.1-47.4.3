@@ -28,7 +28,6 @@ import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
@@ -40,12 +39,12 @@ public class KogasaGrowthHandler {
     private static volatile Set<ResourceLocation> cachedExactIds;
     private static volatile List<Pattern> cachedPatterns;
 
-    @SubscribeEvent
-    public static void onConfigReload(ModConfigEvent.Reloading event) {
-        if (event.getConfig().getSpec() == Config.SPEC) {
-            cachedExactIds = null;
-            cachedPatterns = null;
-        }
+    /**
+     * 配置重载后由 KogasaConfigEvents 调用（ModConfigEvent 属于 MOD 总线）。
+     */
+    public static void invalidateCache() {
+        cachedExactIds = null;
+        cachedPatterns = null;
     }
 
     // 攻击命中

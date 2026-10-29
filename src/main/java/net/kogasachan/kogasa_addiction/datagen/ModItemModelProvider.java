@@ -134,12 +134,4 @@ public class ModItemModelProvider extends ItemModelProvider {
     }
 
     // ==================== 工具方法 ====================
-
-    /**
-     * 手持模型：继承 item/handheld，覆盖 layer0
-     */
-    private void handheld(String name) {
-        withExistingParent(name, mcLoc("item/handheld"))
-                .texture("layer0", modLoc("item/" + name));
-    }
 }

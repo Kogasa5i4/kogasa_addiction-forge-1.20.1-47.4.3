@@ -4,12 +4,9 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
-import net.kogasachan.kogasa_addiction.event.common.TimestopHandler;
+import net.kogasachan.kogasa_addiction.client.ClientTimestopState;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
-import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
-import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
-import net.kogasachan.kogasa_addiction.util.KogasaNumberFormatHelper;
-import net.kogasachan.kogasa_addiction.util.ModConfigCache;
+import net.kogasachan.kogasa_addiction.util.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
@@ -21,13 +18,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +86,7 @@ public class KogasaTooltipHandler {
                         .withStyle(ChatFormatting.DARK_GRAY));
             } else {
                 for (String id : used) {
-                    Component itemName = getItemDisplayName(id);
+                    Component itemName = KogasaDisplayHelper.getItemDisplayName(id);
                     tooltip.add(Component.translatable(
                                     "tooltip.kogasa_addiction.reinforcement.entry", itemName)
                             .withStyle(ChatFormatting.GRAY));
@@ -135,10 +130,11 @@ public class KogasaTooltipHandler {
         if (Screen.hasAltDown()) {
             List<KogasaAbility> abilities = KogasaAbilityData.getAbilities(stack);
             int maxSlots = KogasaAbilityData.getMaxAbilitySlots(stack);
+            int usedSlots = KogasaAbilityData.getUsedSlots(stack);
 
             // 标题
             tooltip.add(Component.translatable(
-                            "tooltip.kogasa_addiction.abilities", abilities.size(), maxSlots)
+                            "tooltip.kogasa_addiction.abilities", usedSlots, maxSlots)
                     .withStyle(ChatFormatting.AQUA));
 
             // 能力列表 / 空提示
@@ -154,8 +150,8 @@ public class KogasaTooltipHandler {
                             .withStyle(ChatFormatting.LIGHT_PURPLE));
                 }
             }
-            // 槽位满且未解锁第 2 槽 → 显示解锁提示（只在有能力时显示）
-            if (abilities.size() >= maxSlots && maxSlots < 2) {
+            // 槽位满且未解锁第 2 槽 → 显示解锁提示（只在有能力或弹药时显示）
+            if (usedSlots >= maxSlots && maxSlots < 2) {
                 String secondSlotGrowth = KogasaNumberFormatHelper.formatPercentTrimmed(Config.GROWTH_FOR_SECOND_ABILITY_SLOT.get(), 0);
                 tooltip.add(Component.translatable(
                                 "tooltip.kogasa_addiction.abilities.full_hint",
@@ -245,7 +241,7 @@ public class KogasaTooltipHandler {
             }
 
             if (KogasaAbilityData.hasAbility(stack, KogasaAbility.SAKUYA)) {
-                if (!TimestopHandler.IS_FROZEN) {
+                if (!ClientTimestopState.isFrozen()) {
                     tooltip.add(Component.translatable("tooltip.kogasa_addiction.timestop.available")
                             .withStyle(ChatFormatting.BLUE));
                 } else {
@@ -327,7 +323,7 @@ public class KogasaTooltipHandler {
                     ResourceLocation potionId = KogasaAbilityData.getAmmoPotionId(stack);
                     if (potionId != null) {
                         KogasaAbilityData.PotionKind kind = KogasaAbilityData.getAmmoPotionKind(stack);
-                        Component potionName = getPotionDisplayName(potionId, kind);
+                        Component potionName = KogasaDisplayHelper.getPotionDisplayName(potionId, kind);
                         tooltip.add(Component.translatable(
                                         "tooltip.kogasa_addiction.ammo.potion", potionName)
                                 .withStyle(ChatFormatting.LIGHT_PURPLE));
@@ -395,51 +391,6 @@ public class KogasaTooltipHandler {
             tooltip.add(Component.translatable("tooltip.kogasa_addiction.hint.alt")
                     .withStyle(ChatFormatting.DARK_GRAY));
         }
-    }
-
-    /**
-     * 把 "minecraft:iron_sword" 转成玩家当前语言下的物品显示名
-     */
-    private static Component getItemDisplayName(String id) {
-        // 处理 "arrow:" 前缀：剥掉后按物品 ID 解析
-        return getComponent(id);
-    }
-
-    @NotNull public static Component getComponent(String id) {
-        String actualId = id;
-        boolean isArrow = false;
-        if (id.startsWith("arrow:")) {
-            actualId = id.substring("arrow:".length());
-            isArrow = true;
-        }
-
-        ResourceLocation loc = ResourceLocation.tryParse(actualId);
-        if (loc == null) return Component.literal(id);
-
-        var item = ForgeRegistries.ITEMS.getValue(loc);
-        if (item == null || item == Items.AIR) return Component.literal(id);
-
-        Component name = new ItemStack(item).getHoverName();
-        if (isArrow) {
-            // 显示"16× 箭"而不是"箭"，提示消耗数量
-            return Component.translatable(
-                    "tooltip.kogasa_addiction.reinforcement.entry.arrow", name);
-        }
-        return name;
-    }
-
-    private static Component getPotionDisplayName(ResourceLocation potionId,
-                                                  KogasaAbilityData.PotionKind kind) {
-        var potion = ForgeRegistries.POTIONS.getValue(potionId);
-        if (potion == null) return Component.literal(potionId.toString());
-
-        ItemStack potionStack = switch (kind) {
-            case REGULAR -> new ItemStack(Items.POTION);
-            case SPLASH -> new ItemStack(Items.SPLASH_POTION);
-            case LINGERING -> new ItemStack(Items.LINGERING_POTION);
-        };
-        PotionUtils.setPotion(potionStack, potion);
-        return potionStack.getHoverName();
     }
 
     /**

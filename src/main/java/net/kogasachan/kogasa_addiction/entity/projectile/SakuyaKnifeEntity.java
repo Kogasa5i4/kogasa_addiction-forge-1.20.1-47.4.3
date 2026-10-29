@@ -36,6 +36,17 @@ public class SakuyaKnifeEntity extends ThrownTrident {
         }
     }
 
+    /**
+     * 供渲染使用的原始飞刀副本，不会掷损坏概率。
+     */
+    public ItemStack getRenderStack() {
+        ItemStack stack = new ItemStack(ModItems.SAKUYA_KNIFE.get());
+        if (this.tridentItem != null && this.tridentItem.hasTag()) {
+            stack.setTag(this.tridentItem.getTag().copy());
+        }
+        return stack;
+    }
+
     @Override
     @NotNull public ItemStack getPickupItem() {
         // 获取最开始扔出去的那把飞刀的 ItemStack

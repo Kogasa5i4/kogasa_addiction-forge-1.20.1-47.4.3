@@ -473,6 +473,11 @@ public class Config {
             .comment("每件咲夜能力装备提供的时停时间（秒）。")
             .defineInRange("sakuyaTimestopSecondsPerEquipment", 5, 1, 60);
 
+    public static final ForgeConfigSpec.IntValue SAKUYA_TIMESTOP_RADIUS = BUILDER
+            .comment("Timestop radius in blocks. 20 = 20 blocks.")
+            .comment("时停作用半径（格）。20 = 20 格。")
+            .defineInRange("sakuyaTimestopRadius", 20, 1, 128);
+
     static {
         BUILDER.pop();
     }

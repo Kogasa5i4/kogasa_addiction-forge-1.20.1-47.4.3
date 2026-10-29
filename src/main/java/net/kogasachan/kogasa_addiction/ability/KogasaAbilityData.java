@@ -17,6 +17,13 @@ public class KogasaAbilityData {
     private static final String ROOT = "KogasaAbilities";
     private static final String ABILITIES = "Abilities";
     private static final String NEWS_VALUE = "NewsValue";
+
+    /**
+     * 远程弹射物能力标记：发射时写入投掷物 persistentData，
+     * 命中时据此判断能力，避免射手中途切换武器导致效果丢失。
+     */
+    public static final String PROJECTILE_KOISHI = "KogasaKoishiArrow";
+    public static final String PROJECTILE_TENSHI = "KogasaTenshiArrow";
     private static final String AYA_KILLED_MOBS = "AyaKilledMobs";
     private static final String AYA_MINED_BLOCKS = "AyaMinedBlocks";
     private static final String AYA_DAMAGES_TAKEN = "AyaDamagesTaken";
@@ -24,7 +31,9 @@ public class KogasaAbilityData {
     // ==================== 基础读写 ====================
 
     private static CompoundTag getTag(ItemStack stack) {
-        return stack.getOrCreateTag().getCompound(ROOT);
+        // 只读访问：没有根标签时返回空 compound，避免 Tooltip 渲染等只读路径创建空 NBT。
+        CompoundTag tag = stack.getTag();
+        return tag == null ? new CompoundTag() : tag.getCompound(ROOT);
     }
 
     private static void saveTag(ItemStack stack, CompoundTag tag) {
@@ -115,7 +124,7 @@ public class KogasaAbilityData {
     }
 
     /**
-     * 已占用的能力槽数量
+     * 已占用的能力槽数量。特殊弹药不占用能力槽位。
      */
     public static int getUsedSlots(ItemStack stack) {
         return getAbilities(stack).size();

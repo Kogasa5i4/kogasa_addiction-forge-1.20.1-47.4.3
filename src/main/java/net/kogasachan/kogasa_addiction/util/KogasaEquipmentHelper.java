@@ -69,12 +69,6 @@ public class KogasaEquipmentHelper {
             return buildHandModifiers(stack, baseDamage, absorbed, baseSpeed);
         }
 
-        if (item instanceof HoeItem hoe) {
-            double baseDamage = 1.0 + hoe.getAttackDamage();
-            double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
-            return buildHandModifiers(stack, baseDamage, absorbed, -3.0F);
-        }
-
         if (item instanceof TridentItem trident) {
             double baseDamage = 1.0 + 8.0;
             double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
@@ -187,9 +181,6 @@ public class KogasaEquipmentHelper {
         }
         if (item instanceof ArmorItem armor) {
             return armor.getDefense();
-        }
-        if (item instanceof HoeItem hoe) {
-            return hoe.getTier().getAttackDamageBonus();
         }
         if (item instanceof TridentItem) {
             return 8.0;
@@ -342,8 +333,8 @@ public class KogasaEquipmentHelper {
      */
     public static TagKey<Item> getMatchingTag(ItemStack stack) {
         Item item = stack.getItem();
-        if (item instanceof FumoItem fumoItem) return Tags.Items.TOOLS;
-        if (item instanceof SakuyaKnifeItem sakuyaKnifeItem) return Tags.Items.TOOLS_TRIDENTS;
+        if (item instanceof FumoItem) return Tags.Items.TOOLS;
+        if (item instanceof SakuyaKnifeItem) return Tags.Items.TOOLS_TRIDENTS;
         // 用注册名判断，避免为每种类型创建单独的类判断
         ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
         if (id == null) return null;

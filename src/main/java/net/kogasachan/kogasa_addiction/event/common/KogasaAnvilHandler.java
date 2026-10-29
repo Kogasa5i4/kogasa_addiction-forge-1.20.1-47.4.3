@@ -11,7 +11,6 @@ import net.kogasachan.kogasa_addiction.item.SakuyaKnifeItem;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.*;
@@ -48,13 +47,12 @@ public class KogasaAnvilHandler {
         }
 
         if (left.is(ModItems.BROKEN_SAKUYA_KNIFE.get()) && right.is(ModItems.SAKUYA_INGOT.get())) {
-            if (left.getCount() > 3) return;
-
             ItemStack result = new ItemStack(ModItems.SAKUYA_KNIFE.get());
             if (left.getTag() != null && left.hasTag()) {
                 result.setTag(left.getTag().copy());
             }
-            result.setCount(left.getCount());
+            // 一次最多修复 3 把；超过 3 把的余量由 AnvilMenuMixin 放回左侧输入槽
+            result.setCount(Math.min(left.getCount(), 3));
 
             event.setOutput(result);
             event.setCost(Config.SAKUYA_KNIFE_REPAIR_COST.get());
@@ -108,7 +106,7 @@ public class KogasaAnvilHandler {
             return;
         }
 
-        int currentCount = KogasaAbilityData.getAbilities(left).size();
+        int currentCount = KogasaAbilityData.getUsedSlots(left);
         int maxSlots = KogasaAbilityData.getMaxAbilitySlots(left);
         if (currentCount >= maxSlots) {
             event.setOutput(ItemStack.EMPTY);

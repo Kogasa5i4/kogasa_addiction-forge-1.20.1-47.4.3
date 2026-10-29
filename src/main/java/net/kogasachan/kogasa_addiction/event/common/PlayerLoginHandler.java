@@ -2,6 +2,7 @@ package net.kogasachan.kogasa_addiction.event.common;
 
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.item.SakuyaKnifeItem;
+import net.kogasachan.kogasa_addiction.network.KeyStateTracker;
 import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -27,6 +28,14 @@ public class PlayerLoginHandler {
 
         // 2. 清理咲夜飞刀上遗留的激流附魔
         removeRiptideFromKnives(player);
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        // 避免 Ctrl/Alt 状态表残留离线玩家的 UUID
+        if (event.getEntity() instanceof ServerPlayer player) {
+            KeyStateTracker.clear(player.getUUID());
+        }
     }
 
     /**

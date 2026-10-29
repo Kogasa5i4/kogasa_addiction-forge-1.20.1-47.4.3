@@ -47,7 +47,7 @@ public class AyaArrowTippingRecipe extends CustomRecipe {
     @Override
     public @NotNull ItemStack assemble(@NotNull CraftingContainer container,
                                        @NotNull RegistryAccess registryAccess) {
-        ItemStack potionStack = container.getItem(5);  // 中心位置
+        ItemStack potionStack = container.getItem(4);  // 中心位置
         if (!potionStack.is(Items.LINGERING_POTION)) return ItemStack.EMPTY;
 
         ItemStack result = new ItemStack(ModItems.AYA_ARROW.get(), 8);

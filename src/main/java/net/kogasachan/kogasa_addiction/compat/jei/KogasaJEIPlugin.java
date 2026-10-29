@@ -2,7 +2,6 @@ package net.kogasachan.kogasa_addiction.compat.jei;
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
-import mezz.jei.api.registration.IModIngredientRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -14,7 +13,6 @@ import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.item.KogasaAbilityIngotItem;
 import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
-import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -25,7 +23,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -35,28 +32,7 @@ public class KogasaJEIPlugin implements IModPlugin {
     private static final ResourceLocation PLUGIN_UID = ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "jei_plugin");
 
     /**
-     * 构造强化后的输出：复制输入，设置强化次数为1，记录吸收材料
-     */
-    private static ItemStack buildReinforcedOutput(ItemStack input, Item materialItem) {
-        ItemStack output = input.copy();
-        KogasaEquipmentData.setReinforcements(output, 1);
-
-        ResourceLocation materialId = ForgeRegistries.ITEMS.getKey(materialItem);
-        if (materialId != null) {
-            KogasaEquipmentData.addUsedMaterial(output, materialId.toString());
-        }
-
-        // 吸收值（可选，让 JEI 显示更真实的数值）
-        double absorb = KogasaEquipmentHelper.getEquipmentBaseValue(new ItemStack(materialItem));
-        if (absorb > 0) {
-            KogasaEquipmentData.addAbsorbedValue(output, absorb);
-        }
-
-        return output;
-    }
-
-    /**
-     * 4 种能力锭 × 示例装备 → 输出带能力的装备
+     * 6 种能力锭 × 示例装备 → 输出带能力的装备
      * 使用剑作为输入代表，tooltip 说明适用于所有 Kogasa 装备
      */
     private static void registerAbilityRecipes(List<AnvilReinforcementRecipe> recipes) {
@@ -83,7 +59,7 @@ public class KogasaJEIPlugin implements IModPlugin {
     }
 
     /**
-     * 9 种装备 × 对应标签内材料 → 输出强化后的装备
+     * 11 种装备 × 对应标签内材料 → 输出强化后的装备
      */
     private static void registerReinforcementRecipes(List<AnvilReinforcementRecipe> recipes) {
         Map<Item, TagKey<Item>> equipmentTags = new LinkedHashMap<>();

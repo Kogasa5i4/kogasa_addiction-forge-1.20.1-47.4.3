@@ -10,8 +10,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -22,9 +20,11 @@ public class KoishiAbilityHandler {
 
     @SubscribeEvent
     public static void onLivingHurt(LivingHurtEvent event) {
-        // 找出攻击者（支持近战 + 远程）
-        ServerPlayer player = resolveAttacker(event);
-        if (player == null) return;
+        DamageSource source = event.getSource();
+        // 只处理真正的近战伤害：远程伤害由 KoishiRangedAbilityHandler 独立结算，
+        // 避免同一击同时吃近战暴击与远程暴击，也避免在 LivingHurtEvent 内再次 hurt 造成嵌套结算。
+        if (!(source.getDirectEntity() instanceof ServerPlayer player)) return;
+        if (source.is(KoishiRangedAbilityHandler.KOISHI_RANGED)) return;
 
         ItemStack held = player.getMainHandItem();
         if (!KogasaAbilityHelper.isEquipmentWithAbility(held, KogasaAbility.KOISHI)) return;
@@ -36,10 +36,6 @@ public class KoishiAbilityHandler {
 
         float multiplier = Config.KOISHI_CRIT_MULTIPLIER.get().floatValue();
         event.setAmount(event.getAmount() * multiplier);
-
-        DamageSource magicSource = player.damageSources().indirectMagic(player, player);
-        event.getEntity().hurt(magicSource, event.getAmount() * multiplier);
-        event.setCanceled(true);
 
         // 暴击粒子
         if (event.getEntity().level() instanceof ServerLevel serverLevel) {
@@ -54,19 +50,5 @@ public class KoishiAbilityHandler {
         // 暴击音效
         player.level().playSound(null, player.blockPosition(),
                 SoundEvents.PLAYER_ATTACK_CRIT, SoundSource.PLAYERS, 0.8F, 1.2F);
-    }
-
-    /**
-     * 从伤害来源解析攻击者，支持近战和弹射物
-     */
-    private static ServerPlayer resolveAttacker(LivingHurtEvent event) {
-        Entity attacker = event.getSource().getEntity();
-        if (attacker instanceof ServerPlayer sp) return sp;
-
-        if (event.getSource().getDirectEntity() instanceof Projectile proj
-                && proj.getOwner() instanceof ServerPlayer owner) {
-            return owner;
-        }
-        return null;
     }
 }

@@ -7,7 +7,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public class PacketHandler {
-    private static final String PROTOCOL_VERSION = "1";
+    private static final String PROTOCOL_VERSION = "2";
 
     public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
             ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "main"),
@@ -47,6 +47,12 @@ public class PacketHandler {
                 .encoder(TimestopPacket::encode)
                 .decoder(TimestopPacket::new)
                 .consumerMainThread(TimestopPacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(TimestopStatePacket.class, packetId++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(TimestopStatePacket::encode)
+                .decoder(TimestopStatePacket::new)
+                .consumerMainThread(TimestopStatePacket::handle)
                 .add();
     }
 }

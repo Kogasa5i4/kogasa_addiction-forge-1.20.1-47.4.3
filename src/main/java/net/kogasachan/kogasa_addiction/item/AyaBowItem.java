@@ -95,8 +95,8 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
                 int fireworkCount = KogasaEquipmentHelper.getBowArrowCount(stack);
 
                 for (int i = 0; i < fireworkCount; i++) {
-                    // 消耗一支箭（每发烟花消耗一支箭）
-                    if (!ammoInfinite && !player.getAbilities().instabuild) {
+                    // 消耗一支箭（每发烟花消耗一支箭）；触发不消耗时整轮都不扣
+                    if (!noConsume && !ammoInfinite && !player.getAbilities().instabuild) {
                         ammo.shrink(1);
                     }
 
@@ -116,11 +116,11 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
                     float f2 = Mth.cos(yaw * ((float) Math.PI / 180F)) * Mth.cos(pitch * ((float) Math.PI / 180F));
 
                     if (KogasaAbilityData.hasAbility(stack, KogasaAbility.KOISHI)) {
-                        rocket.getPersistentData().putBoolean("KogasaKoishiArrow", true);
+                        rocket.getPersistentData().putBoolean(KogasaAbilityData.PROJECTILE_KOISHI, true);
                     }
 
                     if (KogasaAbilityData.hasAbility(stack, KogasaAbility.TENSHI)) {
-                        rocket.getPersistentData().putBoolean("KogasaTenshiArrow", true);
+                        rocket.getPersistentData().putBoolean(KogasaAbilityData.PROJECTILE_TENSHI, true);
                     }
 
                     rocket.shoot(f, f1, f2, power * 1.5F, 1.0F);
@@ -216,11 +216,11 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
                 if (ammoInfinite) arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
 
                 if (KogasaAbilityData.hasAbility(stack, KogasaAbility.KOISHI)) {
-                    arrow.getPersistentData().putBoolean("KogasaKoishiArrow", true);
+                    arrow.getPersistentData().putBoolean(KogasaAbilityData.PROJECTILE_KOISHI, true);
                 }
 
                 if (KogasaAbilityData.hasAbility(stack, KogasaAbility.TENSHI)) {
-                    arrow.getPersistentData().putBoolean("KogasaTenshiArrow", true);
+                    arrow.getPersistentData().putBoolean(KogasaAbilityData.PROJECTILE_TENSHI, true);
                 }
 
                 level.addFreshEntity(arrow);

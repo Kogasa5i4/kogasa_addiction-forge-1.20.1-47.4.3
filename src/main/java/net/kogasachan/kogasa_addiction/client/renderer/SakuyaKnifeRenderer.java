@@ -3,13 +3,11 @@ package net.kogasachan.kogasa_addiction.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.kogasachan.kogasa_addiction.entity.projectile.SakuyaKnifeEntity;
-import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -28,13 +26,7 @@ public class SakuyaKnifeRenderer extends EntityRenderer<SakuyaKnifeEntity> {
     @Override
     public void render(SakuyaKnifeEntity entity, float entityYaw, float partialTicks,
                        @NotNull PoseStack poseStack, @NotNull MultiBufferSource buffer, int packedLight) {
-        ItemStack stack = new ItemStack(ModItems.SAKUYA_KNIFE.get());
-        CompoundTag tag = entity.getPickupItem().getTag();
-        if (tag != null) {
-            if (!tag.isEmpty()) {
-                stack.setTag(tag.copy());
-            }
-        }
+        ItemStack stack = entity.getRenderStack();
 
         poseStack.pushPose();
 

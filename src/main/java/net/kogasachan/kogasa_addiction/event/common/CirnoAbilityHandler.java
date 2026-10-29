@@ -89,7 +89,10 @@ public class CirnoAbilityHandler {
         // 复活：清空天子能力的无念无想记录，再消耗成长值并恢复耐久。
         TenshiAbilityHandler.clearCharge(player);
         KogasaEquipmentData.setGrowth(stack, growth - cost);
-        stack.setDamageValue((int) (max * 0.99));
+        // 必须至少留到 max-2，否则低耐久装备会停留在 max-1 的复活判定线上，
+        // 下一 tick 再次触发复活并反复扣除成长值。
+        int restoredDamage = Math.max(0, Math.min((int) (max * 0.99), max - 2));
+        stack.setDamageValue(restoredDamage);
         player.getInventory().setChanged();
 
         // 音效 + 提示

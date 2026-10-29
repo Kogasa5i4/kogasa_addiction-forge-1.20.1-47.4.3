@@ -11,13 +11,9 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
-import net.kogasachan.kogasa_addiction.event.client.KogasaTooltipHandler;
 import net.kogasachan.kogasa_addiction.event.common.KogasaGrowthHandler;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
-import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
-import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
-import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
-import net.kogasachan.kogasa_addiction.util.KogasaNumberFormatHelper;
+import net.kogasachan.kogasa_addiction.util.*;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -34,7 +30,6 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -507,7 +502,7 @@ public class KogasaCommands {
                     ResourceLocation potionId = KogasaAbilityData.getAmmoPotionId(held);
                     var kind = KogasaAbilityData.getAmmoPotionKind(held);
                     if (potionId != null) {
-                        Component potionName = getPotionDisplayName(potionId, kind);
+                        Component potionName = KogasaDisplayHelper.getPotionDisplayName(potionId, kind);
                         ctx.getSource().sendSuccess(() -> Component.translatable(
                                         "commands.kogasa_addiction.info.ammo.potion")
                                 .append(potionName), false);
@@ -729,7 +724,7 @@ public class KogasaCommands {
             return 0;
         }
 
-        int current = KogasaAbilityData.getAbilities(held).size();
+        int current = KogasaAbilityData.getUsedSlots(held);
         int max = KogasaAbilityData.getMaxAbilitySlots(held);
         if (current >= max) {
             ctx.getSource().sendFailure(Component.translatable(
@@ -888,15 +883,7 @@ public class KogasaCommands {
             return 0;
         }
 
-        // 槽位检查
-        int used = KogasaAbilityData.getUsedSlots(held);
-        int max = KogasaAbilityData.getMaxAbilitySlots(held);
-        if (used >= max) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "commands.kogasa_addiction.error.ability_slots_full", used, max));
-            return 0;
-        }
-
+        // 特殊弹药不占用能力槽位
         KogasaAbilityData.setPotionAmmo(held, potionId, kind);
         player.getInventory().setChanged();
 
@@ -938,15 +925,7 @@ public class KogasaCommands {
             return 0;
         }
 
-        // 槽位检查
-        int used = KogasaAbilityData.getUsedSlots(held);
-        int max = KogasaAbilityData.getMaxAbilitySlots(held);
-        if (used >= max) {
-            ctx.getSource().sendFailure(Component.translatable(
-                    "commands.kogasa_addiction.error.ability_slots_full", used, max));
-            return 0;
-        }
-
+        // 特殊弹药不占用能力槽位
         KogasaAbilityData.setFireworkAmmo(held, nbt.copy());
         player.getInventory().setChanged();
 
@@ -1117,20 +1096,6 @@ public class KogasaCommands {
     }
 
     private static Component getMaterialDisplayName(String id) {
-        return KogasaTooltipHandler.getComponent(id);
-    }
-
-    private static Component getPotionDisplayName(ResourceLocation potionId,
-                                                  KogasaAbilityData.PotionKind kind) {
-        var potion = ForgeRegistries.POTIONS.getValue(potionId);
-        if (potion == null) return Component.literal(potionId.toString());
-
-        ItemStack potionStack = switch (kind) {
-            case REGULAR -> new ItemStack(Items.POTION);
-            case SPLASH -> new ItemStack(Items.SPLASH_POTION);
-            case LINGERING -> new ItemStack(Items.LINGERING_POTION);
-        };
-        PotionUtils.setPotion(potionStack, potion);
-        return potionStack.getHoverName();
+        return KogasaDisplayHelper.getItemDisplayName(id);
     }
 }

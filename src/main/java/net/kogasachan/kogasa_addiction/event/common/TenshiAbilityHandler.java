@@ -175,9 +175,11 @@ public class TenshiAbilityHandler {
     // ==================== 供外部调用的清零方法 ====================
 
     public static void clearCharge(Player player) {
-        player.getPersistentData().putDouble(NBT_CHARGE, 0.0);
-        player.getPersistentData().putBoolean(NBT_READY, false);
-        if (player instanceof ServerPlayer sp) {
+        var data = player.getPersistentData();
+        boolean wasActive = data.getDouble(NBT_CHARGE) != 0.0D || data.getBoolean(NBT_READY);
+        data.putDouble(NBT_CHARGE, 0.0);
+        data.putBoolean(NBT_READY, false);
+        if (wasActive && player instanceof ServerPlayer sp) {
             PacketHandler.INSTANCE.send(
                     net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> sp),
                     new TenshiAbilityPacket(0, false)

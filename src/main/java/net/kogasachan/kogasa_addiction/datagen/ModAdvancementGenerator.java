@@ -51,7 +51,7 @@ public class ModAdvancementGenerator implements ForgeAdvancementProvider.Advance
                 .addCriterion("obtain_kogasa_ingot", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.KOGASA_INGOT.get()))
                 .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "obtain_kogasa_ingot"), existingFileHelper);
 
-        // ===== 2. 幻想乡元素周期律：五种能力锭 =====
+        // ===== 2. 幻想乡元素周期律：六种能力锭 =====
         Advancement ingot_collector = Advancement.Builder.advancement()
                 .display(new DisplayInfo(
                         new ItemStack(ModItems.TENSHI_INGOT.get()),

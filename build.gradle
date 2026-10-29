@@ -98,9 +98,6 @@ dependencies {
     runtimeOnly fg.deobf("teamtwilight:twilightforest:${twilight_forest_version}:universal")
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-
-    implementation 'net.java.dev.jna:jna:5.13.0'
-    implementation 'net.java.dev.jna:jna-platform:5.13.0'
 }
 
 tasks.named('processResources', ProcessResources).configure {

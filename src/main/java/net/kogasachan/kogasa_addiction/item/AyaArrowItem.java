@@ -47,6 +47,12 @@ public class AyaArrowItem extends ArrowItem {
     ) {
         AyaArrowEntity arrow = new AyaArrowEntity(level, shooter);
 
+        // 缓存原始箭矢 NBT，拾取时原样还原（药水/自定义效果/颜色等）
+        CompoundTag itemTag = stack.getTag();
+        if (itemTag != null && !itemTag.isEmpty()) {
+            arrow.getPersistentData().put(AyaArrowEntity.ITEM_NBT_KEY, itemTag.copy());
+        }
+
         // 手动读取 NBT（原版 setEffectsFromItem 只认 tipped_arrow）
         CompoundTag tag = stack.getTag();
         if (tag != null) {

@@ -4,10 +4,12 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "kogasa_addiction.refmap.json",
   "mixins": [
+    "AnvilMenuMixin",
     "BlastFurnaceMixin",
     "CrossbowAutoReloadMixin",
     "CrossbowMixin",
     "CrossbowNoConsumeMixin",
+    "GrindstoneMenuMixin",
     "IceBlockMixin"
   ],
   "minVersion": "0.8"

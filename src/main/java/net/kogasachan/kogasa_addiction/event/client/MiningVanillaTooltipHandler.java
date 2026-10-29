@@ -24,15 +24,17 @@ public class MiningVanillaTooltipHandler {
         ItemStack stack = event.getItemStack();
         List<Component> tooltip = event.getToolTip();
 
-        // ========== 1. 删除原版攻速行（对所有物品） ==========
-        String speedAttrKey = Component.translatable(
-                "attribute.name.generic.attack_speed").getString();
-        tooltip.removeIf(line -> line.getString().contains(speedAttrKey));
-
-        // ========== 2. 判断物品类型 ==========
+        // ========== 1. 删除原版攻速行（仅本模组装备） ==========
+        // 非本模组物品保留原版 Tooltip，避免与其他模组/资源包冲突。
         Item item = stack.getItem();
         boolean isKogasa = item instanceof IKogasaEquipment;
+        if (isKogasa) {
+            String speedAttrKey = Component.translatable(
+                    "attribute.name.generic.attack_speed").getString();
+            tooltip.removeIf(line -> line.getString().contains(speedAttrKey));
+        }
 
+        // ========== 2. 判断物品类型 ==========
         // 有攻速属性的物品：剑、镐/斧/铲（DiggerItem）、锄
         boolean hasAttackSpeed = item instanceof SwordItem
                 || item instanceof DiggerItem
@@ -42,18 +44,11 @@ public class MiningVanillaTooltipHandler {
         // 挖掘工具：镐/斧/铲/锄
         boolean isDigger = item instanceof DiggerItem;
 
-        // ========== 3. 插入自定义攻速行 ==========
+        // ========== 3. 插入自定义攻速行（仅本模组装备） ==========
         int speedInsertIdx = -1;
-        if (hasAttackSpeed) {
-            double speed;
-            boolean capped = false;
-            if (isKogasa) {
-                speed = KogasaEquipmentHelper.getDisplayAttackSpeed(stack);
-                capped = KogasaEquipmentHelper.isAttackSpeedCapped(stack);
-            } else {
-                double baseSpeed = KogasaEquipmentHelper.getBaseAttackSpeed(stack);
-                speed = 4.0 + baseSpeed;
-            }
+        if (hasAttackSpeed && isKogasa) {
+            double speed = KogasaEquipmentHelper.getDisplayAttackSpeed(stack);
+            boolean capped = KogasaEquipmentHelper.isAttackSpeedCapped(stack);
 
             MutableComponent speedLine = Component.translatable(
                     "tooltip.kogasa_addiction.vanilla_attack_speed",
@@ -104,7 +99,7 @@ public class MiningVanillaTooltipHandler {
     }
 
     /**
-     * 获取物品的挖掘速度（含 Kogasa 倍率和效率附魔）
+     * 获取物品的挖掘速度（Kogasa 装备含强化/成长倍率；效率附魔由玩家属性另算）
      */
     private static float getMiningSpeed(ItemStack stack) {
         if (!(stack.getItem() instanceof DiggerItem digger)) return 1.0F;

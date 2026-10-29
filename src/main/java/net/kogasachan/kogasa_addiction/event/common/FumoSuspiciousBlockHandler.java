@@ -99,10 +99,11 @@ public class FumoSuspiciousBlockHandler {
             event.setCanceled(true);
             // 破坏：移除方块（不掉原版物品），播放破坏音效/粒子
             level.destroyBlock(pos, false);
-            // 掉落一个无 NBT 的可疑方块物品
+            // 可疑方块本身不掉落，避免额外刷出没有战利品表的可疑方块；
+            // 只返还转换后的普通沙/砂砾。
             ItemStack drop = new ItemStack(state.is(Blocks.SUSPICIOUS_SAND)
-                    ? Items.SUSPICIOUS_SAND
-                    : Items.SUSPICIOUS_GRAVEL);
+                    ? Items.SAND
+                    : Items.GRAVEL);
             Block.popResource(level, pos, drop);
         }
     }

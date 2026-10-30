@@ -157,7 +157,7 @@ public class KogasaCommands {
                                 .executes(ctx -> {
                                     ServerPlayer player = ctx.getSource().getPlayerOrException();
                                     player.getPersistentData().remove("KogasaFirstJoinReward");
-                                    // 下次登录/执行 /kogasa givefirstjoin 时发放
+                                    // 下次登录时由 FirstJoinRewardHandler 重新发放
                                     return 1;
                                 }))
                         // /kogasa removeenchant <enchantment>
@@ -250,7 +250,7 @@ public class KogasaCommands {
         if (isRanged) {
             if (isArrowMaterial) {
                 materialId = "arrow:" + ForgeRegistries.ITEMS.getKey(material.getItem());
-                // 箭矢不限重复
+                // 箭矢使用独立 materialId，且不检查重复，允许重复使用
             } else if (material.getItem() instanceof BowItem
                     || material.getItem() instanceof CrossbowItem) {
                 ResourceLocation rightId = ForgeRegistries.ITEMS.getKey(material.getItem());
@@ -560,7 +560,7 @@ public class KogasaCommands {
                     KogasaNumberFormatHelper.formatPercentTrimmed(ratio, 0)
             ), false);
 
-            // 如果蓄满，额外提示一下（这里复用了你之前的 ready 键，或者不需要可以删）
+            // 蓄满时额外显示 ready 提示
             if (isReady) {
                 ctx.getSource().sendSuccess(() -> Component.translatable(
                         "commands.kogasa_addiction.info.tenshi.ready"), false);

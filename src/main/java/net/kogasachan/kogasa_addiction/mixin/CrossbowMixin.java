@@ -133,7 +133,7 @@ public class CrossbowMixin {
 
             level.playSound(null, pShooter.getX(), pShooter.getY(), pShooter.getZ(),
                     SoundEvents.FIREWORK_ROCKET_SHOOT, SoundSource.PLAYERS, 1.0F, 1.2F);
-            return true;  // 返回 true 表示不再添加原版箭矢
+            return true;  // 已由烟花替代，阻止原版箭矢加入世界
         }
 
         // ===== 6. 药水：给箭矢附加效果 =====

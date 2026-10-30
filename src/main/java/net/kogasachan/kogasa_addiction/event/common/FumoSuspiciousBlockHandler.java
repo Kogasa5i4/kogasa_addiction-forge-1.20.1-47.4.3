@@ -97,10 +97,8 @@ public class FumoSuspiciousBlockHandler {
 
         if (process(level, pos, player, fumo, fumoHand, state)) {
             event.setCanceled(true);
-            // 破坏：移除方块（不掉原版物品），播放破坏音效/粒子
+            // 方块本体不按原版掉落；战利品已在上方单独提取，这里只返还普通沙/砂砾。
             level.destroyBlock(pos, false);
-            // 可疑方块本身不掉落，避免额外刷出没有战利品表的可疑方块；
-            // 只返还转换后的普通沙/砂砾。
             ItemStack drop = new ItemStack(state.is(Blocks.SUSPICIOUS_SAND)
                     ? Items.SAND
                     : Items.GRAVEL);

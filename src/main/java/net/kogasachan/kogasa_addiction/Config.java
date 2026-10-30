@@ -11,10 +11,10 @@ public class Config {
         BUILDER.push("general");
     }
 
-    public static final ForgeConfigSpec.BooleanValue SHOW_MINING_SPEED = BUILDER
-            .comment("Show current mining speed in tooltips for digger tools.\n" +
-                    "在挖掘工具的工具提示中显示当前挖掘速度。")
-            .define("showMiningSpeed", true);
+    public static final ForgeConfigSpec.IntValue MINING_SPEED_TOOLTIP_MODE = BUILDER
+            .comment("Mining speed tooltip mode. 0 = disabled, 1 = all digger tools, 2 = Kogasa equipment only.\n" +
+                    "挖掘速度 Tooltip 模式。0 = 不显示，1 = 所有挖掘工具，2 = 仅本模组装备。")
+            .defineInRange("miningSpeedTooltipMode", 2, 0, 2);
 
     public static final ForgeConfigSpec.BooleanValue ENABLE_FIRST_JOIN_REWARD = BUILDER
             .comment("Give players a random piece of mod equipment with a random ability on their first join.\n" +
@@ -84,7 +84,7 @@ public class Config {
 
     public static final ForgeConfigSpec.DoubleValue GROWTH_PER_USE = BUILDER
             .comment("Growth gained per correct use. 0.001 = 0.1%.\n" +
-                    "每次成长获得的百分比加成。0.001 = 0.1%.")
+                    "每次成长获得的百分比加成。0.001 = 0.1%。")
             .defineInRange("growthPerUse", 0.001, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue MAX_GROWTH = BUILDER
@@ -98,8 +98,8 @@ public class Config {
             .define("enableExtraSlots", true);
 
     public static final ForgeConfigSpec.DoubleValue GROWTH_PER_EXTRA_SLOT = BUILDER
-            .comment("Growth required to unlock one extra reinforcement slot. 0.01 = 1% growth.\n" +
-                    "解锁一个额外强化槽所需的成长值。0.01 = 1%。")
+            .comment("Growth required to unlock one extra reinforcement slot. Default 0.1 = 10% growth.\n" +
+                    "解锁一个额外强化槽所需的成长值。默认 0.1 = 10%。")
             .defineInRange("growthPerExtraSlot", 0.1, 0.0001, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.IntValue MAX_EXTRA_SLOTS = BUILDER
@@ -113,8 +113,8 @@ public class Config {
             .define("enableGrowthEnchant", true);
 
     public static final ForgeConfigSpec.DoubleValue GROWTH_PER_ENCHANT = BUILDER
-            .comment("Growth required to unlock one random enchantment. 0.01 = 1% growth per enchant.\n" +
-                    "解锁一个随机附魔所需的成长值。0.01 = 1%。")
+            .comment("Growth required to unlock one random enchantment. Default 0.02 = 2% growth per enchant.\n" +
+                    "解锁一个随机附魔所需的成长值。默认 0.02 = 2%。")
             .defineInRange("growthPerEnchant", 0.02, 0.0001, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.IntValue MAX_GROWTH_ENCHANTS = BUILDER
@@ -128,8 +128,10 @@ public class Config {
             .define("allowMaxLevelEnchants", true);
 
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> GROWTH_ENCHANT_BLACKLIST = BUILDER
-            .comment("Enchantments listed here will not be granted or upgraded by the growth system.",
-                    "此处列出的附魔不会被成长系统授予或升级。",
+            .comment("Enchantments listed here will not be granted or upgraded by the growth system. Supports * wildcards (e.g. *:*curse).",
+                    "此处列出的附魔不会被成长系统授予或升级。支持 * 通配符（例如 *:*curse）。",
+                    "Existing config files are not migrated automatically when this default list changes.",
+                    "默认列表更新不会自动写入已有配置文件，升级后请手动补充。",
                     "Format: modid:enchantment_id, e.g. minecraft:riptide",
                     "格式：模组ID:附魔ID，例如 minecraft:riptide")
             .defineListAllowEmpty(
@@ -164,8 +166,8 @@ public class Config {
             .defineInRange("durabilityFixedPerReinforcement", 500, 0, Integer.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue DURABILITY_RATIO_PER_REINFORCEMENT = BUILDER
-            .comment("Durability ratio added per reinforcement. 0.1 = +10% of base.\n" +
-                    "每次强化因强化次数而增加的耐久值比例。0.1 = +10%。")
+            .comment("Durability ratio added per reinforcement. Default 0.25 = +25% of base.\n" +
+                    "每次强化因强化次数而增加的耐久值比例。默认 0.25 = +25%。")
             .defineInRange("durabilityRatioPerReinforcement", 0.25, 0.0, Double.MAX_VALUE);
 
     static {
@@ -229,8 +231,8 @@ public class Config {
             .defineInRange("bowMultishot3Growth", 2.5, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue RANGED_MULTISHOT_SPREAD = BUILDER
-            .comment("Multishot spread angle in degrees. 8 = ±4° for 3 arrows.\n" +
-                    "多发散射角度（度）。8 = 三发时 ±4°。")
+            .comment("Multishot spread in degrees between adjacent arrows. 8 = ±4° for 2 arrows, ±8° for 3 arrows.\n" +
+                    "多发时相邻箭矢的偏航角间隔（度）。8 = 双发 ±4°，三发 ±8°。")
             .defineInRange("multishotSpread", 8.0, 0.0, 45.0);
 
     public static final ForgeConfigSpec.DoubleValue CROSSBOW_AUTO_RELOAD_GROWTH = BUILDER
@@ -267,8 +269,8 @@ public class Config {
             .defineInRange("sakuyaKnifeBreakReduction", 0.01, 0.0, 1.0);
 
     public static final ForgeConfigSpec.IntValue SAKUYA_KNIFE_REPAIR_COST = BUILDER
-            .comment("Experience level cost to repair a broken sakuya knife.\n" +
-                    "在铁砧中修复损坏的咲夜飞刀消耗的经验等级。")
+            .comment("Experience level cost to repair a batch of broken sakuya knives (up to 3 per operation).\n" +
+                    "在铁砧中修复一批损坏的咲夜飞刀消耗的经验等级（每次最多 3 把）。")
             .defineInRange("sakuyaKnifeRepairCost", 3, 0, Integer.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue SAKUYA_KNIFE_THROW_VELOCITY = BUILDER
@@ -309,13 +311,13 @@ public class Config {
             .defineInRange("maxNewsValue", 1.0, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue SHOOT_INGOT_CHANCE = BUILDER
-            .comment("Chance to receive an Aya Ingot per eligible screenshot or bow-shot attempt. 0.1 = 10%; attempts during the shared cooldown are ignored.\n" +
-                    "每次符合条件的截图或弓射击尝试获得文文锭的概率。0.1 = 10%；共用冷却期间的尝试会被忽略。")
+            .comment("Chance to receive an Aya Ingot per eligible screenshot or bow/crossbow-shot attempt. 0.1 = 10%; attempts during the shared cooldown are ignored.\n" +
+                    "每次符合条件的截图或弓/弩射击尝试获得文文锭的概率。0.1 = 10%；共用冷却期间的尝试会被忽略。")
             .defineInRange("shootIngotChance", 0.1, 0.0, 1.0);
 
     public static final ForgeConfigSpec.IntValue SHOOT_COOLDOWN_SECONDS = BUILDER
-            .comment("Shared cooldown in seconds for screenshot and bow-shot reward attempts. 10 = 10 seconds; 0 disables the cooldown.\n" +
-                    "截图与弓射击奖励共用的冷却时间（秒）。10 = 10 秒；0 表示不启用冷却。")
+            .comment("Shared cooldown in seconds for screenshot and bow/crossbow-shot reward attempts. 10 = 10 seconds; 0 disables the cooldown.\n" +
+                    "截图与弓/弩射击奖励共用的冷却时间（秒）。10 = 10 秒；0 表示不启用冷却。")
             .defineInRange("shootCooldownSeconds", 10, 0, Integer.MAX_VALUE);
 
     static {
@@ -381,12 +383,12 @@ public class Config {
 
     public static final ForgeConfigSpec.DoubleValue KOISHI_CRIT_CHANCE = BUILDER
             .comment("Koishi crit chance. 0.75 = 75%.\n" +
-                    "koishi 暴击概率。0.75 = 75%。")
+                    "恋恋暴击概率。0.75 = 75%。")
             .defineInRange("koishiCritChance", 0.75, 0.0, 1.0);
 
     public static final ForgeConfigSpec.DoubleValue KOISHI_CRIT_MULTIPLIER = BUILDER
             .comment("Koishi crit damage multiplier. 1.5 = 150%.\n" +
-                    "koishi 暴击伤害倍率。1.5 = 150%。")
+                    "恋恋暴击伤害倍率。1.5 = 150%。")
             .defineInRange("koishiCritMultiplier", 1.5, 1.0, 10.0);
 
     public static final ForgeConfigSpec.IntValue KOISHI_GHAST_KILLS_REQUIRED = BUILDER
@@ -452,7 +454,7 @@ public class Config {
 
     public static final ForgeConfigSpec.DoubleValue TENSHI_FLYING_MOB_MULTIPLIER = BUILDER
             .comment("Damage multiplier against non-boss flying mobs. 2.0 = 200%.")
-            .comment("对非Boss飞行生物的伤害倍率。2.0 = 200%。")
+            .comment("对非 Boss 飞行生物的伤害倍率。2.0 = 200%。")
             .defineInRange("tenshiFlyingMobMultiplier", 2.0, 1.0, Double.MAX_VALUE);
 
     static {

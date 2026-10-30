@@ -195,7 +195,7 @@ public class KogasaGrowthHandler {
     /**
      * 授予或升级一个附魔
      * - 物品无附魔：随机授予一个新附魔
-     * - 物品有附魔：随机选一个未达 maxLevel+1 的附魔 +1，如果都满级则随机授予一个新附魔
+     * - 物品有附魔：随机选一个未达 maxLevel+1 的非黑名单附魔 +1；没有可升级项时随机授予新附魔
      * - 没有可升级的：返回 false
      */
     public static boolean grantOrUpgradeEnchant(ItemStack stack, Player player) {
@@ -236,7 +236,7 @@ public class KogasaGrowthHandler {
     }
 
     /**
-     * 从物品可接受、且尚未拥有的附魔中随机选一个
+     * 从物品可接受、尚未拥有、且不在黑名单中的附魔里随机选一个。
      */
     private static Enchantment pickRandomNewEnchantment(ItemStack stack, Player player,
                                                         Map<Enchantment, Integer> existing) {

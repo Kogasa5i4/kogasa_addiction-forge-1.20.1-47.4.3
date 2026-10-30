@@ -74,7 +74,7 @@ public class KogasaAbilityIngotItem extends Item {
     }
 
     /**
-     * Build acquisition hints from the active config so the tooltip stays accurate after config changes.
+     * 根据当前配置生成获取方式提示，保证配置修改后 Tooltip 仍然准确。
      */
     private Component createObtainLine(String key) {
         Component result = switch (ability) {

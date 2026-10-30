@@ -13,7 +13,7 @@ public class KogasaArmorMaterial {
     public static final ArmorMaterial INSTANCE = new ArmorMaterial() {
         @Override
         public int getDurabilityForType(ArmorItem.Type type) {
-            // 皮革：头部 55，胸甲 80，护腿 75，靴子 65
+            // 基础耐久（皮革档）：头部 55，胸甲 80，护腿 75，靴子 65
             return switch (type) {
                 case HELMET -> 55;
                 case CHESTPLATE -> 80;

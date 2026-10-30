@@ -31,7 +31,7 @@ public class CirnoIngotDigHandler {
             return;
         }
 
-        // 9% 掉落
+        // 按配置概率掉落（默认 9%）
         if (!(event.getLevel() instanceof ServerLevel serverLevel)) return;
         if (serverLevel.random.nextFloat() < Config.CIRNO_INGOT_DROP_CHANCE.get()) {
             Block.popResource(serverLevel, event.getPos(),

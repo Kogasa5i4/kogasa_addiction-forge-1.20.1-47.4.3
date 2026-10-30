@@ -20,7 +20,6 @@ public class KogasaRangedAbilityHandler {
 
     private static final String STREAK_KEY = "KogasaRangedHitStreak";
     private static final String LAST_HIT_TIME_KEY = "KogasaLastRangedHitTime";
-    private static final int STREAK_RESET_TICKS = 60; // 3秒
 
     @SubscribeEvent
     public static void onProjectileHit(LivingHurtEvent event) {

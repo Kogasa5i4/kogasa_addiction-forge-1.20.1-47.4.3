@@ -10,9 +10,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.MissingMappingsEvent;
 
 /**
- * Maps the old Kogasa armor registry names to their new Tenshi names.
- * Forge applies these remaps when loading saved data containing the old registry IDs,
- * allowing ItemStacks (including their NBT, damage, enchantments and growth data) to survive.
+ * 将旧的 Kogasa 护甲注册名迁移到新的天子护甲注册名。
+ * Forge 在加载包含旧注册 ID 的存档数据时会应用这些重映射，
+ * 从而保留 ItemStack 的 NBT、耐久、附魔与成长数据。
  */
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class ItemIdMigration {

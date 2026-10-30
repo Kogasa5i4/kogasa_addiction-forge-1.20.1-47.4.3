@@ -43,13 +43,13 @@ public class SakuyaKnifeItem extends TridentItem implements IKogasaEquipment {
         return KogasaEquipmentHelper.getAttributeModifiers(this, slot, stack);
     }
 
-    // 取消耐久机制：将最大耐久设为一个极大的值或者阻止破坏
+    // 耐久仅为兼容属性/附魔逻辑保留；isDamageable 返回 false，实际不会消耗耐久
     @Override
     public int getMaxDamage(ItemStack stack) {
         return 250;
     }
 
-    // 防止因投掷消耗耐久
+    // 投掷不消耗耐久
     @Override
     public boolean isDamageable(ItemStack stack) {
         return false;
@@ -67,7 +67,7 @@ public class SakuyaKnifeItem extends TridentItem implements IKogasaEquipment {
             // 1. 生成实体
             SakuyaKnifeEntity knife = new SakuyaKnifeEntity(level, player, stack);
 
-            // 2. 设置飞行速度和伤害
+            // 2. 设置投掷速度
             float velocity = Config.SAKUYA_KNIFE_THROW_VELOCITY.get().floatValue();
             knife.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, velocity, 1.0F);
 
@@ -91,7 +91,7 @@ public class SakuyaKnifeItem extends TridentItem implements IKogasaEquipment {
         if (enchantment == Enchantments.RIPTIDE) {
             return false;
         }
-        // 其他附魔交还给父类（或原版逻辑）判断
+        // 其他附魔交由父类判断
         return super.canApplyAtEnchantingTable(stack, enchantment);
     }
 }

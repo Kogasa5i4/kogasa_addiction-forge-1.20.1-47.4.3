@@ -20,6 +20,6 @@ public class ModBlockTagsProvider extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.@NotNull Provider provider) {
-        // 暂时没有方块标签，留空
+        // 本模组当前没有方块标签，留空
     }
 }

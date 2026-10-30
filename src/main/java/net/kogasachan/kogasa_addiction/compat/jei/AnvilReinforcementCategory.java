@@ -25,8 +25,6 @@ public class AnvilReinforcementCategory implements IRecipeCategory<AnvilReinforc
     public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "anvil_reinforcement");
     public static final RecipeType<AnvilReinforcementRecipe> RECIPE_TYPE =
             RecipeType.create(KogasaAddiction.MODID, "anvil_reinforcement", AnvilReinforcementRecipe.class);
-    private static final ResourceLocation RECIPE_GUI_VANILLA =
-            ResourceLocation.fromNamespaceAndPath("jei", "textures/gui/gui_vanilla.png");
     private final IDrawable icon;
     private final IDrawable background;
     private final IDrawable border;
@@ -154,8 +152,7 @@ public class AnvilReinforcementCategory implements IRecipeCategory<AnvilReinforc
         // 箭头
         arrow.draw(guiGraphics, 76, 1);
 
-        // 经验消耗
-        // 经验成本根据类型选择
+        // 经验成本
         int cost = switch (recipe.kind()) {
             case ABILITY -> Config.ABILITY_INFUSION_COST.get();
             case REINFORCEMENT -> Config.REINFORCEMENT_COST.get();
@@ -174,12 +171,6 @@ public class AnvilReinforcementCategory implements IRecipeCategory<AnvilReinforc
         guiGraphics.drawString(font, experienceString,
                 getWidth() - width - 2, getHeight() - 11, mainColor, true);
     }
-
-//    @Deprecated
-//    @Override
-//    public @Nullable IDrawable getBackground() {
-//        return background;
-//    }
 
     @Override
     public @Nullable ResourceLocation getRegistryName(AnvilReinforcementRecipe recipe) {

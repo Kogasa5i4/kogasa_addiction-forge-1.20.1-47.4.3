@@ -8,7 +8,7 @@ public class ClientPacketHandler {
     public static void cancelBlockPlace(BlockPos pos) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return;
-        // 用 flag 3 = BLOCK_UPDATE | BLOCK_UPDATE_CLIENTS，立刻重渲染，消除预测方块
+        // flag 3 = Block.UPDATE_NEIGHBORS | Block.UPDATE_CLIENTS，立刻重渲染，消除预测方块
         mc.level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
     }
 }

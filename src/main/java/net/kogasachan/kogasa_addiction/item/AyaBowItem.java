@@ -85,7 +85,7 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
                 }
             }
 
-            // ===== 烟花分支：消耗箭矢，发射烟花 =====
+            // ===== 烟花分支：按规则消耗箭矢，发射烟花 =====
             var ammoType = KogasaAbilityData.getAmmoType(stack);
             // 烟花多发分支
             if (ammoType == KogasaAbilityData.AmmoType.FIREWORK) {
@@ -176,7 +176,7 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
                     arrow.setPierceLevel((byte) totalPierce);
                 }
 
-                // 原版附魔
+                // 原版附魔：力量、冲击、火矢
                 int powerEnch = stack.getEnchantmentLevel(Enchantments.POWER_ARROWS);
                 if (powerEnch > 0) arrow.setBaseDamage(arrow.getBaseDamage() + powerEnch * 0.5 + 0.5);
                 int punch = stack.getEnchantmentLevel(Enchantments.PUNCH_ARROWS);

@@ -42,7 +42,7 @@ public class KogasaJEIPlugin implements IModPlugin {
         BuiltInRegistries.ITEM.getTagOrEmpty(ModItemTagsProvider.ABILITY_INGOTS).forEach(holder -> {
             Item ingotItem = holder.value();
 
-            // 2. 过滤：只处理属于我们能力锭类的物品
+            // 2. 过滤：只处理本模组的能力锭类物品
             if (ingotItem instanceof KogasaAbilityIngotItem abilityIngot) {
                 KogasaAbility ability = abilityIngot.getAbility();
 
@@ -108,7 +108,7 @@ public class KogasaJEIPlugin implements IModPlugin {
     private static void registerBowArrowRecipe(List<AnvilReinforcementRecipe> recipes, Item bowItem) {
         ItemStack input = new ItemStack(bowItem);
 
-        // 用 ItemTags.ARROWS 里的前几个箭矢作为代表
+        // 用 ItemTags.ARROWS 中的所有箭矢作为代表
         List<ItemStack> arrows = new ArrayList<>();
         BuiltInRegistries.ITEM.getTagOrEmpty(ItemTags.ARROWS).forEach(holder -> {
             Item item = holder.value();
@@ -155,7 +155,7 @@ public class KogasaJEIPlugin implements IModPlugin {
         ItemStack input = new ItemStack(weaponItem);
         ItemStack output = input.copy();
 
-        // 用代表药水 ID 构造输出（tooltip 会说明"任意药水"）
+        // 用代表药水 ID 构造输出；材料列表仅展示常见药水，实际支持任意药水
         KogasaAbilityData.setPotionAmmo(output,
                 ResourceLocation.fromNamespaceAndPath("minecraft", "healing"), kind);
 
@@ -182,7 +182,7 @@ public class KogasaJEIPlugin implements IModPlugin {
         ItemStack input = new ItemStack(weaponItem);
         ItemStack output = input.copy();
 
-        // 用空的烟花 NBT 标记
+        // 用 Flight=1 的最小烟花 NBT 标记
         CompoundTag emptyFireworkNbt = new CompoundTag();
         CompoundTag fireworkTag = new CompoundTag();
         fireworkTag.putByte("Flight", (byte) 1);
@@ -207,7 +207,7 @@ public class KogasaJEIPlugin implements IModPlugin {
     private static void registerClearRecipe(List<AnvilReinforcementRecipe> recipes) {
         Item baseSword = ModItems.KOGASA_SWORD.get();
 
-        // 构造输入：带有强化1、成长0.5、KOGASA能力的木剑
+        // 构造输入：带有强化 1、成长 0.5、KOGASA 能力的小伞剑
         ItemStack input = new ItemStack(baseSword);
         KogasaEquipmentData.setReinforcements(input, 1);
         KogasaEquipmentData.setGrowth(input, 0.5);
@@ -257,19 +257,19 @@ public class KogasaJEIPlugin implements IModPlugin {
     public void registerRecipes(@NotNull IRecipeRegistration registration) {
         List<AnvilReinforcementRecipe> recipes = new ArrayList<>();
 
-        // 1. 能力配方（4 个）
+        // 1. 能力配方（6 个）
         registerAbilityRecipes(recipes);
 
-        // 2. 强化配方（11 个）
+        // 2. 强化配方（11 类装备 + 2 种弓弩箭矢）
         registerReinforcementRecipes(recipes);
 
         // 3. 弹药配方（8 个）
         registerAmmoRecipes(recipes);
 
-        // 4. 修复配方（1个）
+        // 4. 修复配方（1 个）
         registerRepairRecipe(recipes);
 
-        // 5. 清除配方（2个）
+        // 5. 清除配方（2 个）
         registerClearRecipe(recipes);
 
         KogasaAddiction.LOGGER.info("Registered {} JEI anvil recipes", recipes.size());

@@ -29,7 +29,7 @@ public class KoishiAbilityHandler {
         ItemStack held = player.getMainHandItem();
         if (!KogasaAbilityHelper.isEquipmentWithAbility(held, KogasaAbility.KOISHI)) return;
 
-        // 75% 概率造成 1.5 倍伤害
+        // 按配置概率造成暴击（默认 75% 概率、1.5 倍伤害）
         if (player.getRandom().nextFloat() >= Config.KOISHI_CRIT_CHANCE.get().floatValue()) {
             return;
         }

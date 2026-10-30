@@ -109,7 +109,7 @@ public class TenshiAbilityHandler {
             LivingEntity target = event.getEntity();
             if (target == attacker) return;
 
-            // 1. 施加负面效果（最高等级缓慢和挖掘疲劳）
+            // 1. 施加负面效果（VII 级缓慢与挖掘疲劳）
             int debuffDuration = Config.TENSHI_DEBUFF_DURATION_SECONDS.get() * 20;
             // amplifier 6 代表等级 VII（原版极高级别，近乎定身和无法挖掘）
             target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, debuffDuration, 6));

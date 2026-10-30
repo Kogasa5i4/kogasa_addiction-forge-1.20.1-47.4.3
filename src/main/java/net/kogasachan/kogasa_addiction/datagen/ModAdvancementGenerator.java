@@ -304,7 +304,7 @@ public class ModAdvancementGenerator implements ForgeAdvancementProvider.Advance
                 .addCriterion("impossible", new ImpossibleTrigger.TriggerInstance())
                 .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "kappa_tech"), existingFileHelper);
 
-        // ===== 21. ⑨⑨81：获得64个琪露诺锭（隐藏） =====
+        // ===== 21. ⑨⑨81：获得 64 个琪露诺锭（隐藏） =====
         ItemPredicate has64Cirno = ItemPredicate.Builder.item()
                 .of(ModItems.CIRNO_INGOT.get())
                 .withCount(MinMaxBounds.Ints.atLeast(64))

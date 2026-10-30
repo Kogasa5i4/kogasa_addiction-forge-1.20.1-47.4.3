@@ -36,7 +36,7 @@ public class CirnoAbilityHandler {
 
         LivingEntity target = event.getEntity();
 
-        // 99% 对目标施加缓慢 IV
+        // 按配置概率对目标施加缓慢（默认 99%、IV 级）
         if (player.getRandom().nextFloat() < Config.CIRNO_SLOW_CHANCE.get()) {
             target.addEffect(new MobEffectInstance(
                     MobEffects.MOVEMENT_SLOWDOWN,
@@ -45,7 +45,7 @@ public class CirnoAbilityHandler {
                     false, true));
         }
 
-        // 9% 对自己施加缓慢
+        // 按配置概率对自己施加缓慢（默认 9%）
         if (player.getRandom().nextFloat() < Config.CIRNO_SELF_SLOW_CHANCE.get()) {
             player.addEffect(new MobEffectInstance(
                     MobEffects.MOVEMENT_SLOWDOWN,

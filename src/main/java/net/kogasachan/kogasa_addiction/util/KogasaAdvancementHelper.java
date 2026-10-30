@@ -15,7 +15,7 @@ import net.minecraft.world.item.ItemStack;
 public class KogasaAdvancementHelper {
 
     /**
-     * 检查玩家当前持有的物品，并尝试授予所有相关进度。
+     * 检查指定装备，并尝试授予所有相关进度。
      * 应在所有会修改装备 NBT 的地方调用。
      */
     public static void checkAndGrant(ServerPlayer player, ItemStack stack) {
@@ -40,7 +40,7 @@ public class KogasaAdvancementHelper {
         // 风神少女（弩 + 自动装填阈值）
         if (stack.getItem() instanceof CrossbowItem
                 && growth >= Config.CROSSBOW_AUTO_RELOAD_GROWTH.get()) {
-            grant(player, "wind_god_girl"); // 改为正确的路径
+            grant(player, "wind_god_girl");
         }
 
         // 月战老兵（不消耗概率 100%）

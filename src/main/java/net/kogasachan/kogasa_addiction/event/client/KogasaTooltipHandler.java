@@ -112,7 +112,7 @@ public class KogasaTooltipHandler {
                                 "tooltip.kogasa_addiction.growth", percent)
                         .withStyle(ChatFormatting.GREEN));
 
-                // 新增：成长附魔进度
+                // 成长附魔进度
                 int grantedEnchants = KogasaEquipmentData.getGrowthEnchantsGranted(stack);
                 int maxEnchants = Config.MAX_GROWTH_ENCHANTS.get();
                 if (Config.ENABLE_GROWTH_ENCHANT.get() && maxEnchants > 0) {
@@ -150,7 +150,7 @@ public class KogasaTooltipHandler {
                             .withStyle(ChatFormatting.LIGHT_PURPLE));
                 }
             }
-            // 槽位满且未解锁第 2 槽 → 显示解锁提示（只在有能力或弹药时显示）
+            // 槽位满且未解锁第 2 槽 → 显示解锁提示（只在已占用能力槽时显示）
             if (usedSlots >= maxSlots && maxSlots < 2) {
                 String secondSlotGrowth = KogasaNumberFormatHelper.formatPercentTrimmed(Config.GROWTH_FOR_SECOND_ABILITY_SLOT.get(), 0);
                 tooltip.add(Component.translatable(
@@ -259,7 +259,7 @@ public class KogasaTooltipHandler {
                         || stack.getItem() instanceof CrossbowItem
                         || stack.getItem() instanceof TridentItem;
 
-                // 2. 护甲专属描述与动态状态
+                // 护甲专属描述与动态状态
                 if (isArmor) {
                     double threshold = Config.TENSHI_DOMAIN_THRESHOLD.get();
 
@@ -293,7 +293,7 @@ public class KogasaTooltipHandler {
                     }
                 }
 
-                // 3. 武器专属描述
+                // 武器专属描述
                 if (isWeapon) {
                     // 动态：显示玩家当前身上的正面 Buff
                     net.minecraft.client.player.LocalPlayer player = net.minecraft.client.Minecraft.getInstance().player;
@@ -346,7 +346,7 @@ public class KogasaTooltipHandler {
                 }
             }
 
-            // ===== 远程武器专属：穿透、多发 =====
+            // ===== 远程武器专属：穿透、多发、不消耗 =====
             if (stack.getItem() instanceof BowItem || stack.getItem() instanceof CrossbowItem) {
                 int pierceLevel = KogasaEquipmentHelper.getBowPierceLevel(stack);
                 int arrowCount = KogasaEquipmentHelper.getBowArrowCount(stack);

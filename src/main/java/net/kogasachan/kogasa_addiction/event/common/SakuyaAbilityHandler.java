@@ -39,7 +39,7 @@ public class SakuyaAbilityHandler {
         int maxHealth = (int) target.getMaxHealth();
         int level = (maxHealth / 20) + (maxHealth % 3);
 
-        // 如果等级为0，或者超过原版255上限，做保护
+        // 如果等级为 0，或者超过原版 255 上限，做保护
         if (level <= 0) return;
         int amplifier = Math.min(level - 1, 254);
 

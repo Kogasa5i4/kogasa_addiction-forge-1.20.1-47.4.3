@@ -53,7 +53,7 @@ public class SakuyaKnifeEntity extends ThrownTrident {
         // 获取最开始扔出去的那把飞刀的 ItemStack
         ItemStack originStack = this.tridentItem;
 
-        // 如果是创造模式，或者空物品，直接返回原物
+        // 原始物品为空时只能返回一把新的普通飞刀
         if (originStack.isEmpty()) return new ItemStack(ModItems.SAKUYA_KNIFE.get());
 
         // 计算当前飞刀的强化和成长值
@@ -69,14 +69,14 @@ public class SakuyaKnifeEntity extends ThrownTrident {
         if (this.random.nextDouble() < finalChance) {
             // 触发损坏：生成损坏版飞刀，并复制原有 NBT
             ItemStack broken = new ItemStack(ModItems.BROKEN_SAKUYA_KNIFE.get());
-            if (originStack.getTag() != null && originStack.hasTag()) {
+            if (originStack.hasTag()) {
                 broken.setTag(originStack.getTag().copy());
             }
             broken.setCount(1);
             return broken;
         }
 
-        // 未损坏：返回原版飞刀（保留 NBT）
+        // 未损坏：返回正常飞刀（保留 NBT）
         ItemStack result = originStack.copy();
         result.setCount(1);
         return result;
@@ -104,17 +104,15 @@ public class SakuyaKnifeEntity extends ThrownTrident {
         if (knifeStack.isEmpty()) return;
 
         // 4. 计算来自强化/成长系统的额外伤害
-        //    这里我们调用你已有的 KogasaEquipmentHelper 来计算倍率
         double multiplier = KogasaEquipmentHelper.getTotalMultiplier(knifeStack);
         if (multiplier > 1.0) {
-            // 基础伤害在原版中约为 8.0（可配置或从父类获取）
+            // 沿用原版三叉戟的基础伤害 8.0；额外伤害按总倍率补足
             float baseDamage = 8.0F;
             float extraDamage = (float) (baseDamage * (multiplier - 1.0));
 
             if (extraDamage > 0) {
-                // 构建一个与父类一致的伤害源（三叉戟伤害）
+                // 构建与父类一致的三叉戟伤害源
                 DamageSource source = this.damageSources().trident(this, owner);
-                // 造成额外伤害，并施加击退效果
                 target.hurt(source, extraDamage);
             }
         }

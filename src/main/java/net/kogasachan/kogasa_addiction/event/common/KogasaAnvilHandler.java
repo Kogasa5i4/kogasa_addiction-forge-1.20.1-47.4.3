@@ -37,7 +37,7 @@ public class KogasaAnvilHandler {
 
         // 检查左侧是否为咲夜飞刀
         if (left.getItem() instanceof SakuyaKnifeItem) {
-            // 检查右侧材料（附魔书或另一把三叉戟）是否含有激流
+            // 右侧材料（附魔书、三叉戟等）带有激流时禁止修复/合并
             Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(right);
             if (enchants.containsKey(Enchantments.RIPTIDE)) {
                 event.setOutput(ItemStack.EMPTY); // 禁止输出
@@ -48,7 +48,7 @@ public class KogasaAnvilHandler {
 
         if (left.is(ModItems.BROKEN_SAKUYA_KNIFE.get()) && right.is(ModItems.SAKUYA_INGOT.get())) {
             ItemStack result = new ItemStack(ModItems.SAKUYA_KNIFE.get());
-            if (left.getTag() != null && left.hasTag()) {
+            if (left.hasTag()) {
                 result.setTag(left.getTag().copy());
             }
             // 一次最多修复 3 把；超过 3 把的余量由 AnvilMenuMixin 放回左侧输入槽
@@ -59,7 +59,7 @@ public class KogasaAnvilHandler {
             event.setMaterialCost(1);
         }
 
-        // 左侧必须是 Kogasa 套件
+        // 左侧必须是 Kogasa 装备
         if (!(left.getItem() instanceof IKogasaEquipment)) return;
         if (right.isEmpty()) return;
 
@@ -124,7 +124,7 @@ public class KogasaAnvilHandler {
 
     /**
      * 强化：装备 + 同类型装备 → 装备强化 1 级
-     * 水桶清强化，奶桶清能力，保留成长及其他数据
+     * 水桶清强化（含吸收值/材料记录），奶桶清能力，保留成长、附魔等其他数据
      */
     private static void handleReinforcement(AnvilUpdateEvent event,
                                             ItemStack left, ItemStack right) {

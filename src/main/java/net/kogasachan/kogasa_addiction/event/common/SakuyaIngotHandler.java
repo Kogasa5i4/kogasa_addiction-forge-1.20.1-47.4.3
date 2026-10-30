@@ -24,7 +24,7 @@ public class SakuyaIngotHandler {
         // 每 100 tick (5秒) 检查一次世界时间
         if (server.getTickCount() % 100 != 0) return;
 
-        // 获取当前主世界的时间（原版中 getDayTime 累计增加，不受睡觉跳过影响）
+        // 获取当前主世界天数（每 24000 tick 为一天）
         long currentDay = server.overworld().getDayTime() / 24000L;
 
         // 遍历所有在线玩家

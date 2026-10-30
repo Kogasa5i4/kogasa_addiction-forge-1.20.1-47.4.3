@@ -84,7 +84,7 @@ public class KoishiRangedAbilityHandler {
 
         // ===== 分支 1：只有天子，没有恋恋 =====
         if (!hasKoishi) {
-            // 使用魔法伤害源（或自定义 tenshi_ranged），确保不被末影人/凋零免疫，从而触发 LivingHurtEvent
+            // 使用间接魔法伤害源，绕过末影人/凋灵的箭矢免疫，从而触发 LivingHurtEvent
             DamageSource tenshiSource = player.damageSources().indirectMagic(arrow, player);
             boolean damaged = livingTarget.hurt(tenshiSource, damage);
             recordVanillaBookkeeping(arrow, livingTarget, player, damaged);

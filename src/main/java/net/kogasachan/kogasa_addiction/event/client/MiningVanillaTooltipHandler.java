@@ -35,7 +35,7 @@ public class MiningVanillaTooltipHandler {
         }
 
         // ========== 2. 判断物品类型 ==========
-        // 有攻速属性的物品：剑、镐/斧/铲（DiggerItem）、锄
+        // 有攻速属性的物品：剑、镐/斧/铲/锄、三叉戟
         boolean hasAttackSpeed = item instanceof SwordItem
                 || item instanceof DiggerItem
                 || item instanceof HoeItem
@@ -66,8 +66,11 @@ public class MiningVanillaTooltipHandler {
             }
         }
 
-        // ========== 4. 插入挖掘速度（紧跟在攻速行后面） ==========
-        if (isDigger && Config.SHOW_MINING_SPEED.get()) {
+        // ========== 4. 插入挖掘速度（按配置模式，紧跟在攻速行后面） ==========
+        int miningSpeedMode = Config.MINING_SPEED_TOOLTIP_MODE.get();
+        boolean showMiningSpeed = isDigger
+                && (miningSpeedMode == 1 || (miningSpeedMode == 2 && isKogasa));
+        if (showMiningSpeed) {
             float miningSpeed = getMiningSpeed(stack);
 
             Component miningLine = Component.translatable(

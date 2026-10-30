@@ -75,7 +75,7 @@ public class KogasaEquipmentHelper {
             return buildHandModifiers(stack, baseDamage, absorbed, -2.9F);
         }
 
-        // 其他类型的 Kogasa 装备（暂时没有）
+        // 其他未单独处理的 Kogasa 装备（如弓弩）使用默认属性
         return item.getDefaultAttributeModifiers(slot);
     }
 
@@ -166,8 +166,9 @@ public class KogasaEquipmentHelper {
 
     /**
      * 获取一件装备的“基础价值”，用于铁砧强化时累加。
-     * - 剑/工具：Tier 加成 + 附加伤害
+     * - 剑/工具：物品自身的攻击伤害
      * - 护甲：防御值
+     * - 三叉戟：固定 8.0
      * - 其他：0
      */
     public static double getEquipmentBaseValue(ItemStack stack) {
@@ -252,7 +253,7 @@ public class KogasaEquipmentHelper {
         if (path.endsWith("_axe")) return -3.2;
         if (path.endsWith("_hoe")) return -3.0;
         if (path.endsWith("_shovel")) return -3.0;
-        return -2.8; // 镐
+        return -2.8; // 未识别的工具/武器（含镐）
     }
 
     /**
@@ -283,7 +284,7 @@ public class KogasaEquipmentHelper {
     }
 
     /**
-     * 强化倍率
+     * 强化倍率（仅在拥有小伞能力时生效）
      */
     public static double getReinforcementMultiplier(ItemStack stack) {
         if (!KogasaAbilityData.hasAbility(stack, KogasaAbility.KOGASA)) {
@@ -354,7 +355,7 @@ public class KogasaEquipmentHelper {
 
     /**
      * 返回装备类型的后缀标识（不含下划线），例如 "sword"、"pickaxe"。
-     * 非标准后缀装备（Fumo、SakuyaKnife）返回 null。
+     * Fumo 返回 null；咲夜飞刀返回 "knife"。
      */
     public static String getEquipmentSuffix(ItemStack stack) {
         Item item = stack.getItem();
@@ -379,7 +380,7 @@ public class KogasaEquipmentHelper {
     /**
      * 判断 right 是否是 left 的有效强化材料。
      * 先走 tag 匹配；tag 不匹配时退回注册名后缀匹配。
-     * 三叉戟类特例：接受剑或三叉戟（tag 或后缀）。
+     * 三叉戟类特例：接受剑、三叉戟或飞刀。
      */
     public static boolean matchesReinforcementMaterial(ItemStack left, ItemStack right) {
         TagKey<Item> tag = getMatchingTag(left);
@@ -458,9 +459,7 @@ public class KogasaEquipmentHelper {
     }
 
     /**
-     * 对药水效果应用 Cirno 增强：
-     * - 等级 +2
-     * - 时长 ×1.5
+     * 对药水效果应用 Cirno 增强（默认等级 +2、时长 ×1.5）：
      * - 缓慢特殊处理：至少 V 级（amplifier = 4）
      */
     public static List<MobEffectInstance> applyCirnoPotionBoost(

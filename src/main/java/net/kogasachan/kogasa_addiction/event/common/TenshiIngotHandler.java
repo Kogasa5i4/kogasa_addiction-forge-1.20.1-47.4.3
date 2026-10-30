@@ -41,7 +41,7 @@ public class TenshiIngotHandler {
 
         // ===== 触发成功，开始拦截 =====
 
-        // 取消方块放置（相当于方块被破坏且不掉落）
+        // 取消本次方块放置，不产生方块掉落
         PacketHandler.INSTANCE.send(
                 PacketDistributor.PLAYER.with(() -> player),
                 new TenshiBeaconBlockReplacementPacket(pos)

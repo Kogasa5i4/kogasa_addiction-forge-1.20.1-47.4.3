@@ -67,7 +67,7 @@ public class TimestopHandler {
         IS_FROZEN = true;
         OWNER_UUID = player.getUUID();
 
-        // 计算持续时间（毫秒转世界刻，1秒 = 20刻）
+        // 计算持续时间（秒转世界刻，1 秒 = 20 刻）
         int seconds = count * Config.SAKUYA_TIMESTOP_SECONDS_PER_EQUIPMENT.get();
         long durationTicks = seconds * 20L;
         TIMESTOP_END_TIME = player.level().getGameTime() + durationTicks;
@@ -198,7 +198,7 @@ public class TimestopHandler {
 
     private static boolean hasSakuyaAbility(ItemStack stack) {
         return stack.getItem() instanceof IKogasaEquipment &&
-                KogasaAbilityData.hasAbility(stack, KogasaAbility.SAKUYA); // 确保你的枚举里有 SAKUYA
+                KogasaAbilityData.hasAbility(stack, KogasaAbility.SAKUYA);
     }
 
     public static void stopTimestop() {

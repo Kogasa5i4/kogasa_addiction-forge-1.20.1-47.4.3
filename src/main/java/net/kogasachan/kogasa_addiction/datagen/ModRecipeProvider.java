@@ -133,7 +133,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_aya_ingot", has(ModItems.AYA_INGOT.get()))
                 .save(writer);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.SAKUYA_KNIFE.get(), 1)
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.SAKUYA_KNIFE.get(), 3)
                 .pattern(" X ")
                 .pattern("X#X")
                 .pattern(" X ")

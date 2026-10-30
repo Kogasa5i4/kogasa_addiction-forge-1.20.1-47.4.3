@@ -36,21 +36,21 @@ public class ClientSetup {
     public static void onClientSetup$totem(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             ItemProperties.register(
-                Items.TOTEM_OF_UNDYING,
-                ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "custom_name_check"),
-                (stack, level, entity, seed) -> {
-                    if (!stack.hasCustomHoverName()) return 0.0F;
+                    Items.TOTEM_OF_UNDYING,
+                    ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "custom_name_check"),
+                    (stack, level, entity, seed) -> {
+                        if (!stack.hasCustomHoverName()) return 0.0F;
 
-                    Component name = stack.getHoverName();
-                    if (name instanceof TranslatableContents tc
-                            && SPECIAL_KEY.equals(tc.getKey())) {
-                        return 1.0F;
-                    } else if (name.getString().equals("大妖精的Bomb")
-                            || name.getString().equals("Daiyousei's Bomb")) {
-                        return 1.0F;
-                    }
-                    return 0.0F;
-                });
+                        Component name = stack.getHoverName();
+                        if (name instanceof TranslatableContents tc
+                                && SPECIAL_KEY.equals(tc.getKey())) {
+                            return 1.0F;
+                        } else if (name.getString().equals("大妖精的Bomb")
+                                || name.getString().equals("Daiyousei's Bomb")) {
+                            return 1.0F;
+                        }
+                        return 0.0F;
+                    });
         });
     }
 

@@ -3,6 +3,7 @@ package net.kogasachan.kogasa_addiction.network;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
+
 import java.util.function.Supplier;
 
 public class TenshiAbilityPacket {

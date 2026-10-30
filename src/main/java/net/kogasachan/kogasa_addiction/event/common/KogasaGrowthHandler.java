@@ -288,8 +288,7 @@ public class KogasaGrowthHandler {
             switch (c) {
                 case '*' -> sb.append(".*");
                 case '?' -> sb.append('.');
-                case '.', '(', ')', '[', ']', '{', '}', '+', '^', '$', '|', '\\' ->
-                        sb.append('\\').append(c);
+                case '.', '(', ')', '[', ']', '{', '}', '+', '^', '$', '|', '\\' -> sb.append('\\').append(c);
                 default -> sb.append(c);
             }
         }

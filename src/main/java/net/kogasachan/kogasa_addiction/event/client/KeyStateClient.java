@@ -29,10 +29,11 @@ public class KeyStateClient {
         long window = mc.getWindow().getWindow();
         boolean ctrl = InputConstants.isKeyDown(window, GLFW.GLFW_KEY_LEFT_CONTROL)
                 || InputConstants.isKeyDown(window, GLFW.GLFW_KEY_RIGHT_CONTROL);
-        boolean alt  = InputConstants.isKeyDown(window, GLFW.GLFW_KEY_LEFT_ALT)
+        boolean alt = InputConstants.isKeyDown(window, GLFW.GLFW_KEY_LEFT_ALT)
                 || InputConstants.isKeyDown(window, GLFW.GLFW_KEY_RIGHT_ALT);
         if (ctrl != lastCtrl || alt != lastAlt) {
-            lastCtrl = ctrl; lastAlt = alt;
+            lastCtrl = ctrl;
+            lastAlt = alt;
             PacketHandler.INSTANCE.sendToServer(new KeyStatePacket(ctrl, alt));
         }
     }

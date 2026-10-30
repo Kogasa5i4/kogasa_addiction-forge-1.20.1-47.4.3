@@ -45,7 +45,9 @@ public class KoishiRangedAbilityHandler {
             Registries.DAMAGE_TYPE,
             ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "koishi_ranged"));
 
-    /** 已穿透实体数量，用于在自定义命中结算下模拟原版穿透上限。 */
+    /**
+     * 已穿透实体数量，用于在自定义命中结算下模拟原版穿透上限。
+     */
     private static final String PIERCE_HITS = "KogasaRangedPierceHits";
 
     @SubscribeEvent
@@ -175,7 +177,7 @@ public class KoishiRangedAbilityHandler {
             killed.add(target);
             CriteriaTriggers.KILLED_BY_CROSSBOW.trigger(player, killed);
         } else {
-            CriteriaTriggers.KILLED_BY_CROSSBOW.trigger(player, List.of((Entity) target));
+            CriteriaTriggers.KILLED_BY_CROSSBOW.trigger(player, List.of(target));
         }
     }
 

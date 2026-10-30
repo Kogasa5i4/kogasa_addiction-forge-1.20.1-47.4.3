@@ -25,7 +25,8 @@ public class KogasaNumberFormatHelper {
 
     /**
      * 百分比，输入原始比值（0.33 → "33%"），最多 maxDecimals 位小数，去尾零。
-     * */
+     *
+     */
     public static String formatPercentTrimmed(double ratio, int maxDecimals) {
         DecimalFormat df = new DecimalFormat(
                 "#" + (maxDecimals > 0 ? "." + "#".repeat(maxDecimals) : "") + "%",

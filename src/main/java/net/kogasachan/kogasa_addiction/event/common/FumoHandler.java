@@ -1,4 +1,3 @@
-
 package net.kogasachan.kogasa_addiction.event.common;
 
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
@@ -43,7 +42,8 @@ public class FumoHandler {
     private static final Map<TableKey, Integer> CANDIDATE_TABLES =
             new HashMap<>();
 
-    private record TableKey(ResourceKey<Level> dimension, BlockPos pos) {}
+    private record TableKey(ResourceKey<Level> dimension, BlockPos pos) {
+    }
 
     @SubscribeEvent
     public static void onEnchantmentLevelSet(

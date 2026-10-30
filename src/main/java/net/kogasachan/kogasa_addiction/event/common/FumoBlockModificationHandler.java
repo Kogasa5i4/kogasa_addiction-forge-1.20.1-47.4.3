@@ -29,19 +29,25 @@ import java.util.List;
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class FumoBlockModificationHandler {
 
-    /** 斧：先去蜡，再刮削，最后去皮 */
+    /**
+     * 斧：先去蜡，再刮削，最后去皮
+     */
     private static final List<ToolAction> AXE_ACTIONS = List.of(
             ToolActions.AXE_WAX_OFF,
             ToolActions.AXE_SCRAPE,
             ToolActions.AXE_STRIP
     );
 
-    /** 锹：压土径 */
+    /**
+     * 锹：压土径
+     */
     private static final List<ToolAction> SHOVEL_ACTIONS = List.of(
             ToolActions.SHOVEL_FLATTEN
     );
 
-    /** 锄：耕地 */
+    /**
+     * 锄：耕地
+     */
     private static final List<ToolAction> HOE_ACTIONS = List.of(
             ToolActions.HOE_TILL
     );
@@ -106,11 +112,11 @@ public class FumoBlockModificationHandler {
     }
 
     private static SoundEvent resolveSound(ToolAction action) {
-        if (action == ToolActions.AXE_STRIP)      return SoundEvents.AXE_STRIP;
-        if (action == ToolActions.AXE_SCRAPE)     return SoundEvents.AXE_SCRAPE;
-        if (action == ToolActions.AXE_WAX_OFF)    return SoundEvents.AXE_WAX_OFF;
+        if (action == ToolActions.AXE_STRIP) return SoundEvents.AXE_STRIP;
+        if (action == ToolActions.AXE_SCRAPE) return SoundEvents.AXE_SCRAPE;
+        if (action == ToolActions.AXE_WAX_OFF) return SoundEvents.AXE_WAX_OFF;
         if (action == ToolActions.SHOVEL_FLATTEN) return SoundEvents.SHOVEL_FLATTEN;
-        if (action == ToolActions.HOE_TILL)       return SoundEvents.HOE_TILL;
+        if (action == ToolActions.HOE_TILL) return SoundEvents.HOE_TILL;
         return null;
     }
 

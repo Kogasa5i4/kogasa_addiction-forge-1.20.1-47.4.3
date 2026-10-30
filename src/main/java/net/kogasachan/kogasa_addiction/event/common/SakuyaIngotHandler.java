@@ -49,7 +49,7 @@ public class SakuyaIngotHandler {
         int x = (int) Math.floor(player.getX());
         int z = (int) Math.floor(player.getZ());
         int y = (int) Math.floor(player.getY());
-        String combined = String.valueOf(Math.abs(x)  + Math.abs(z)  + Math.abs(y));
+        String combined = String.valueOf(Math.abs(x) + Math.abs(z) + Math.abs(y));
 
         int digitSum = 0;
         for (char c : combined.toCharArray()) {

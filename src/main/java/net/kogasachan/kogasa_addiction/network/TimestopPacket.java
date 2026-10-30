@@ -9,9 +9,14 @@ import java.util.function.Supplier;
 
 public class TimestopPacket {
 
-    public TimestopPacket() {}
-    public TimestopPacket(FriendlyByteBuf buf) {}
-    public void encode(FriendlyByteBuf buf) {}
+    public TimestopPacket() {
+    }
+
+    public TimestopPacket(FriendlyByteBuf buf) {
+    }
+
+    public void encode(FriendlyByteBuf buf) {
+    }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {

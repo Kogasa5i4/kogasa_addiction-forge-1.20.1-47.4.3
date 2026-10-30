@@ -386,7 +386,8 @@ public class KogasaEquipmentHelper {
         if (tag != null && right.is(tag)) return true;
 
         if (left.getItem() instanceof TridentItem) {
-            if (right.is(ItemTags.SWORDS) || right.is(Tags.Items.TOOLS_TRIDENTS) || right.is(ModItemTagsProvider.KNIVES)) return true;
+            if (right.is(ItemTags.SWORDS) || right.is(Tags.Items.TOOLS_TRIDENTS) || right.is(ModItemTagsProvider.KNIVES))
+                return true;
             ResourceLocation rightId = ForgeRegistries.ITEMS.getKey(right.getItem());
             if (rightId == null) return false;
             String path = rightId.getPath();

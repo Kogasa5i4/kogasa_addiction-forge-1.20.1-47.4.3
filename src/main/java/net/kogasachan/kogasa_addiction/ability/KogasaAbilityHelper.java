@@ -8,7 +8,8 @@ import net.minecraft.world.item.ItemStack;
 
 public final class KogasaAbilityHelper {
 
-    private KogasaAbilityHelper() {}
+    private KogasaAbilityHelper() {
+    }
 
     /**
      * 任意护甲槽是否装备了带指定能力的物品

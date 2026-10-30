@@ -103,7 +103,8 @@ public class TenshiAbilityHandler {
         // ===== 攻击端：全人类的绯想天（命中特效） =====
         if (event.getSource().getEntity() instanceof ServerPlayer attacker) {
             // 检查攻击者是否穿有天子护甲（或者手持带有天子能力的武器）
-            if (!KogasaAbilityHelper.hasAbilityInArmor(attacker, KogasaAbility.TENSHI) && !KogasaAbilityHelper.hasAbilityInMainHand(attacker, KogasaAbility.TENSHI)) return;
+            if (!KogasaAbilityHelper.hasAbilityInArmor(attacker, KogasaAbility.TENSHI) && !KogasaAbilityHelper.hasAbilityInMainHand(attacker, KogasaAbility.TENSHI))
+                return;
 
             LivingEntity target = event.getEntity();
             if (target == attacker) return;

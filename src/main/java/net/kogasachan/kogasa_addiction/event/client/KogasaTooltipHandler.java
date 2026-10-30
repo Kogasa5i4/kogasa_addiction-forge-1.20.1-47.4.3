@@ -287,7 +287,7 @@ public class KogasaTooltipHandler {
                                                 KogasaNumberFormatHelper.formatTrimmed(charge, 1),
                                                 KogasaNumberFormatHelper.formatTrimmed(threshold, 1),
                                                 resistance)
-                                    .withStyle(ChatFormatting.DARK_AQUA));
+                                        .withStyle(ChatFormatting.DARK_AQUA));
                             }
                         }
                     }

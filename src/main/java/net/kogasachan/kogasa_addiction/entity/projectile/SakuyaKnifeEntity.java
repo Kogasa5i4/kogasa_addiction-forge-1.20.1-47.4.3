@@ -48,7 +48,8 @@ public class SakuyaKnifeEntity extends ThrownTrident {
     }
 
     @Override
-    @NotNull public ItemStack getPickupItem() {
+    @NotNull
+    public ItemStack getPickupItem() {
         // 获取最开始扔出去的那把飞刀的 ItemStack
         ItemStack originStack = this.tridentItem;
 

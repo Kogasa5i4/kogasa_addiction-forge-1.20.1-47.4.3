@@ -73,7 +73,9 @@ public class KogasaAbilityIngotItem extends Item {
         super.appendHoverText(stack, level, tooltip, flag);
     }
 
-    /** Build acquisition hints from the active config so the tooltip stays accurate after config changes. */
+    /**
+     * Build acquisition hints from the active config so the tooltip stays accurate after config changes.
+     */
     private Component createObtainLine(String key) {
         Component result = switch (ability) {
             case AYA -> {

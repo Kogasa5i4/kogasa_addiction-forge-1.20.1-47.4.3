@@ -466,7 +466,7 @@ public class Config {
     public static final ForgeConfigSpec.DoubleValue SAKUYA_INGOT_CHANCE = BUILDER
             .comment("Chance to get a Sakuya Ingot at the start of each day if the coordinate condition is met. 0.1 = 10%.")
             .comment("每天开始时，满足坐标条件获取咲夜锭的概率。0.1 = 10%。")
-            .defineInRange("sakuyaIngotChance", 1/3D, 0.0, 1.0);
+            .defineInRange("sakuyaIngotChance", 1 / 3D, 0.0, 1.0);
 
     public static final ForgeConfigSpec.IntValue SAKUYA_TIMESTOP_SECONDS_PER_EQUIPMENT = BUILDER
             .comment("Timestop duration per piece of Sakuya equipment (in seconds).")

@@ -220,6 +220,13 @@ public class Config {
                     "弓弩获得额外穿透 I 所需的成长值。")
             .defineInRange("bowPierceGrowth", 0.5, 0.0, Double.MAX_VALUE);
 
+    public static final ForgeConfigSpec.DoubleValue RANGED_DRAW_SPEED_ABSORB_RATIO = BUILDER
+            .comment("Fraction of the vanilla full-draw time absorbed as \"draw speed\" per bow/crossbow reinforcement.\n" +
+                    "0.1 = every reinforcement absorbs 10% of the 20 (bow) / 25 (crossbow) ticks needed to draw fully.\n" +
+                    "弓弩每次强化吸收的拉弓速度比例（相对原版拉满时间）。\n" +
+                    "0.1 = 每次强化吸收 20（弓）/ 25（弩）tick 的 10%，即拉满时间缩短 1 tick。")
+            .defineInRange("rangedDrawSpeedAbsorbRatio", 0.1, 0.0, 1.0);
+
     public static final ForgeConfigSpec.DoubleValue BOW_MULTISHOT_2_GROWTH = BUILDER
             .comment("Growth required for 2-arrow multishot.\n" +
                     "解锁双发所需的成长值。")
@@ -437,6 +444,17 @@ public class Config {
             .comment("放置信标基座方块获取天子锭的概率。0.105 = 10.5%。")
             .defineInRange("tenshiIngotChance", 0.105, 0.0, 1.0);
 
+    public static final ForgeConfigSpec.BooleanValue TENSHI_INGOT_CONSUME_BLOCK = BUILDER
+            .comment("If true, the placed beacon-base block item is consumed when the ingot triggers.\n" +
+                    "Default false: the block is not consumed (pure bonus loot), which is the historic behavior.\n" +
+                    "NOTE: keeping this false means the player can repeatedly place the same block to keep rolling;\n" +
+                    "set it to true if you want each roll to cost one block.\n" +
+                    "天子锭触发时是否消耗被放置的方块物品。\n" +
+                    "默认 false：不消耗方块（纯额外奖励，与历史行为一致）。\n" +
+                    "注意：保持 false 意味着玩家可以反复放置同一方块持续触发；\n" +
+                    "如果希望每次触发消耗一个方块，请设为 true。")
+            .define("tenshiIngotConsumeBlock", false);
+
     public static final ForgeConfigSpec.DoubleValue TENSHI_DOMAIN_THRESHOLD = BUILDER
             .comment("Damage required to charge the 'State of No-Thought, No-Mind' (20 in default).")
             .comment("无念无想的境界所需的蓄力伤害值（默认20）。")
@@ -479,6 +497,11 @@ public class Config {
             .comment("Timestop radius in blocks. 20 = 20 blocks.")
             .comment("时停作用半径（格）。20 = 20 格。")
             .defineInRange("sakuyaTimestopRadius", 20, 1, 128);
+
+    public static final ForgeConfigSpec.IntValue SAKUYA_TIMESTOP_COOLDOWN_SECONDS = BUILDER
+            .comment("Cooldown in seconds after a timestop ends before it can be triggered again. 0 disables the cooldown.\n" +
+                    "一次时停结束后，再次发动时停所需的冷却时间（秒）。0 表示不启用冷却。")
+            .defineInRange("sakuyaTimestopCooldownSeconds", 30, 0, Integer.MAX_VALUE);
 
     static {
         BUILDER.pop();

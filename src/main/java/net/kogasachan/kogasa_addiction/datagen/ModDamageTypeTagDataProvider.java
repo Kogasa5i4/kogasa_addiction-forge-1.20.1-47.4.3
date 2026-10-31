@@ -21,14 +21,10 @@ public class ModDamageTypeTagDataProvider implements DataProvider {
     public @NotNull CompletableFuture<?> run(@NotNull CachedOutput cache) {
         Path bypasses_armor = this.output.getOutputFolder()
                 .resolve("data/minecraft/tags/damage_type/bypasses_armor.json");
-        Path bypasses_cooldown = this.output.getOutputFolder()
-                .resolve("data/minecraft/tags/damage_type/bypasses_cooldown.json");
         Path bypasses_effects = this.output.getOutputFolder()
                 .resolve("data/minecraft/tags/damage_type/bypasses_effects.json");
         Path bypasses_enchantments = this.output.getOutputFolder()
                 .resolve("data/minecraft/tags/damage_type/bypasses_enchantments.json");
-        Path bypasses_invulnerability = this.output.getOutputFolder()
-                .resolve("data/minecraft/tags/damage_type/bypasses_invulnerability.json");
         Path bypasses_resistance = this.output.getOutputFolder()
                 .resolve("data/minecraft/tags/damage_type/bypasses_resistance.json");
         Path bypasses_shield = this.output.getOutputFolder()
@@ -36,12 +32,13 @@ public class ModDamageTypeTagDataProvider implements DataProvider {
         Path always_hurts_ender_dragons = this.output.getOutputFolder()
                 .resolve("data/minecraft/tags/damage_type/always_hurts_ender_dragons.json");
 
+        // 刻意不挂 bypasses_invulnerability / bypasses_cooldown：
+        // 前者会让本模组远程伤害打穿创造模式与无敌帧，后者会让同一目标失去受击冷却，
+        // 两者叠加等于无限制穿甲连击，平衡与 PVP 风险过大。
         return CompletableFuture.allOf(
                 save(cache, bypasses_armor),
-                save(cache, bypasses_cooldown),
                 save(cache, bypasses_effects),
                 save(cache, bypasses_enchantments),
-                save(cache, bypasses_invulnerability),
                 save(cache, bypasses_resistance),
                 save(cache, bypasses_shield),
                 save(cache, always_hurts_ender_dragons)

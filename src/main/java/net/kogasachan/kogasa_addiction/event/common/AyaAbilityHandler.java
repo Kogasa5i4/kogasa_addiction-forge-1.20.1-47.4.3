@@ -42,10 +42,7 @@ public class AyaAbilityHandler {
         ItemStack held = player.getMainHandItem();
         if (!KogasaAbilityHelper.isEquipmentWithAbility(held, KogasaAbility.AYA)) return;
 
-        ResourceLocation mobId = ForgeRegistries.ENTITY_TYPES.getKey(event.getEntity().getType());
-        if (mobId == null) return;
-
-        if (KogasaAbilityData.tryAddKilledMob(held, mobId.toString())) {
+        if (KogasaAbilityData.tryAddKilledMob(held, event.getEntity().getType())) {
             onNewRecord(player, held, 0.1);
         }
     }
@@ -59,10 +56,7 @@ public class AyaAbilityHandler {
         ItemStack held = player.getMainHandItem();
         if (!KogasaAbilityHelper.isEquipmentWithAbility(held, KogasaAbility.AYA)) return;
 
-        ResourceLocation blockId = ForgeRegistries.BLOCKS.getKey(event.getState().getBlock());
-        if (blockId == null) return;
-
-        if (KogasaAbilityData.tryAddMinedBlock(held, blockId.toString())) {
+        if (KogasaAbilityData.tryAddMinedBlock(held, event.getState().getBlock())) {
             onNewRecord(serverPlayer, held, 1);
         }
     }
@@ -75,16 +69,14 @@ public class AyaAbilityHandler {
         ItemStack held = player.getMainHandItem();
         if (!KogasaAbilityHelper.isEquipmentWithAbility(held, KogasaAbility.AYA)) return;
 
-        // 获取伤害类型的注册名
+        // 伤害类型是数据包注册表，取它的 ResourceKey 位置
         ResourceKey<DamageType> damageKey = event.getSource()
                 .typeHolder()
                 .unwrapKey()
                 .orElse(null);
         if (damageKey == null) return;
 
-        String damageId = damageKey.location().toString();
-
-        if (KogasaAbilityData.tryAddDamageTaken(held, damageId)) {
+        if (KogasaAbilityData.tryAddDamageTaken(held, damageKey.location())) {
             onNewRecord(player, held, 1);
         }
     }

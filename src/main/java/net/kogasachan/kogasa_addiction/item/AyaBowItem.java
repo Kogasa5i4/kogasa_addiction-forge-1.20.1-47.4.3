@@ -141,7 +141,9 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
 
             double multiplier = KogasaEquipmentData.getMultiplier(stack);
             int arrowCount = KogasaEquipmentHelper.getBowArrowCount(stack);
-            float velocityMultiplier = (float) Math.sqrt(multiplier);
+            // 总倍率给基础弹速，强化吸收来的"发射威力"再叠一层
+            float velocityMultiplier = (float) (Math.sqrt(multiplier)
+                    * KogasaEquipmentHelper.getRangedPowerMultiplier(stack));
 
             // 药水效果：如果是药水弹药，缓存效果列表
             List<MobEffectInstance> potionEffects = new ArrayList<>();
@@ -167,9 +169,9 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
                 AbstractArrow arrow = arrowItem.createArrow(level, ammo, player);
                 arrow = customArrow(arrow);
 
-                // ===== 穿透叠加：Aya 箭矢自带 1 + 弓弩成长穿透 =====
-                int basePierce = arrow instanceof AyaArrowEntity
-                        ? arrow.getPierceLevel() : 0;
+                // ===== 穿透叠加：原版穿透附魔（customArrow 已写入）+ 弓弩成长穿透 =====
+                // 原先只对 Aya 箭取基础值，普通箭会被成长穿透覆盖掉原版穿透附魔
+                int basePierce = arrow.getPierceLevel();
                 int bowPierce = KogasaEquipmentHelper.getBowPierceLevel(stack);
                 int totalPierce = basePierce + bowPierce;
                 if (totalPierce > 0) {
@@ -245,15 +247,25 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
     }
 
     /**
-     * 自定义 power 计算：
-     * 拉满所需 charge = 20 / sqrt(multiplier)
-     * multiplier = 1.0 → 20 tick（原版）
-     * multiplier = 4.0 → 10 tick（快一倍）
+     * 自定义 power 计算，拉满所需 tick 由两条链共同缩短：
+     * <ol>
+     *   <li>总倍率：{@code 20 / sqrt(multiplier)}（原有行为，multiplier=4 时 10 tick）</li>
+     *   <li>强化吸收的拉弓速度：从上面结果里再扣掉 {@code DrawSpeedValue} 个 tick</li>
+     * </ol>
+     * 两条链独立生效，最终至少保留 1 tick。
      */
     public static float getCustomPowerForTime(ItemStack stack, int charge) {
         double multiplier = KogasaEquipmentData.getMultiplier(stack);
-        float maxCharge = (float) (20.0 / Math.sqrt(multiplier));
-        float f = charge / maxCharge;
+
+        int vanillaTicks = (int) Math.round(KogasaEquipmentHelper.getRangedBaseDrawTicks(stack));
+        if (vanillaTicks <= 0) {
+            vanillaTicks = 20;
+        }
+
+        int maxCharge = (int) Math.round(vanillaTicks / Math.sqrt(multiplier));
+        maxCharge = KogasaEquipmentHelper.getEffectiveDrawTicks(stack, Math.max(1, maxCharge));
+
+        float f = charge / (float) maxCharge;
         f = (f * f + f * 2.0F) / 3.0F;
         return Math.min(f, 1.0F);
     }

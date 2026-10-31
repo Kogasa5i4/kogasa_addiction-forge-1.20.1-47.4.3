@@ -59,34 +59,45 @@ public class KogasaJEIPlugin implements IModPlugin {
     }
 
     /**
-     * 11 种装备 × 对应标签内材料 → 输出强化后的装备
+     * 全部可强化装备 × 对应标签内材料 → 输出强化后的装备。
+     *
+     * <p>除 Fumo 之外全部收录（Fumo 是万能工具，按需求不在 JEI 展示强化配方）。
+     * 每件装备可以对应多个标签 —— 咲夜飞刀在运行时会走三叉戟特例，
+     * 额外接受剑与刀类材料，这里必须一并列出，否则 JEI 会漏展示。
      */
     private static void registerReinforcementRecipes(List<AnvilReinforcementRecipe> recipes) {
-        Map<Item, TagKey<Item>> equipmentTags = new LinkedHashMap<>();
-        equipmentTags.put(ModItems.KOGASA_SWORD.get(), ItemTags.SWORDS);
-        equipmentTags.put(ModItems.KOGASA_PICKAXE.get(), ItemTags.PICKAXES);
-        equipmentTags.put(ModItems.KOGASA_AXE.get(), ItemTags.AXES);
-        equipmentTags.put(ModItems.KOGASA_SHOVEL.get(), ItemTags.SHOVELS);
-        equipmentTags.put(ModItems.KOGASA_HOE.get(), ItemTags.HOES);
-        equipmentTags.put(ModItems.TENSHI_HELMET.get(), Tags.Items.ARMORS_HELMETS);
-        equipmentTags.put(ModItems.TENSHI_CHESTPLATE.get(), Tags.Items.ARMORS_CHESTPLATES);
-        equipmentTags.put(ModItems.TENSHI_LEGGINGS.get(), Tags.Items.ARMORS_LEGGINGS);
-        equipmentTags.put(ModItems.TENSHI_BOOTS.get(), Tags.Items.ARMORS_BOOTS);
-        equipmentTags.put(ModItems.AYA_BOW.get(), Tags.Items.TOOLS_BOWS);
-        equipmentTags.put(ModItems.AYA_CROSSBOW.get(), Tags.Items.TOOLS_CROSSBOWS);
+        Map<Item, List<TagKey<Item>>> equipmentTags = new LinkedHashMap<>();
+        equipmentTags.put(ModItems.KOGASA_SWORD.get(), List.of(ItemTags.SWORDS));
+        equipmentTags.put(ModItems.KOGASA_PICKAXE.get(), List.of(ItemTags.PICKAXES));
+        equipmentTags.put(ModItems.KOGASA_AXE.get(), List.of(ItemTags.AXES));
+        equipmentTags.put(ModItems.KOGASA_SHOVEL.get(), List.of(ItemTags.SHOVELS));
+        equipmentTags.put(ModItems.KOGASA_HOE.get(), List.of(ItemTags.HOES));
+        equipmentTags.put(ModItems.TENSHI_HELMET.get(), List.of(Tags.Items.ARMORS_HELMETS));
+        equipmentTags.put(ModItems.TENSHI_CHESTPLATE.get(), List.of(Tags.Items.ARMORS_CHESTPLATES));
+        equipmentTags.put(ModItems.TENSHI_LEGGINGS.get(), List.of(Tags.Items.ARMORS_LEGGINGS));
+        equipmentTags.put(ModItems.TENSHI_BOOTS.get(), List.of(Tags.Items.ARMORS_BOOTS));
+        equipmentTags.put(ModItems.AYA_BOW.get(), List.of(Tags.Items.TOOLS_BOWS));
+        equipmentTags.put(ModItems.AYA_CROSSBOW.get(), List.of(Tags.Items.TOOLS_CROSSBOWS));
+        // 咲夜飞刀：运行时 matchesReinforcementMaterial 走三叉戟特例，接受三叉戟 / 剑 / 刀
+        equipmentTags.put(ModItems.SAKUYA_KNIFE.get(), List.of(
+                Tags.Items.TOOLS_TRIDENTS,
+                ItemTags.SWORDS,
+                ModItemTagsProvider.KNIVES));
 
-        for (Map.Entry<Item, TagKey<Item>> entry : equipmentTags.entrySet()) {
+        for (Map.Entry<Item, List<TagKey<Item>>> entry : equipmentTags.entrySet()) {
             Item kogasaItem = entry.getKey();
-            TagKey<Item> tag = entry.getValue();
 
-            // 收集标签内所有物品（排除 Kogasa 自身和空气）
-            List<ItemStack> materials = new ArrayList<>();
-            BuiltInRegistries.ITEM.getTagOrEmpty(tag).forEach(holder -> {
-                Item item = holder.value();
-                if (item == Items.AIR) return;
-                if (item instanceof IKogasaEquipment) return; // 防止用自己强化自己
-                materials.add(new ItemStack(item));
-            });
+            // 收集所有标签内物品（排除 Kogasa 自身和空气），跨标签去重
+            Map<Item, ItemStack> materials = new LinkedHashMap<>();
+            for (TagKey<Item> tag : entry.getValue()) {
+                BuiltInRegistries.ITEM.getTagOrEmpty(tag).forEach(holder -> {
+                    Item item = holder.value();
+                    if (item == Items.AIR) return;
+                    // 防止用本模组装备互相强化（运行时对同名物品也会拦下）
+                    if (item instanceof IKogasaEquipment) return;
+                    materials.putIfAbsent(item, new ItemStack(item));
+                });
+            }
             if (materials.isEmpty()) continue;
 
             ItemStack input = new ItemStack(kogasaItem);
@@ -94,7 +105,7 @@ public class KogasaJEIPlugin implements IModPlugin {
             KogasaEquipmentData.setReinforcements(output, 1);
 
             recipes.add(new AnvilReinforcementRecipe(
-                    input, materials, output, RecipeKind.REINFORCEMENT));
+                    input, new ArrayList<>(materials.values()), output, RecipeKind.REINFORCEMENT));
         }
 
         // ===== 弓弩强化配方：16 支箭 =====

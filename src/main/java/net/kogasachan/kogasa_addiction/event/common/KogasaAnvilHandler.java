@@ -135,33 +135,17 @@ public class KogasaAnvilHandler {
         }
 
         // ===== 清除数据逻辑：水桶清强化，奶桶清能力 =====
+        // 一律走 KogasaEquipmentData / KogasaAbilityData 的封装，不再在这里硬编码 NBT 键名：
+        // 键名一旦在数据层改动，写死在这里的字符串会静默失效。
         if (right.is(Items.WATER_BUCKET) || right.is(Items.MILK_BUCKET)) {
             ItemStack result = left.copy();
-            net.minecraft.nbt.CompoundTag rootTag = result.getTag();
 
-            if (rootTag != null) {
-                if (right.is(Items.WATER_BUCKET)) {
-                    // 水桶：精准移除强化相关字段，保留成长
-                    if (rootTag.contains("KogasaEquipment", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
-                        net.minecraft.nbt.CompoundTag equipTag = rootTag.getCompound("KogasaEquipment");
-                        equipTag.remove("Reinforcements");
-                        equipTag.remove("UsedMaterials");
-                        equipTag.remove("AbsorbedValue");
-
-                        // 如果强化清空后连成长也没了，就把这个标签彻底删掉
-                        if (equipTag.isEmpty()) {
-                            rootTag.remove("KogasaEquipment");
-                        }
-                    }
-                } else if (right.is(Items.MILK_BUCKET)) {
-                    // 奶桶：移除能力标签，保留强化和成长
-                    rootTag.remove("KogasaAbilities");
-                }
-
-                // 如果清理后 NBT 完全空了，就清除空标签防止残留
-                if (rootTag.isEmpty()) {
-                    result.setTag(null);
-                }
+            if (right.is(Items.WATER_BUCKET)) {
+                // 水桶：清强化次数 / 已吸收材料 / 吸收值 / 拉弓速度，保留成长与附魔
+                KogasaEquipmentData.clearReinforcementData(result);
+            } else {
+                // 奶桶：清能力侧数据（能力列表、新闻值与记录、弹药），保留强化与成长
+                KogasaAbilityData.clearAllData(result);
             }
 
             event.setOutput(result);
@@ -222,11 +206,29 @@ public class KogasaAnvilHandler {
         KogasaEquipmentData.setReinforcements(result, re + 1);
         KogasaEquipmentData.addUsedMaterial(result, materialId);
 
-        double baseValue = KogasaEquipmentHelper.getEquipmentBaseValue(right);
         double ratio = KogasaEquipmentHelper.getAbsorbedRatio(right);
+
+        // 弓弩：任何箭矢都视作原版弓弩的等价复制品，属性完全一致 ——
+        // 所以威力与拉弓时间都按左侧这件弓/弩自己的原版数值结算，与材料具体是什么无关。
+        double baseValue;
+        double drawValue;
+        if (isBowOrCrossbow) {
+            baseValue = KogasaEquipmentHelper.getRangedBasePower(left);
+            drawValue = KogasaEquipmentHelper.getRangedBaseDrawTicks(left)
+                    * Config.RANGED_DRAW_SPEED_ABSORB_RATIO.get();
+        } else {
+            baseValue = KogasaEquipmentHelper.getEquipmentBaseValue(right);
+            drawValue = 0.0D;
+        }
+
         double absorb = baseValue * ratio;
         if (absorb > 0) {
             KogasaEquipmentData.addAbsorbedValue(result, absorb);
+        }
+
+        double drawAbsorb = drawValue * ratio;
+        if (drawAbsorb > 0) {
+            KogasaEquipmentData.addDrawSpeedValue(result, drawAbsorb);
         }
 
         event.setOutput(result);

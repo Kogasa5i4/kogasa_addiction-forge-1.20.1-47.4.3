@@ -48,6 +48,15 @@ public class TenshiIngotHandler {
         );
         event.setCanceled(true);
 
+        // 是否消耗被放置的方块：显式控制，不再依赖 Forge 在 BlockItem#place 里的注入点语义。
+        // 旧写法完全没有处理这一点，实际结果是"扣不扣"取决于注入点，行为不确定。
+        if (Config.TENSHI_INGOT_CONSUME_BLOCK.get() && !player.getAbilities().instabuild) {
+            ItemStack used = findPlacedStack(player, state);
+            if (!used.isEmpty()) {
+                used.shrink(1);
+            }
+        }
+
         // 手动播放方块破坏/信标激活的音效，给玩家反馈
         level.playSound(null, pos, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 1.0F, 1.2F);
         level.playSound(null, pos, SoundEvents.STONE_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
@@ -64,5 +73,18 @@ public class TenshiIngotHandler {
                         .withStyle(net.minecraft.ChatFormatting.GOLD),
                 true
         );
+    }
+
+    /**
+     * 找出玩家身上用于放置这个方块的那个物品栈（主手优先，其次副手）。
+     */
+    private static ItemStack findPlacedStack(ServerPlayer player, BlockState placed) {
+        for (ItemStack candidate : new ItemStack[]{player.getMainHandItem(), player.getOffhandItem()}) {
+            if (candidate.getItem() instanceof net.minecraft.world.item.BlockItem blockItem
+                    && blockItem.getBlock() == placed.getBlock()) {
+                return candidate;
+            }
+        }
+        return ItemStack.EMPTY;
     }
 }

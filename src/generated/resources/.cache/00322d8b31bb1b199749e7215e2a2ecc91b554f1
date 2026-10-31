@@ -1,9 +1,7 @@
-// 1.20.1	2026-10-18T21:07:17.5159047	Mod Damage Type Tags
+// 1.20.1	2026-10-31T20:16:14.0763726	Mod Damage Type Tags
 d27d7124a7967e31949da3e6c30b398ddb4f1f29 data/minecraft/tags/damage_type/always_hurts_ender_dragons.json
 d27d7124a7967e31949da3e6c30b398ddb4f1f29 data/minecraft/tags/damage_type/bypasses_armor.json
-d27d7124a7967e31949da3e6c30b398ddb4f1f29 data/minecraft/tags/damage_type/bypasses_cooldown.json
 d27d7124a7967e31949da3e6c30b398ddb4f1f29 data/minecraft/tags/damage_type/bypasses_effects.json
 d27d7124a7967e31949da3e6c30b398ddb4f1f29 data/minecraft/tags/damage_type/bypasses_enchantments.json
-d27d7124a7967e31949da3e6c30b398ddb4f1f29 data/minecraft/tags/damage_type/bypasses_invulnerability.json
 d27d7124a7967e31949da3e6c30b398ddb4f1f29 data/minecraft/tags/damage_type/bypasses_resistance.json
 d27d7124a7967e31949da3e6c30b398ddb4f1f29 data/minecraft/tags/damage_type/bypasses_shield.json

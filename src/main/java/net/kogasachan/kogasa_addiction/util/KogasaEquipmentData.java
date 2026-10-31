@@ -15,27 +15,110 @@ public class KogasaEquipmentData {
     private static final String USED_MATERIALS = "UsedMaterials";
     private static final String GROWTH = "Growth";
     private static final String ABSORBED_VALUE = "AbsorbedValue";
+    /** 弓弩专用：累积吸收的"拉弓速度"（单位 tick，从原版拉满时间中扣减） */
+    private static final String DRAW_SPEED_VALUE = "DrawSpeedValue";
     private static final String GROWTH_ENCHANTS_GRANTED = "GrowthEnchantsGranted";
-    private static final String KEY_GROWTH_ENCHANT_FAIL_NOTIFIED = "GrowthEnchantFailNotified";
+    private static final String GROWTH_ENCHANT_FAIL_NOTIFIED = "GrowthEnchantFailNotified";
+
+    // 新旧位置用的是同一个键名，只是父标签不同：
+    //   新位置 → 物品 tag["KogasaEquipment"]["GrowthEnchantFailNotified"]
+    //   旧位置 → 物品 tag["GrowthEnchantFailNotified"]（读取兼容，写入时迁移）
 
     public static boolean hasGrowthEnchantFailNotified(ItemStack stack) {
-        CompoundTag tag = stack.getTag();
-        return tag != null && tag.getBoolean(KEY_GROWTH_ENCHANT_FAIL_NOTIFIED);
+        if (getTag(stack).getBoolean(GROWTH_ENCHANT_FAIL_NOTIFIED)) return true;
+
+        CompoundTag root = stack.getTag();
+        return root != null && root.getBoolean(GROWTH_ENCHANT_FAIL_NOTIFIED);
     }
 
     public static void setGrowthEnchantFailNotified(ItemStack stack, boolean value) {
+        CompoundTag root = stack.getTag();
+        if (root != null) {
+            root.remove(GROWTH_ENCHANT_FAIL_NOTIFIED);
+        }
+
+        CompoundTag tag = getTag(stack);
         if (value) {
-            stack.getOrCreateTag().putBoolean(KEY_GROWTH_ENCHANT_FAIL_NOTIFIED, true);
-        } else {
-            CompoundTag tag = stack.getTag();
-            if (tag != null) {
-                tag.remove(KEY_GROWTH_ENCHANT_FAIL_NOTIFIED);
+            tag.putBoolean(GROWTH_ENCHANT_FAIL_NOTIFIED, true);
+            saveTag(stack, tag);
+            return;
+        }
+
+        if (tag.contains(GROWTH_ENCHANT_FAIL_NOTIFIED)) {
+            tag.remove(GROWTH_ENCHANT_FAIL_NOTIFIED);
+            if (tag.isEmpty()) {
+                // 避免留下一个空的 KogasaEquipment 复合标签
+                if (root != null) root.remove(ROOT);
+            } else {
+                saveTag(stack, tag);
             }
         }
     }
 
+    /**
+     * 是否存有任何强化/成长数据（含旧位置残留的标记）。
+     */
+    public static boolean hasData(ItemStack stack) {
+        CompoundTag root = stack.getTag();
+        if (root == null) return false;
+        if (root.contains(ROOT)) return true;
+        return root.getBoolean(GROWTH_ENCHANT_FAIL_NOTIFIED);
+    }
+
+    /**
+     * 清空该装备的全部强化/成长数据（整个 {@link #ROOT} 复合标签，含旧位置残留的标记）。
+     */
+    public static void clearAll(ItemStack stack) {
+        CompoundTag root = stack.getTag();
+        if (root == null) return;
+
+        root.remove(ROOT);
+        root.remove(GROWTH_ENCHANT_FAIL_NOTIFIED);
+        if (root.isEmpty()) stack.setTag(null);
+    }
+
     public static double getAbsorbedValue(ItemStack stack) {
         return getTag(stack).getDouble(ABSORBED_VALUE);
+    }
+
+    /**
+     * 已吸收的拉弓速度（tick）。弓弩强化时从材料身上吸收，用于缩短拉满所需时间。
+     */
+    public static double getDrawSpeedValue(ItemStack stack) {
+        return getTag(stack).getDouble(DRAW_SPEED_VALUE);
+    }
+
+    public static void addDrawSpeedValue(ItemStack stack, double value) {
+        if (value <= 0) return;
+        CompoundTag tag = getTag(stack);
+        tag.putDouble(DRAW_SPEED_VALUE, tag.getDouble(DRAW_SPEED_VALUE) + value);
+        saveTag(stack, tag);
+    }
+
+    public static void setDrawSpeedValue(ItemStack stack, double value) {
+        CompoundTag tag = getTag(stack);
+        tag.putDouble(DRAW_SPEED_VALUE, value);
+        saveTag(stack, tag);
+    }
+
+    /**
+     * 清除强化相关数据（强化次数 / 已吸收材料 / 吸收值 / 拉弓速度），
+     * 保留成长值与成长附魔计数。对应铁砧里的水桶清除。
+     */
+    public static void clearReinforcementData(ItemStack stack) {
+        CompoundTag root = stack.getTag();
+        if (root == null || !root.contains(ROOT)) return;
+
+        CompoundTag tag = root.getCompound(ROOT);
+        tag.remove(REINFORCEMENTS);
+        tag.remove(USED_MATERIALS);
+        tag.remove(ABSORBED_VALUE);
+        tag.remove(DRAW_SPEED_VALUE);
+
+        if (tag.isEmpty()) {
+            root.remove(ROOT);
+            if (root.isEmpty()) stack.setTag(null);
+        }
     }
 
     public static void addAbsorbedValue(ItemStack stack, double value) {

@@ -12,6 +12,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -70,6 +72,19 @@ public class KogasaGrowthHandler {
     public static void onHurt(LivingHurtEvent event) {
         if (!Config.ENABLE_GROWTH.get()) return;
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
+
+        DamageSource source = event.getSource();
+        // 来源缺失（异常或其它模组构造的 DamageSource）直接跳过
+        if (source == null) return;
+        // 0 伤害（被完全吸收、无敌帧内等）不喂成长
+        if (event.getAmount() <= 0.0F) return;
+        // 环境伤害不算"承受攻击"：否则站在火里 / 反复摔落 / 泡水就能零成本刷成长
+        if (source.is(DamageTypeTags.IS_FIRE)
+                || source.is(DamageTypeTags.IS_FALL)
+                || source.is(DamageTypeTags.IS_DROWNING)
+                || source.is(DamageTypeTags.IS_FREEZING)) {
+            return;
+        }
 
         triggerGrowth(player);
     }

@@ -2,6 +2,11 @@ package net.kogasachan.kogasa_addiction.item;
 
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
+import net.kogasachan.kogasa_addiction.item.tool.KogasaAxeItem;
+import net.kogasachan.kogasa_addiction.item.tool.KogasaHoeItem;
+import net.kogasachan.kogasa_addiction.item.tool.KogasaPickaxeItem;
+import net.kogasachan.kogasa_addiction.item.tool.KogasaShovelItem;
+import net.kogasachan.kogasa_addiction.item.tool.KogasaSwordItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ArmorItem;
@@ -60,27 +65,27 @@ public class ModItems {
     // 工具/武器
     public static final RegistryObject<Item> KOGASA_SWORD = ITEMS.register(
             "kogasa_sword",
-            () -> new IKogasaEquipment.KogasaSwordItem(KogasaTier.INSTANCE, 3, -2.4F,
+            () -> new KogasaSwordItem(KogasaTier.INSTANCE, 3, -2.4F,
                     new Item.Properties().rarity(Rarity.EPIC))
     );
     public static final RegistryObject<Item> KOGASA_PICKAXE = ITEMS.register(
             "kogasa_pickaxe",
-            () -> new IKogasaEquipment.KogasaPickaxeItem(KogasaTier.INSTANCE, 1, -2.8F,
+            () -> new KogasaPickaxeItem(KogasaTier.INSTANCE, 1, -2.8F,
                     new Item.Properties().rarity(Rarity.EPIC))
     );
     public static final RegistryObject<Item> KOGASA_AXE = ITEMS.register(
             "kogasa_axe",
-            () -> new IKogasaEquipment.KogasaAxeItem(KogasaTier.INSTANCE, 6.0F, -3.2F,
+            () -> new KogasaAxeItem(KogasaTier.INSTANCE, 6.0F, -3.2F,
                     new Item.Properties().rarity(Rarity.EPIC))
     );
     public static final RegistryObject<Item> KOGASA_SHOVEL = ITEMS.register(
             "kogasa_shovel",
-            () -> new IKogasaEquipment.KogasaShovelItem(KogasaTier.INSTANCE, 1.5F, -3.0F,
+            () -> new KogasaShovelItem(KogasaTier.INSTANCE, 1.5F, -3.0F,
                     new Item.Properties().rarity(Rarity.EPIC))
     );
     public static final RegistryObject<Item> KOGASA_HOE = ITEMS.register(
             "kogasa_hoe",
-            () -> new IKogasaEquipment.KogasaHoeItem(KogasaTier.INSTANCE, 0, -3.0F,
+            () -> new KogasaHoeItem(KogasaTier.INSTANCE, 0, -3.0F,
                     new Item.Properties().rarity(Rarity.EPIC))
     );
 

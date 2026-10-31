@@ -1,16 +1,25 @@
 package net.kogasachan.kogasa_addiction.ability;
 
 import net.kogasachan.kogasa_addiction.Config;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.LongArrayTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 public class KogasaAbilityData {
 
@@ -56,17 +65,40 @@ public class KogasaAbilityData {
     }
 
     /**
-     * 是否拥有指定能力
+     * 一次解析出能力集合，供需要连续判断多个能力的调用方复用，
+     * 避免在同一段渲染/结算逻辑里反复解析 NBT。
+     */
+    public static Set<KogasaAbility> getAbilitySet(ItemStack stack) {
+        ListTag list = getTag(stack).getList(ABILITIES, Tag.TAG_STRING);
+        Set<KogasaAbility> result = EnumSet.noneOf(KogasaAbility.class);
+        for (int i = 0; i < list.size(); i++) {
+            KogasaAbility ability = KogasaAbility.byId(list.getString(i));
+            if (ability != null) result.add(ability);
+        }
+        return result;
+    }
+
+    /**
+     * 是否拥有指定能力。
+     * 直接扫描字符串列表，不创建任何临时集合 —— 该方法处在属性计算与 Tooltip 渲染的热路径上
+     * （每次属性重算 / 每帧多次调用），因此刻意避免走 {@link #getAbilities(ItemStack)}。
      */
     public static boolean hasAbility(ItemStack stack, KogasaAbility ability) {
-        return getAbilities(stack).contains(ability);
+        if (ability == null) return false;
+
+        String id = ability.getId();
+        ListTag list = getTag(stack).getList(ABILITIES, Tag.TAG_STRING);
+        for (int i = 0; i < list.size(); i++) {
+            if (id.equals(list.getString(i))) return true;
+        }
+        return false;
     }
 
     /**
      * 是否拥有任意能力
      */
     public static boolean hasAnyAbility(ItemStack stack) {
-        return !getAbilities(stack).isEmpty();
+        return !getAbilitySet(stack).isEmpty();
     }
 
     /**
@@ -111,6 +143,26 @@ public class KogasaAbilityData {
         saveTag(stack, tag);
     }
 
+    /**
+     * 是否存有任何能力侧数据。
+     */
+    public static boolean hasData(ItemStack stack) {
+        CompoundTag root = stack.getTag();
+        return root != null && root.contains(ROOT);
+    }
+
+    /**
+     * 清空该装备的全部能力侧数据（整个 {@link #ROOT} 复合标签：
+     * 能力列表、新闻值与记录、弹药）。用于命令的整体重置。
+     */
+    public static void clearAllData(ItemStack stack) {
+        CompoundTag root = stack.getTag();
+        if (root == null) return;
+
+        root.remove(ROOT);
+        if (root.isEmpty()) stack.setTag(null);
+    }
+
     // ==================== 能力槽位 ====================
 
     /**
@@ -125,9 +177,10 @@ public class KogasaAbilityData {
 
     /**
      * 已占用的能力槽数量。特殊弹药不占用能力槽位。
+     * 用集合去重统计，避免历史数据里出现重复 id 时槽位虚高。
      */
     public static int getUsedSlots(ItemStack stack) {
-        return getAbilities(stack).size();
+        return getAbilitySet(stack).size();
     }
 
     // ==================== Aya 新闻值 ====================
@@ -144,37 +197,62 @@ public class KogasaAbilityData {
         saveTag(stack, tag);
     }
 
-    // ==================== Aya 已记录集合 ====================
+    // ==================== Aya 已记录集合（位图） ====================
+    //
+    // 旧实现把"记录过的生物/方块/伤害类型"存成字符串 ID 列表，每遇到一种新的就追加一条，
+    // 总量随注册表无限增长（长期存档可上千条）。物品 NBT 会随容器同步下发给客户端，
+    // 超过包上限后这件装备就无法同步了。
+    //
+    // 现在改成按**注册表数字 ID** 打位的 long[]，体积有硬上限：
+    //   方块 ~1200 个 → 19 个 long → 152 字节
+    //   生物 ~150 个  → 3 个 long → 24 字节
+    //   伤害类型      → 1 个 long
+    // 语义完全不变：仍是"这件装备记没记录过 X"，新闻值仍按件累计。
+    //
+    // 之所以没把记录搬到玩家身上：玩家的 persistentData 也是无上限增长的（只是不走物品同步），
+    // 所以"确保不溢出"严格来说不成立；位图则是构造上就有界，且不改变"按件"的既有玩法。
+
+    /** 伤害类型记录（字符串列表）的硬上限，防止数据包驱动的注册表把 NBT 撑爆 */
+    private static final int MAX_DAMAGE_TYPE_RECORDS = 256;
 
     /**
-     * 检查某类记录是否已存在，不存在则添加。返回 true 表示是新记录。
+     * 记录一种生物。返回 true 表示是新记录。
      */
-    public static boolean tryAddRecord(ItemStack stack, String key, String value) {
+    public static boolean tryAddKilledMob(ItemStack stack, EntityType<?> type) {
+        return tryAddBit(stack, AYA_KILLED_MOBS, BuiltInRegistries.ENTITY_TYPE.getId(type));
+    }
+
+    /**
+     * 记录一种方块。返回 true 表示是新记录。
+     */
+    public static boolean tryAddMinedBlock(ItemStack stack, Block block) {
+        return tryAddBit(stack, AYA_MINED_BLOCKS, BuiltInRegistries.BLOCK.getId(block));
+    }
+
+    /**
+     * 记录一种伤害类型。返回 true 表示是新记录。
+     *
+     * <p>伤害类型是**数据包驱动的注册表**（{@code Registries.DAMAGE_TYPE}），没有
+     * {@code BuiltInRegistries} 静态字段，数据层拿不到它的数字 ID —— 所以这一类仍用字符串列表，
+     * 但加了硬上限 {@link #MAX_DAMAGE_TYPE_RECORDS}。伤害类型总量本来就小（原版约 40 个），
+     * 这样既保留"记过哪种伤害"的语义，又不会像原来那样无界增长。
+     */
+    public static boolean tryAddDamageTaken(ItemStack stack, ResourceLocation damageTypeId) {
+        if (damageTypeId == null) return false;
+
         CompoundTag tag = getTag(stack);
-        ListTag list = tag.getList(key, Tag.TAG_STRING);
+        ListTag list = tag.getList(AYA_DAMAGES_TAKEN, Tag.TAG_STRING);
+        String value = damageTypeId.toString();
+
         for (int i = 0; i < list.size(); i++) {
             if (list.getString(i).equals(value)) return false;
         }
+        if (list.size() >= MAX_DAMAGE_TYPE_RECORDS) return false;
+
         list.add(StringTag.valueOf(value));
-        tag.put(key, list);
+        tag.put(AYA_DAMAGES_TAKEN, list);
         saveTag(stack, tag);
         return true;
-    }
-
-    public static int getRecordCount(ItemStack stack, String key) {
-        return getTag(stack).getList(key, Tag.TAG_STRING).size();
-    }
-
-    public static boolean tryAddKilledMob(ItemStack stack, String mobId) {
-        return tryAddRecord(stack, AYA_KILLED_MOBS, mobId);
-    }
-
-    public static boolean tryAddMinedBlock(ItemStack stack, String blockId) {
-        return tryAddRecord(stack, AYA_MINED_BLOCKS, blockId);
-    }
-
-    public static boolean tryAddDamageTaken(ItemStack stack, String damageTypeId) {
-        return tryAddRecord(stack, AYA_DAMAGES_TAKEN, damageTypeId);
     }
 
     public static int getKilledMobCount(ItemStack stack) {
@@ -187,6 +265,114 @@ public class KogasaAbilityData {
 
     public static int getDamageTakenCount(ItemStack stack) {
         return getRecordCount(stack, AYA_DAMAGES_TAKEN);
+    }
+
+    /**
+     * 记录总数。位图（生物/方块）按置位数统计，字符串列表（伤害类型）按条目数统计。
+     */
+    public static int getRecordCount(ItemStack stack, String key) {
+        Tag raw = getTag(stack).get(key);
+
+        if (raw instanceof LongArrayTag longArray) {
+            int count = 0;
+            for (long word : longArray.getAsLongArray()) {
+                count += Long.bitCount(word);
+            }
+            return count;
+        }
+        if (raw instanceof ListTag list) {
+            return list.size();
+        }
+        return 0;
+    }
+
+    // ==================== 位图内部实现 ====================
+
+    private static boolean tryAddBit(ItemStack stack, String key, int id) {
+        if (id < 0) return false;
+
+        // 这一步可能触发旧字符串列表 → 位图的迁移，并已写回
+        long[] bits = bitmapOf(stack, key);
+
+        int word = id >>> 6;
+        long mask = 1L << (id & 63);
+
+        if (word < bits.length && (bits[word] & mask) != 0L) {
+            return false;
+        }
+        if (word >= bits.length) {
+            bits = Arrays.copyOf(bits, word + 1);
+        }
+        bits[word] |= mask;
+
+        CompoundTag tag = getTag(stack);
+        tag.putLongArray(key, bits);
+        saveTag(stack, tag);
+        return true;
+    }
+
+    /**
+     * 读取位图；遇到旧版本留下的字符串列表时，就地转换成位图并落盘。
+     */
+    private static long[] bitmapOf(ItemStack stack, String key) {
+        CompoundTag tag = getTag(stack);
+        Tag raw = tag.get(key);
+
+        if (raw instanceof LongArrayTag longArray) {
+            return longArray.getAsLongArray();
+        }
+
+        if (raw instanceof ListTag list) {
+            long[] migrated = migrateLegacyList(key, list);
+            tag.remove(key);
+            if (migrated.length > 0) {
+                tag.putLongArray(key, migrated);
+            }
+            saveTag(stack, tag);
+            return migrated;
+        }
+
+        return new long[0];
+    }
+
+    /**
+     * 把旧格式（字符串 ID 列表）转成位图；无法解析的条目直接丢弃。
+     */
+    private static long[] migrateLegacyList(String key, ListTag list) {
+        Registry<?> registry = registryForKey(key);
+        if (registry == null) return new long[0];
+
+        long[] bits = new long[0];
+        for (int i = 0; i < list.size(); i++) {
+            ResourceLocation id = ResourceLocation.tryParse(list.getString(i));
+            if (id == null) continue;
+
+            Object value = registry.get(id);
+            if (value == null) continue;
+
+            int index = idOf(registry, value);
+            if (index < 0) continue;
+
+            int word = index >>> 6;
+            if (word >= bits.length) {
+                bits = Arrays.copyOf(bits, word + 1);
+            }
+            bits[word] |= (1L << (index & 63));
+        }
+        return bits;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static int idOf(Registry<?> registry, Object value) {
+        return ((Registry) registry).getId(value);
+    }
+
+    private static Registry<?> registryForKey(String key) {
+        return switch (key) {
+            case AYA_KILLED_MOBS -> BuiltInRegistries.ENTITY_TYPE;
+            case AYA_MINED_BLOCKS -> BuiltInRegistries.BLOCK;
+            default -> null;
+        };
     }
 
     public static void setNewsValue(ItemStack stack, double value) {

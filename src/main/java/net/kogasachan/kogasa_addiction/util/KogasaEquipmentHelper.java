@@ -8,6 +8,8 @@ import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.datagen.ModItemTagsProvider;
 import net.kogasachan.kogasa_addiction.item.FumoItem;
 import net.kogasachan.kogasa_addiction.item.SakuyaKnifeItem;
+import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKind;
+import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKinds;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -165,6 +167,78 @@ public class KogasaEquipmentHelper {
     }
 
     /**
+     * 原版弓的箭矢初速基数（BowItem.releaseUsing 里 power * 3.0F）
+     */
+    private static final double VANILLA_BOW_POWER = 3.0D;
+
+    /**
+     * 原版弩的箭矢初速基数（CrossbowItem.ARROW_POWER）
+     */
+    private static final double VANILLA_CROSSBOW_POWER = 3.15D;
+
+    /**
+     * 原版弓拉满所需 tick（BowItem.MAX_DRAW_DURATION）
+     */
+    private static final double VANILLA_BOW_DRAW_TICKS = 20.0D;
+
+    /**
+     * 原版弩装填所需 tick（CrossbowItem.MAX_CHARGE_DURATION）
+     */
+    private static final double VANILLA_CROSSBOW_DRAW_TICKS = 25.0D;
+
+    public static boolean isRanged(ItemStack stack) {
+        return stack.getItem() instanceof BowItem || stack.getItem() instanceof CrossbowItem;
+    }
+
+    /**
+     * 弓弩的"基础发射威力"。
+     *
+     * <p>强化材料侧的口径：**任何箭矢都视作原版弓弩的等价复制品**，属性完全一致，
+     * 因此这里只看左侧这件装备自己是弓还是弩，与材料是什么无关。
+     */
+    public static double getRangedBasePower(ItemStack rangedStack) {
+        if (rangedStack.getItem() instanceof CrossbowItem) return VANILLA_CROSSBOW_POWER;
+        if (rangedStack.getItem() instanceof BowItem) return VANILLA_BOW_POWER;
+        return 0.0D;
+    }
+
+    /**
+     * 弓弩的"基础拉弓时间"（tick），口径同上。
+     */
+    public static double getRangedBaseDrawTicks(ItemStack rangedStack) {
+        if (rangedStack.getItem() instanceof CrossbowItem) return VANILLA_CROSSBOW_DRAW_TICKS;
+        if (rangedStack.getItem() instanceof BowItem) return VANILLA_BOW_DRAW_TICKS;
+        return 0.0D;
+    }
+
+    /**
+     * 发射威力倍率 =（原版威力 + 已吸收威力）/ 原版威力。
+     *
+     * <p>与近战保持同一口径：吸收值是"基础值的增量"，所以第 1 次强化在默认
+     * {@code weaponAbsorbedRatio=0.5} 下是 +50% 初速，而不是直接把初速翻倍。
+     */
+    public static double getRangedPowerMultiplier(ItemStack stack) {
+        double base = getRangedBasePower(stack);
+        if (base <= 0.0D) return 1.0D;
+
+        double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
+        if (absorbed <= 0.0D) return 1.0D;
+
+        return 1.0D + absorbed / base;
+    }
+
+    /**
+     * 实际拉满所需 tick：原版拉满时间 - 已吸收的拉弓速度，至少保留 1 tick。
+     */
+    public static int getEffectiveDrawTicks(ItemStack stack, int vanillaTicks) {
+        double absorbed = KogasaEquipmentData.getDrawSpeedValue(stack);
+        if (absorbed <= 0.0D) return vanillaTicks;
+
+        long reduced = Math.round(vanillaTicks - absorbed);
+        return (int) Math.max(1L, reduced);
+    }
+
+    /**
      * 获取一件装备的“基础价值”，用于铁砧强化时累加。
      * - 剑/工具：物品自身的攻击伤害
      * - 护甲：防御值
@@ -241,19 +315,11 @@ public class KogasaEquipmentHelper {
     }
 
     /**
-     * 按注册名返回物品的基础攻速修饰符
+     * 物品的基础攻速修饰符，由装备类型表统一给出。
      */
     public static double getBaseAttackSpeed(ItemStack stack) {
-        if (stack.getItem() instanceof FumoItem fumo) return -2.0;
-        if (stack.getItem() instanceof SakuyaKnifeItem sakuyaKnifeItem) return -2.9;
-        var id = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem());
-        if (id == null) return -2.8;
-        String path = id.getPath();
-        if (path.endsWith("_sword")) return -2.4;
-        if (path.endsWith("_axe")) return -3.2;
-        if (path.endsWith("_hoe")) return -3.0;
-        if (path.endsWith("_shovel")) return -3.0;
-        return -2.8; // 未识别的工具/武器（含镐）
+        KogasaEquipmentKind kind = KogasaEquipmentKinds.of(stack);
+        return kind == null ? -2.8D : kind.baseAttackSpeed();
     }
 
     /**
@@ -330,77 +396,31 @@ public class KogasaEquipmentHelper {
     }
 
     /**
-     * 根据左侧 Kogasa 物品返回对应的匹配标签
+     * 左侧装备对应的强化材料 tag（由宽容类型判定得出，未识别返回 null）。
      */
     public static TagKey<Item> getMatchingTag(ItemStack stack) {
-        Item item = stack.getItem();
-        if (item instanceof FumoItem) return Tags.Items.TOOLS;
-        if (item instanceof SakuyaKnifeItem) return Tags.Items.TOOLS_TRIDENTS;
-        // 用注册名判断，避免为每种类型创建单独的类判断
-        ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
-        if (id == null) return null;
-        String path = id.getPath();
-
-        if (path.endsWith("_sword")) return ItemTags.SWORDS;
-        if (path.endsWith("_pickaxe")) return ItemTags.PICKAXES;
-        if (path.endsWith("_axe")) return ItemTags.AXES;
-        if (path.endsWith("_shovel")) return ItemTags.SHOVELS;
-        if (path.endsWith("_hoe")) return ItemTags.HOES;
-        if (path.endsWith("_helmet")) return Tags.Items.ARMORS_HELMETS;
-        if (path.endsWith("_chestplate")) return Tags.Items.ARMORS_CHESTPLATES;
-        if (path.endsWith("_leggings")) return Tags.Items.ARMORS_LEGGINGS;
-        if (path.endsWith("_boots")) return Tags.Items.ARMORS_BOOTS;
-        return null;
+        KogasaEquipmentKind kind = KogasaEquipmentKinds.of(stack);
+        return kind == null ? null : kind.materialTag();
     }
 
     /**
-     * 返回装备类型的后缀标识（不含下划线），例如 "sword"、"pickaxe"。
-     * Fumo 返回 null；咲夜飞刀返回 "knife"。
+     * 返回装备类型的后缀标识（不含下划线），例如 "sword"、"pickaxe"；未识别返回 null。
      */
     public static String getEquipmentSuffix(ItemStack stack) {
-        Item item = stack.getItem();
-
-        ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
-        if (id == null) return null;
-        String path = id.getPath();
-
-        if (path.endsWith("sword")) return "sword";
-        if (path.endsWith("pickaxe")) return "pickaxe";
-        if (path.endsWith("axe")) return "axe";
-        if (path.endsWith("shovel")) return "shovel";
-        if (path.endsWith("hoe")) return "hoe";
-        if (path.endsWith("helmet")) return "helmet";
-        if (path.endsWith("chestplate")) return "chestplate";
-        if (path.endsWith("leggings")) return "leggings";
-        if (path.endsWith("boots")) return "boots";
-        if (path.endsWith("knife")) return "knife";
-        return null;
+        KogasaEquipmentKind kind = KogasaEquipmentKinds.of(stack);
+        return kind == null ? null : kind.suffix();
     }
 
     /**
      * 判断 right 是否是 left 的有效强化材料。
-     * 先走 tag 匹配；tag 不匹配时退回注册名后缀匹配。
-     * 三叉戟类特例：接受剑、三叉戟或飞刀。
+     *
+     * <p>宽容匹配：先按宽容规则判定左侧的装备类型，再由该类型判断材料是否可接受 ——
+     * 类身份 / 物品 tag / 注册名后缀三者任一成立即可。飞刀另有"接受剑/三叉戟/刀"的特例。
      */
     public static boolean matchesReinforcementMaterial(ItemStack left, ItemStack right) {
-        TagKey<Item> tag = getMatchingTag(left);
-        if (tag != null && right.is(tag)) return true;
-
-        if (left.getItem() instanceof TridentItem) {
-            if (right.is(ItemTags.SWORDS) || right.is(Tags.Items.TOOLS_TRIDENTS) || right.is(ModItemTagsProvider.KNIVES))
-                return true;
-            ResourceLocation rightId = ForgeRegistries.ITEMS.getKey(right.getItem());
-            if (rightId == null) return false;
-            String path = rightId.getPath();
-            return path.endsWith("sword") || path.endsWith("trident") || path.endsWith("knife");
-        }
-
-        String suffix = getEquipmentSuffix(left);
-        if (suffix == null) return false;
-
-        ResourceLocation rightId = ForgeRegistries.ITEMS.getKey(right.getItem());
-        if (rightId == null) return false;
-        return rightId.getPath().endsWith("_" + suffix);
+        KogasaEquipmentKind kind = KogasaEquipmentKinds.of(left);
+        if (kind == null) return false;
+        return kind.acceptsMaterial(right);
     }
 
     /**

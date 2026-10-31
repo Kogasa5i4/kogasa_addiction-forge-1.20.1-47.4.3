@@ -25,7 +25,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, value = Dist.CLIENT,
         bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -130,7 +132,13 @@ public class KogasaTooltipHandler {
         if (Screen.hasAltDown()) {
             List<KogasaAbility> abilities = KogasaAbilityData.getAbilities(stack);
             int maxSlots = KogasaAbilityData.getMaxAbilitySlots(stack);
-            int usedSlots = KogasaAbilityData.getUsedSlots(stack);
+            int usedSlots = abilities.size();
+
+            // 一次性解析出集合，后面 6 个能力分支都复用它，
+            // 避免每帧对同一件装备重复解析 NBT 能力列表
+            Set<KogasaAbility> abilitySet = abilities.isEmpty()
+                    ? EnumSet.noneOf(KogasaAbility.class)
+                    : EnumSet.copyOf(abilities);
 
             // 标题
             tooltip.add(Component.translatable(
@@ -159,7 +167,7 @@ public class KogasaTooltipHandler {
                         .withStyle(ChatFormatting.DARK_GRAY));
             }
 
-            if (KogasaAbilityData.hasAbility(stack, KogasaAbility.AYA)) {
+            if (abilitySet.contains(KogasaAbility.AYA)) {
                 double news = KogasaAbilityData.getNewsValue(stack);
                 int killed = KogasaAbilityData.getKilledMobCount(stack);
                 int mined = KogasaAbilityData.getMinedBlockCount(stack);
@@ -176,7 +184,7 @@ public class KogasaTooltipHandler {
                         .withStyle(ChatFormatting.GRAY));
             }
 
-            if (KogasaAbilityData.hasAbility(stack, KogasaAbility.CIRNO)) {
+            if (abilitySet.contains(KogasaAbility.CIRNO)) {
                 if (!Config.CIRNO_REVIVE_ENABLED.get()) {
                     tooltip.add(Component.translatable(
                                     "tooltip.kogasa_addiction.cirno.revive_disabled")
@@ -193,7 +201,7 @@ public class KogasaTooltipHandler {
                 }
             }
 
-            if (KogasaAbilityData.hasAbility(stack, KogasaAbility.KOISHI)) {
+            if (abilitySet.contains(KogasaAbility.KOISHI)) {
                 boolean isRangedWeapon = stack.getItem() instanceof BowItem
                         || stack.getItem() instanceof CrossbowItem;
                 if (isRangedWeapon) {
@@ -225,7 +233,7 @@ public class KogasaTooltipHandler {
                 }
             }
 
-            if (KogasaAbilityData.hasAbility(stack, KogasaAbility.KOGASA)) {
+            if (abilitySet.contains(KogasaAbility.KOGASA)) {
                 double reMult = KogasaEquipmentHelper.getReinforcementMultiplier(stack);
                 double totalMult = KogasaEquipmentHelper.getTotalMultiplier(stack);
 
@@ -240,7 +248,7 @@ public class KogasaTooltipHandler {
                         .withStyle(ChatFormatting.GOLD));
             }
 
-            if (KogasaAbilityData.hasAbility(stack, KogasaAbility.SAKUYA)) {
+            if (abilitySet.contains(KogasaAbility.SAKUYA)) {
                 if (!ClientTimestopState.isFrozen()) {
                     tooltip.add(Component.translatable("tooltip.kogasa_addiction.timestop.available")
                             .withStyle(ChatFormatting.BLUE));
@@ -251,7 +259,7 @@ public class KogasaTooltipHandler {
             }
 
             // ===== 天子能力 =====
-            if (KogasaAbilityData.hasAbility(stack, KogasaAbility.TENSHI)) {
+            if (abilitySet.contains(KogasaAbility.TENSHI)) {
                 boolean isArmor = stack.getItem() instanceof ArmorItem;
                 boolean isWeapon = stack.getItem() instanceof SwordItem
                         || stack.getItem() instanceof DiggerItem

@@ -52,9 +52,15 @@ public abstract class AnvilMenuMixin {
 
         ItemStack remainder = input.copy();
         remainder.setCount(input.getCount() - 3);
+
         Container inputSlots = this.kogasa$inputSlots();
         inputSlots.setItem(0, remainder);
-        // 让铁砧按剩余输入重新计算结果
-        ((ItemCombinerMenu) (Object) this).slotsChanged(inputSlots);
+        inputSlots.setChanged();
+
+        // 直接让铁砧重算结果。
+        // 这里刻意不调 slotsChanged：它在 ItemCombinerMenu 上是回调链的入口，
+        // 其它铁砧类模组很可能也覆写了它，走那条路会互相递归/打架。
+        // createResult() 是原版重算逻辑本身（AnvilMenu 的 public 方法），语义更确定。
+        ((AnvilMenu) (Object) this).createResult();
     }
 }

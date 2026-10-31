@@ -10,7 +10,8 @@
     "CrossbowMixin",
     "CrossbowNoConsumeMixin",
     "GrindstoneMenuMixin",
-    "IceBlockMixin"
+    "IceBlockMixin",
+    "ServerLevelEntityFreezeMixin"
   ],
   "minVersion": "0.8"
 }

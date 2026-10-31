@@ -196,14 +196,19 @@ public class TenshiAbilityHandler {
         if (target instanceof net.minecraft.world.entity.boss.wither.WitherBoss) return false;
         if (target instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon) return false;
 
-        // 通过属性判断是否能飞行（蝙蝠、幻翼、恶魂、蜜蜂等都有飞行速度属性）
-        if (target.getAttributes().hasAttribute(net.minecraft.world.entity.ai.attributes.Attributes.FLYING_SPEED)) {
+        // 原版用 FlyingMob 表示"飞行生物"（蝙蝠 / 幻翼 / 恶魂 / 蜜蜂 / 悦灵）。
+        // 不能用 getAttributes().hasAttribute(FLYING_SPEED)：该属性由
+        // LivingEntity.createLivingAttributes() 给**所有**生物注册（僵尸、牛也有，值为 0），
+        // 所以那个判定等价于"除凋灵与末影龙以外的所有生物"，原意被放大成了群体增伤。
+        if (target instanceof net.minecraft.world.entity.FlyingMob) {
             return true;
         }
-        // 部分特殊原版飞行生物没有飞行属性，枚举补充
-        return target.getType() == net.minecraft.world.entity.EntityType.GHAST
-                || target.getType() == net.minecraft.world.entity.EntityType.PHANTOM
-                || target.getType() == net.minecraft.world.entity.EntityType.ALLAY;
+
+        // FlyingMob 之外、原版里确实会飞的个别实体
+        net.minecraft.world.entity.EntityType<?> type = target.getType();
+        return type == net.minecraft.world.entity.EntityType.VEX
+                || type == net.minecraft.world.entity.EntityType.PARROT
+                || type == net.minecraft.world.entity.EntityType.BLAZE;
     }
 
     /**

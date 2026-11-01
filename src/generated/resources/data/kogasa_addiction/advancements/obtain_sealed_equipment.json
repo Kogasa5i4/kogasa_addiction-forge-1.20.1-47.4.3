@@ -1,0 +1,30 @@
+{
+  "parent": "kogasa_addiction:obtain_kogasa_ingot",
+  "criteria": {
+    "obtain_sealed_equipment": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.kogasa_addiction.obtain_sealed_equipment.description"
+    },
+    "frame": "task",
+    "hidden": true,
+    "icon": {
+      "item": "kogasa_addiction:kogasa_sword",
+      "nbt": "{Damage:0}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.kogasa_addiction.obtain_sealed_equipment.title"
+    }
+  },
+  "requirements": [
+    [
+      "obtain_sealed_equipment"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

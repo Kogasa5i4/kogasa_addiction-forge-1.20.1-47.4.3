@@ -1,0 +1,17 @@
+{
+    "pages":  [
+                  {
+                      "text":  "book.kogasa_addiction.entry.structure_wall.page1",
+                      "type":  "patchouli:text"
+                  },
+                  {
+                      "structure":  "kogasa_addiction:wall",
+                      "type":  "minecraft:structure",
+                      "text":  "book.kogasa_addiction.entry.structure_preview"
+                  }
+              ],
+    "icon":  "minecraft:deepslate_bricks",
+    "category":  "kogasa_addiction:structures",
+    "name":  "book.kogasa_addiction.entry.structure_wall.name",
+    "sortnum":  3
+}

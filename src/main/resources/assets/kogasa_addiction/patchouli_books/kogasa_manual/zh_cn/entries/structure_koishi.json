@@ -1,0 +1,17 @@
+{
+    "pages":  [
+                  {
+                      "text":  "book.kogasa_addiction.entry.structure_koishi.page1",
+                      "type":  "patchouli:text"
+                  },
+                  {
+                      "structure":  "kogasa_addiction:koishi",
+                      "type":  "minecraft:structure",
+                      "text":  "book.kogasa_addiction.entry.structure_preview"
+                  }
+              ],
+    "icon":  "minecraft:black_wool",
+    "category":  "kogasa_addiction:structures",
+    "name":  "book.kogasa_addiction.entry.structure_koishi.name",
+    "sortnum":  5
+}

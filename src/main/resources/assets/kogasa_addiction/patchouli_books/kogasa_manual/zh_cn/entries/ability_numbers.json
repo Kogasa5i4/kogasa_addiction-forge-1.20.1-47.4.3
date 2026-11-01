@@ -1,0 +1,24 @@
+{
+    "pages":  [
+                  {
+                      "text":  "book.kogasa_addiction.entry.ability_numbers.page1",
+                      "type":  "patchouli:text"
+                  },
+                  {
+                      "text":  "book.kogasa_addiction.entry.ability_numbers.page2",
+                      "type":  "patchouli:text"
+                  },
+                  {
+                      "text":  "book.kogasa_addiction.entry.ability_numbers.page3",
+                      "type":  "patchouli:text"
+                  },
+                  {
+                      "text":  "book.kogasa_addiction.entry.ability_numbers.page4",
+                      "type":  "patchouli:text"
+                  }
+              ],
+    "icon":  "minecraft:experience_bottle",
+    "category":  "kogasa_addiction:abilities",
+    "name":  "book.kogasa_addiction.entry.ability_numbers.name",
+    "sortnum":  8
+}

@@ -1,0 +1,17 @@
+{
+    "pages":  [
+                  {
+                      "text":  "book.kogasa_addiction.entry.structure_mystia.page1",
+                      "type":  "patchouli:text"
+                  },
+                  {
+                      "structure":  "kogasa_addiction:mystia_izakaya",
+                      "type":  "minecraft:structure",
+                      "text":  "book.kogasa_addiction.entry.structure_preview"
+                  }
+              ],
+    "icon":  "minecraft:campfire",
+    "category":  "kogasa_addiction:structures",
+    "name":  "book.kogasa_addiction.entry.structure_mystia.name",
+    "sortnum":  6
+}

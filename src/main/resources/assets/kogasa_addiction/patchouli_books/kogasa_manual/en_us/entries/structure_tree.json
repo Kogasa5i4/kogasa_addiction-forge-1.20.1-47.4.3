@@ -1,0 +1,17 @@
+{
+    "pages":  [
+                  {
+                      "text":  "book.kogasa_addiction.entry.structure_tree.page1",
+                      "type":  "patchouli:text"
+                  },
+                  {
+                      "structure":  "kogasa_addiction:tree",
+                      "type":  "minecraft:structure",
+                      "text":  "book.kogasa_addiction.entry.structure_preview"
+                  }
+              ],
+    "icon":  "minecraft:cherry_log",
+    "category":  "kogasa_addiction:structures",
+    "name":  "book.kogasa_addiction.entry.structure_tree.name",
+    "sortnum":  1
+}

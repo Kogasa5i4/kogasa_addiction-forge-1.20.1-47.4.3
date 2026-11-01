@@ -1,25 +1,18 @@
 package net.kogasachan.kogasa_addiction.ability;
 
 import net.kogasachan.kogasa_addiction.Config;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.LongArrayTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
+import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
+import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class KogasaAbilityData {
 
@@ -39,10 +32,41 @@ public class KogasaAbilityData {
 
     // ==================== 基础读写 ====================
 
+    /** 能力数据模式版本（存于 KogasaAbilities 根内）。结构变更时 +1，并在 {@link #migrate} 里补步骤。 */
+    public static final int SCHEMA_VERSION = 1;
+    private static final String KEY_SCHEMA_VERSION = "SchemaVersion";
+
     private static CompoundTag getTag(ItemStack stack) {
         // 只读访问：没有根标签时返回空 compound，避免 Tooltip 渲染等只读路径创建空 NBT。
         CompoundTag tag = stack.getTag();
-        return tag == null ? new CompoundTag() : tag.getCompound(ROOT);
+        if (tag == null) return new CompoundTag();
+
+        CompoundTag root = tag.getCompound(ROOT);
+        ensureMigrated(root);
+        return root;
+    }
+
+    /**
+     * 幂等迁移：把根标签从旧版本逐步升级到 {@link #SCHEMA_VERSION}。
+     * 以后改数据结构时：SCHEMA_VERSION +1，并在 {@link #migrate} 里为旧版本号加一个 case。
+     */
+    private static void ensureMigrated(CompoundTag root) {
+        int version = root.getInt(KEY_SCHEMA_VERSION);
+        while (version < SCHEMA_VERSION) {
+            version = migrate(root, version);
+        }
+        if (root.getInt(KEY_SCHEMA_VERSION) != SCHEMA_VERSION) {
+            root.putInt(KEY_SCHEMA_VERSION, SCHEMA_VERSION);
+        }
+    }
+
+    private static int migrate(CompoundTag root, int from) {
+        return switch (from) {
+            // v0 → v1：旧版没有版本字段，结构本身未变，仅盖章。
+            // 注意：Aya 记录的"字符串列表 → 位图"迁移由 bitmapOf() 惰性完成，不在版本链里重复。
+            case 0 -> 1;
+            default -> SCHEMA_VERSION; // 未知版本号，保守跳到最新
+        };
     }
 
     private static void saveTag(ItemStack stack, CompoundTag tag) {
@@ -82,9 +106,13 @@ public class KogasaAbilityData {
      * 是否拥有指定能力。
      * 直接扫描字符串列表，不创建任何临时集合 —— 该方法处在属性计算与 Tooltip 渲染的热路径上
      * （每次属性重算 / 每帧多次调用），因此刻意避免走 {@link #getAbilities(ItemStack)}。
+     *
+     * <p>封印中的装备（{@link KogasaEquipmentData#isLocked}）视为没有任何能力：
+     * 能力已注入但尚未生效，成长达标解封后恢复。
      */
     public static boolean hasAbility(ItemStack stack, KogasaAbility ability) {
         if (ability == null) return false;
+        if (KogasaEquipmentData.isLocked(stack)) return false;
 
         String id = ability.getId();
         ListTag list = getTag(stack).getList(ABILITIES, Tag.TAG_STRING);
@@ -95,26 +123,44 @@ public class KogasaAbilityData {
     }
 
     /**
-     * 是否拥有任意能力
+     * 是否拥有任意能力（封印中视为没有）。
      */
     public static boolean hasAnyAbility(ItemStack stack) {
+        if (KogasaEquipmentData.isLocked(stack)) return false;
         return !getAbilitySet(stack).isEmpty();
     }
 
     /**
-     * 添加能力。返回 false 表示已拥有或槽位不足。
+     * 添加能力
      */
-    public static boolean addAbility(ItemStack stack, KogasaAbility ability) {
+    public static void addAbility(ItemStack stack, KogasaAbility ability) {
         List<KogasaAbility> current = getAbilities(stack);
-        if (current.contains(ability)) return false;
-        if (current.size() >= getMaxAbilitySlots(stack)) return false;
+        if (current.contains(ability)) return;
+        if (current.size() >= getMaxAbilitySlots(stack)) return;
 
         CompoundTag tag = getTag(stack);
         ListTag list = tag.getList(ABILITIES, Tag.TAG_STRING);
         list.add(StringTag.valueOf(ability.getId()));
         tag.put(ABILITIES, list);
         saveTag(stack, tag);
-        return true;
+    }
+
+    /**
+     * 战利品注入专用：无视能力槽限制直接写入一个能力（已存在则跳过）。
+     * 配合 {@link KogasaEquipmentData#setLocked} 产出"封印装备"。
+     */
+    public static void forceAddAbility(ItemStack stack, KogasaAbility ability) {
+        if (ability == null) return;
+
+        String id = ability.getId();
+        CompoundTag tag = getTag(stack);
+        ListTag list = tag.getList(ABILITIES, Tag.TAG_STRING);
+        for (int i = 0; i < list.size(); i++) {
+            if (id.equals(list.getString(i))) return;
+        }
+        list.add(StringTag.valueOf(id));
+        tag.put(ABILITIES, list);
+        saveTag(stack, tag);
     }
 
     /**
@@ -166,13 +212,33 @@ public class KogasaAbilityData {
     // ==================== 能力槽位 ====================
 
     /**
-     * 当前装备的能力槽位上限。
-     * 基础 1 个，成长值达到阈值后解锁第 2 个。
+     * 当前装备的能力槽位上限（等差数列解锁）。
+     *
+     * <p>第 N 个槽在 {@code abilitySlotInitialGrowth + (N-1) * abilitySlotGrowthIncrement}
+     * 处解锁，最多 {@code abilitySlotMax} 个。
+     * 默认 0 / 0.5 / 4：第 1 槽 0 成长即可用，之后每 +0.5 成长多一个槽。
      */
     public static int getMaxAbilitySlots(ItemStack stack) {
         double growth = net.kogasachan.kogasa_addiction.util.KogasaEquipmentData.getGrowth(stack);
-        double threshold = Config.GROWTH_FOR_SECOND_ABILITY_SLOT.get();
-        return growth >= threshold ? 2 : 1;
+        double initial = Config.ABILITY_SLOT_INITIAL_GROWTH.get();
+        double increment = Config.ABILITY_SLOT_GROWTH_INCREMENT.get();
+        int max = Config.ABILITY_SLOT_MAX.get();
+
+        if (growth < initial) return 0;
+        if (increment <= 0.0D) return max;
+
+        long slots = (long) Math.floor((growth - initial) / increment) + 1L;
+        return (int) Math.min(slots, max);
+    }
+
+    /**
+     * 第 (unlockedSlots + 1) 个槽解锁所需的成长值（unlockedSlots 为当前已解锁数量）。
+     * 用于 tooltip 显示"下一个槽还要多少成长"。
+     */
+    public static double getGrowthForNextSlot(int unlockedSlots) {
+        double initial = Config.ABILITY_SLOT_INITIAL_GROWTH.get();
+        double increment = Config.ABILITY_SLOT_GROWTH_INCREMENT.get();
+        return initial + Math.max(0, unlockedSlots) * increment;
     }
 
     /**
@@ -219,21 +285,22 @@ public class KogasaAbilityData {
      * 记录一种生物。返回 true 表示是新记录。
      */
     public static boolean tryAddKilledMob(ItemStack stack, EntityType<?> type) {
-        return tryAddBit(stack, AYA_KILLED_MOBS, BuiltInRegistries.ENTITY_TYPE.getId(type));
+        return tryAddBit(stack, AYA_KILLED_MOBS, idOf(ForgeRegistries.ENTITY_TYPES, type));
     }
 
     /**
      * 记录一种方块。返回 true 表示是新记录。
      */
     public static boolean tryAddMinedBlock(ItemStack stack, Block block) {
-        return tryAddBit(stack, AYA_MINED_BLOCKS, BuiltInRegistries.BLOCK.getId(block));
+        return tryAddBit(stack, AYA_MINED_BLOCKS, idOf(ForgeRegistries.BLOCKS, block));
     }
 
     /**
      * 记录一种伤害类型。返回 true 表示是新记录。
      *
-     * <p>伤害类型是**数据包驱动的注册表**（{@code Registries.DAMAGE_TYPE}），没有
-     * {@code BuiltInRegistries} 静态字段，数据层拿不到它的数字 ID —— 所以这一类仍用字符串列表，
+     * <p>伤害类型是**数据包驱动的注册表**（{@code Registries.DAMAGE_TYPE}），
+     * {@code BuiltInRegistries} / {@code ForgeRegistries} 都没有对应的静态字段，
+     * 数据层拿不到它的数字 ID —— 所以这一类仍用字符串列表，
      * 但加了硬上限 {@link #MAX_DAMAGE_TYPE_RECORDS}。伤害类型总量本来就小（原版约 40 个），
      * 这样既保留"记过哪种伤害"的语义，又不会像原来那样无界增长。
      */
@@ -339,7 +406,7 @@ public class KogasaAbilityData {
      * 把旧格式（字符串 ID 列表）转成位图；无法解析的条目直接丢弃。
      */
     private static long[] migrateLegacyList(String key, ListTag list) {
-        Registry<?> registry = registryForKey(key);
+        IForgeRegistry<?> registry = registryForKey(key);
         if (registry == null) return new long[0];
 
         long[] bits = new long[0];
@@ -347,7 +414,7 @@ public class KogasaAbilityData {
             ResourceLocation id = ResourceLocation.tryParse(list.getString(i));
             if (id == null) continue;
 
-            Object value = registry.get(id);
+            Object value = registry.getValue(id);
             if (value == null) continue;
 
             int index = idOf(registry, value);
@@ -363,14 +430,15 @@ public class KogasaAbilityData {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static int idOf(Registry<?> registry, Object value) {
-        return ((Registry) registry).getId(value);
+    private static int idOf(IForgeRegistry<?> registry, Object value) {
+        // IForgeRegistry 接口不暴露数字 ID，实现类 ForgeRegistry 提供 getID
+        return ((ForgeRegistry) registry).getID(value);
     }
 
-    private static Registry<?> registryForKey(String key) {
+    private static IForgeRegistry<?> registryForKey(String key) {
         return switch (key) {
-            case AYA_KILLED_MOBS -> BuiltInRegistries.ENTITY_TYPE;
-            case AYA_MINED_BLOCKS -> BuiltInRegistries.BLOCK;
+            case AYA_KILLED_MOBS -> ForgeRegistries.ENTITY_TYPES;
+            case AYA_MINED_BLOCKS -> ForgeRegistries.BLOCKS;
             default -> null;
         };
     }

@@ -30,17 +30,17 @@ public class BlastFurnaceMixin {
      * @reason 高炉燃烧时概率产出小伞锭，优先输出到相邻容器
      */
     @Inject(method = "serverTick", at = @At("HEAD"))
-    private static void kogasa$produceIngot(Level level, BlockPos pos, BlockState state,
-                                            AbstractFurnaceBlockEntity blockEntity,
+    private static void kogasa$produceIngot(Level pLevel, BlockPos pPos, BlockState pState,
+                                            AbstractFurnaceBlockEntity pBlockEntity,
                                             CallbackInfo ci) {
-        if (level.isClientSide) return;
-        if (!(blockEntity instanceof BlastFurnaceBlockEntity)) return;
-        if (!blockEntity.isLit()) return;
-        if (level.random.nextFloat() >= ModConfigCache.kogasaIngotChance) return;
+        if (pLevel.isClientSide) return;
+        if (!(pBlockEntity instanceof BlastFurnaceBlockEntity)) return;
+        if (!pBlockEntity.isLit()) return;
+        if (pLevel.random.nextFloat() >= ModConfigCache.kogasaIngotChance) return;
 
         ItemStack drop = new ItemStack(ModItems.KOGASA_INGOT.get());
 
-        Direction facing = state.getValue(AbstractFurnaceBlock.FACING);
+        Direction facing = pState.getValue(AbstractFurnaceBlock.FACING);
         Direction[] faces = {
                 facing,                       // 前
                 facing.getClockWise(),        // 左
@@ -52,8 +52,8 @@ public class BlastFurnaceMixin {
 
         // 1. 插入六个面的容器
         for (Direction dir : faces) {
-            BlockPos targetPos = pos.relative(dir);
-            BlockEntity be = level.getBlockEntity(targetPos);
+            BlockPos targetPos = pPos.relative(dir);
+            BlockEntity be = pLevel.getBlockEntity(targetPos);
             if (be == null) continue;
 
             Optional<IItemHandler> resolved = be.getCapability(
@@ -67,25 +67,25 @@ public class BlastFurnaceMixin {
 
         // 2. 六个面有空气/流体 → 掉落
         for (Direction dir : faces) {
-            BlockPos targetPos = pos.relative(dir);
-            if (kogasa_addiction_forge_1_20_1_47_4_3$canPlaceItemAt(level, targetPos)) {
-                kogasa_addiction_forge_1_20_1_47_4_3$spawnItem(level, targetPos, drop);
+            BlockPos targetPos = pPos.relative(dir);
+            if (kogasa_addiction_forge_1_20_1_47_4_3$canPlaceItemAt(pLevel, targetPos)) {
+                kogasa_addiction_forge_1_20_1_47_4_3$spawnItem(pLevel, targetPos, drop);
                 return;
             }
         }
 
         // 3. 上方搜索空气
-        BlockPos searchPos = pos.above();
+        BlockPos searchPos = pPos.above();
         for (int i = 0; i < ModConfigCache.kogasaIngotSearchHeight; i++) {
-            if (kogasa_addiction_forge_1_20_1_47_4_3$canPlaceItemAt(level, searchPos)) {
-                kogasa_addiction_forge_1_20_1_47_4_3$spawnItem(level, searchPos, drop);
+            if (kogasa_addiction_forge_1_20_1_47_4_3$canPlaceItemAt(pLevel, searchPos)) {
+                kogasa_addiction_forge_1_20_1_47_4_3$spawnItem(pLevel, searchPos, drop);
                 return;
             }
             searchPos = searchPos.above();
         }
 
         // 4. 上表面中心
-        kogasa_addiction_forge_1_20_1_47_4_3$spawnItem(level, pos.above(), drop);
+        kogasa_addiction_forge_1_20_1_47_4_3$spawnItem(pLevel, pPos.above(), drop);
     }
 
     /**

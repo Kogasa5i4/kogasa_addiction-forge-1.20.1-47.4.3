@@ -3,11 +3,11 @@ package net.kogasachan.kogasa_addiction.item;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.TierSortingRegistry;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BooleanSupplier;
@@ -29,16 +29,16 @@ import java.util.function.BooleanSupplier;
  */
 public interface IKogasaEquipment {
 
-    static boolean isCorrectToolForDrops(ItemStack stack, BlockState state, int tierLevel,
+    /**
+     * 挖掘等级判定：强化次数可把有效等级抬到原版阶梯的任意一档（下界合金封顶），
+     * 判定走 Forge 的 {@link TierSortingRegistry}（数据驱动，认全部 NEEDS tag，
+     * 包括其它模组的），不再使用已弃用的 {@code Tier#getLevel()} 数字比较。
+     */
+    static boolean isCorrectToolForDrops(ItemStack stack, BlockState state, Tier tier,
                                          BooleanSupplier vanillaFallback) {
         if (stack.getItem() instanceof IKogasaEquipment) {
-            int level = KogasaEquipmentHelper.getDynamicHarvestLevel(stack, tierLevel);
-            if (level > 6) return true;
-            if (state.is(Tags.Blocks.NEEDS_NETHERITE_TOOL)) return level >= 4;
-            if (state.is(BlockTags.NEEDS_DIAMOND_TOOL)) return level >= 3;
-            if (state.is(BlockTags.NEEDS_IRON_TOOL)) return level >= 2;
-            if (state.is(BlockTags.NEEDS_STONE_TOOL)) return level >= 1;
-            if (state.is(Tags.Blocks.NEEDS_WOOD_TOOL) || state.is(Tags.Blocks.NEEDS_GOLD_TOOL)) return level >= 0;
+            Tier effective = KogasaEquipmentHelper.getDynamicHarvestTier(stack, tier);
+            return TierSortingRegistry.isCorrectTierForDrops(effective, state);
         }
         return vanillaFallback.getAsBoolean();
     }

@@ -57,12 +57,10 @@ public class DataGenerators {
 
         // 伤害类型
         RegistrySetBuilder builder = new RegistrySetBuilder();
-        builder.add(Registries.DAMAGE_TYPE, (context) -> {
-            context.register(
-                    ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "koishi_ranged")),
-                    new DamageType("koishi_ranged", DamageScaling.NEVER, 0.0F)
-            );
-        });
+        builder.add(Registries.DAMAGE_TYPE, (context) -> context.register(
+                ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "koishi_ranged")),
+                new DamageType("koishi_ranged", DamageScaling.NEVER, 0.0F)
+        ));
 
         // 1. 生成伤害类型 JSON
         generator.addProvider(event.includeServer(),

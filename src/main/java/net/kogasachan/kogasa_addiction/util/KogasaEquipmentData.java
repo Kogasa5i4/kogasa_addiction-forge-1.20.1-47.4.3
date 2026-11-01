@@ -19,6 +19,8 @@ public class KogasaEquipmentData {
     private static final String DRAW_SPEED_VALUE = "DrawSpeedValue";
     private static final String GROWTH_ENCHANTS_GRANTED = "GrowthEnchantsGranted";
     private static final String GROWTH_ENCHANT_FAIL_NOTIFIED = "GrowthEnchantFailNotified";
+    /** 战利品开出的"封印装备"：能力已注入但不生效，成长达到阈值后自动解封 */
+    private static final String LOCKED = "Locked";
 
     // 新旧位置用的是同一个键名，只是父标签不同：
     //   新位置 → 物品 tag["KogasaEquipment"]["GrowthEnchantFailNotified"]
@@ -46,13 +48,22 @@ public class KogasaEquipmentData {
 
         if (tag.contains(GROWTH_ENCHANT_FAIL_NOTIFIED)) {
             tag.remove(GROWTH_ENCHANT_FAIL_NOTIFIED);
-            if (tag.isEmpty()) {
+            if (isEmptyIgnoringVersion(tag)) {
                 // 避免留下一个空的 KogasaEquipment 复合标签
                 if (root != null) root.remove(ROOT);
             } else {
                 saveTag(stack, tag);
             }
         }
+    }
+
+    /**
+     * 去掉版本号字段后是否为空：单独存在的 SchemaVersion 不算有效数据，
+     * 清空类操作应当把这种"空壳根"一并删掉。
+     */
+    private static boolean isEmptyIgnoringVersion(CompoundTag tag) {
+        if (tag.isEmpty()) return true;
+        return tag.size() == 1 && tag.contains(KEY_SCHEMA_VERSION);
     }
 
     /**
@@ -115,7 +126,7 @@ public class KogasaEquipmentData {
         tag.remove(ABSORBED_VALUE);
         tag.remove(DRAW_SPEED_VALUE);
 
-        if (tag.isEmpty()) {
+        if (isEmptyIgnoringVersion(tag)) {
             root.remove(ROOT);
             if (root.isEmpty()) stack.setTag(null);
         }
@@ -128,10 +139,44 @@ public class KogasaEquipmentData {
         saveTag(stack, tag);
     }
 
+    /** 装备数据模式版本（存于 KogasaEquipment 根内）。结构变更时 +1，并在 {@link #migrate} 里补步骤。 */
+    public static final int SCHEMA_VERSION = 2;
+    private static final String KEY_SCHEMA_VERSION = "SchemaVersion";
+
     public static CompoundTag getTag(ItemStack stack) {
         // 只读访问：写入方会在修改后调用 saveTag。
         CompoundTag tag = stack.getTag();
-        return tag == null ? new CompoundTag() : tag.getCompound(ROOT);
+        if (tag == null) return new CompoundTag();
+
+        CompoundTag root = tag.getCompound(ROOT);
+        ensureMigrated(root);
+        return root;
+    }
+
+    /**
+     * 幂等迁移：把根标签从旧版本逐步升级到 {@link #SCHEMA_VERSION}。
+     * 以后改数据结构时：SCHEMA_VERSION +1，并在 {@link #migrate} 里为旧版本号加一个 case。
+     */
+    private static void ensureMigrated(CompoundTag root) {
+        int version = root.getInt(KEY_SCHEMA_VERSION);
+        while (version < SCHEMA_VERSION) {
+            version = migrate(root, version);
+        }
+        if (root.getInt(KEY_SCHEMA_VERSION) != SCHEMA_VERSION) {
+            root.putInt(KEY_SCHEMA_VERSION, SCHEMA_VERSION);
+        }
+    }
+
+    private static int migrate(CompoundTag root, int from) {
+        return switch (from) {
+            // v0 → v1：旧版没有版本字段，结构本身未变，仅盖章。
+            // 顶层遗留的 GrowthEnchantFailNotified 由 hasGrowthEnchantFailNotified /
+            // setGrowthEnchantFailNotified 的兼容读写在访问时自然迁移。
+            case 0 -> 1;
+            // v1 → v2：新增 Locked 键（无旧数据需要搬运，仅盖章）。
+            case 1 -> 2;
+            default -> SCHEMA_VERSION; // 未知版本号，保守跳到最新
+        };
     }
 
     public static void saveTag(ItemStack stack, CompoundTag tag) {
@@ -196,6 +241,38 @@ public class KogasaEquipmentData {
      */
     public static boolean isGrowthUnlocked(ItemStack stack) {
         return getReinforcements(stack) >= ModConfigCache.growthUnlockReinforcements;
+    }
+
+    /**
+     * 是否处于封印状态（战利品开出的装备）：能力已注入但不生效。
+     */
+    public static boolean isLocked(ItemStack stack) {
+        return getTag(stack).getBoolean(LOCKED);
+    }
+
+    /**
+     * 设置/解除封印。解除时若根标签只剩版本号，连空壳根一并删除。
+     */
+    public static void setLocked(ItemStack stack, boolean locked) {
+        CompoundTag tag = getTag(stack);
+        if (locked) {
+            tag.putBoolean(LOCKED, true);
+            saveTag(stack, tag);
+            return;
+        }
+
+        if (tag.contains(LOCKED)) {
+            tag.remove(LOCKED);
+            if (isEmptyIgnoringVersion(tag)) {
+                CompoundTag root = stack.getTag();
+                if (root != null) {
+                    root.remove(ROOT);
+                    if (root.isEmpty()) stack.setTag(null);
+                }
+            } else {
+                saveTag(stack, tag);
+            }
+        }
     }
 
     /**

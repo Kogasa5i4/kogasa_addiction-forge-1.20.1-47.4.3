@@ -11,7 +11,11 @@
     "CrossbowNoConsumeMixin",
     "GrindstoneMenuMixin",
     "IceBlockMixin",
+    "PlayerItemComparisonMixin",
     "ServerLevelEntityFreezeMixin"
+  ],
+  "client": [
+    "ClientDestroyProgressMixin"
   ],
   "minVersion": "0.8"
 }

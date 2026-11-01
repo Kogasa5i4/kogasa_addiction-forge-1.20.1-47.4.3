@@ -36,7 +36,7 @@ public class CrossbowAutoReloadMixin {
 
     /**
      * 发射完成后自动重新装填（消耗背包里的箭）
-     * 注入点在 setCharged(itemstack, false) 之后，此时弩已变回未装填状态
+     * 注入点在 setCharged(stack, false) 之后，此时弩已变回未装填状态
      */
     @Inject(
             method = "use",
@@ -46,11 +46,11 @@ public class CrossbowAutoReloadMixin {
                     shift = At.Shift.AFTER
             )
     )
-    private void kogasa$autoReload(Level level, Player player, InteractionHand hand,
+    private void kogasa$autoReload(Level pLevel, Player pPlayer, InteractionHand pHand,
                                    CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir) {
-        if (level.isClientSide) return;
+        if (pLevel.isClientSide) return;
 
-        ItemStack stack = player.getItemInHand(hand);
+        ItemStack stack = pPlayer.getItemInHand(pHand);
         if (!(stack.getItem() instanceof IKogasaEquipment)) return;
 
         // 成长值是否解锁自动装填
@@ -60,13 +60,13 @@ public class CrossbowAutoReloadMixin {
         if (invokeIsCharged(stack)) return;
 
         // 背包里有箭才能装填
-        if (player.getProjectile(stack).isEmpty()) return;
+        if (pPlayer.getProjectile(stack).isEmpty()) return;
 
-        if (invokeTryLoad(player, stack)) {
+        if (invokeTryLoad(pPlayer, stack)) {
             invokeSetCharged(stack, true);
-            level.playSound(null, player.getX(), player.getY(), player.getZ(),
+            pLevel.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(),
                     SoundEvents.CROSSBOW_LOADING_END, SoundSource.PLAYERS,
-                    1.0F, 1.0F / (level.getRandom().nextFloat() * 0.5F + 1.0F) + 0.2F);
+                    1.0F, 1.0F / (pLevel.getRandom().nextFloat() * 0.5F + 1.0F) + 0.2F);
         }
     }
 }

@@ -382,5 +382,17 @@ public class ModAdvancementGenerator implements ForgeAdvancementProvider.Advance
                 .parent(first_ability)
                 .addCriterion("impossible", new ImpossibleTrigger.TriggerInstance())
                 .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "perfect_elegant"), existingFileHelper);
+
+        // ===== 25. 被封印的众神 =====
+        Advancement sealed_equipment = Advancement.Builder.advancement()
+                .display(new DisplayInfo(
+                        new ItemStack(ModItems.KOGASA_SWORD.get()),
+                        Component.translatable("advancements.kogasa_addiction.obtain_sealed_equipment.title"),
+                        Component.translatable("advancements.kogasa_addiction.obtain_sealed_equipment.description"),
+                        null, FrameType.TASK, true, false, true
+                ))
+                .parent(first_ability)
+                .addCriterion("obtain_sealed_equipment", new ImpossibleTrigger.TriggerInstance())
+                .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "obtain_sealed_equipment"), existingFileHelper);
     }
 }

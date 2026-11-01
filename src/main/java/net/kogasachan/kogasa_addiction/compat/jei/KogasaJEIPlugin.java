@@ -13,7 +13,6 @@ import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.item.KogasaAbilityIngotItem;
 import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
@@ -23,13 +22,23 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 @JeiPlugin
 public class KogasaJEIPlugin implements IModPlugin {
     private static final ResourceLocation PLUGIN_UID = ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "jei_plugin");
+
+    /**
+     * ForgeRegistries 版"按标签取物品"：标签缺失时返回空流。
+     */
+    private static Stream<Item> itemsInTag(TagKey<Item> tag) {
+        var itemTag = ForgeRegistries.ITEMS.tags().getTag(tag);
+        return itemTag == null ? Stream.empty() : itemTag.stream();
+    }
 
     /**
      * 6 种能力锭 × 示例装备 → 输出带能力的装备
@@ -39,9 +48,7 @@ public class KogasaJEIPlugin implements IModPlugin {
         ItemStack sampleEquipment = new ItemStack(ModItems.KOGASA_SWORD.get());
 
         // 1. 遍历标签内所有物品
-        BuiltInRegistries.ITEM.getTagOrEmpty(ModItemTagsProvider.ABILITY_INGOTS).forEach(holder -> {
-            Item ingotItem = holder.value();
-
+        itemsInTag(ModItemTagsProvider.ABILITY_INGOTS).forEach(ingotItem -> {
             // 2. 过滤：只处理本模组的能力锭类物品
             if (ingotItem instanceof KogasaAbilityIngotItem abilityIngot) {
                 KogasaAbility ability = abilityIngot.getAbility();
@@ -90,8 +97,7 @@ public class KogasaJEIPlugin implements IModPlugin {
             // 收集所有标签内物品（排除 Kogasa 自身和空气），跨标签去重
             Map<Item, ItemStack> materials = new LinkedHashMap<>();
             for (TagKey<Item> tag : entry.getValue()) {
-                BuiltInRegistries.ITEM.getTagOrEmpty(tag).forEach(holder -> {
-                    Item item = holder.value();
+                itemsInTag(tag).forEach(item -> {
                     if (item == Items.AIR) return;
                     // 防止用本模组装备互相强化（运行时对同名物品也会拦下）
                     if (item instanceof IKogasaEquipment) return;
@@ -121,8 +127,7 @@ public class KogasaJEIPlugin implements IModPlugin {
 
         // 用 ItemTags.ARROWS 中的所有箭矢作为代表
         List<ItemStack> arrows = new ArrayList<>();
-        BuiltInRegistries.ITEM.getTagOrEmpty(ItemTags.ARROWS).forEach(holder -> {
-            Item item = holder.value();
+        itemsInTag(ItemTags.ARROWS).forEach(item -> {
             if (item == Items.AIR) return;
             ItemStack stack = new ItemStack(item, 16);  // count=16 让 JEI 显示 "16x"
             arrows.add(stack);

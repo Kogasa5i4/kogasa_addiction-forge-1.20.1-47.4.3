@@ -69,7 +69,13 @@ public class KogasaAnvilHandler {
             return;
         }
 
-        // ========== 分支 2：弓弩弹药装载 ==========
+        // ========== 分支 2：封印（右侧是木棍） ==========
+        if (right.is(Items.STICK)) {
+            handleSeal(event, left);
+            return;
+        }
+
+        // ========== 分支 3：弓弩弹药装载 ==========
         if (isRangedWeapon(left)) {
             if (handleAmmoInfusion(event, left, right)) return;
         }
@@ -78,7 +84,7 @@ public class KogasaAnvilHandler {
         // 若耐久修复或右侧附魔合并有意义，就让原版铁砧继续计算。
         if (shouldUseVanillaCombination(left, right)) return;
 
-        // ========== 分支 3：强化（右侧是同类型装备） ==========
+        // ========== 分支 4：强化（右侧是同类型装备） ==========
         handleReinforcement(event, left, right);
     }
 
@@ -119,6 +125,25 @@ public class KogasaAnvilHandler {
 
         event.setOutput(result);
         event.setCost(Config.ABILITY_INFUSION_COST.get());
+        event.setMaterialCost(1);
+    }
+
+    /**
+     * 封印：装备 + 木棍 → 属性 -50%、能力暂失效，成长达到阈值后自动解封。
+     * 这是"绕过强化解锁成长"的捷径：封印装备无需 3 次强化即可直接积累成长。
+     */
+    private static void handleSeal(AnvilUpdateEvent event, ItemStack left) {
+        if (KogasaEquipmentData.isLocked(left)) {
+            event.setOutput(ItemStack.EMPTY);
+            event.setCost(0);
+            return;
+        }
+
+        ItemStack result = left.copy();
+        KogasaEquipmentData.setLocked(result, true);
+
+        event.setOutput(result);
+        event.setCost(Config.SEAL_COST.get());
         event.setMaterialCost(1);
     }
 

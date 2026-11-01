@@ -66,6 +66,28 @@ public class KogasaAdvancementHelper {
         if (KogasaAbilityData.hasAmmo(stack)) {
             grant(player, "kappa_tech");
         }
+
+        // 被封印的众神（持有封印装备）
+        if (KogasaEquipmentData.isLocked(stack)) {
+            grantSealedEquipment(player);
+        }
+    }
+
+    /**
+     * "被封印的众神"：判据为 {@code minecraft:impossible}，只能程序化授予，
+     * 不能复用 {@link #grant}（那里按判据名 "impossible" 发放）。
+     */
+    public static void grantSealedEquipment(ServerPlayer player) {
+        var server = player.getServer();
+        if (server == null) return;
+
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
+                KogasaAddiction.MODID, "obtain_sealed_equipment");
+        Advancement advancement = server.getAdvancements().getAdvancement(id);
+
+        if (advancement != null) {
+            player.getAdvancements().award(advancement, "obtain_sealed_equipment");
+        }
     }
 
     /**

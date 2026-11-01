@@ -37,9 +37,9 @@ public class KogasaHoeItem extends HoeItem implements IKogasaEquipment {
     }
 
     @Override
-    public boolean isCorrectToolForDrops(ItemStack stack, @NotNull BlockState state) {
+    public boolean isCorrectToolForDrops(@NotNull ItemStack stack, @NotNull BlockState state) {
         return IKogasaEquipment.isCorrectToolForDrops(
-                stack, state, this.getTier().getLevel(),
+                stack, state, this.getTier(),
                 () -> super.isCorrectToolForDrops(stack, state));
     }
 }

@@ -56,12 +56,18 @@ public class KogasaAbilityIngotItem extends Item {
         // 3. 空行分隔
         tooltip.add(Component.empty());
 
-        // 4. 获取方式
-        tooltip.add(Component.translatable(
-                        "tooltip.kogasa_addiction.ability_ingot.obtain.header")
-                .withStyle(ChatFormatting.YELLOW));
-        for (String key : ability.getObtainKeys()) {
-            tooltip.add(createObtainLine(key));
+        // 4. 获取方式（剧透）：按住 Shift 才展开，避免提前剧透
+        if (net.minecraft.client.gui.screens.Screen.hasShiftDown()) {
+            tooltip.add(Component.translatable(
+                            "tooltip.kogasa_addiction.ability_ingot.obtain.header")
+                    .withStyle(ChatFormatting.YELLOW));
+            for (String key : ability.getObtainKeys()) {
+                tooltip.add(createObtainLine(key));
+            }
+        } else {
+            tooltip.add(Component.translatable(
+                            "tooltip.kogasa_addiction.ability_ingot.obtain.spoiler_hint")
+                    .withStyle(ChatFormatting.DARK_GRAY));
         }
 
         // 5. 空行 + 使用提示

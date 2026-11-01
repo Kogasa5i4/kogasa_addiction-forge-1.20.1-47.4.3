@@ -88,6 +88,14 @@
           "functions": [
             { "function": "minecraft:set_count", "count": { "min": 3, "max": 5 } }
           ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:air",
+          "weight": 2,
+          "functions": [
+            { "function": "kogasa_addiction:locked_equipment" }
+          ]
         }
       ]
     }

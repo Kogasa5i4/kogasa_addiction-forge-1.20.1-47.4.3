@@ -13,6 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.enchanting.EnchantmentLevelSetEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -29,11 +30,8 @@ public class FumoHandler {
     private static final Map<TableKey, int[]> ENCHANT_LEVELS =
             new HashMap<>();
 
-    /**
-     * 全局共享冷却。
-     * 0 表示当前可以进行概率判定。
-     */
-    private static int cooldown = 0;
+    /** 每名玩家的独立冷却截止时间（世界 gameTime），存在玩家持久数据里，重登不清零 */
+    private static final String TAG_COOLDOWN_UNTIL = "KogasaFumoCooldownUntil";
 
     /**
      * 记录最近检测到的候选附魔台。
@@ -84,18 +82,14 @@ public class FumoHandler {
             CANDIDATE_TABLES.put(key, event.getPower());
         } else {
             CANDIDATE_TABLES.remove(key);
+            // 与候选表同步清理：否则 ENCHANT_LEVELS 只增不减，附魔台越用越多
+            ENCHANT_LEVELS.remove(key);
         }
     }
 
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) {
-            return;
-        }
-
-        // 冷却期间只递减计数，不搜索玩家或附魔台。
-        if (cooldown > 0) {
-            cooldown--;
             return;
         }
 
@@ -115,8 +109,11 @@ public class FumoHandler {
                     || !level.getBlockState(key.pos())
                     .is(Blocks.ENCHANTING_TABLE)) {
                 iterator.remove();
+                ENCHANT_LEVELS.remove(key);
                 continue;
             }
+
+            long now = level.getGameTime();
 
             // 仅处理当前确实打开附魔台界面的玩家。
             for (ServerPlayer player : level.players()) {
@@ -143,9 +140,15 @@ public class FumoHandler {
                     continue;
                 }
 
+                // 每名玩家独立冷却：旧实现是全局共享的静态冷却，
+                // 任意玩家的一次判定会让全服进入 5 分钟冷却。
+                if (player.getPersistentData().getLong(TAG_COOLDOWN_UNTIL) > now) {
+                    continue;
+                }
+
                 // 只有条件成立时才进行一次概率判定。
-                // 无论命中与否，立即进入全局冷却。
-                cooldown = COOLDOWN_TICKS;
+                // 无论命中与否，都立即进入该玩家自己的冷却。
+                player.getPersistentData().putLong(TAG_COOLDOWN_UNTIL, now + COOLDOWN_TICKS);
 
                 if (level.random.nextInt(CHANCE_DENOMINATOR) == 0) {
                     ItemStack fumo = new ItemStack(ModItems.FUMO.get());
@@ -154,9 +157,18 @@ public class FumoHandler {
                         player.drop(fumo, false);
                     }
                 }
-
-                return;
             }
         }
+    }
+
+    /**
+     * 服务器停止时清空静态状态。
+     * ENCHANT_LEVELS 之前只增不减（候选表被移除时没有同步清理），
+     * 长期运行的服务器 / 反复进出单人世界会确定性泄漏内存。
+     */
+    @SubscribeEvent
+    public static void onServerStopping(ServerStoppingEvent event) {
+        ENCHANT_LEVELS.clear();
+        CANDIDATE_TABLES.clear();
     }
 }

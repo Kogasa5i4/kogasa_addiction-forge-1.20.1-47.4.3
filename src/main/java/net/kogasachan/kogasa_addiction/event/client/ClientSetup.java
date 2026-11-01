@@ -29,6 +29,8 @@ public class ClientSetup {
         event.enqueueWork(() -> {
             registerBowProperties();
             registerCrossbowProperties();
+            // 手册数值动态化：$(kogasa_cfg:xxx) 函数（Patchouli 缺失时自动跳过）
+            KogasaManualConfigFunctions.register();
         });
     }
 

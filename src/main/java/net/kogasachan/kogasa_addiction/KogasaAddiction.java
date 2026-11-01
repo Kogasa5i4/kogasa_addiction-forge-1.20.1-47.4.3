@@ -32,6 +32,7 @@ public class KogasaAddiction {
         ModItems.ITEMS.register(modEventBus);
         ModEntities.ENTITY_TYPES.register(modEventBus);
         ModRecipes.RECIPE_SERIALIZERS.register(modEventBus);
+        net.kogasachan.kogasa_addiction.loot.KogasaLockedEquipmentFunction.LOOT_FUNCTION_TYPES.register(modEventBus);
 
         context.registerConfig(
                 ModConfig.Type.COMMON,

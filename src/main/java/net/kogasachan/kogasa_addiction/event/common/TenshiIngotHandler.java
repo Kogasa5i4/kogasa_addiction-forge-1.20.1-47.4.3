@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -49,7 +50,6 @@ public class TenshiIngotHandler {
         event.setCanceled(true);
 
         // 是否消耗被放置的方块：显式控制，不再依赖 Forge 在 BlockItem#place 里的注入点语义。
-        // 旧写法完全没有处理这一点，实际结果是"扣不扣"取决于注入点，行为不确定。
         if (Config.TENSHI_INGOT_CONSUME_BLOCK.get() && !player.getAbilities().instabuild) {
             ItemStack used = findPlacedStack(player, state);
             if (!used.isEmpty()) {
@@ -80,7 +80,7 @@ public class TenshiIngotHandler {
      */
     private static ItemStack findPlacedStack(ServerPlayer player, BlockState placed) {
         for (ItemStack candidate : new ItemStack[]{player.getMainHandItem(), player.getOffhandItem()}) {
-            if (candidate.getItem() instanceof net.minecraft.world.item.BlockItem blockItem
+            if (candidate.getItem() instanceof BlockItem blockItem
                     && blockItem.getBlock() == placed.getBlock()) {
                 return candidate;
             }

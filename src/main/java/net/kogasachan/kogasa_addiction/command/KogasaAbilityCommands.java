@@ -1,7 +1,6 @@
 package net.kogasachan.kogasa_addiction.command;
 
 import com.mojang.brigadier.arguments.DoubleArgumentType;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -9,34 +8,16 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
-import net.kogasachan.kogasa_addiction.event.common.KogasaGrowthHandler;
-import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
-import net.kogasachan.kogasa_addiction.util.*;
-import net.minecraft.commands.CommandBuildContext;
+import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
+import net.kogasachan.kogasa_addiction.util.KogasaNumberFormatHelper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.ResourceArgument;
-import net.minecraft.commands.arguments.item.ItemArgument;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.*;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.world.item.ItemStack;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static net.kogasachan.kogasa_addiction.command.KogasaCommandSupport.*;
+import static net.kogasachan.kogasa_addiction.command.KogasaCommandSupport.ABILITY_SUGGESTIONS;
+import static net.kogasachan.kogasa_addiction.command.KogasaCommandSupport.ADMIN;
 
 /** /kogasa addability|removeability|clearabilities|newsvalue|setnewsvalue —— 能力侧数据命令组。 */
 public final class KogasaAbilityCommands {

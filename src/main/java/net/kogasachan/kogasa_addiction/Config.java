@@ -14,12 +14,82 @@ public class Config {
     public static final ForgeConfigSpec.IntValue MINING_SPEED_TOOLTIP_MODE = BUILDER
             .comment("Mining speed tooltip mode. 0 = disabled, 1 = all digger tools, 2 = Kogasa equipment only.\n" +
                     "挖掘速度 Tooltip 模式。0 = 不显示，1 = 所有挖掘工具，2 = 仅本模组装备。")
-            .defineInRange("miningSpeedTooltipMode", 2, 0, 2);
+            .defineInRange("miningSpeedTooltipMode", 1, 0, 2);
+
+    public static final ForgeConfigSpec.IntValue RANGED_STATS_TOOLTIP_MODE = BUILDER
+            .comment("Draw time / projectile velocity tooltip mode. 0 = off, 1 = all bows/crossbows/tridents, 2 = mod equipment only.\n" +
+                    "蓄力时间/弹射物速度 Tooltip 模式。0 = 不显示，1 = 所有弓弩三叉戟，2 = 仅本模组装备。")
+            .defineInRange("rangedStatsTooltipMode", 1, 0, 2);
 
     public static final ForgeConfigSpec.BooleanValue ENABLE_FIRST_JOIN_REWARD = BUILDER
             .comment("Give players a random piece of mod equipment with a random ability on their first join.\n" +
                     "玩家首次进入世界时获得一件随机模组装备，附带随机能力。")
             .define("enableFirstJoinReward", true);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.push("loot");
+    }
+
+    /**
+     * 战利品开出的"封印装备"：封印期间属性 -50% 且能力不生效，
+     * 成长达到该值时自动解封（恢复全力 + 结算成长附魔）。
+     */
+    public static final ForgeConfigSpec.DoubleValue LOCKED_EQUIPMENT_UNLOCK_GROWTH = BUILDER
+            .comment("""
+                    Growth value at which loot "sealed" equipment automatically unlocks.
+                    Sealed equipment has -50% attributes and inactive abilities until then.
+                    战利品开出的封印装备在封印期间属性 -50% 且能力不生效，成长达到该值时自动解封。""")
+            .defineInRange("lockedEquipmentUnlockGrowth", 0.5, 0.0, 1.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.push("mobEquipment");
+    }
+
+    public static final ForgeConfigSpec.BooleanValue MOB_EQUIPMENT_ENABLED = BUILDER
+            .comment("Whether monsters can spawn holding/wearing mod equipment.\n" +
+                    "怪物生成时是否可能持有本模组装备。")
+            .define("enabled", true);
+
+    public static final ForgeConfigSpec.DoubleValue MOB_EQUIPMENT_CHANCE = BUILDER
+            .comment("Chance for an eligible monster to get mod equipment. 0.05 = 5%.\n" +
+                    "符合条件的怪物获得本模组装备的概率。0.05 = 5%。")
+            .defineInRange("chance", 0.05, 0.0, 1.0);
+
+    public static final ForgeConfigSpec.DoubleValue MOB_EQUIPMENT_SEALED_CHANCE = BUILDER
+            .comment("Chance that the granted equipment is a sealed piece (random ability, locked until growth).\n" +
+                    "获得的装备为封印装备（随机能力，成长解封）的概率。")
+            .defineInRange("sealedChance", 0.5, 0.0, 1.0);
+
+    public static final ForgeConfigSpec.DoubleValue MOB_EQUIPMENT_DROP_CHANCE = BUILDER
+            .comment("Drop chance for mob equipment on death. Vanilla default is 0.085.\n" +
+                    "怪物死亡时装备的掉落率。原版默认 0.085。")
+            .defineInRange("dropChance", 0.085, 0.0, 1.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.push("villagerTrades");
+    }
+
+    public static final ForgeConfigSpec.BooleanValue VILLAGER_TRADES_ENABLED = BUILDER
+            .comment("Whether villagers and the wandering trader offer mod equipment trades.\n" +
+                    "村民与流浪商人是否出售本模组装备。")
+            .define("enabled", true);
+
+    public static final ForgeConfigSpec.DoubleValue VILLAGER_TRADE_PRICE_MULTIPLIER = BUILDER
+            .comment("Multiplier applied to the emerald cost of all mod villager trades.\n" +
+                    "所有本模组村民交易的绿宝石价格倍率。")
+            .defineInRange("priceMultiplier", 1.0, 0.1, 100.0);
 
     static {
         BUILDER.pop();
@@ -53,6 +123,11 @@ public class Config {
             .comment("Experience level cost to infuse special ammo into an aya bow/crossbow.\n" +
                     "在铁砧中为文文弓/弩装载特殊弹药消耗的经验等级。")
             .defineInRange("ammoInfusionCost", 3, 0, 100);
+
+    public static final ForgeConfigSpec.IntValue SEAL_COST = BUILDER
+            .comment("Experience level cost to seal equipment with a stick in the anvil (loot-style seal: -50% attributes, abilities inactive until growth unlocks it).\n" +
+                    "在铁砧中用木棍封印装备消耗的经验等级（战利品式封印：属性 -50%、能力暂失效，成长达标后解封）。")
+            .defineInRange("sealCost", 1, 0, Integer.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue WEAPON_ABSORBED_RATIO = BUILDER
             .comment("Absorbed value ratio for weapons and tools.\n" +
@@ -221,10 +296,11 @@ public class Config {
             .defineInRange("bowPierceGrowth", 0.5, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue RANGED_DRAW_SPEED_ABSORB_RATIO = BUILDER
-            .comment("Fraction of the vanilla full-draw time absorbed as \"draw speed\" per bow/crossbow reinforcement.\n" +
-                    "0.1 = every reinforcement absorbs 10% of the 20 (bow) / 25 (crossbow) ticks needed to draw fully.\n" +
-                    "弓弩每次强化吸收的拉弓速度比例（相对原版拉满时间）。\n" +
-                    "0.1 = 每次强化吸收 20（弓）/ 25（弩）tick 的 10%，即拉满时间缩短 1 tick。")
+            .comment("""
+                    Fraction of the vanilla full-draw time absorbed as "draw speed" per bow/crossbow reinforcement.
+                    0.1 = every reinforcement absorbs 10% of the 20 (bow) / 25 (crossbow) ticks needed to draw fully.
+                    弓弩每次强化吸收的拉弓速度比例（相对原版拉满时间）。
+                    0.1 = 每次强化吸收 20（弓）/ 25（弩）tick 的 10%，即拉满时间缩短 1 tick。""")
             .defineInRange("rangedDrawSpeedAbsorbRatio", 0.1, 0.0, 1.0);
 
     public static final ForgeConfigSpec.DoubleValue BOW_MULTISHOT_2_GROWTH = BUILDER
@@ -298,10 +374,24 @@ public class Config {
                     "在铁砧中为装备注入能力锭消耗的经验等级。")
             .defineInRange("abilityInfusionCost", 3, 0, Integer.MAX_VALUE);
 
-    public static final ForgeConfigSpec.DoubleValue GROWTH_FOR_SECOND_ABILITY_SLOT = BUILDER
-            .comment("Growth required to unlock the 2nd ability slot. 0.5 = 50% growth.\n" +
-                    "解锁第 2 个能力槽所需的成长值。0.5 = 50%。")
-            .defineInRange("growthForSecondAbilitySlot", 0.5, 0.0, Double.MAX_VALUE);
+    public static final ForgeConfigSpec.DoubleValue ABILITY_SLOT_INITIAL_GROWTH = BUILDER
+            .comment("Growth required to unlock the FIRST ability slot. 0 = the first slot is always available.\n" +
+                    "解锁第一个能力槽所需的成长值。默认 0 = 第一槽始终可用。")
+            .defineInRange("abilitySlotInitialGrowth", 0.0, 0.0, Double.MAX_VALUE);
+
+    public static final ForgeConfigSpec.DoubleValue ABILITY_SLOT_GROWTH_INCREMENT = BUILDER
+            .comment("""
+                    Extra growth required for each additional ability slot (arithmetic progression).
+                    Slot N unlocks at: abilitySlotInitialGrowth + (N-1) * abilitySlotGrowthIncrement.
+                    Defaults 0 / 0.5: slots unlock at 0, 0.5, 1.0, 1.5 ... (capped by abilitySlotMax).
+                    每个额外能力槽所需的成长增量（等差数列解锁）。
+                    第 N 个槽在 初始值 + (N-1) × 增量 处解锁。默认 0 / 0.5：0、0.5、1.0、1.5 ...（受 abilitySlotMax 封顶）。""")
+            .defineInRange("abilitySlotGrowthIncrement", 0.5, 0.0001, Double.MAX_VALUE);
+
+    public static final ForgeConfigSpec.IntValue ABILITY_SLOT_MAX = BUILDER
+            .comment("Hard cap on the number of ability slots. Default 4.\n" +
+                    "能力槽数量上限。默认 4。")
+            .defineInRange("abilitySlotMax", 4, 1, 64);
 
     static {
         BUILDER.push("aya");
@@ -445,14 +535,15 @@ public class Config {
             .defineInRange("tenshiIngotChance", 0.105, 0.0, 1.0);
 
     public static final ForgeConfigSpec.BooleanValue TENSHI_INGOT_CONSUME_BLOCK = BUILDER
-            .comment("If true, the placed beacon-base block item is consumed when the ingot triggers.\n" +
-                    "Default false: the block is not consumed (pure bonus loot), which is the historic behavior.\n" +
-                    "NOTE: keeping this false means the player can repeatedly place the same block to keep rolling;\n" +
-                    "set it to true if you want each roll to cost one block.\n" +
-                    "天子锭触发时是否消耗被放置的方块物品。\n" +
-                    "默认 false：不消耗方块（纯额外奖励，与历史行为一致）。\n" +
-                    "注意：保持 false 意味着玩家可以反复放置同一方块持续触发；\n" +
-                    "如果希望每次触发消耗一个方块，请设为 true。")
+            .comment("""
+                    If true, the placed beacon-base block item is consumed when the ingot triggers.
+                    Default false: the block is not consumed (pure bonus loot), which is the historic behavior.
+                    NOTE: keeping this false means the player can repeatedly place the same block to keep rolling;
+                    set it to true if you want each roll to cost one block.
+                    天子锭触发时是否消耗被放置的方块物品。
+                    默认 false：不消耗方块（纯额外奖励，与历史行为一致）。
+                    注意：保持 false 意味着玩家可以反复放置同一方块持续触发；
+                    如果希望每次触发消耗一个方块，请设为 true。""")
             .define("tenshiIngotConsumeBlock", false);
 
     public static final ForgeConfigSpec.DoubleValue TENSHI_DOMAIN_THRESHOLD = BUILDER

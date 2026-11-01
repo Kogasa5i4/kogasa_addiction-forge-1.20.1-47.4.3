@@ -30,38 +30,38 @@ public class CrossbowMixin {
 
     // ========== 1. 发射时触发成长，并重置本次射击的烟花标记 ==========
     @Inject(method = "performShooting", at = @At("HEAD"))
-    private static void kogasa$onShoot(Level level, LivingEntity shooter,
-                                       InteractionHand hand, ItemStack stack,
-                                       float velocity, float inaccuracy,
+    private static void kogasa$onShoot(Level pLevel, LivingEntity pShooter,
+                                       InteractionHand pUsedHand, ItemStack pCrossbowStack,
+                                       float pVelocity, float pInaccuracy,
                                        CallbackInfo ci) {
-        if (level.isClientSide) return;
+        if (pLevel.isClientSide) return;
 
         // 每次射击清一次"烟花已生成"标记，供实体加入世界时去重
-        if (stack.getTag() != null) {
-            stack.getTag().remove(CrossbowProjectileHandler.TAG_FIREWORK_SPAWNED);
+        if (pCrossbowStack.getTag() != null) {
+            pCrossbowStack.getTag().remove(CrossbowProjectileHandler.TAG_FIREWORK_SPAWNED);
         }
 
-        if (!(stack.getItem() instanceof IKogasaEquipment)) return;
-        if (!(shooter instanceof ServerPlayer player)) return;
+        if (!(pCrossbowStack.getItem() instanceof IKogasaEquipment)) return;
+        if (!(pShooter instanceof ServerPlayer player)) return;
 
-        KogasaGrowthHandler.addGrowth(stack, player);
+        KogasaGrowthHandler.addGrowth(pCrossbowStack, player);
     }
 
     // ========== 2. 装填速度：总倍率 + 强化吸收的拉弓速度 ==========
     @Inject(method = "getChargeDuration", at = @At("RETURN"), cancellable = true)
-    private static void kogasa$modifyChargeDuration(ItemStack stack,
+    private static void kogasa$modifyChargeDuration(ItemStack pCrossbowStack,
                                                     CallbackInfoReturnable<Integer> cir) {
-        if (!(stack.getItem() instanceof IKogasaEquipment)) return;
+        if (!(pCrossbowStack.getItem() instanceof IKogasaEquipment)) return;
 
         int original = cir.getReturnValue();
         if (original <= 0) return;
 
         // 链 1：总倍率（沿用原行为）
-        double multiplier = KogasaEquipmentData.getMultiplier(stack);
+        double multiplier = KogasaEquipmentData.getMultiplier(pCrossbowStack);
         int shortened = (int) Math.round(original / Math.sqrt(multiplier));
 
         // 链 2：强化吸收来的拉弓速度
-        shortened = KogasaEquipmentHelper.getEffectiveDrawTicks(stack, Math.max(1, shortened));
+        shortened = KogasaEquipmentHelper.getEffectiveDrawTicks(pCrossbowStack, Math.max(1, shortened));
 
         cir.setReturnValue(shortened);
     }

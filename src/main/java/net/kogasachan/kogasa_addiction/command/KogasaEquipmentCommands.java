@@ -1,7 +1,6 @@
 package net.kogasachan.kogasa_addiction.command;
 
 import com.mojang.brigadier.arguments.DoubleArgumentType;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -9,36 +8,30 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
-import net.kogasachan.kogasa_addiction.event.common.KogasaGrowthHandler;
-import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
-import net.kogasachan.kogasa_addiction.util.*;
+import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
+import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
+import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
+import net.kogasachan.kogasa_addiction.util.KogasaNumberFormatHelper;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.ResourceArgument;
 import net.minecraft.commands.arguments.item.ItemArgument;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.*;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.BowItem;
+import net.minecraft.world.item.CrossbowItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.annotation.Nullable;
 
 import static net.kogasachan.kogasa_addiction.command.KogasaCommandSupport.*;
 
-/** /kogasa grow|reinforce|reset|resetfirstjoin —— 修改装备本体数据的命令组。 */
+/** /kogasa grow|reinforce|reset|resetfirstjoin|seal|unseal —— 修改装备本体数据的命令组。 */
 public final class KogasaEquipmentCommands {
 
     private KogasaEquipmentCommands() {
@@ -65,6 +58,16 @@ public final class KogasaEquipmentCommands {
                     // 下次登录时由 FirstJoinRewardHandler 重新发放
                     return 1;
                 }));
+        // 封印装备（战利品机制）的测试命令：seal 可指定能力，缺省随机
+        root.then(Commands.literal("seal")
+                .requires(ADMIN)
+                .executes(ctx -> seal(ctx, null))
+                .then(Commands.argument("ability", StringArgumentType.word())
+                        .suggests(ABILITY_SUGGESTIONS)
+                        .executes(ctx -> seal(ctx, StringArgumentType.getString(ctx, "ability")))));
+        root.then(Commands.literal("unseal")
+                .requires(ADMIN)
+                .executes(KogasaEquipmentCommands::unseal));
     }
 
     // ==================== grow ====================
@@ -179,6 +182,58 @@ public final class KogasaEquipmentCommands {
         return 1;
     }
 
+
+    // ==================== seal / unseal ====================
+
+    /** 封印主手装备：注入指定（或随机）能力 + Locked=true，模拟战利品开出的封印装备。 */
+    private static int seal(CommandContext<CommandSourceStack> ctx, @Nullable String abilityId)
+            throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        ItemStack held = KogasaCommandSupport.requireKogasaEquipment(ctx);
+        if (held.isEmpty()) return 0;
+
+        KogasaAbility ability;
+        if (abilityId != null) {
+            ability = KogasaAbility.byId(abilityId);
+            if (ability == null) {
+                ctx.getSource().sendFailure(Component.translatable(
+                        "commands.kogasa_addiction.error.unknown_ability", abilityId));
+                return 0;
+            }
+        } else {
+            ability = KogasaAbility.values()[
+                    player.getRandom().nextInt(KogasaAbility.values().length)];
+        }
+
+        KogasaAbilityData.forceAddAbility(held, ability);
+        KogasaEquipmentData.setLocked(held, true);
+        player.getInventory().setChanged();
+
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.seal.success",
+                ability.getDisplayName()), true);
+        return 1;
+    }
+
+    private static int unseal(CommandContext<CommandSourceStack> ctx)
+            throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        ItemStack held = KogasaCommandSupport.requireKogasaEquipment(ctx);
+        if (held.isEmpty()) return 0;
+
+        if (!KogasaEquipmentData.isLocked(held)) {
+            ctx.getSource().sendSuccess(() -> Component.translatable(
+                    "commands.kogasa_addiction.unseal.already"), false);
+            return 1;
+        }
+
+        KogasaEquipmentData.setLocked(held, false);
+        player.getInventory().setChanged();
+
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.unseal.success"), true);
+        return 1;
+    }
 
     // ==================== reset ====================
 

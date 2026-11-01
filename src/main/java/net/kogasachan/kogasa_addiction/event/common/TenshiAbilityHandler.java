@@ -8,6 +8,7 @@ import net.kogasachan.kogasa_addiction.network.PacketHandler;
 import net.kogasachan.kogasa_addiction.network.TenshiAbilityPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -21,7 +22,9 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -215,22 +218,8 @@ public class TenshiAbilityHandler {
      * 随机赋予一种原版正面增益，并实现叠加逻辑
      */
     private static void applyRandomBuff(ServerPlayer player) {
-        List<MobEffect> beneficialEffects = List.of(
-                MobEffects.MOVEMENT_SPEED,
-                MobEffects.DIG_SPEED,
-                MobEffects.DAMAGE_BOOST,
-                MobEffects.JUMP,
-                MobEffects.REGENERATION,
-                MobEffects.DAMAGE_RESISTANCE,
-                MobEffects.FIRE_RESISTANCE,
-                MobEffects.WATER_BREATHING,
-                MobEffects.INVISIBILITY,
-                MobEffects.NIGHT_VISION,
-                MobEffects.HEALTH_BOOST,
-                MobEffects.ABSORPTION,
-                MobEffects.SATURATION,
-                MobEffects.LUCK
-        );
+        List<MobEffect> beneficialEffects = getBeneficialEffects();
+        if (beneficialEffects.isEmpty()) return;
 
         MobEffect chosen = beneficialEffects.get(player.getRandom().nextInt(beneficialEffects.size()));
         MobEffectInstance current = player.getEffect(chosen);
@@ -246,5 +235,27 @@ public class TenshiAbilityHandler {
         }
 
         player.addEffect(new MobEffectInstance(chosen, newDuration, newAmplifier, false, true, true));
+    }
+
+    /** 可随机的增益池：惰性构建（首次调用时注册表已填好，不能在静态初始化里遍历） */
+    private static List<MobEffect> beneficialEffects = null;
+
+    /**
+     * 遍历原版效果注册表（仅 minecraft 命名空间）+ {@code isBeneficial()} 检查，
+     * 不再硬编码列表——原版后续新增的正面效果会自动进入池子。
+     * 排除两个不适合作随机增益的：瞬间治疗（即时生效、无持续叠加意义）与村庄英雄（情景性）。
+     */
+    private static List<MobEffect> getBeneficialEffects() {
+        if (beneficialEffects == null) {
+            List<MobEffect> effects = new ArrayList<>();
+            for (MobEffect effect : ForgeRegistries.MOB_EFFECTS) {
+                ResourceLocation id = ForgeRegistries.MOB_EFFECTS.getKey(effect);
+                if (id == null || !"minecraft".equals(id.getNamespace())) continue;
+                if (effect == MobEffects.HEAL || effect == MobEffects.HERO_OF_THE_VILLAGE) continue;
+                if (effect.isBeneficial()) effects.add(effect);
+            }
+            beneficialEffects = effects;
+        }
+        return beneficialEffects;
     }
 }

@@ -1,6 +1,7 @@
 package net.kogasachan.kogasa_addiction.datagen;
 
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbilityRegistry;
 import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
@@ -13,6 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,13 +66,10 @@ public class ModItemTagsProvider extends ItemTagsProvider {
         this.tag(Tags.Items.TOOLS_TRIDENTS).add(ModItems.SAKUYA_KNIFE.get());
         this.tag(KNIVES).add(ModItems.SAKUYA_KNIFE.get());
 
-        // ===== 能力锭：加入模组专属标签 =====
-        this.tag(ABILITY_INGOTS)
-                .add(ModItems.KOGASA_INGOT.get())
-                .add(ModItems.AYA_INGOT.get())
-                .add(ModItems.CIRNO_INGOT.get())
-                .add(ModItems.KOISHI_INGOT.get())
-                .add(ModItems.TENSHI_INGOT.get())
-                .add(ModItems.SAKUYA_INGOT.get());
+        // ===== 能力锭：由能力注册表自动生成，新增能力无需改这里 =====
+        var ingotTag = this.tag(ABILITY_INGOTS);
+        for (RegistryObject<Item> ingot : KogasaAbilityRegistry.ingots().values()) {
+            ingotTag.add(ingot.get());
+        }
     }
 }

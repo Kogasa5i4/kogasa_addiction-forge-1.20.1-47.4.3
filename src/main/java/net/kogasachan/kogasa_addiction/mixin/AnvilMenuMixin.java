@@ -1,6 +1,9 @@
 package net.kogasachan.kogasa_addiction.mixin;
 
 import net.kogasachan.kogasa_addiction.item.ModItems;
+import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
+import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AnvilMenu;
@@ -32,14 +35,21 @@ public abstract class AnvilMenuMixin {
     }
 
     @Inject(method = "onTake", at = @At("HEAD"))
-    private void kogasa$captureInput(Player player, ItemStack output, CallbackInfo ci) {
+    private void kogasa$captureInput(Player pPlayer, ItemStack pStack, CallbackInfo ci) {
         Container inputSlots = this.kogasa$inputSlots();
         this.kogasa$inputBeforeTake = inputSlots.getItem(0).copy();
         this.kogasa$materialBeforeTake = inputSlots.getItem(1).copy();
     }
 
     @Inject(method = "onTake", at = @At("TAIL"))
-    private void kogasa$returnRemainder(Player player, ItemStack output, CallbackInfo ci) {
+    private void kogasa$returnRemainder(Player pPlayer, ItemStack pStack, CallbackInfo ci) {
+        // 木棍封印等经铁砧取走的封印装备：发放"被封印的众神"隐藏进度
+        if (pPlayer instanceof ServerPlayer serverPlayer
+                && !pStack.isEmpty()
+                && KogasaEquipmentData.isLocked(pStack)) {
+            KogasaAdvancementHelper.grantSealedEquipment(serverPlayer);
+        }
+
         ItemStack input = this.kogasa$inputBeforeTake;
         ItemStack material = this.kogasa$materialBeforeTake;
         this.kogasa$inputBeforeTake = null;

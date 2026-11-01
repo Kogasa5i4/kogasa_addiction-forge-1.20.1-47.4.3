@@ -23,13 +23,13 @@ public class IceBlockMixin {
      * @reason 霜冰自然融化时概率掉落琪露诺锭
      */
     @Inject(method = "melt", at = @At("HEAD"))
-    private void kogasa$onMelt(BlockState state, Level level, BlockPos pos, CallbackInfo ci) {
+    private void kogasa$onMelt(BlockState pState, Level pLevel, BlockPos pPos, CallbackInfo ci) {
         // 只处理霜冰，普通冰融化（在 ultraWarm 维度）不掉
-        if (!(state.getBlock() instanceof FrostedIceBlock)) return;
-        if (!(level instanceof ServerLevel serverLevel)) return;
+        if (!(pState.getBlock() instanceof FrostedIceBlock)) return;
+        if (!(pLevel instanceof ServerLevel serverLevel)) return;
 
         if (serverLevel.random.nextFloat() < ModConfigCache.cirnoIngotDropChance) {
-            Block.popResource(serverLevel, pos, new ItemStack(ModItems.CIRNO_INGOT.get()));
+            Block.popResource(serverLevel, pPos, new ItemStack(ModItems.CIRNO_INGOT.get()));
         }
     }
 }

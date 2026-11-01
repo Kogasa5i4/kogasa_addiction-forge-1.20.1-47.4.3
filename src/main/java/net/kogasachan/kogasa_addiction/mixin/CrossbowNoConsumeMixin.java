@@ -40,10 +40,10 @@ public class CrossbowNoConsumeMixin {
      * 每次装填前清除上次的不消耗标记
      */
     @Inject(method = "tryLoadProjectiles", at = @At("HEAD"))
-    private static void kogasa$clearNoConsumeMark(LivingEntity shooter, ItemStack crossbow,
+    private static void kogasa$clearNoConsumeMark(LivingEntity pShooter, ItemStack pCrossbowStack,
                                                   CallbackInfoReturnable<Boolean> cir) {
-        if (crossbow.getTag() != null) {
-            crossbow.getTag().remove(TAG_NO_CONSUME);
+        if (pCrossbowStack.getTag() != null) {
+            pCrossbowStack.getTag().remove(TAG_NO_CONSUME);
         }
     }
 
@@ -51,22 +51,22 @@ public class CrossbowNoConsumeMixin {
      * 在真正发生 split 的那次调用前，把弹药栈先补一支回去。
      */
     @Inject(method = "loadProjectile", at = @At("HEAD"))
-    private static void kogasa$preGrantArrow(LivingEntity shooter, ItemStack crossbow, ItemStack ammo,
-                                            boolean hasAmmo, boolean creative,
-                                            CallbackInfoReturnable<Boolean> cir) {
+    private static void kogasa$preGrantArrow(LivingEntity pShooter, ItemStack pCrossbowStack, ItemStack pAmmoStack,
+                                             boolean pHasAmmo, boolean pIsCreative,
+                                             CallbackInfoReturnable<Boolean> cir) {
         // 只在"会被 split 的那一条路径"上动手：非创造 + 第 1 支 + 弹药非空
-        if (creative || hasAmmo) return;
-        if (ammo.isEmpty()) return;
-        if (!crossbow.is(ModItems.AYA_CROSSBOW.get())) return;
-        if (!(shooter instanceof Player player)) return;
+        if (pIsCreative || pHasAmmo) return;
+        if (pAmmoStack.isEmpty()) return;
+        if (!pCrossbowStack.is(ModItems.AYA_CROSSBOW.get())) return;
+        if (!(pShooter instanceof Player player)) return;
         if (player.getAbilities().instabuild) return;
 
-        double chance = KogasaEquipmentHelper.getNoConsumeArrowChance(crossbow);
+        double chance = KogasaEquipmentHelper.getNoConsumeArrowChance(pCrossbowStack);
         if (chance <= 0.0D) return;
         if (player.getRandom().nextDouble() >= chance) return;
 
         // 先补一支，抵消随后原版的 split(1)
-        ammo.grow(1);
-        crossbow.getOrCreateTag().putBoolean(TAG_NO_CONSUME, true);
+        pAmmoStack.grow(1);
+        pCrossbowStack.getOrCreateTag().putBoolean(TAG_NO_CONSUME, true);
     }
 }

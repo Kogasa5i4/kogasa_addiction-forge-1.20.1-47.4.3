@@ -2,22 +2,10 @@ package net.kogasachan.kogasa_addiction.item.kind;
 
 import net.kogasachan.kogasa_addiction.datagen.ModItemTagsProvider;
 import net.kogasachan.kogasa_addiction.item.FumoItem;
-import net.kogasachan.kogasa_addiction.item.SakuyaKnifeItem;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.AxeItem;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.CrossbowItem;
-import net.minecraft.world.item.HoeItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.PickaxeItem;
-import net.minecraft.world.item.ShovelItem;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.TridentItem;
+import net.minecraft.world.item.*;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -93,7 +81,9 @@ public enum KogasaEquipmentKind {
         if (item == null || item == Items.AIR) return false;
 
         if (matchesClass(item)) return true;
-        if (item.builtInRegistryHolder().is(materialTag)) return true;
+        // ItemStack.is(TagKey) 自 1.18 起一直是稳定 API，
+        // 代替在后续版本被弃用的 builtInRegistryHolder()。
+        if (item.getDefaultInstance().is(materialTag)) return true;
         return nameEndsWith(item, suffix);
     }
 
@@ -134,7 +124,7 @@ public enum KogasaEquipmentKind {
         return switch (this) {
             case FUMO -> item instanceof FumoItem;
             // 三叉戟类统一按飞刀处理：这与旧实现 "left instanceof TridentItem 时接受剑/三叉戟/刀" 一致
-            case KNIFE -> item instanceof SakuyaKnifeItem || item instanceof TridentItem;
+            case KNIFE -> item instanceof TridentItem;
             case CROSSBOW -> item instanceof CrossbowItem;
             case BOW -> item instanceof BowItem;
             case PICKAXE -> item instanceof PickaxeItem;

@@ -140,7 +140,7 @@ public class SakuyaKnifeEntity extends ThrownTrident {
         if (this.random.nextDouble() < finalChance) {
             // 触发损坏：生成损坏版飞刀，并复制原有 NBT
             ItemStack broken = new ItemStack(ModItems.BROKEN_SAKUYA_KNIFE.get());
-            if (originStack.hasTag()) {
+            if (originStack.hasTag() && originStack.getTag() != null) {
                 broken.setTag(originStack.getTag().copy());
             }
             broken.setCount(1);

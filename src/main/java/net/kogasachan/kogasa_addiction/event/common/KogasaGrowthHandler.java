@@ -129,7 +129,9 @@ public class KogasaGrowthHandler {
     }
 
     public static void addGrowth(ItemStack stack, ServerPlayer player) {
-        if (!KogasaEquipmentData.isGrowthUnlocked(stack)) return;
+        // 封印装备（战利品）不需要先强化也能成长：成长正是解封的进度
+        boolean locked = KogasaEquipmentData.isLocked(stack);
+        if (!KogasaEquipmentData.isGrowthUnlocked(stack) && !locked) return;
 
         double growth = KogasaEquipmentData.getGrowth(stack);
         double max = Config.MAX_GROWTH.get();
@@ -139,12 +141,37 @@ public class KogasaGrowthHandler {
         growth = Math.min(growth + Config.GROWTH_PER_USE.get(), max);
         KogasaEquipmentData.setGrowth(stack, growth);
 
-        // 只在成长值真的增加时才检查附魔解锁
-        if (growth > oldGrowth) {
+        // 只在成长值真的增加时才检查附魔解锁；封印期间不发成长附魔（解封时一次性结算）
+        if (growth > oldGrowth && !locked) {
             checkGrowthEnchant(stack, player);
         }
 
+        // 封印装备跨过解封阈值
+        if (growth > oldGrowth && locked) {
+            checkLockedUnlock(stack, player);
+        }
+
         KogasaAdvancementHelper.checkAndGrant(player, stack);
+    }
+
+    /**
+     * 封印装备在成长达到阈值时自动解封：属性恢复全力、能力生效 + 结算应得的成长附魔。
+     */
+    private static void checkLockedUnlock(ItemStack stack, ServerPlayer player) {
+        double threshold = Config.LOCKED_EQUIPMENT_UNLOCK_GROWTH.get();
+        if (KogasaEquipmentData.getGrowth(stack) < threshold) return;
+
+        KogasaEquipmentData.setLocked(stack, false);
+
+        player.level().playSound(null, player.blockPosition(),
+                SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.8F, 1.2F);
+        player.displayClientMessage(
+                Component.translatable("message.kogasa_addiction.locked_equipment.unlocked")
+                        .withStyle(ChatFormatting.GOLD),
+                true);
+
+        // 解封瞬间一次性结算封印期间积累的成长附魔
+        checkGrowthEnchant(stack, player);
     }
 
     /**

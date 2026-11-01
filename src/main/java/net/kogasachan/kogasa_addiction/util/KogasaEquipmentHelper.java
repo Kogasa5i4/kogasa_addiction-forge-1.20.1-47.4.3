@@ -5,13 +5,10 @@ import com.google.common.collect.Multimap;
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
-import net.kogasachan.kogasa_addiction.datagen.ModItemTagsProvider;
-import net.kogasachan.kogasa_addiction.item.FumoItem;
-import net.kogasachan.kogasa_addiction.item.SakuyaKnifeItem;
+import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKind;
 import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKinds;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.ItemTags;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -20,8 +17,6 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.*;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +28,38 @@ public class KogasaEquipmentHelper {
             UUID.fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF");
     private static final UUID WEAPON_SPEED_UUID =
             UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3");
+
+    /**
+     * 兜底分支的默认属性。本模组未单独处理属性的装备（弓弩）与"槽位不匹配"的分支
+     * （副手持剑、护甲错槽）在原版内建属性恒为空，直接返回共享空表即可；
+     * 也顺带绕开已弃用的 {@code Item#getDefaultAttributeModifiers}。
+     */
+    private static final Multimap<Attribute, AttributeModifier> EMPTY_MODIFIERS =
+            ImmutableMultimap.of();
+
+    /** 原版三叉戟基准攻击伤害的惰性缓存（首次属性计算时读取注册表，之后复用）。 */
+    private static Double vanillaTridentDamage = null;
+
+    /**
+     * 原版三叉戟的基准攻击伤害：动态读取注册表中 Items.TRIDENT 的内建属性
+     * （ATTACK_DAMAGE 的 ADDITION 修饰符之和），代替硬编码 8.0。
+     * 走 {@code ItemStack#getAttributeModifiers}（非弃用 API；原版三叉戟没有
+     * 覆写双参方法，不会与本模组的属性链路形成递归）。
+     */
+    private static double getVanillaTridentDamage() {
+        if (vanillaTridentDamage == null) {
+            double damage = 0.0D;
+            for (AttributeModifier modifier : Items.TRIDENT.getDefaultInstance()
+                    .getAttributeModifiers(EquipmentSlot.MAINHAND)
+                    .get(Attributes.ATTACK_DAMAGE)) {
+                if (modifier.getOperation() == AttributeModifier.Operation.ADDITION) {
+                    damage += modifier.getAmount();
+                }
+            }
+            vanillaTridentDamage = damage;
+        }
+        return vanillaTridentDamage;
+    }
 
     private static final UUID[] ARMOR_UUIDS = {
             UUID.fromString("845DB27C-C624-495F-8C9F-6020A9A58B6B"), // FEET
@@ -49,13 +76,15 @@ public class KogasaEquipmentHelper {
 
         if (item instanceof ArmorItem armor) {
             if (slot != armor.getEquipmentSlot()) {
-                return armor.getDefaultAttributeModifiers(slot);
+                // 护甲错槽：原版内建属性为空
+                return EMPTY_MODIFIERS;
             }
             return buildArmorModifiers(stack, armor, slot);
         }
 
         if (slot != EquipmentSlot.MAINHAND) {
-            return item.getDefaultAttributeModifiers(slot);
+            // 副手持握武器/工具：原版内建属性为空
+            return EMPTY_MODIFIERS;
         }
 
         if (item instanceof SwordItem sword) {
@@ -72,13 +101,13 @@ public class KogasaEquipmentHelper {
         }
 
         if (item instanceof TridentItem trident) {
-            double baseDamage = 1.0 + 8.0;
+            double baseDamage = 1.0 + getVanillaTridentDamage();
             double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
             return buildHandModifiers(stack, baseDamage, absorbed, -2.9F);
         }
 
-        // 其他未单独处理的 Kogasa 装备（如弓弩）使用默认属性
-        return item.getDefaultAttributeModifiers(slot);
+        // 其他未单独处理的 Kogasa 装备（如弓弩）使用默认属性：原版内建属性为空
+        return EMPTY_MODIFIERS;
     }
 
     /**
@@ -238,11 +267,113 @@ public class KogasaEquipmentHelper {
         return (int) Math.max(1L, reduced);
     }
 
+    /** 原版三叉戟蓄满所需 tick（ThrownTrident 满力蓄力时间） */
+    private static final double VANILLA_TRIDENT_DRAW_TICKS = 10.0D;
+
+    /** 原版三叉戟投掷初速 */
+    private static final double VANILLA_TRIDENT_POWER = 2.5D;
+
+    /**
+     * 当前实际拉满所需 tick：弓 20 / 弩 25 / 三叉戟 10，
+     * 先按总倍率开方缩短，再扣掉强化吸收的拉弓速度。
+     * 非弓弩三叉戟返回 0。
+     */
+    public static int getEffectiveChargeTicks(ItemStack stack) {
+        double base = getRangedBaseDrawTicks(stack);
+        if (base <= 0.0D && stack.getItem() instanceof TridentItem) {
+            base = VANILLA_TRIDENT_DRAW_TICKS;
+        }
+        if (base <= 0.0D) return 0;
+
+        double multiplier = KogasaEquipmentData.getMultiplier(stack);
+        int shortened = (int) Math.round(base / Math.sqrt(multiplier));
+        return getEffectiveDrawTicks(stack, Math.max(1, shortened));
+    }
+
+    /**
+     * 显示用的弹射物速度：基础弹速（弓 3.0 / 弩 3.15 / 三叉戟 2.5）
+     * × 总倍率开方 × 强化吸收的发射威力倍率。非弓弩三叉戟返回 0。
+     */
+    public static double getDisplayProjectileVelocity(ItemStack stack) {
+        double base = getRangedBasePower(stack);
+        if (base <= 0.0D && stack.getItem() instanceof TridentItem) {
+            base = VANILLA_TRIDENT_POWER;
+        }
+        if (base <= 0.0D) return 0.0D;
+
+        double multiplier = KogasaEquipmentData.getMultiplier(stack);
+        return base * Math.sqrt(multiplier) * getRangedPowerMultiplier(stack);
+    }
+
+    // ==================== 物品"实质相同"比较（成长不打断攻击/挖掘） ====================
+    //
+    // 背景：Player.tick 与 MultiPlayerGameMode#sameDestroyTarget 都会比较"主手物品
+    // 是否与上一刻相同"（ItemStack.matches / isSameItemSameTags）。成长每次攻击/挖掘
+    // 都写一次 KogasaEquipment.Growth，物品 NBT 随之变化，于是攻击冷却被 reset、
+    // 挖掘进度被清零。这里提供"忽略本模组高频数据根"的比较，供两个 mixin 调用。
+
+    /**
+     * 实质相同比较：把双方物品的 KogasaEquipment / KogasaAbilities 根剥掉后再走
+     * 原版 isSameItemSameTags。非本模组物品不做任何剥除（走原版语义）。
+     */
+    public static boolean areStacksEffectivelySame(ItemStack a, ItemStack b) {
+        if (ItemStack.isSameItemSameTags(a, b)) return true;
+
+        if (!(a.getItem() instanceof IKogasaEquipment)
+                && !(b.getItem() instanceof IKogasaEquipment)) {
+            return false;
+        }
+
+        ItemStack aCopy = a.copy();
+        ItemStack bCopy = b.copy();
+        KogasaEquipmentData.clearAll(aCopy);
+        KogasaEquipmentData.clearAll(bCopy);
+        KogasaAbilityData.clearAllData(aCopy);
+        KogasaAbilityData.clearAllData(bCopy);
+        return ItemStack.isSameItemSameTags(aCopy, bCopy);
+    }
+
+    /**
+     * Player.tick 用 ItemStack.matches 判定"主手是否变化"以决定是否重置攻击冷却。
+     * 原版 matches = 数量相等 && isSameItemSameTags。这里保持数量语义，
+     * 只把标签比较换成 {@link #areStacksEffectivelySame}。
+     */
+    public static boolean matchesIgnoringGrowth(ItemStack a, ItemStack b) {
+        if (a == b) return true;
+        if (a.getCount() != b.getCount()) return false;
+        return areStacksEffectivelySame(a, b);
+    }
+
+    /**
+     * 与 Forge 默认 shouldCauseBlockBreakReset 同语义（耐久不参与比较），
+     * 额外把本模组高频数据根剥掉：成长等写入不再导致挖掘进度重置。
+     */
+    public static boolean shouldCauseBlockBreakResetIgnoringGrowth(ItemStack oldStack, ItemStack newStack) {
+        if (!newStack.is(oldStack.getItem())) return true;
+
+        if (!newStack.isDamageableItem() || !oldStack.isDamageableItem()) {
+            return !areStacksEffectivelySame(newStack, oldStack);
+        }
+
+        // 损伤物品：与原版一致，耐久不计入比较
+        ItemStack newCopy = newStack.copy();
+        ItemStack oldCopy = oldStack.copy();
+        CompoundTag newTag = newCopy.getTag();
+        CompoundTag oldTag = oldCopy.getTag();
+        if (newTag != null) newTag.remove(ItemStack.TAG_DAMAGE);
+        if (oldTag != null) oldTag.remove(ItemStack.TAG_DAMAGE);
+        KogasaEquipmentData.clearAll(newCopy);
+        KogasaEquipmentData.clearAll(oldCopy);
+        KogasaAbilityData.clearAllData(newCopy);
+        KogasaAbilityData.clearAllData(oldCopy);
+        return !ItemStack.isSameItemSameTags(newCopy, oldCopy);
+    }
+
     /**
      * 获取一件装备的“基础价值”，用于铁砧强化时累加。
      * - 剑/工具：物品自身的攻击伤害
      * - 护甲：防御值
-     * - 三叉戟：固定 8.0
+     * - 三叉戟：原版基准攻击伤害（动态读取，见 {@link #getVanillaTridentDamage()}）
      * - 其他：0
      */
     public static double getEquipmentBaseValue(ItemStack stack) {
@@ -258,7 +389,7 @@ public class KogasaEquipmentHelper {
             return armor.getDefense();
         }
         if (item instanceof TridentItem) {
-            return 8.0;
+            return getVanillaTridentDamage();
         }
         return 0;
     }
@@ -298,7 +429,7 @@ public class KogasaEquipmentHelper {
         } else if (item instanceof DiggerItem digger) {
             baseDamage = 1.0 + digger.getAttackDamage();
         } else if (item instanceof TridentItem) {
-            baseDamage = 1.0 + 8.0;
+            baseDamage = 1.0 + getVanillaTridentDamage();
         }
         double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
         if (Config.ABSORBED_VALUE_INCLUDED_IN_MULTIPLIER.get()) {
@@ -369,12 +500,18 @@ public class KogasaEquipmentHelper {
     }
 
     /**
-     * 综合倍率：强化 × 成长 × AYA 新闻值倍率
+     * 综合倍率：强化 × 成长 × AYA 新闻值倍率；
+     * 封印装备（战利品）再减半（属性 -50%），解封后恢复。
      */
     public static double getTotalMultiplier(ItemStack stack) {
-        return getReinforcementMultiplier(stack)
+        double total = getReinforcementMultiplier(stack)
                 * getGrowthMultiplier(stack)
                 * getNewsMultiplier(stack);
+
+        if (KogasaEquipmentData.isLocked(stack)) {
+            total *= 0.5D;
+        }
+        return total;
     }
 
     /**
@@ -434,11 +571,28 @@ public class KogasaEquipmentHelper {
     }
 
     /**
-     * 动态挖掘等级：max(Tier基础等级, 强化次数)
+     * 有效挖掘等级：基础材质与强化次数取高者，映射为原版 {@link Tiers} 常量。
+     * 不再使用已弃用的 {@code Tier#getLevel()}——基础等级用原版 Tier 身份比较，
+     * 强化等级按 0~4 阶梯映射（下界合金封顶）。
      */
-    public static int getDynamicHarvestLevel(ItemStack stack, int baseLevel) {
+    public static Tier getDynamicHarvestTier(ItemStack stack, Tier baseTier) {
         int re = KogasaEquipmentData.getReinforcements(stack);
-        return Math.max(baseLevel, re);
+        int level = Math.max(indexOfVanillaTier(baseTier), re);
+
+        if (level >= 4) return Tiers.NETHERITE;
+        if (level == 3) return Tiers.DIAMOND;
+        if (level == 2) return Tiers.IRON;
+        if (level == 1) return Tiers.STONE;
+        return Tiers.WOOD;
+    }
+
+    /** 原版 Tier → 旧数字等级（木/金 0，石 1，铁 2，钻 3，下界合金 4）；非原版材质视为 0。 */
+    private static int indexOfVanillaTier(Tier tier) {
+        if (tier == Tiers.NETHERITE) return 4;
+        if (tier == Tiers.DIAMOND) return 3;
+        if (tier == Tiers.IRON) return 2;
+        if (tier == Tiers.STONE) return 1;
+        return 0; // 木 / 金 / 本模组自定义材质
     }
 
     /**

@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class GrindstoneMenuMixin {
 
     @Inject(method = "removeNonCurses", at = @At("RETURN"), cancellable = true)
-    private void kogasa$resetGrowthEnchantState(ItemStack stack, int damage, int count,
+    private void kogasa$resetGrowthEnchantState(ItemStack pStack, int pDamage, int pCount,
                                                 CallbackInfoReturnable<ItemStack> cir) {
         ItemStack result = cir.getReturnValue();
         if (result.isEmpty() || !(result.getItem() instanceof IKogasaEquipment)) return;

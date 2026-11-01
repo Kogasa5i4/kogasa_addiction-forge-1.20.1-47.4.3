@@ -40,7 +40,7 @@ public class KogasaSwordItem extends SwordItem implements IKogasaEquipment {
     @Override
     public boolean isCorrectToolForDrops(ItemStack stack, @NotNull BlockState state) {
         return IKogasaEquipment.isCorrectToolForDrops(
-                stack, state, this.getTier().getLevel(),
+                stack, state, this.getTier(),
                 () -> super.isCorrectToolForDrops(stack, state));
     }
 }

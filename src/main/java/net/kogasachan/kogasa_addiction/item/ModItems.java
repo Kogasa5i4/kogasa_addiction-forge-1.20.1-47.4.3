@@ -2,11 +2,8 @@ package net.kogasachan.kogasa_addiction.item;
 
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
-import net.kogasachan.kogasa_addiction.item.tool.KogasaAxeItem;
-import net.kogasachan.kogasa_addiction.item.tool.KogasaHoeItem;
-import net.kogasachan.kogasa_addiction.item.tool.KogasaPickaxeItem;
-import net.kogasachan.kogasa_addiction.item.tool.KogasaShovelItem;
-import net.kogasachan.kogasa_addiction.item.tool.KogasaSwordItem;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbilityRegistry;
+import net.kogasachan.kogasa_addiction.item.tool.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ArmorItem;
@@ -25,42 +22,23 @@ public class ModItems {
 
     // 材料
 
-    // ===== 能力锭 =====
-    public static final RegistryObject<Item> KOGASA_INGOT = ITEMS.register(
-            "kogasa_ingot",
-            () -> new KogasaAbilityIngotItem(KogasaAbility.KOGASA,
-                    new Item.Properties().fireResistant().rarity(Rarity.EPIC))
-    );
+    // ===== 能力锭：由能力注册表统一驱动（新增能力会自动生成对应锭，无需在此加注册代码） =====
+    public static final RegistryObject<Item> KOGASA_INGOT = registerAbilityIngot(KogasaAbility.KOGASA);
+    public static final RegistryObject<Item> AYA_INGOT = registerAbilityIngot(KogasaAbility.AYA);
+    public static final RegistryObject<Item> CIRNO_INGOT = registerAbilityIngot(KogasaAbility.CIRNO);
+    public static final RegistryObject<Item> KOISHI_INGOT = registerAbilityIngot(KogasaAbility.KOISHI);
+    public static final RegistryObject<Item> TENSHI_INGOT = registerAbilityIngot(KogasaAbility.TENSHI);
+    public static final RegistryObject<Item> SAKUYA_INGOT = registerAbilityIngot(KogasaAbility.SAKUYA);
 
-    public static final RegistryObject<Item> AYA_INGOT = ITEMS.register(
-            "aya_ingot",
-            () -> new KogasaAbilityIngotItem(KogasaAbility.AYA,
-                    new Item.Properties().fireResistant().rarity(Rarity.EPIC))
-    );
-
-    public static final RegistryObject<Item> CIRNO_INGOT = ITEMS.register(
-            "cirno_ingot",
-            () -> new KogasaAbilityIngotItem(KogasaAbility.CIRNO,
-                    new Item.Properties().fireResistant().rarity(Rarity.EPIC))
-    );
-
-    public static final RegistryObject<Item> KOISHI_INGOT = ITEMS.register(
-            "koishi_ingot",
-            () -> new KogasaAbilityIngotItem(KogasaAbility.KOISHI,
-                    new Item.Properties().fireResistant().rarity(Rarity.EPIC))
-    );
-
-    public static final RegistryObject<Item> TENSHI_INGOT = ITEMS.register(
-            "tenshi_ingot",
-            () -> new KogasaAbilityIngotItem(KogasaAbility.TENSHI,
-                    new Item.Properties().fireResistant().rarity(Rarity.EPIC))
-    );
-
-    public static final RegistryObject<Item> SAKUYA_INGOT = ITEMS.register(
-            "sakuya_ingot",
-            () -> new KogasaAbilityIngotItem(KogasaAbility.SAKUYA,
-                    new Item.Properties().fireResistant().rarity(Rarity.EPIC))
-    );
+    private static RegistryObject<Item> registerAbilityIngot(KogasaAbility ability) {
+        RegistryObject<Item> ingot = ITEMS.register(
+                ability.getId() + "_ingot",
+                () -> new KogasaAbilityIngotItem(ability,
+                        new Item.Properties().fireResistant().rarity(Rarity.EPIC))
+        );
+        KogasaAbilityRegistry.registerIngot(ability, ingot);
+        return ingot;
+    }
 
     // 工具/武器
     public static final RegistryObject<Item> KOGASA_SWORD = ITEMS.register(

@@ -30,8 +30,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ServerLevelEntityFreezeMixin {
 
     @Inject(method = "tickNonPassenger", at = @At("HEAD"), cancellable = true)
-    private void kogasa$freezeTimestoppedEntity(Entity entity, CallbackInfo ci) {
-        if (TimestopHandler.shouldFreeze(entity)) {
+    private void kogasa$freezeTimestoppedEntity(Entity p_8648_, CallbackInfo ci) {
+        if (TimestopHandler.shouldFreeze(p_8648_)) {
             ci.cancel();
         }
     }

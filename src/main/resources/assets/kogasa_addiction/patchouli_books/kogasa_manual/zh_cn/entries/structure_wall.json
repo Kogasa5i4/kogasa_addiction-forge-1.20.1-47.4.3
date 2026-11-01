@@ -3,11 +3,6 @@
                   {
                       "text":  "book.kogasa_addiction.entry.structure_wall.page1",
                       "type":  "patchouli:text"
-                  },
-                  {
-                      "structure":  "kogasa_addiction:wall",
-                      "type":  "minecraft:structure",
-                      "text":  "book.kogasa_addiction.entry.structure_preview"
                   }
               ],
     "icon":  "minecraft:deepslate_bricks",

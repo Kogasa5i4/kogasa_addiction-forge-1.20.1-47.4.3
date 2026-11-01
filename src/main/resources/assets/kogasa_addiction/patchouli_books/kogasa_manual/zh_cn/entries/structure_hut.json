@@ -3,11 +3,6 @@
                   {
                       "text":  "book.kogasa_addiction.entry.structure_hut.page1",
                       "type":  "patchouli:text"
-                  },
-                  {
-                      "structure":  "kogasa_addiction:hut",
-                      "type":  "minecraft:structure",
-                      "text":  "book.kogasa_addiction.entry.structure_preview"
                   }
               ],
     "icon":  "minecraft:packed_ice",

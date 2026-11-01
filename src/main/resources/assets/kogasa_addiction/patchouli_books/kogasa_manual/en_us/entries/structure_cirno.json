@@ -3,11 +3,6 @@
                   {
                       "text":  "book.kogasa_addiction.entry.structure_cirno.page1",
                       "type":  "patchouli:text"
-                  },
-                  {
-                      "structure":  "kogasa_addiction:cirno",
-                      "type":  "minecraft:structure",
-                      "text":  "book.kogasa_addiction.entry.structure_preview"
                   }
               ],
     "icon":  "minecraft:ice",

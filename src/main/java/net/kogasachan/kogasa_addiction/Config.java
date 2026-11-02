@@ -361,6 +361,11 @@ public class Config {
             .comment("咲夜飞刀的初始投掷速度。原版三叉戟约为2.5。")
             .defineInRange("sakuyaKnifeThrowVelocity", 3.0, 0.5, Double.MAX_VALUE);
 
+    public static final ForgeConfigSpec.DoubleValue SAKUYA_KNIFE_MENDING_REPAIR_CHANCE = BUILDER
+            .comment("Chance per XP absorption that a broken knife with Mending consumes 1 XP and is restored to a normal knife. 0.2 = 20%; 0 disables.\n" +
+                    "带经验修补的损坏飞刀：每次吸收经验有该概率消耗 1 点经验还原为正常飞刀。0.2 = 20%；0 = 禁用。")
+            .defineInRange("mendingRepairChance", 0.2, 0.0, 1.0);
+
     static {
         BUILDER.pop(2);
     }

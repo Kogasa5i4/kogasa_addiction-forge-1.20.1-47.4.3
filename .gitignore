@@ -25,3 +25,9 @@ run
 forge*changelog.txt
 /run-data/
 /run/
+
+# 本地开发笔记 / changelog（不提交）
+/README.md
+
+# datagen 运行目录
+run-data

@@ -4,6 +4,7 @@ import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.advancements.FrameType;
 import net.minecraft.advancements.critereon.*;
@@ -394,5 +395,27 @@ public class ModAdvancementGenerator implements ForgeAdvancementProvider.Advance
                 .parent(first_ability)
                 .addCriterion("obtain_sealed_equipment", new ImpossibleTrigger.TriggerInstance())
                 .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "obtain_sealed_equipment"), existingFileHelper);
+
+        // ===== 26. 配方解锁：手册（登录即解锁） =====
+        Advancement.Builder.advancement()
+                .addCriterion("tick",
+                        new PlayerTrigger.TriggerInstance(CriteriaTriggers.TICK.getId(), ContextAwarePredicate.ANY))
+                .rewards(AdvancementRewards.Builder.recipe(
+                        ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "kogasa_manual")))
+                .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "recipes/kogasa_manual"),
+                        existingFileHelper);
+
+        // ===== 27. 配方解锁：文文箭染色 =====
+        Advancement.Builder.advancement()
+                .parent(ResourceLocation.withDefaultNamespace("recipes/root"))
+                .addCriterion("has_aya_arrow",
+                        InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.AYA_ARROW.get()))
+                .addCriterion("has_lingering_potion",
+                        InventoryChangeTrigger.TriggerInstance.hasItems(Items.LINGERING_POTION))
+                .requirements(new String[][]{{"has_aya_arrow"}, {"has_lingering_potion"}})
+                .rewards(AdvancementRewards.Builder.recipe(
+                        ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "aya_arrow_tipping")))
+                .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "recipes/aya_arrow_tipping"),
+                        existingFileHelper);
     }
 }

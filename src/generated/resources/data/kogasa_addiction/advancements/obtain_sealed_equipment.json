@@ -1,5 +1,5 @@
 {
-  "parent": "kogasa_addiction:obtain_kogasa_ingot",
+  "parent": "kogasa_addiction:first_ability",
   "criteria": {
     "obtain_sealed_equipment": {
       "trigger": "minecraft:impossible"

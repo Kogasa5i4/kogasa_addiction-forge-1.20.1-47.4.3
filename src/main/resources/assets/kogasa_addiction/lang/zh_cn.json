@@ -253,6 +253,9 @@
   "death.attack.koishi_ranged": "%1$s 被恋恋刺穿了",
   "death.attack.koishi_ranged.item": "%1$s 被 %2$s 用 %3$s 刺穿了",
   "death.attack.koishi_ranged.player": "%1$s 被 %2$s 的刺穿了",
+  "death.attack.tenshi_forced": "%1$s 被天子的绯想剑击穿了",
+  "death.attack.tenshi_forced.item": "%1$s 被 %2$s 用 %3$s 击穿了",
+  "death.attack.tenshi_forced.player": "%1$s 被 %2$s 的绯想剑击穿了",
   "entity.kogasa_addiction.aya_arrow": "文文箭",
   "entity.kogasa_addiction.sakuya_knife": "咲夜飞刀",
   "item.kogasa_addiction.aya_arrow": "文文箭",
@@ -387,8 +390,8 @@
   "tooltip.kogasa_addiction.tenshi.buffs": "  当前增益：%s",
   "tooltip.kogasa_addiction.tenshi.charge": "  当前境界：%1$s / %2$s (§a抗性 %3$s 级§r)",
   "tooltip.kogasa_addiction.tenshi.ready": "  当前境界：§c已蓄满§r（下一次命中触发爆发并清空）",
-  "tooltip.kogasa_addiction.timestop.available": " 时停能力目前可用。",
-  "tooltip.kogasa_addiction.timestop.unavailable": " 时停能力目前不可用。",
+  "tooltip.kogasa_addiction.timestop.available": "  时停能力目前可用。",
+  "tooltip.kogasa_addiction.timestop.unavailable": "  时停能力目前不可用。",
   "tooltip.kogasa_addiction.vanilla_attack_damage": " %s 攻击伤害",
   "tooltip.kogasa_addiction.vanilla_attack_speed": " %s 攻击速度"
 }

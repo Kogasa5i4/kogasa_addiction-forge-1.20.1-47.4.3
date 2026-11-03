@@ -50,6 +50,7 @@ public class ModDamageTypeTagDataProvider implements DataProvider {
         json.addProperty("replace", false);
         JsonArray values = new JsonArray();
         values.add("kogasa_addiction:koishi_ranged");
+        values.add("kogasa_addiction:tenshi_forced");
         json.add("values", values);
         return DataProvider.saveStable(cache, json, path);
     }

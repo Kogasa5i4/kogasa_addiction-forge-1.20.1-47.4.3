@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 999951467,
+    "separation": 9,
+    "spacing": 36
+  },
+  "structures": [
+    {
+      "structure": "kogasa_addiction:cirno",
+      "weight": 1
+    }
+  ]
+}

@@ -45,6 +45,11 @@ public class KoishiRangedAbilityHandler {
             Registries.DAMAGE_TYPE,
             ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "koishi_ranged"));
 
+    /** 天子强制命中（远程）：自带死亡消息，不再借用 indirectMagic 的通用魔法击杀文本 */
+    public static final ResourceKey<DamageType> TENSHI_FORCED = ResourceKey.create(
+            Registries.DAMAGE_TYPE,
+            ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "tenshi_forced"));
+
     /**
      * 已穿透实体数量，用于在自定义命中结算下模拟原版穿透上限。
      */
@@ -84,8 +89,8 @@ public class KoishiRangedAbilityHandler {
 
         // ===== 分支 1：只有天子，没有恋恋 =====
         if (!hasKoishi) {
-            // 使用间接魔法伤害源，绕过末影人/凋灵的箭矢免疫，从而触发 LivingHurtEvent
-            DamageSource tenshiSource = player.damageSources().indirectMagic(arrow, player);
+            // 使用自定义的"天子强制命中"伤害源：穿甲/穿抗性，且死亡消息是专属文本
+            DamageSource tenshiSource = createSource(player, arrow, TENSHI_FORCED);
             boolean damaged = livingTarget.hurt(tenshiSource, damage);
             recordVanillaBookkeeping(arrow, livingTarget, player, damaged);
 
@@ -201,10 +206,14 @@ public class KoishiRangedAbilityHandler {
     }
 
     private static DamageSource createArmorBypassingSource(ServerPlayer player) {
+        return createSource(player, player, KOISHI_RANGED);
+    }
+
+    private static DamageSource createSource(ServerPlayer player, Entity directEntity, ResourceKey<DamageType> key) {
         ServerLevel level = (ServerLevel) player.level();
         return new DamageSource(
-                level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(KOISHI_RANGED),
-                player, player
+                level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(key),
+                directEntity, player
         );
     }
 }

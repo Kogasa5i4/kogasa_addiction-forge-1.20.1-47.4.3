@@ -1,0 +1,43 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_aya_arrow": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "kogasa_addiction:aya_arrow"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_lingering_potion": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:lingering_potion"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_aya_arrow"
+    ],
+    [
+      "has_lingering_potion"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "kogasa_addiction:aya_arrow_tipping"
+    ]
+  },
+  "sends_telemetry_event": true
+}

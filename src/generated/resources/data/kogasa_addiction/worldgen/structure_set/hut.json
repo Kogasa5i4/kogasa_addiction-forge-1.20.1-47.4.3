@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 986751432,
+    "separation": 12,
+    "spacing": 48
+  },
+  "structures": [
+    {
+      "structure": "kogasa_addiction:hut",
+      "weight": 1
+    }
+  ]
+}

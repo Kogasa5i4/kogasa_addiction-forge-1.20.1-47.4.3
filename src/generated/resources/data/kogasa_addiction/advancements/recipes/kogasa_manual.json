@@ -1,0 +1,19 @@
+{
+  "criteria": {
+    "tick": {
+      "conditions": {},
+      "trigger": "minecraft:tick"
+    }
+  },
+  "requirements": [
+    [
+      "tick"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "kogasa_addiction:kogasa_manual"
+    ]
+  },
+  "sends_telemetry_event": true
+}

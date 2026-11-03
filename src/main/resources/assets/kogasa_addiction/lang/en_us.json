@@ -253,6 +253,9 @@
   "death.attack.koishi_ranged": "%1$s was pierced by Koishi",
   "death.attack.koishi_ranged.item": "%1$s was pierced by %2$s using %3$s",
   "death.attack.koishi_ranged.player": "%1$s was pierced by %2$s",
+  "death.attack.tenshi_forced": "%1$s was crushed by Tenshi",
+  "death.attack.tenshi_forced.item": "%1$s was crushed by %2$s using %3$s",
+  "death.attack.tenshi_forced.player": "%1$s was crushed by %2$s's Hishou no Ken",
   "entity.kogasa_addiction.aya_arrow": "Aya Arrow",
   "entity.kogasa_addiction.sakuya_knife": "Sakuya Knife",
   "item.kogasa_addiction.aya_arrow": "Aya Arrow",
@@ -387,8 +390,8 @@
   "tooltip.kogasa_addiction.tenshi.buffs": "  Current Buffs: %s",
   "tooltip.kogasa_addiction.tenshi.charge": "  Current State: %1$s / %2$s (§aResistance %3$s§r)",
   "tooltip.kogasa_addiction.tenshi.ready": "  Current State: §cFully Charged§r (Next hit unleashes burst and resets)",
-  "tooltip.kogasa_addiction.timestop.available": " The time stop ability is available.",
-  "tooltip.kogasa_addiction.timestop.unavailable": " The time stop ability is unavailable.",
+  "tooltip.kogasa_addiction.timestop.available": "  The time stop ability is available.",
+  "tooltip.kogasa_addiction.timestop.unavailable": "  The time stop ability is unavailable.",
   "tooltip.kogasa_addiction.vanilla_attack_damage": " %s Attack Damage",
   "tooltip.kogasa_addiction.vanilla_attack_speed": " %s Attack Speed"
 }

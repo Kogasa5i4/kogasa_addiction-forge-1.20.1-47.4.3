@@ -46,6 +46,9 @@ public class DataGenerators {
         // 配方
         generator.addProvider(event.includeServer(), new ModRecipeProvider(output));
 
+        // 战利品表（宝箱）
+        generator.addProvider(event.includeServer(), new ModLootTableProvider(output));
+
         // 物品模型
         generator.addProvider(event.includeClient(),
                 new ModItemModelProvider(output, existingFileHelper));
@@ -55,12 +58,24 @@ public class DataGenerators {
                 new ForgeAdvancementProvider(output, event.getLookupProvider(),
                         existingFileHelper, List.of(new ModAdvancementGenerator())));
 
-        // 伤害类型
+        // 伤害类型（同一注册表只能 add 一次，两个类型写在一个 bootstrap 里）
         RegistrySetBuilder builder = new RegistrySetBuilder();
-        builder.add(Registries.DAMAGE_TYPE, (context) -> context.register(
-                ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "koishi_ranged")),
-                new DamageType("koishi_ranged", DamageScaling.NEVER, 0.0F)
-        ));
+        builder.add(Registries.DAMAGE_TYPE, (context) -> {
+            context.register(
+                    ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "koishi_ranged")),
+                    new DamageType("koishi_ranged", DamageScaling.NEVER, 0.0F)
+            );
+            // 天子强制命中：原先借用 indirectMagic，死亡消息是通用的魔法击杀
+            context.register(
+                    ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "tenshi_forced")),
+                    new DamageType("tenshi_forced", DamageScaling.NEVER, 0.0F)
+            );
+        });
+
+        // 世界生成：模板池 → 结构 → 结构集（顺序不能反，后面的 bootstrap 需要前面的 lookup）
+        builder.add(Registries.TEMPLATE_POOL, ModWorldgen::bootstrapPools);
+        builder.add(Registries.STRUCTURE, ModWorldgen::bootstrapStructures);
+        builder.add(Registries.STRUCTURE_SET, ModWorldgen::bootstrapStructureSets);
 
         // 1. 生成伤害类型 JSON
         generator.addProvider(event.includeServer(),

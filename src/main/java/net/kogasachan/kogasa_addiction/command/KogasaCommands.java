@@ -37,11 +37,12 @@ public final class KogasaCommands {
         // 只读命令：任何人可用
         KogasaInfoCommands.register(root);
 
-        // 以下都会修改装备 / 玩家数据，统一要求权限等级 2
+        // 以下都会修改装备 / 玩家数据 / 配置，统一要求权限等级 2
         KogasaEquipmentCommands.register(root, event.getBuildContext());
         KogasaAbilityCommands.register(root);
         KogasaAmmoCommands.register(root, event.getBuildContext());
         KogasaEnchantCommands.register(root, event.getBuildContext());
+        KogasaConfigCommands.register(root);
 
         event.getDispatcher().register(root);
     }

@@ -1,4 +1,5 @@
 package net.kogasachan.kogasa_addiction.ability.tooltip;
+import net.kogasachan.kogasa_addiction.event.client.ClientConfigCache;
 
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.util.KogasaNumberFormatHelper;
@@ -18,12 +19,12 @@ public final class KoishiAbilityTooltip implements KogasaAbilityTooltip {
                 || ctx.stack().getItem() instanceof CrossbowItem;
 
         if (isRangedWeapon) {
-            if (Config.ENABLE_KOISHI_RANGED.get()) {
-                double mult = Config.KOISHI_RANGED_CRIT_MULTIPLIER.get();
-                double specialTargetMult = Config.KOISHI_PROJECTILE_IMMUNE_MULTIPLIER.get();
+            if (ClientConfigCache.get(Config.ENABLE_KOISHI_RANGED)) {
+                double mult = ClientConfigCache.get(Config.KOISHI_RANGED_CRIT_MULTIPLIER);
+                double specialTargetMult = ClientConfigCache.get(Config.KOISHI_PROJECTILE_IMMUNE_MULTIPLIER);
                 ctx.add(Component.translatable(
                                 "tooltip.kogasa_addiction.koishi.ranged_crit_info",
-                                KogasaNumberFormatHelper.formatPercentTrimmed(Config.KOISHI_RANGED_CRIT_CHANCE.get(), 0),
+                                KogasaNumberFormatHelper.formatPercentTrimmed(ClientConfigCache.get(Config.KOISHI_RANGED_CRIT_CHANCE), 0),
                                 KogasaNumberFormatHelper.formatTrimmed(mult, 2))
                         .withStyle(ChatFormatting.LIGHT_PURPLE));
                 ctx.add(Component.translatable(
@@ -37,10 +38,10 @@ public final class KoishiAbilityTooltip implements KogasaAbilityTooltip {
                         .withStyle(ChatFormatting.DARK_GRAY));
             }
         } else {
-            double mult = Config.KOISHI_CRIT_MULTIPLIER.get();
+            double mult = ClientConfigCache.get(Config.KOISHI_CRIT_MULTIPLIER);
             ctx.add(Component.translatable(
                             "tooltip.kogasa_addiction.koishi.crit_info",
-                            KogasaNumberFormatHelper.formatPercentTrimmed(Config.KOISHI_CRIT_CHANCE.get(), 0),
+                            KogasaNumberFormatHelper.formatPercentTrimmed(ClientConfigCache.get(Config.KOISHI_CRIT_CHANCE), 0),
                             KogasaNumberFormatHelper.formatTrimmed(mult, 2))
                     .withStyle(ChatFormatting.LIGHT_PURPLE));
         }

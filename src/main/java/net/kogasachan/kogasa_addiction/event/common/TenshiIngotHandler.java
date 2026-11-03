@@ -3,6 +3,7 @@ package net.kogasachan.kogasa_addiction.event.common;
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.item.ModItems;
+import net.kogasachan.kogasa_addiction.network.HeldItemSyncPacket;
 import net.kogasachan.kogasa_addiction.network.PacketHandler;
 import net.kogasachan.kogasa_addiction.network.TenshiBeaconBlockReplacementPacket;
 import net.minecraft.core.BlockPos;
@@ -66,6 +67,11 @@ public class TenshiIngotHandler {
         if (!player.getInventory().add(ingot)) {
             player.drop(ingot, false);
         }
+
+        // 客户端在放置时已经预测扣掉了 1 个方块；用服务端真实物品覆盖，避免手持数量显示少 1
+        PacketHandler.INSTANCE.send(
+                PacketDistributor.PLAYER.with(() -> player),
+                new HeldItemSyncPacket(player.getInventory().selected, player.getMainHandItem(), player.getOffhandItem()));
 
         // 聊天栏提示
         player.displayClientMessage(

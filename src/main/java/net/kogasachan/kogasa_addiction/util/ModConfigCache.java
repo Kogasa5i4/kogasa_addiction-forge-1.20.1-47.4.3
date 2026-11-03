@@ -25,7 +25,10 @@ public class ModConfigCache {
         refresh();
     }
 
-    private static void refresh() {
+    /**
+     * 重新读取缓存值。配置加载/重载时自动调用；{@code /kogasa config set} 修改配置后也会调用一次。
+     */
+    public static void refresh() {
         kogasaIngotChance = Config.KOGASA_INGOT_CHANCE.get().floatValue();
         growthUnlockReinforcements = Config.GROWTH_UNLOCK_REINFORCEMENTS.get();
         cirnoIngotDropChance = Config.CIRNO_INGOT_DROP_CHANCE.get();

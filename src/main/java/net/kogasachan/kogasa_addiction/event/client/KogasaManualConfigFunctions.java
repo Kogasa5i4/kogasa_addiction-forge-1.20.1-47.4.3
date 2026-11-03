@@ -22,103 +22,103 @@ public final class KogasaManualConfigFunctions {
 
     static {
         // ---- 成长 / 强化 / 吸收 ----
-        f("growthPerUse", () -> pct(Config.GROWTH_PER_USE.get()));
-        f("maxGrowth", () -> num(Config.MAX_GROWTH.get()));
-        f("maxGrowthPlusOne", () -> num(Config.MAX_GROWTH.get() + 1.0));
-        f("growthUnlockReinforcements", () -> Integer.toString(Config.GROWTH_UNLOCK_REINFORCEMENTS.get()));
-        f("growthPerEnchant", () -> pct(Config.GROWTH_PER_ENCHANT.get()));
-        f("maxGrowthEnchants", () -> Integer.toString(Config.MAX_GROWTH_ENCHANTS.get()));
-        f("growthPerExtraSlot", () -> pct(Config.GROWTH_PER_EXTRA_SLOT.get()));
-        f("maxExtraSlots", () -> Integer.toString(Config.MAX_EXTRA_SLOTS.get()));
-        f("maxReinforcements", () -> Integer.toString(Config.MAX_REINFORCEMENTS.get()));
+        f("growthPerUse", () -> pct(ClientConfigCache.get(Config.GROWTH_PER_USE)));
+        f("maxGrowth", () -> num(ClientConfigCache.get(Config.MAX_GROWTH)));
+        f("maxGrowthPlusOne", () -> num(ClientConfigCache.get(Config.MAX_GROWTH) + 1.0));
+        f("growthUnlockReinforcements", () -> Integer.toString(ClientConfigCache.get(Config.GROWTH_UNLOCK_REINFORCEMENTS)));
+        f("growthPerEnchant", () -> pct(ClientConfigCache.get(Config.GROWTH_PER_ENCHANT)));
+        f("maxGrowthEnchants", () -> Integer.toString(ClientConfigCache.get(Config.MAX_GROWTH_ENCHANTS)));
+        f("growthPerExtraSlot", () -> pct(ClientConfigCache.get(Config.GROWTH_PER_EXTRA_SLOT)));
+        f("maxExtraSlots", () -> Integer.toString(ClientConfigCache.get(Config.MAX_EXTRA_SLOTS)));
+        f("maxReinforcements", () -> Integer.toString(ClientConfigCache.get(Config.MAX_REINFORCEMENTS)));
         f("maxReinforcementsTotal", () -> Integer.toString(
-                Config.MAX_REINFORCEMENTS.get() + Config.MAX_EXTRA_SLOTS.get()));
-        f("reinforcementCost", () -> Integer.toString(Config.REINFORCEMENT_COST.get()));
-        f("kogasaReinforcementPerLevel", () -> pct(Config.KOGASA_REINFORCEMENT_MULTIPLIER_PER_LEVEL.get()));
-        f("weaponAbsorbedRatio", () -> pct(Config.WEAPON_ABSORBED_RATIO.get()));
-        f("armorAbsorbedRatio", () -> pct(Config.ARMOR_ABSORBED_RATIO.get()));
-        f("durabilityFixed", () -> Integer.toString(Config.DURABILITY_FIXED_PER_REINFORCEMENT.get()));
-        f("durabilityRatio", () -> pct(Config.DURABILITY_RATIO_PER_REINFORCEMENT.get()));
+                ClientConfigCache.get(Config.MAX_REINFORCEMENTS) + ClientConfigCache.get(Config.MAX_EXTRA_SLOTS)));
+        f("reinforcementCost", () -> Integer.toString(ClientConfigCache.get(Config.REINFORCEMENT_COST)));
+        f("kogasaReinforcementPerLevel", () -> pct(ClientConfigCache.get(Config.KOGASA_REINFORCEMENT_MULTIPLIER_PER_LEVEL)));
+        f("weaponAbsorbedRatio", () -> pct(ClientConfigCache.get(Config.WEAPON_ABSORBED_RATIO)));
+        f("armorAbsorbedRatio", () -> pct(ClientConfigCache.get(Config.ARMOR_ABSORBED_RATIO)));
+        f("durabilityFixed", () -> Integer.toString(ClientConfigCache.get(Config.DURABILITY_FIXED_PER_REINFORCEMENT)));
+        f("durabilityRatio", () -> pct(ClientConfigCache.get(Config.DURABILITY_RATIO_PER_REINFORCEMENT)));
 
         // ---- 属性 ----
-        f("miningSpeedRatioPerReinforcement", () -> pct(Config.MINING_SPEED_RATIO_PER_REINFORCEMENT.get()));
-        f("attackSpeedCap", () -> num(Config.ATTACK_SPEED_CAP.get()));
-        f("attackSpeedGrowthRatio", () -> pct(Config.ATTACK_SPEED_GROWTH_RATIO.get()));
-        f("knockbackBase", () -> pct(Config.KNOCKBACK_BASE_RESISTANCE.get()));
-        f("knockbackMaxPerPiece", () -> pct(Config.KNOCKBACK_MAX_PER_PIECE.get()));
+        f("miningSpeedRatioPerReinforcement", () -> pct(ClientConfigCache.get(Config.MINING_SPEED_RATIO_PER_REINFORCEMENT)));
+        f("attackSpeedCap", () -> num(ClientConfigCache.get(Config.ATTACK_SPEED_CAP)));
+        f("attackSpeedGrowthRatio", () -> pct(ClientConfigCache.get(Config.ATTACK_SPEED_GROWTH_RATIO)));
+        f("knockbackBase", () -> pct(ClientConfigCache.get(Config.KNOCKBACK_BASE_RESISTANCE)));
+        f("knockbackMaxPerPiece", () -> pct(ClientConfigCache.get(Config.KNOCKBACK_MAX_PER_PIECE)));
 
         // ---- 能力槽 / 封印 ----
-        f("abilitySlotInitial", () -> pct(Config.ABILITY_SLOT_INITIAL_GROWTH.get()));
-        f("slot1", () -> pct(Config.ABILITY_SLOT_INITIAL_GROWTH.get() + Config.ABILITY_SLOT_GROWTH_INCREMENT.get()));
-        f("slot2", () -> pct(Config.ABILITY_SLOT_INITIAL_GROWTH.get() + 2 * Config.ABILITY_SLOT_GROWTH_INCREMENT.get()));
-        f("slot3", () -> pct(Config.ABILITY_SLOT_INITIAL_GROWTH.get() + 3 * Config.ABILITY_SLOT_GROWTH_INCREMENT.get()));
-        f("abilitySlotMax", () -> Integer.toString(Config.ABILITY_SLOT_MAX.get()));
-        f("abilityInfusionCost", () -> Integer.toString(Config.ABILITY_INFUSION_COST.get()));
-        f("lockedUnlockGrowth", () -> pct(Config.LOCKED_EQUIPMENT_UNLOCK_GROWTH.get()));
+        f("abilitySlotInitial", () -> pct(ClientConfigCache.get(Config.ABILITY_SLOT_INITIAL_GROWTH)));
+        f("slot1", () -> pct(ClientConfigCache.get(Config.ABILITY_SLOT_INITIAL_GROWTH) + ClientConfigCache.get(Config.ABILITY_SLOT_GROWTH_INCREMENT)));
+        f("slot2", () -> pct(ClientConfigCache.get(Config.ABILITY_SLOT_INITIAL_GROWTH) + 2 * ClientConfigCache.get(Config.ABILITY_SLOT_GROWTH_INCREMENT)));
+        f("slot3", () -> pct(ClientConfigCache.get(Config.ABILITY_SLOT_INITIAL_GROWTH) + 3 * ClientConfigCache.get(Config.ABILITY_SLOT_GROWTH_INCREMENT)));
+        f("abilitySlotMax", () -> Integer.toString(ClientConfigCache.get(Config.ABILITY_SLOT_MAX)));
+        f("abilityInfusionCost", () -> Integer.toString(ClientConfigCache.get(Config.ABILITY_INFUSION_COST)));
+        f("lockedUnlockGrowth", () -> pct(ClientConfigCache.get(Config.LOCKED_EQUIPMENT_UNLOCK_GROWTH)));
 
         // ---- 远程 ----
-        f("bowPierceGrowth", () -> pct(Config.BOW_PIERCE_GROWTH.get()));
-        f("multishot2Growth", () -> pct(Config.BOW_MULTISHOT_2_GROWTH.get()));
-        f("multishot3Growth", () -> pct(Config.BOW_MULTISHOT_3_GROWTH.get()));
-        f("multishotSpread", () -> num(Config.RANGED_MULTISHOT_SPREAD.get()));
-        f("multishotSpreadHalf", () -> num(Config.RANGED_MULTISHOT_SPREAD.get() / 2.0));
-        f("autoReloadGrowth", () -> pct(Config.CROSSBOW_AUTO_RELOAD_GROWTH.get()));
-        f("noConsumeStartGrowth", () -> pct(Config.NO_CONSUME_ARROW_START_GROWTH.get()));
-        f("noConsumeFullGrowth", () -> pct(Config.NO_CONSUME_ARROW_FULL_GROWTH.get()));
-        f("drawSpeedAbsorbRatio", () -> pct(Config.RANGED_DRAW_SPEED_ABSORB_RATIO.get()));
+        f("bowPierceGrowth", () -> pct(ClientConfigCache.get(Config.BOW_PIERCE_GROWTH)));
+        f("multishot2Growth", () -> pct(ClientConfigCache.get(Config.BOW_MULTISHOT_2_GROWTH)));
+        f("multishot3Growth", () -> pct(ClientConfigCache.get(Config.BOW_MULTISHOT_3_GROWTH)));
+        f("multishotSpread", () -> num(ClientConfigCache.get(Config.RANGED_MULTISHOT_SPREAD)));
+        f("multishotSpreadHalf", () -> num(ClientConfigCache.get(Config.RANGED_MULTISHOT_SPREAD) / 2.0));
+        f("autoReloadGrowth", () -> pct(ClientConfigCache.get(Config.CROSSBOW_AUTO_RELOAD_GROWTH)));
+        f("noConsumeStartGrowth", () -> pct(ClientConfigCache.get(Config.NO_CONSUME_ARROW_START_GROWTH)));
+        f("noConsumeFullGrowth", () -> pct(ClientConfigCache.get(Config.NO_CONSUME_ARROW_FULL_GROWTH)));
+        f("drawSpeedAbsorbRatio", () -> pct(ClientConfigCache.get(Config.RANGED_DRAW_SPEED_ABSORB_RATIO)));
 
         // ---- 飞刀 ----
-        f("knifeBreakChance", () -> pct(Config.SAKUYA_KNIFE_BASE_BREAK_CHANCE.get()));
-        f("knifeBreakReduction", () -> pct(Config.SAKUYA_KNIFE_BREAK_REDUCTION.get()));
-        f("knifeRepairCost", () -> Integer.toString(Config.SAKUYA_KNIFE_REPAIR_COST.get()));
-        f("knifeThrowVelocity", () -> num(Config.SAKUYA_KNIFE_THROW_VELOCITY.get()));
+        f("knifeBreakChance", () -> pct(ClientConfigCache.get(Config.SAKUYA_KNIFE_BASE_BREAK_CHANCE)));
+        f("knifeBreakReduction", () -> pct(ClientConfigCache.get(Config.SAKUYA_KNIFE_BREAK_REDUCTION)));
+        f("knifeRepairCost", () -> Integer.toString(ClientConfigCache.get(Config.SAKUYA_KNIFE_REPAIR_COST)));
+        f("knifeThrowVelocity", () -> num(ClientConfigCache.get(Config.SAKUYA_KNIFE_THROW_VELOCITY)));
 
         // ---- 文文 ----
-        f("newsValuePerRecord", () -> pct(Config.NEWS_VALUE_PER_RECORD.get()));
-        f("newsValuePerRecordTenth", () -> pct(Config.NEWS_VALUE_PER_RECORD.get() * 0.1));
-        f("maxNewsValue", () -> pct(Config.MAX_NEWS_VALUE.get()));
-        f("maxNewsValuePlusOne", () -> num(Config.MAX_NEWS_VALUE.get() + 1.0));
-        f("ayaSpeedDuration", () -> Integer.toString(Config.AYA_SPEED_DURATION_SECONDS.get()));
-        f("ayaHasteDuration", () -> Integer.toString(Config.AYA_HASTE_DURATION_SECONDS.get()));
+        f("newsValuePerRecord", () -> pct(ClientConfigCache.get(Config.NEWS_VALUE_PER_RECORD)));
+        f("newsValuePerRecordTenth", () -> pct(ClientConfigCache.get(Config.NEWS_VALUE_PER_RECORD) * 0.1));
+        f("maxNewsValue", () -> pct(ClientConfigCache.get(Config.MAX_NEWS_VALUE)));
+        f("maxNewsValuePlusOne", () -> num(ClientConfigCache.get(Config.MAX_NEWS_VALUE) + 1.0));
+        f("ayaSpeedDuration", () -> Integer.toString(ClientConfigCache.get(Config.AYA_SPEED_DURATION_SECONDS)));
+        f("ayaHasteDuration", () -> Integer.toString(ClientConfigCache.get(Config.AYA_HASTE_DURATION_SECONDS)));
 
         // ---- 琪露诺 ----
-        f("cirnoSlowChance", () -> pct(Config.CIRNO_SLOW_CHANCE.get()));
-        f("cirnoSelfSlowChance", () -> pct(Config.CIRNO_SELF_SLOW_CHANCE.get()));
-        f("cirnoSlowDuration", () -> num(Config.CIRNO_SLOW_DURATION.get()));
-        f("cirnoSlowLevel", () -> Integer.toString(Config.CIRNO_SLOW_LEVEL.get()));
-        f("cirnoSelfSlowDuration", () -> num(Config.CIRNO_SELF_SLOW_DURATION.get()));
-        f("cirnoReviveGrowthCost", () -> pct(Config.CIRNO_REVIVE_GROWTH_COST.get()));
-        f("cirnoPotionLevelBonus", () -> Integer.toString(Config.CIRNO_POTION_LEVEL_BONUS.get()));
-        f("cirnoPotionDurationMultiplier", () -> num(Config.CIRNO_POTION_DURATION_MULTIPLIER.get()));
-        f("cirnoSlownessDurationSeconds", () -> Integer.toString(Config.CIRNO_SLOWNESS_DURATION_TICKS.get() / 20));
-        f("cirnoSlownessLevel", () -> Integer.toString(Config.CIRNO_SLOWNESS_LEVEL.get()));
+        f("cirnoSlowChance", () -> pct(ClientConfigCache.get(Config.CIRNO_SLOW_CHANCE)));
+        f("cirnoSelfSlowChance", () -> pct(ClientConfigCache.get(Config.CIRNO_SELF_SLOW_CHANCE)));
+        f("cirnoSlowDuration", () -> num(ClientConfigCache.get(Config.CIRNO_SLOW_DURATION)));
+        f("cirnoSlowLevel", () -> Integer.toString(ClientConfigCache.get(Config.CIRNO_SLOW_LEVEL)));
+        f("cirnoSelfSlowDuration", () -> num(ClientConfigCache.get(Config.CIRNO_SELF_SLOW_DURATION)));
+        f("cirnoReviveGrowthCost", () -> pct(ClientConfigCache.get(Config.CIRNO_REVIVE_GROWTH_COST)));
+        f("cirnoPotionLevelBonus", () -> Integer.toString(ClientConfigCache.get(Config.CIRNO_POTION_LEVEL_BONUS)));
+        f("cirnoPotionDurationMultiplier", () -> num(ClientConfigCache.get(Config.CIRNO_POTION_DURATION_MULTIPLIER)));
+        f("cirnoSlownessDurationSeconds", () -> Integer.toString(ClientConfigCache.get(Config.CIRNO_SLOWNESS_DURATION_TICKS) / 20));
+        f("cirnoSlownessLevel", () -> Integer.toString(ClientConfigCache.get(Config.CIRNO_SLOWNESS_LEVEL)));
 
         // ---- 恋恋 ----
-        f("koishiCritChance", () -> pct(Config.KOISHI_CRIT_CHANCE.get()));
-        f("koishiCritMultiplier", () -> num(Config.KOISHI_CRIT_MULTIPLIER.get()));
-        f("koishiGhastKills", () -> Integer.toString(Config.KOISHI_GHAST_KILLS_REQUIRED.get()));
-        f("koishiRangedCritChance", () -> pct(Config.KOISHI_RANGED_CRIT_CHANCE.get()));
-        f("koishiRangedCritMultiplier", () -> num(Config.KOISHI_RANGED_CRIT_MULTIPLIER.get()));
-        f("koishiProjectileImmuneMultiplier", () -> num(Config.KOISHI_PROJECTILE_IMMUNE_MULTIPLIER.get()));
+        f("koishiCritChance", () -> pct(ClientConfigCache.get(Config.KOISHI_CRIT_CHANCE)));
+        f("koishiCritMultiplier", () -> num(ClientConfigCache.get(Config.KOISHI_CRIT_MULTIPLIER)));
+        f("koishiGhastKills", () -> Integer.toString(ClientConfigCache.get(Config.KOISHI_GHAST_KILLS_REQUIRED)));
+        f("koishiRangedCritChance", () -> pct(ClientConfigCache.get(Config.KOISHI_RANGED_CRIT_CHANCE)));
+        f("koishiRangedCritMultiplier", () -> num(ClientConfigCache.get(Config.KOISHI_RANGED_CRIT_MULTIPLIER)));
+        f("koishiProjectileImmuneMultiplier", () -> num(ClientConfigCache.get(Config.KOISHI_PROJECTILE_IMMUNE_MULTIPLIER)));
         f("koishiProjectileImmuneSquared", () -> num(
-                Config.KOISHI_PROJECTILE_IMMUNE_MULTIPLIER.get() * Config.KOISHI_PROJECTILE_IMMUNE_MULTIPLIER.get()));
+                ClientConfigCache.get(Config.KOISHI_PROJECTILE_IMMUNE_MULTIPLIER) * ClientConfigCache.get(Config.KOISHI_PROJECTILE_IMMUNE_MULTIPLIER)));
 
         // ---- 小伞 ----
-        f("kogasaStreakWindow", () -> Integer.toString(Config.KOGASA_STREAK_RESET_SECONDS.get()));
-        f("kogasaStreakBonus", () -> pct(Config.KOGASA_STREAK_BONUS.get()));
-        f("kogasaStreakMax", () -> Integer.toString(Config.KOGASA_STREAK_MAX.get()));
+        f("kogasaStreakWindow", () -> Integer.toString(ClientConfigCache.get(Config.KOGASA_STREAK_RESET_SECONDS)));
+        f("kogasaStreakBonus", () -> pct(ClientConfigCache.get(Config.KOGASA_STREAK_BONUS)));
+        f("kogasaStreakMax", () -> Integer.toString(ClientConfigCache.get(Config.KOGASA_STREAK_MAX)));
 
         // ---- 天子 ----
-        f("tenshiDomainThreshold", () -> num(Config.TENSHI_DOMAIN_THRESHOLD.get()));
-        f("tenshiBurstRatio", () -> pct(Config.TENSHI_BURST_DAMAGE_RATIO.get()));
-        f("tenshiDebuffDuration", () -> Integer.toString(Config.TENSHI_DEBUFF_DURATION_SECONDS.get()));
-        f("tenshiFlyingMultiplier", () -> num(Config.TENSHI_FLYING_MOB_MULTIPLIER.get()));
+        f("tenshiDomainThreshold", () -> num(ClientConfigCache.get(Config.TENSHI_DOMAIN_THRESHOLD)));
+        f("tenshiBurstRatio", () -> pct(ClientConfigCache.get(Config.TENSHI_BURST_DAMAGE_RATIO)));
+        f("tenshiDebuffDuration", () -> Integer.toString(ClientConfigCache.get(Config.TENSHI_DEBUFF_DURATION_SECONDS)));
+        f("tenshiFlyingMultiplier", () -> num(ClientConfigCache.get(Config.TENSHI_FLYING_MOB_MULTIPLIER)));
 
         // ---- 咲夜 ----
-        f("sakuyaTimestopSeconds", () -> Integer.toString(Config.SAKUYA_TIMESTOP_SECONDS_PER_EQUIPMENT.get()));
-        f("sakuyaTimestopRadius", () -> Integer.toString(Config.SAKUYA_TIMESTOP_RADIUS.get()));
-        f("sakuyaTimestopCooldown", () -> Integer.toString(Config.SAKUYA_TIMESTOP_COOLDOWN_SECONDS.get()));
-        f("sakuyaIngotChance", () -> pct(Config.SAKUYA_INGOT_CHANCE.get()));
+        f("sakuyaTimestopSeconds", () -> Integer.toString(ClientConfigCache.get(Config.SAKUYA_TIMESTOP_SECONDS_PER_EQUIPMENT)));
+        f("sakuyaTimestopRadius", () -> Integer.toString(ClientConfigCache.get(Config.SAKUYA_TIMESTOP_RADIUS)));
+        f("sakuyaTimestopCooldown", () -> Integer.toString(ClientConfigCache.get(Config.SAKUYA_TIMESTOP_COOLDOWN_SECONDS)));
+        f("sakuyaIngotChance", () -> pct(ClientConfigCache.get(Config.SAKUYA_INGOT_CHANCE)));
     }
 
     private KogasaManualConfigFunctions() {

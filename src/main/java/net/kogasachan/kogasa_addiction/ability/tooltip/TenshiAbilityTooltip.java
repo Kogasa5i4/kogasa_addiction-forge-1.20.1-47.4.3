@@ -1,4 +1,5 @@
 package net.kogasachan.kogasa_addiction.ability.tooltip;
+import net.kogasachan.kogasa_addiction.event.client.ClientConfigCache;
 
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
@@ -29,7 +30,7 @@ public final class TenshiAbilityTooltip implements KogasaAbilityTooltip {
 
         // 护甲专属描述与动态状态
         if (isArmor) {
-            double threshold = Config.TENSHI_DOMAIN_THRESHOLD.get();
+            double threshold = ClientConfigCache.get(Config.TENSHI_DOMAIN_THRESHOLD);
 
             net.minecraft.client.player.LocalPlayer player =
                     net.minecraft.client.Minecraft.getInstance().player;

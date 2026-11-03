@@ -81,7 +81,7 @@ public final class KogasaTooltipAlt {
                                 "tooltip.kogasa_addiction.abilities.sealed_progress",
                                 KogasaNumberFormatHelper.formatPercentTrimmed(growth, 0),
                                 KogasaNumberFormatHelper.formatPercentTrimmed(
-                                        Config.LOCKED_EQUIPMENT_UNLOCK_GROWTH.get(), 0))
+                                        ClientConfigCache.get(Config.LOCKED_EQUIPMENT_UNLOCK_GROWTH), 0))
                         .withStyle(ChatFormatting.DARK_GRAY));
             }
             // 只要还有空余能力槽就提示注入方式（无论当前是否已经注入过能力）
@@ -92,7 +92,7 @@ public final class KogasaTooltipAlt {
             // 槽位已用满且下一个槽仍在成长可达范围内 → 显示解锁提示
             if (usedSlots >= maxSlots) {
                 double nextSlotGrowth = KogasaAbilityData.getGrowthForNextSlot(maxSlots);
-                if (nextSlotGrowth <= Config.MAX_GROWTH.get()) {
+                if (nextSlotGrowth <= ClientConfigCache.get(Config.MAX_GROWTH)) {
                     tooltip.add(Component.translatable(
                                     "tooltip.kogasa_addiction.abilities.full_hint",
                                     KogasaNumberFormatHelper.formatPercentTrimmed(nextSlotGrowth, 0))
@@ -175,7 +175,7 @@ public final class KogasaTooltipAlt {
                     }
                 } else {
                     // 未解锁：显示还差多少成长值
-                    double start = Config.NO_CONSUME_ARROW_START_GROWTH.get();
+                    double start = ClientConfigCache.get(Config.NO_CONSUME_ARROW_START_GROWTH);
                     if (start > 0) {
                         tooltip.add(Component.translatable(
                                         "tooltip.kogasa_addiction.ranged.no_consume.locked",

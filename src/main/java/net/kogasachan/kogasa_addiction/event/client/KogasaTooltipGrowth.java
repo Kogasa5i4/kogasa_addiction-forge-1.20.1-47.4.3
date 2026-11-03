@@ -33,8 +33,8 @@ public final class KogasaTooltipGrowth {
 
             // 成长附魔进度
             int grantedEnchants = KogasaEquipmentData.getGrowthEnchantsGranted(stack);
-            int maxEnchants = Config.MAX_GROWTH_ENCHANTS.get();
-            if (Config.ENABLE_GROWTH_ENCHANT.get() && maxEnchants > 0) {
+            int maxEnchants = ClientConfigCache.get(Config.MAX_GROWTH_ENCHANTS);
+            if (ClientConfigCache.get(Config.ENABLE_GROWTH_ENCHANT) && maxEnchants > 0) {
                 tooltip.add(Component.translatable(
                                 "tooltip.kogasa_addiction.growth_enchant", grantedEnchants, maxEnchants)
                         .withStyle(ChatFormatting.LIGHT_PURPLE));

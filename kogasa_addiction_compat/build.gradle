@@ -1,0 +1,279 @@
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'org.spongepowered.mixin' version '0.7.+'
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+// ===== 主模组标识与开发版 jar 路径 =====
+def mainProperties = new Properties()
+file('../gradle.properties').withInputStream { mainProperties.load(it) }
+def mainModId = mainProperties.getProperty('main_mod_id', 'kogasa_addiction')
+def mainModVersion = mainProperties.getProperty('mod_version')
+def mainModDevJar = file("../build/libs/${mainModId}-${mainModVersion}-dev.jar")
+
+minecraft {
+    // 与主模组一致：AT 暴露需要的字段/方法（例如 AbstractContainerScreen.hoveredSlot）
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    mappings channel: mapping_channel, version: mapping_version
+
+    copyIdeResources = true
+
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+
+            // 主模组通过 run/mods 里的“开发版 jar”（MCP 名、未 reobf）加载，见 syncMainMod 任务。
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        client {
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile',
+                    "${projectDir}/../build/createSrgToMcp/output.srg"
+        }
+
+        server {
+            args '--nogui'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile',
+                    "${projectDir}/../build/createSrgToMcp/output.srg"
+        }
+
+        data {
+            workingDirectory project.file('run-data')
+            args '--mod', mod_id, '--all',
+                    '--output', file('src/generated/resources/'),
+                    '--existing', file('src/main/resources/')
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile',
+                    "${projectDir}/../build/createSrgToMcp/output.srg"
+        }
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+repositories {
+    maven {
+        name = 'MinecraftForge'
+        url = 'https://maven.minecraftforge.net/'
+    }
+    maven {
+        name = "Jared's maven"
+        url = "https://maven.blamejared.com/"
+    }
+    maven { url = "https://maven.createmod.net" }
+    maven { url "https://modmaven.dev/" }
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    // 依赖主模组：用开发版 jar 而不是 classes 目录。
+    // 目录依赖 IntelliJ 不会当作库索引（编辑器会报红），jar 会被正常索引成库。
+    // 开发环境运行期由 syncMainMod 把同一个 jar 同步进 run/mods。
+    compileOnly files(mainModDevJar)
+
+    // ===== 软依赖：只在开发环境提供，方便查看手册与 JEI 内容 =====
+    // 刻意不写进 mods.toml：附属本身不依赖它们。
+    compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"))
+    compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"))
+    runtimeOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"))
+
+    // 手册的打开逻辑在主模组，附属没有 Patchouli 的编译期引用；runtimeOnly 仅用于开发环境查看手册
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")
+
+    compileOnly fg.deobf("teamtwilight:twilightforest:${twilight_forest_version}:universal")
+    runtimeOnly fg.deobf("teamtwilight:twilightforest:${twilight_forest_version}:universal")
+
+    // Mixin 注解处理器（与主模组一致）
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+}
+
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
+    config "${mod_id}.mixins.json"
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    filteringCharset = 'UTF-8'
+
+    var replaceProperties = [
+            minecraft_version   : minecraft_version, minecraft_version_range: minecraft_version_range,
+            forge_version       : forge_version, forge_version_range: forge_version_range,
+            loader_version_range: loader_version_range,
+            mod_id              : mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+            mod_authors         : mod_authors, mod_description: mod_description,
+            main_mod_id         : main_mod_id, main_mod_version_range: main_mod_version_range,
+    ]
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
+    }
+}
+
+tasks.named('jar', Jar).configure {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    // 双保险：从 compileJava 的 AP 输出目录直接带上 refmap
+    from(layout.buildDirectory.dir('tmp/compileJava')) {
+        include "${mod_id}.refmap.json"
+    }
+
+    doFirst {
+        def refmap = layout.buildDirectory.file("tmp/compileJava/${mod_id}.refmap.json").get().asFile
+        if (!refmap.exists()) {
+            throw new GradleException("缺少 Mixin refmap：${refmap}\n请执行 `clean build`，或检查 annotationProcessor 是否运行")
+        }
+    }
+
+    manifest {
+        attributes([
+                'Specification-Title'     : mod_id,
+                'Specification-Vendor'    : mod_authors,
+                'Specification-Version'   : '1',
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : mod_authors,
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                'MixinConfigs'          : "${mod_id}.mixins.json"
+        ])
+    }
+
+    finalizedBy 'reobfJar'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    // Mixin 注解处理器在增量编译 / 构建缓存命中时可能不重新生成 refmap，
+    // 会导致生产环境出现 "Reference map ... could not be read" + No refMap loaded。
+    // 附属编译量很小，直接关掉增量，保证每次都有 refmap。
+    options.incremental = false
+}
+
+processResources {
+    exclude '.cache'
+    exclude '.cache/**'
+}
+
+// ===== 编译前自动编译主工程 =====
+def isWindows = System.getProperty('os.name').toLowerCase().contains('windows')
+
+tasks.register('compileMainProject', Exec) {
+    description = '编译父工程（主模组），只在父工程源码变动时实际执行'
+
+    onlyIf {
+        System.getenv('KOGASA_SKIP_MAIN_COMPILE') == null
+                && !project.hasProperty('kogasaSkipMainCompile')
+    }
+
+    inputs.dir file('../src/main/java')
+    inputs.dir file('../src/main/resources')
+    inputs.dir file('../src/generated/resources')
+    outputs.dir file('../build/classes/java/main')
+    outputs.file mainModDevJar
+
+    workingDir file('..')
+    if (isWindows) {
+        commandLine 'cmd', '/c', 'gradlew.bat compileJava processResources createSrgToMcp devJar --console=plain'
+    } else {
+        commandLine 'sh', '-c', './gradlew compileJava processResources createSrgToMcp devJar --console=plain'
+    }
+}
+
+tasks.named('compileJava') {
+    // 编译期依赖主模组的开发版 jar，两个任务都可能产出它
+    dependsOn 'compileMainProject', 'ensureMainDevJar'
+}
+
+// ===== 直接运行附属任务时，先确保主模组的开发版 jar 是最新的 =====
+// 父工程的一键任务（compatBuild / compatRunClient / compatRunServer）会带 kogasaParentBuild 标记，
+// 此时 devJar 已由父任务构建，跳过这里，避免嵌套 Gradle 进程抢锁。
+def skipEnsure = System.getenv('KOGASA_SKIP_MAIN_COMPILE') != null
+        || project.hasProperty('kogasaParentBuild')
+        || project.hasProperty('kogasaSkipMainCompile')
+
+tasks.register('ensureMainDevJar', Exec) {
+    description = '确保主模组开发版 jar 最新（直接运行附属任务时）'
+
+    onlyIf { !skipEnsure }
+
+    inputs.dir file('../src/main/java')
+    inputs.dir file('../src/main/resources')
+    inputs.dir file('../src/generated/resources')
+    outputs.file mainModDevJar
+
+    workingDir file('..')
+    if (isWindows) {
+        commandLine 'cmd', '/c', 'gradlew.bat devJar createSrgToMcp --console=plain'
+    } else {
+        commandLine 'sh', '-c', './gradlew devJar createSrgToMcp --console=plain'
+    }
+}
+
+// ===== 开发运行：把主模组的开发版 jar 同步进 run/mods =====
+tasks.register('syncMainMod', Copy) {
+    dependsOn 'compileMainProject', 'ensureMainDevJar'
+    from mainModDevJar
+    into file('run/mods')
+    doFirst {
+        if (!mainModDevJar.exists()) {
+            throw new GradleException(
+                    "缺少主模组开发版 jar：${mainModDevJar}" +
+                    "\n请先在主工程目录执行：gradlew devJar")
+        }
+    }
+}
+
+// datagen 的 gameDir 是 run-data，主模组 jar 也要放一份到 run-data/mods
+tasks.register('syncMainModData', Copy) {
+    dependsOn 'compileMainProject', 'ensureMainDevJar'
+    from mainModDevJar
+    into file('run-data/mods')
+}
+
+tasks.configureEach {
+    if (name == 'runClient' || name == 'runServer') {
+        dependsOn 'syncMainMod'
+    }
+    if (name == 'runData') {
+        dependsOn 'syncMainModData'
+    }
+}
+
+// ===== datagen 缓存：runData 结束后自动删除，避免 .cache 堆在 src/generated 里 =====
+tasks.register('cleanDataCache', Delete) {
+    delete file('src/generated/resources/.cache')
+}
+
+tasks.configureEach {
+    if (name == 'runData') {
+        finalizedBy 'cleanDataCache'
+    }
+}

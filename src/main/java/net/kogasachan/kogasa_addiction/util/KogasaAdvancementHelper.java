@@ -19,7 +19,7 @@ public class KogasaAdvancementHelper {
      * 应在所有会修改装备 NBT 的地方调用。
      */
     public static void checkAndGrant(ServerPlayer player, ItemStack stack) {
-        if (!(stack.getItem() instanceof IKogasaEquipment)) return;
+        if (!net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(stack)) return;
 
         // 强化
         int re = KogasaEquipmentData.getReinforcements(stack);
@@ -116,7 +116,7 @@ public class KogasaAdvancementHelper {
         int size = inventory.getContainerSize();
         for (int i = 0; i < size; i++) {
             ItemStack stack = inventory.getItem(i);
-            if (!stack.isEmpty() && stack.getItem() instanceof IKogasaEquipment) {
+            if (!stack.isEmpty() && net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(stack)) {
                 checkAndGrant(player, stack);
             }
         }

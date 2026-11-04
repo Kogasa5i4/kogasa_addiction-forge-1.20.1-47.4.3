@@ -9,7 +9,7 @@
         }
       ],
       "recipe": {
-        "type": "patchouli:shapeless_book_recipe",
+        "type": "minecraft:crafting_shapeless",
         "ingredients": [
           {
             "tag": "kogasa_addiction:ability_ingots"
@@ -18,7 +18,9 @@
             "item": "minecraft:book"
           }
         ],
-        "book": "kogasa_addiction:kogasa_manual"
+        "result": {
+          "item": "kogasa_addiction:kogasa_manual"
+        }
       }
     }
   ]

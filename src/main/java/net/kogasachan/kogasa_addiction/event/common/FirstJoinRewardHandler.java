@@ -66,19 +66,8 @@ public class FirstJoinRewardHandler {
 
         giveItemToPlayer(player, stack);
 
-        // ===== 2. 发放帕秋莉手册（软依赖） =====
-        if (ModList.get().isLoaded("patchouli")) {
-            Item guideBookItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.fromNamespaceAndPath("patchouli", "guide_book"));
-            if (guideBookItem != null) {
-                ItemStack bookStack = new ItemStack(guideBookItem);
-                CompoundTag bookNbt = new CompoundTag();
-                // 指定是哪本书，格式为：命名空间:书ID
-                bookNbt.putString("patchouli:book", KogasaAddiction.MODID + ":kogasa_manual");
-                bookStack.setTag(bookNbt);
-
-                giveItemToPlayer(player, bookStack);
-            }
-        }
+        // ===== 2. 发放本模组手册 =====
+        giveItemToPlayer(player, new ItemStack(ModItems.KOGASA_MANUAL.get()));
 
         // ===== 3. 标记已领取与反馈 =====
         data.putBoolean(NBT_KEY, true);
@@ -89,7 +78,7 @@ public class FirstJoinRewardHandler {
         player.displayClientMessage(
                 Component.translatable("message.kogasa_addiction.first_join_reward")
                         .withStyle(ChatFormatting.LIGHT_PURPLE),
-                false);
+                true);
 
         KogasaAddiction.LOGGER.info("First join reward given to {}: {} with {}",
                 player.getName().getString(),

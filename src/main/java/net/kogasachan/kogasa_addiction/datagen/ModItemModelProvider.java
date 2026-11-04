@@ -53,6 +53,9 @@ public class ModItemModelProvider extends ItemModelProvider {
 
         // 6. Fumo
         basicItem(ModItems.FUMO.get());
+
+        // 7. 手册
+        basicItem(ModItems.KOGASA_MANUAL.get());
     }
 
     // ==================== 弓 ====================

@@ -36,6 +36,7 @@ public final class KogasaCommands {
 
         // 只读命令：任何人可用
         KogasaInfoCommands.register(root);
+        KogasaNbtCommands.register(root);
 
         // 以下都会修改装备 / 玩家数据 / 配置，统一要求权限等级 2
         KogasaEquipmentCommands.register(root, event.getBuildContext());

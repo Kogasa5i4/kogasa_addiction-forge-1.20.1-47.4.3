@@ -15,6 +15,7 @@ import net.minecraft.world.item.Items;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
@@ -26,6 +27,9 @@ public class ClientSetup {
 
     @SubscribeEvent
     public static void onClientSetup$register(FMLClientSetupEvent event) {
+        // 装了兼容附属时才显示主手册里的“兼容”分类
+        setCompatEntriesFlag();
+
         event.enqueueWork(() -> {
             registerBowProperties();
             registerCrossbowProperties();
@@ -130,5 +134,17 @@ public class ClientSetup {
                         CrossbowItem.isCharged(stack)
                                 && CrossbowItem.containsChargedProjectile(stack, Items.FIREWORK_ROCKET)
                                 ? 1.0F : 0.0F);
+    }
+
+    /** 装了兼容附属时，显示主手册里的“兼容”分类（未装则整类隐藏） */
+    private static void setCompatEntriesFlag() {
+        if (!ModList.get().isLoaded("patchouli")) {
+            return;
+        }
+        if (!ModList.get().isLoaded("kogasa_addiction_compat")) {
+            return;
+        }
+        vazkii.patchouli.api.PatchouliAPI.get().setConfigFlag(
+                net.kogasachan.kogasa_addiction.item.KogasaManualItem.COMPAT_ENTRIES_FLAG, true);
     }
 }

@@ -41,7 +41,7 @@ public class CrossbowMixin {
             pCrossbowStack.getTag().remove(CrossbowProjectileHandler.TAG_FIREWORK_SPAWNED);
         }
 
-        if (!(pCrossbowStack.getItem() instanceof IKogasaEquipment)) return;
+        if (!net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(pCrossbowStack)) return;
         if (!(pShooter instanceof ServerPlayer player)) return;
 
         KogasaGrowthHandler.addGrowth(pCrossbowStack, player);
@@ -51,7 +51,7 @@ public class CrossbowMixin {
     @Inject(method = "getChargeDuration", at = @At("RETURN"), cancellable = true)
     private static void kogasa$modifyChargeDuration(ItemStack pCrossbowStack,
                                                     CallbackInfoReturnable<Integer> cir) {
-        if (!(pCrossbowStack.getItem() instanceof IKogasaEquipment)) return;
+        if (!net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(pCrossbowStack)) return;
 
         int original = cir.getReturnValue();
         if (original <= 0) return;

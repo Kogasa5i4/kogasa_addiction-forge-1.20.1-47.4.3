@@ -53,6 +53,9 @@ public class DataGenerators {
         generator.addProvider(event.includeClient(),
                 new ModItemModelProvider(output, existingFileHelper));
 
+        // 语言：以 lang_src/ 为唯一源，带键集合 / 占位符校验
+        generator.addProvider(event.includeClient(), new LangSrcProvider(output));
+
         // 进度
         generator.addProvider(event.includeServer(),
                 new ForgeAdvancementProvider(output, event.getLookupProvider(),

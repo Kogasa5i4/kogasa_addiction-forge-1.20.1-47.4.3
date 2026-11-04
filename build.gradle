@@ -156,9 +156,11 @@ mixin {
 processResources {
     exclude '.cache'
     exclude '.cache/**'
+    // lang_src 只是 datagen 源文件，不打包进 jar
+    exclude 'lang_src/**'
 }
 
-// ===== 供弹幕附属开发环境使用的"开发版"jar =====
+// ===== 供附属模组开发环境使用的"开发版"jar =====
 // 注意：build/libs 里默认产物是 reobf 过的发布版（SRG 名），开发环境用的是 MCP 名，
 // 直接放进 run/mods 会报 NoSuchFieldError: f_xxxxx_ / InvalidAccessorException。
 // 这个任务打包**未 reobf** 的开发版，附属的 runClient / runServer 加载它。
@@ -170,36 +172,47 @@ tasks.register('devJar', Jar) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
-// ===== 弹幕附属（复合构建 kogasa_addiction_danmaku）的一键入口 =====
+// ===== 兼容附属（复合构建 kogasa_addiction_compat）的一键入口 =====
 // 先编译主模组，再构建 / 启动附属客户端；IDEA 右侧 Gradle 栏里可直接双击运行。
 // 用 GradleBuild（同 daemon 内的嵌套构建）而不是另起进程：不会和父构建抢工程目录的文件锁。
-def addonDir = file('kogasa_addiction_danmaku')
+def addonDir = file('kogasa_addiction_compat')
 if (addonDir.exists()) {
-    tasks.register('addonBuild', GradleBuild) {
+    tasks.register('compatBuild', GradleBuild) {
         group = 'kogasa addon'
-        description = '编译主模组后构建弹幕附属'
+        description = '编译主模组后构建兼容附属'
         dependsOn 'compileJava', 'processResources', 'createSrgToMcp', 'devJar'
         dir = addonDir
         tasks = ['build']
         // 主模组已由本任务依赖编译，让附属构建跳过它自己的"先编译父工程"步骤
-        startParameter.projectProperties = ['kogasaSkipMainCompile': 'true']
+        startParameter.projectProperties = ['kogasaSkipMainCompile': 'true', 'kogasaParentBuild': 'true']
     }
 
-    tasks.register('addonRunClient', GradleBuild) {
+    tasks.register('compatRunClient', GradleBuild) {
         group = 'kogasa addon'
-        description = '编译主模组后启动弹幕附属的客户端'
+        description = '编译主模组后启动兼容附属的客户端'
         dependsOn 'compileJava', 'processResources', 'createSrgToMcp', 'devJar'
         dir = addonDir
         tasks = ['runClient']
-        startParameter.projectProperties = ['kogasaSkipMainCompile': 'true']
+        startParameter.projectProperties = ['kogasaSkipMainCompile': 'true', 'kogasaParentBuild': 'true']
     }
 
-    tasks.register('addonRunServer', GradleBuild) {
+    tasks.register('compatRunServer', GradleBuild) {
         group = 'kogasa addon'
-        description = '编译主模组后启动弹幕附属的服务端（验证加载用）'
+        description = '编译主模组后启动兼容附属的服务端（验证加载用）'
         dependsOn 'compileJava', 'processResources', 'createSrgToMcp', 'devJar'
         dir = addonDir
         tasks = ['runServer']
-        startParameter.projectProperties = ['kogasaSkipMainCompile': 'true']
+        startParameter.projectProperties = ['kogasaSkipMainCompile': 'true', 'kogasaParentBuild': 'true']
+    }
+}
+
+// ===== datagen 缓存：runData 结束后自动删除，避免 .cache 堆在 src/generated 里 =====
+tasks.register('cleanDataCache', Delete) {
+    delete file('src/generated/resources/.cache')
+}
+
+tasks.configureEach {
+    if (name == 'runData') {
+        finalizedBy 'cleanDataCache'
     }
 }

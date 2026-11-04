@@ -34,7 +34,7 @@ public final class KogasaAbilityHelper {
      */
     public static boolean hasAbilityInSlot(Player player, EquipmentSlot slot, KogasaAbility ability) {
         ItemStack stack = player.getItemBySlot(slot);
-        return stack.getItem() instanceof IKogasaEquipment
+        return net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(stack)
                 && KogasaAbilityData.hasAbility(stack, ability);
     }
 
@@ -43,9 +43,9 @@ public final class KogasaAbilityHelper {
      */
     public static ItemStack getHeldKogasaEquipment(ServerPlayer player) {
         ItemStack main = player.getMainHandItem();
-        if (main.getItem() instanceof IKogasaEquipment) return main;
+        if (net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(main)) return main;
         ItemStack off = player.getOffhandItem();
-        if (off.getItem() instanceof IKogasaEquipment) return off;
+        if (net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(off)) return off;
         return ItemStack.EMPTY;
     }
 
@@ -53,7 +53,7 @@ public final class KogasaAbilityHelper {
      * 该物品是 Kogasa 装备且带有指定能力
      */
     public static boolean isEquipmentWithAbility(ItemStack stack, KogasaAbility ability) {
-        return stack.getItem() instanceof IKogasaEquipment
+        return net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(stack)
                 && KogasaAbilityData.hasAbility(stack, ability);
     }
 }

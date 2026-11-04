@@ -19,7 +19,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.*;
 
 import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.UUID;
 
 public class KogasaEquipmentHelper {
@@ -43,14 +45,17 @@ public class KogasaEquipmentHelper {
     /**
      * 原版三叉戟的基准攻击伤害：动态读取注册表中 Items.TRIDENT 的内建属性
      * （ATTACK_DAMAGE 的 ADDITION 修饰符之和），代替硬编码 8.0。
-     * 走 {@code ItemStack#getAttributeModifiers}（非弃用 API；原版三叉戟没有
-     * 覆写双参方法，不会与本模组的属性链路形成递归）。
+     *
+     * <p><b>不能用 {@code ItemStack#getAttributeModifiers}</b>：那会触发 Forge 的
+     * {@code ItemAttributeModifierEvent}，兼容附属会把“原版三叉戟”也当成兼容物品再算一遍属性，
+     * 于是递归到栈溢出（客户端 tooltip 直接崩）。这里直接用物品的内建属性，不经过事件。
      */
+    @SuppressWarnings("deprecation")
     private static double getVanillaTridentDamage() {
         if (vanillaTridentDamage == null) {
             double damage = 0.0D;
-            for (AttributeModifier modifier : Items.TRIDENT.getDefaultInstance()
-                    .getAttributeModifiers(EquipmentSlot.MAINHAND)
+            for (AttributeModifier modifier : Items.TRIDENT
+                    .getDefaultAttributeModifiers(EquipmentSlot.MAINHAND)
                     .get(Attributes.ATTACK_DAMAGE)) {
                 if (modifier.getOperation() == AttributeModifier.Operation.ADDITION) {
                     damage += modifier.getAmount();
@@ -67,6 +72,16 @@ public class KogasaEquipmentHelper {
             UUID.fromString("9F3D476D-C118-4544-8365-64846904B48E"), // CHEST
             UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150")  // HEAD
     };
+
+    /**
+     * 空手基础的 +1 只给本模组装备。
+     *
+     * <p>兼容物品（非 {@link IKogasaEquipment}）走原版数值：攻击伤害修饰符不再额外 +1，
+     * 否则实际伤害和 tooltip 都会比原版高 1 点。
+     */
+    private static double emptyHandBonus(ItemStack stack) {
+        return stack.getItem() instanceof IKogasaEquipment ? 1.0 : 0.0;
+    }
 
     /**
      * 统一入口：根据物品类型分派属性计算
@@ -88,20 +103,20 @@ public class KogasaEquipmentHelper {
         }
 
         if (item instanceof SwordItem sword) {
-            double baseDamage = 1.0 + sword.getDamage();
+            double baseDamage = emptyHandBonus(stack) + sword.getDamage();
             double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
             return buildHandModifiers(stack, baseDamage, absorbed, -2.4F);
         }
 
         if (item instanceof DiggerItem digger) {
-            double baseDamage = 1.0 + digger.getAttackDamage();
+            double baseDamage = emptyHandBonus(stack) + digger.getAttackDamage();
             double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
             float baseSpeed = (float) getBaseAttackSpeed(stack);
             return buildHandModifiers(stack, baseDamage, absorbed, baseSpeed);
         }
 
         if (item instanceof TridentItem trident) {
-            double baseDamage = 1.0 + getVanillaTridentDamage();
+            double baseDamage = emptyHandBonus(stack) + getVanillaTridentDamage();
             double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
             return buildHandModifiers(stack, baseDamage, absorbed, -2.9F);
         }
@@ -319,8 +334,8 @@ public class KogasaEquipmentHelper {
     public static boolean areStacksEffectivelySame(ItemStack a, ItemStack b) {
         if (ItemStack.isSameItemSameTags(a, b)) return true;
 
-        if (!(a.getItem() instanceof IKogasaEquipment)
-                && !(b.getItem() instanceof IKogasaEquipment)) {
+        if (!isKogasaEquipment(a)
+                && !isKogasaEquipment(b)) {
             return false;
         }
 
@@ -425,11 +440,11 @@ public class KogasaEquipmentHelper {
         Item item = stack.getItem();
         double baseDamage = 0;
         if (item instanceof SwordItem sword) {
-            baseDamage = 1.0 + sword.getDamage();
+            baseDamage = emptyHandBonus(stack) + sword.getDamage();
         } else if (item instanceof DiggerItem digger) {
-            baseDamage = 1.0 + digger.getAttackDamage();
+            baseDamage = emptyHandBonus(stack) + digger.getAttackDamage();
         } else if (item instanceof TridentItem) {
-            baseDamage = 1.0 + getVanillaTridentDamage();
+            baseDamage = emptyHandBonus(stack) + getVanillaTridentDamage();
         }
         double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
         if (Config.ABSORBED_VALUE_INCLUDED_IN_MULTIPLIER.get()) {
@@ -680,5 +695,39 @@ public class KogasaEquipmentHelper {
     private static double getAyaNews(ItemStack stack) {
         return KogasaAbilityData.hasAbility(stack, KogasaAbility.AYA)
                 ? KogasaAbilityData.getNewsValue(stack) : 0.0;
+    }
+    // ===== 外部（附属模组）装备判定 =====
+    // 兼容附属会把"标签 / 标记过的物品"注册进来，让它们和本模组装备走同一套逻辑。
+    // 判定异常不能影响主逻辑，所以逐个 try/catch。
+
+    private static final List<Predicate<ItemStack>> EXTERNAL_EQUIPMENT_PREDICATES = new ArrayList<>();
+
+    public static void registerEquipmentPredicate(Predicate<ItemStack> predicate) {
+        EXTERNAL_EQUIPMENT_PREDICATES.add(predicate);
+    }
+
+    /**
+     * 统一的"是否按本模组装备处理"判定。
+     *
+     * <p>本模组物品恒为 true；外部判定（兼容附属）注册后生效。
+     * 这里刻意不读配置：是否启用由注册方（兼容附属）自己判断。
+     */
+    public static boolean isKogasaEquipment(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) {
+            return false;
+        }
+        if (stack.getItem() instanceof IKogasaEquipment) {
+            return true;
+        }
+        for (Predicate<ItemStack> predicate : EXTERNAL_EQUIPMENT_PREDICATES) {
+            try {
+                if (predicate.test(stack)) {
+                    return true;
+                }
+            } catch (RuntimeException ignored) {
+                // 外部判定出错时忽略，不影响主逻辑
+            }
+        }
+        return false;
     }
 }

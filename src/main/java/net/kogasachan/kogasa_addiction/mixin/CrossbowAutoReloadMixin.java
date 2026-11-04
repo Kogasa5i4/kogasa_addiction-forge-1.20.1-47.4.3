@@ -50,7 +50,7 @@ public class CrossbowAutoReloadMixin {
     private void kogasa$autoReload(Level pLevel, Player pPlayer, InteractionHand pHand,
                                    CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir) {
         ItemStack stack = pPlayer.getItemInHand(pHand);
-        if (!(stack.getItem() instanceof IKogasaEquipment)) return;
+        if (!net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(stack)) return;
 
         // 成长值是否解锁自动装填
         if (!KogasaEquipmentHelper.isCrossbowAutoReload(stack)) return;

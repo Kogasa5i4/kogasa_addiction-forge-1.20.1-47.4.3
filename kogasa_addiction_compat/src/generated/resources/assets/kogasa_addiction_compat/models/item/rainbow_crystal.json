@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "kogasa_addiction_compat:item/rainbow_crystal"
+  }
+}

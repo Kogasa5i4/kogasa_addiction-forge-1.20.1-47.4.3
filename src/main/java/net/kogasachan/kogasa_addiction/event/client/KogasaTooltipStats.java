@@ -7,8 +7,11 @@ import net.kogasachan.kogasa_addiction.util.KogasaNumberFormatHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.item.*;
+import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -156,12 +159,42 @@ public final class KogasaTooltipStats {
     }
 
     /**
-     * 原版属性行由 {@code CommonComponents.space()} 开头（" +7 攻击伤害"），
-     * 附魔行没有这个前导空格，用它来区分最稳。
+     * 原版属性行有两种渲染格式，不能只靠“空格前缀”判断：
+     * <ul>
+     *   <li>基础值（{@code attribute.modifier.equals}）：以 {@code CommonComponents.space()} 开头，深绿色；</li>
+     *   <li>非基础修饰符（{@code plus}/{@code take}）：没有前导空格，蓝色/红色
+     *       （JEI、创造栏等 player 为 null 的场景也会走这一支）。</li>
+     * </ul>
+     * 统一改为“文本里包含任意属性名”。属性行一定带属性名（攻击伤害/攻击速度/护甲……），
+     * 附魔行与 lore 不会，因此不会误吞其它行。
      */
     private static boolean isAttributeLine(Component line) {
         String text = line.getString();
-        return !text.isEmpty() && text.charAt(0) == ' ' && !text.isBlank();
+        if (text.isBlank()) {
+            return false;
+        }
+        if (text.charAt(0) == ' ') {
+            return true;
+        }
+        for (String name : attributeNames()) {
+            if (!name.isEmpty() && text.contains(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static List<String> attributeNames;
+
+    private static List<String> attributeNames() {
+        if (attributeNames == null) {
+            List<String> names = new ArrayList<>();
+            for (Attribute attribute : ForgeRegistries.ATTRIBUTES) {
+                names.add(Component.translatable(attribute.getDescriptionId()).getString());
+            }
+            attributeNames = names;
+        }
+        return attributeNames;
     }
 
     private static String translated(String key) {
@@ -179,7 +212,7 @@ public final class KogasaTooltipStats {
         if (!(stack.getItem() instanceof DiggerItem digger)) return 1.0F;
 
         float speed = digger.getTier().getSpeed();
-        if (stack.getItem() instanceof IKogasaEquipment) {
+        if (net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(stack)) {
             speed = KogasaEquipmentHelper.getDestroySpeed(stack, speed);
         }
         return speed;

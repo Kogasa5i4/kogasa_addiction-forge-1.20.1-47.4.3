@@ -21,7 +21,7 @@ public abstract class GrindstoneMenuMixin {
     private void kogasa$resetGrowthEnchantState(ItemStack pStack, int pDamage, int pCount,
                                                 CallbackInfoReturnable<ItemStack> cir) {
         ItemStack result = cir.getReturnValue();
-        if (result.isEmpty() || !(result.getItem() instanceof IKogasaEquipment)) return;
+        if (result.isEmpty() || !net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(result)) return;
         if (KogasaEquipmentData.getGrowthEnchantsGranted(result) <= 0
                 && !KogasaEquipmentData.hasGrowthEnchantFailNotified(result)) {
             return;

@@ -121,7 +121,7 @@ public class KogasaGrowthHandler {
                 EquipmentSlot.LEGS, EquipmentSlot.FEET,
                 EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND}) {
             ItemStack armor = player.getItemBySlot(slot);
-            if (armor.getItem() instanceof IKogasaEquipment) {
+            if (net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(armor)) {
                 addGrowth(armor, player);
                 player.getInventory().setChanged();
             }

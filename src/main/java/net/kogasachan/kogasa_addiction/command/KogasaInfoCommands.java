@@ -48,7 +48,7 @@ public final class KogasaInfoCommands {
     private static int info(CommandContext<CommandSourceStack> ctx)
             throws CommandSyntaxException {
         ServerPlayer player = ctx.getSource().getPlayerOrException();
-        ItemStack held = KogasaCommandSupport.requireKogasaEquipment(ctx);
+        ItemStack held = KogasaCommandSupport.requireAnyHeldItem(ctx);
         if (held.isEmpty()) return 0;
 
         int re = KogasaEquipmentData.getReinforcements(held);
@@ -61,17 +61,17 @@ public final class KogasaInfoCommands {
         boolean isRanged = isRangedWeapon(held);
 
         // ===== 标题 =====
-        ctx.getSource().sendSuccess(() -> Component.translatable(
+        KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                 "commands.kogasa_addiction.info.header",
                 held.getHoverName()), false);
 
         // ===== 强化 =====
-        ctx.getSource().sendSuccess(() -> Component.translatable(
+        KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                 "commands.kogasa_addiction.info.reinforcement",
                 re, maxRe), false);
 
         // ===== 成长 =====
-        ctx.getSource().sendSuccess(() -> Component.translatable(
+        KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                 "commands.kogasa_addiction.info.growth",
                 KogasaNumberFormatHelper.formatTrimmed(growth, 4),
                 KogasaNumberFormatHelper.formatPercentTrimmed(growth, 2),
@@ -84,7 +84,7 @@ public final class KogasaInfoCommands {
                 ? KogasaAbilityData.getNewsValue(held) : 0.0);
         double totalMult = reMult * growthMult * newsMult;
 
-        ctx.getSource().sendSuccess(() -> Component.translatable(
+        KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                 "commands.kogasa_addiction.info.multiplier",
                 KogasaNumberFormatHelper.formatTrimmed(reMult, 2),
                 KogasaNumberFormatHelper.formatTrimmed(growthMult, 2),
@@ -92,26 +92,26 @@ public final class KogasaInfoCommands {
                 KogasaNumberFormatHelper.formatTrimmed(totalMult, 3)), false);
 
         // ===== 吸收值 =====
-        ctx.getSource().sendSuccess(() -> Component.translatable(
+        KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                 "commands.kogasa_addiction.info.absorbed",
                 KogasaNumberFormatHelper.formatTrimmed(absorbed, 2)), false);
 
         // ===== 成长附魔次数 =====
-        ctx.getSource().sendSuccess(() -> Component.translatable(
+        KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                 "commands.kogasa_addiction.info.growth_enchant",
                 growthEnchants), false);
 
         // ===== 已吸收材料 =====
         if (usedMaterials.isEmpty()) {
-            ctx.getSource().sendSuccess(() -> Component.translatable(
+            KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                     "commands.kogasa_addiction.info.materials.none"), false);
         } else {
-            ctx.getSource().sendSuccess(() -> Component.translatable(
+            KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                     "commands.kogasa_addiction.info.materials.header",
                     usedMaterials.size()), false);
             for (String id : usedMaterials) {
                 Component name = getMaterialDisplayName(id);
-                ctx.getSource().sendSuccess(() -> Component.literal("  §7- §f")
+                KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.literal("  §7- §f")
                         .append(name), false);
             }
         }
@@ -119,12 +119,12 @@ public final class KogasaInfoCommands {
         // ===== 当前附魔 =====
         Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(held);
         if (!enchants.isEmpty()) {
-            ctx.getSource().sendSuccess(() -> Component.translatable(
+            KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                     "commands.kogasa_addiction.info.enchants.header",
                     enchants.size()), false);
             for (Map.Entry<Enchantment, Integer> entry : enchants.entrySet()) {
                 Component name = entry.getKey().getFullname(entry.getValue());
-                ctx.getSource().sendSuccess(() -> Component.literal("  §7- §f")
+                KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.literal("  §7- §f")
                         .append(name), false);
             }
         }
@@ -134,23 +134,23 @@ public final class KogasaInfoCommands {
         int maxSlots = KogasaAbilityData.getMaxAbilitySlots(held);
         int usedSlots = KogasaAbilityData.getUsedSlots(held);
 
-        ctx.getSource().sendSuccess(() -> Component.translatable(
+        KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                 "commands.kogasa_addiction.info.abilities.header",
                 usedSlots, maxSlots), false);
 
         if (abilities.isEmpty()) {
-            ctx.getSource().sendSuccess(() -> Component.translatable(
+            KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                     "commands.kogasa_addiction.info.abilities.none"), false);
         } else {
             for (KogasaAbility ability : abilities) {
-                ctx.getSource().sendSuccess(() -> Component.literal("  §7- §f")
+                KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.literal("  §7- §f")
                         .append(ability.getDisplayName()), false);
             }
         }
 
         // ===== 封印状态 =====
         if (KogasaEquipmentData.isLocked(held)) {
-            ctx.getSource().sendSuccess(() -> Component.translatable(
+            KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                     "commands.kogasa_addiction.info.sealed",
                     KogasaNumberFormatHelper.formatPercentTrimmed(
                             KogasaEquipmentData.getGrowth(held), 0),
@@ -166,12 +166,12 @@ public final class KogasaInfoCommands {
             int mined = KogasaAbilityData.getMinedBlockCount(held);
             int damaged = KogasaAbilityData.getDamageTakenCount(held);
 
-            ctx.getSource().sendSuccess(() -> Component.translatable(
+            KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                     "commands.kogasa_addiction.info.news_value",
                     KogasaNumberFormatHelper.formatTrimmed(news, 4),
                     KogasaNumberFormatHelper.formatPercentTrimmed(news, 2),
                     KogasaNumberFormatHelper.formatPercentTrimmed(maxNews, 2)), false);
-            ctx.getSource().sendSuccess(() -> Component.translatable(
+            KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                     "commands.kogasa_addiction.info.news_records",
                     killed, mined, damaged), false);
         }
@@ -181,11 +181,11 @@ public final class KogasaInfoCommands {
             // 穿透进度
             int pierce = KogasaEquipmentHelper.getBowPierceLevel(held);
             if (pierce > 0) {
-                ctx.getSource().sendSuccess(() -> Component.translatable(
+                KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                         "commands.kogasa_addiction.info.ranged.pierce.unlocked", pierce), false);
             } else {
                 double threshold = Config.BOW_PIERCE_GROWTH.get();
-                ctx.getSource().sendSuccess(() -> Component.translatable(
+                KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                         "commands.kogasa_addiction.info.ranged.pierce.locked",
                         KogasaNumberFormatHelper.formatPercentTrimmed(threshold, 2),
                         KogasaNumberFormatHelper.formatPercentTrimmed(growth, 2)), false);
@@ -194,18 +194,18 @@ public final class KogasaInfoCommands {
             // 多发进度
             int arrows = KogasaEquipmentHelper.getBowArrowCount(held);
             if (arrows >= 3) {
-                ctx.getSource().sendSuccess(() -> Component.translatable(
+                KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                         "commands.kogasa_addiction.info.ranged.multishot.max"), false);
             } else if (arrows == 2) {
                 double threshold = Config.BOW_MULTISHOT_3_GROWTH.get();
-                ctx.getSource().sendSuccess(() -> Component.translatable(
+                KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                         "commands.kogasa_addiction.info.ranged.multishot.progress",
                         arrows,
                         KogasaNumberFormatHelper.formatPercentTrimmed(threshold, 2),
                         KogasaNumberFormatHelper.formatPercentTrimmed(growth, 2)), false);
             } else {
                 double threshold = Config.BOW_MULTISHOT_2_GROWTH.get();
-                ctx.getSource().sendSuccess(() -> Component.translatable(
+                KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                         "commands.kogasa_addiction.info.ranged.multishot.progress",
                         arrows,
                         KogasaNumberFormatHelper.formatPercentTrimmed(threshold, 2),
@@ -220,33 +220,33 @@ public final class KogasaInfoCommands {
                     var kind = KogasaAbilityData.getAmmoPotionKind(held);
                     if (potionId != null) {
                         Component potionName = KogasaDisplayHelper.getPotionDisplayName(potionId, kind);
-                        ctx.getSource().sendSuccess(() -> Component.translatable(
+                        KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                                         "commands.kogasa_addiction.info.ammo.potion")
                                 .append(potionName), false);
                     }
                 } else if (ammoType == KogasaAbilityData.AmmoType.FIREWORK) {
-                    ctx.getSource().sendSuccess(() -> Component.translatable(
+                    KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                             "commands.kogasa_addiction.info.ammo.firework"), false);
                 }
             } else {
-                ctx.getSource().sendSuccess(() -> Component.translatable(
+                KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                         "commands.kogasa_addiction.info.ammo.none"), false);
             }
 
             // 不消耗箭矢概率
             double noConsume = KogasaEquipmentHelper.getNoConsumeArrowChance(held);
             if (noConsume >= 1.0) {
-                ctx.getSource().sendSuccess(() -> Component.translatable(
+                KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                         "commands.kogasa_addiction.info.ranged.no_consume.max"), false);
             } else if (noConsume > 0) {
                 final String pct = KogasaNumberFormatHelper.formatPercentTrimmed(noConsume, 0);
-                ctx.getSource().sendSuccess(() -> Component.translatable(
+                KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                         "commands.kogasa_addiction.info.ranged.no_consume", pct), false);
             } else {
                 double start = Config.NO_CONSUME_ARROW_START_GROWTH.get();
                 final String cur = KogasaNumberFormatHelper.formatPercentTrimmed(growth, 0);
                 final String need = KogasaNumberFormatHelper.formatPercentTrimmed(start, 0);
-                ctx.getSource().sendSuccess(() -> Component.translatable(
+                KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                         "commands.kogasa_addiction.info.ranged.no_consume.locked", cur, need), false);
             }
         }
@@ -255,7 +255,7 @@ public final class KogasaInfoCommands {
         boolean hasTenshiArmor = false;
         for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
             ItemStack armor = player.getItemBySlot(slot);
-            if (armor.getItem() instanceof IKogasaEquipment && KogasaAbilityData.hasAbility(armor, KogasaAbility.TENSHI)) {
+            if (net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(armor) && KogasaAbilityData.hasAbility(armor, KogasaAbility.TENSHI)) {
                 hasTenshiArmor = true;
                 break;
             }
@@ -269,7 +269,7 @@ public final class KogasaInfoCommands {
             int resistanceLevel = (int) Math.min(5, Math.floor(charge / (threshold / 4.0)));
 
             // 输出护甲蓄力状态 (传入：当前值, 阈值, 抗性等级, 爆发百分比)
-            ctx.getSource().sendSuccess(() -> Component.translatable(
+            KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                     "commands.kogasa_addiction.info.tenshi.armor",
                     KogasaNumberFormatHelper.formatTrimmed(charge, 1),
                     KogasaNumberFormatHelper.formatTrimmed(threshold, 1),
@@ -279,25 +279,25 @@ public final class KogasaInfoCommands {
 
             // 蓄满时额外显示 ready 提示
             if (isReady) {
-                ctx.getSource().sendSuccess(() -> Component.translatable(
+                KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                         "commands.kogasa_addiction.info.tenshi.ready"), false);
             }
         }
 
         // 检查武器是否带有天子能力
-        if (held.getItem() instanceof IKogasaEquipment && KogasaAbilityData.hasAbility(held, KogasaAbility.TENSHI) && isRangedWeapon(held)) {
+        if (net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(held) && KogasaAbilityData.hasAbility(held, KogasaAbility.TENSHI) && isRangedWeapon(held)) {
             int debuffSecs = Config.TENSHI_DEBUFF_DURATION_SECONDS.get();
             double flyingMult = Config.TENSHI_FLYING_MOB_MULTIPLIER.get();
 
             // 输出武器命中状态 (传入：Debuff秒数, 飞行生物倍率)
-            ctx.getSource().sendSuccess(() -> Component.translatable(
+            KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                     "commands.kogasa_addiction.info.tenshi.weapon",
                     debuffSecs,
                     KogasaNumberFormatHelper.formatTrimmed(flyingMult, 1)
             ), false);
 
             // 输出 Buff 说明
-            ctx.getSource().sendSuccess(() -> Component.translatable(
+            KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                     "commands.kogasa_addiction.info.tenshi.buff"), false);
         }
 

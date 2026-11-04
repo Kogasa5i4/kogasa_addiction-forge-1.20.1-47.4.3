@@ -78,7 +78,7 @@ public final class KogasaEnchantCommands {
                                Enchantment enchantment, int level)
             throws CommandSyntaxException {
         ServerPlayer player = ctx.getSource().getPlayerOrException();
-        ItemStack held = KogasaCommandSupport.requireKogasaEquipment(ctx);
+        ItemStack held = KogasaCommandSupport.requireAnyHeldItem(ctx);
         if (held.isEmpty()) return 0;
 
         Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(held);
@@ -99,7 +99,7 @@ public final class KogasaEnchantCommands {
     private static int growEnchant(CommandContext<CommandSourceStack> ctx, int count)
             throws CommandSyntaxException {
         ServerPlayer player = ctx.getSource().getPlayerOrException();
-        ItemStack held = KogasaCommandSupport.requireKogasaEquipment(ctx);
+        ItemStack held = KogasaCommandSupport.requireAnyHeldItem(ctx);
         if (held.isEmpty()) return 0;
 
         // 预检：已满级直接失败
@@ -149,7 +149,7 @@ public final class KogasaEnchantCommands {
     private static int triggerEnchant(CommandContext<CommandSourceStack> ctx)
             throws CommandSyntaxException {
         ServerPlayer player = ctx.getSource().getPlayerOrException();
-        ItemStack held = KogasaCommandSupport.requireKogasaEquipment(ctx);
+        ItemStack held = KogasaCommandSupport.requireAnyHeldItem(ctx);
         if (held.isEmpty()) return 0;
 
         double before = KogasaEquipmentData.getGrowth(held);
@@ -176,7 +176,7 @@ public final class KogasaEnchantCommands {
                                      Enchantment enchantment)
             throws CommandSyntaxException {
         ServerPlayer player = ctx.getSource().getPlayerOrException();
-        ItemStack held = KogasaCommandSupport.requireKogasaEquipment(ctx);
+        ItemStack held = KogasaCommandSupport.requireAnyHeldItem(ctx);
         if (held.isEmpty()) return 0;
 
         Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(held);
@@ -203,7 +203,7 @@ public final class KogasaEnchantCommands {
     private static int clearEnchants(CommandContext<CommandSourceStack> ctx)
             throws CommandSyntaxException {
         ServerPlayer player = ctx.getSource().getPlayerOrException();
-        ItemStack held = KogasaCommandSupport.requireKogasaEquipment(ctx);
+        ItemStack held = KogasaCommandSupport.requireAnyHeldItem(ctx);
         if (held.isEmpty()) return 0;
 
         Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(held);
@@ -229,7 +229,7 @@ public final class KogasaEnchantCommands {
                                        Enchantment enchantment, int level)
             throws CommandSyntaxException {
         ServerPlayer player = ctx.getSource().getPlayerOrException();
-        ItemStack held = KogasaCommandSupport.requireKogasaEquipment(ctx);
+        ItemStack held = KogasaCommandSupport.requireAnyHeldItem(ctx);
         if (held.isEmpty()) return 0;
 
         Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(held);
@@ -258,7 +258,7 @@ public final class KogasaEnchantCommands {
     private static int resetGrowthEnchant(CommandContext<CommandSourceStack> ctx)
             throws CommandSyntaxException {
         ServerPlayer player = ctx.getSource().getPlayerOrException();
-        ItemStack held = KogasaCommandSupport.requireKogasaEquipment(ctx);
+        ItemStack held = KogasaCommandSupport.requireAnyHeldItem(ctx);
         if (held.isEmpty()) return 0;
 
         int before = KogasaEquipmentData.getGrowthEnchantsGranted(held);

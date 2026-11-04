@@ -31,7 +31,7 @@ public final class KogasaTooltipHandler {
     @SubscribeEvent
     public static void onTooltip(ItemTooltipEvent event) {
         ItemStack stack = event.getItemStack();
-        boolean isKogasa = stack.getItem() instanceof IKogasaEquipment;
+        boolean isKogasa = net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(stack);
         List<Component> tooltip = event.getToolTip();
 
         if (!isKogasa) {

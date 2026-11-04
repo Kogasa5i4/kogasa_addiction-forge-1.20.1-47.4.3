@@ -36,7 +36,7 @@ public interface IKogasaEquipment {
      */
     static boolean isCorrectToolForDrops(ItemStack stack, BlockState state, Tier tier,
                                          BooleanSupplier vanillaFallback) {
-        if (stack.getItem() instanceof IKogasaEquipment) {
+        if (net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(stack)) {
             Tier effective = KogasaEquipmentHelper.getDynamicHarvestTier(stack, tier);
             return TierSortingRegistry.isCorrectTierForDrops(effective, state);
         }
@@ -53,10 +53,5 @@ public interface IKogasaEquipment {
      */
     default @NotNull Component getName(@NotNull ItemStack stack) {
         return Component.translatable(stack.getDescriptionId()).withStyle(ChatFormatting.GOLD);
-    }
-
-    /** 所有本模组装备统一为 EPIC 稀有度 */
-    default @NotNull Rarity getRarity(@NotNull ItemStack stack) {
-        return Rarity.EPIC;
     }
 }

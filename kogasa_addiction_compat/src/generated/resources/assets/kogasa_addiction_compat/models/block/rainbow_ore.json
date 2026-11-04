@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "kogasa_addiction_compat:block/rainbow_ore"
+  }
+}

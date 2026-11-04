@@ -31,3 +31,6 @@ forge*changelog.txt
 
 # datagen 运行目录
 run-data
+
+# datagen 缓存（每次 runData 自动清理，不入版本库）
+**/src/generated/resources/.cache/

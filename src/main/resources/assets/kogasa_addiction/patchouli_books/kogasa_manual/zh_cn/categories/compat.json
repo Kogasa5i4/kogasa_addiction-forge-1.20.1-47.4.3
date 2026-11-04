@@ -1,0 +1,7 @@
+{
+  "name": "book.kogasa_addiction_compat.category.compat.name",
+  "description": "book.kogasa_addiction_compat.category.compat.desc",
+  "icon": "kogasa_addiction:kogasa_ingot",
+  "flag": "kogasa_addiction:compat_entries",
+  "sortnum": 100
+}

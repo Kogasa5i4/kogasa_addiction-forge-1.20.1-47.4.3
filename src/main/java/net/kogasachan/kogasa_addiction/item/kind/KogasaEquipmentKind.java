@@ -34,11 +34,11 @@ public enum KogasaEquipmentKind {
 
     // ---- 远程：弩必须早于弓 ----
     CROSSBOW("crossbow", Tags.Items.TOOLS_CROSSBOWS, -2.8D),
-    BOW("bow", Tags.Items.TOOLS_BOWS, -2.8D),
+    BOW("bow", Tags.Items.TOOLS_BOWS, -2.8D, "crossbow"),
 
     // ---- 工具：镐必须早于斧 ----
     PICKAXE("pickaxe", ItemTags.PICKAXES, -2.8D),
-    AXE("axe", ItemTags.AXES, -3.2D),
+    AXE("axe", ItemTags.AXES, -3.2D, "pickaxe"),
     SHOVEL("shovel", ItemTags.SHOVELS, -3.0D),
     HOE("hoe", ItemTags.HOES, -3.0D),
     SWORD("sword", ItemTags.SWORDS, -2.4D),
@@ -52,11 +52,15 @@ public enum KogasaEquipmentKind {
     private final String suffix;
     private final TagKey<Item> materialTag;
     private final double baseAttackSpeed;
+    /** 更具体的同义后缀：命中这些后缀时说明是别的类型（如 crossbow / pickaxe），本类型必须让位 */
+    private final String[] excludedSuffixes;
 
-    KogasaEquipmentKind(String suffix, TagKey<Item> materialTag, double baseAttackSpeed) {
+    KogasaEquipmentKind(String suffix, TagKey<Item> materialTag, double baseAttackSpeed,
+                        String... excludedSuffixes) {
         this.suffix = suffix;
         this.materialTag = materialTag;
         this.baseAttackSpeed = baseAttackSpeed;
+        this.excludedSuffixes = excludedSuffixes;
     }
 
     /** 类型后缀，用于 tooltip / 进度 / 资源名拼接 */
@@ -79,6 +83,10 @@ public enum KogasaEquipmentKind {
      */
     public boolean matches(Item item) {
         if (item == null || item == Items.AIR) return false;
+
+        // 否定判断放最前面：即使某个模组把弩塞进 #forge:tools/bows、把镐塞进 #minecraft:axes，
+        // 只要名字是 crossbow / pickaxe，就绝不按 bow / axe 处理。
+        if (nameEndsWithAny(item, excludedSuffixes)) return false;
 
         if (matchesClass(item)) return true;
         // ItemStack.is(TagKey) 自 1.18 起一直是稳定 API，
@@ -126,9 +134,11 @@ public enum KogasaEquipmentKind {
             // 三叉戟类统一按飞刀处理：这与旧实现 "left instanceof TridentItem 时接受剑/三叉戟/刀" 一致
             case KNIFE -> item instanceof TridentItem;
             case CROSSBOW -> item instanceof CrossbowItem;
-            case BOW -> item instanceof BowItem;
+            // 否定判断：有些模组的弩继承 BowItem，必须先排除
+            case BOW -> !(item instanceof CrossbowItem) && item instanceof BowItem;
             case PICKAXE -> item instanceof PickaxeItem;
-            case AXE -> item instanceof AxeItem;
+            // 否定判断：避免奇怪继承（镐继承斧基类）时被当成斧
+            case AXE -> !(item instanceof PickaxeItem) && item instanceof AxeItem;
             case SHOVEL -> item instanceof ShovelItem;
             case HOE -> item instanceof HoeItem;
             case SWORD -> item instanceof SwordItem;
@@ -146,5 +156,13 @@ public enum KogasaEquipmentKind {
     private static boolean nameEndsWith(Item item, String suffix) {
         ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
         return id != null && id.getPath().endsWith(suffix);
+    }
+
+    private static boolean nameEndsWithAny(Item item, String[] suffixes) {
+        if (suffixes.length == 0) return false;
+        for (String suffix : suffixes) {
+            if (nameEndsWith(item, suffix)) return true;
+        }
+        return false;
     }
 }

@@ -155,7 +155,7 @@ public class TimestopHandler {
                 SoundEvents.BELL_RESONATE, SoundSource.PLAYERS, 1.0F, 0.5F);
         KogasaAdvancementHelper.grant(player, "perfect_elegant");
         player.displayClientMessage(Component.translatable(
-                "message.kogasa_addiction.timestop.start", seconds).withStyle(ChatFormatting.BLUE), false);
+                "message.kogasa_addiction.timestop.start", seconds).withStyle(ChatFormatting.BLUE), true);
     }
 
     // ==================== 每个 tick 维护会话 ====================
@@ -319,7 +319,7 @@ public class TimestopHandler {
     }
 
     private static boolean hasSakuyaAbility(ItemStack stack) {
-        return stack.getItem() instanceof IKogasaEquipment
+        return net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(stack)
                 && KogasaAbilityData.hasAbility(stack, KogasaAbility.SAKUYA);
     }
 }

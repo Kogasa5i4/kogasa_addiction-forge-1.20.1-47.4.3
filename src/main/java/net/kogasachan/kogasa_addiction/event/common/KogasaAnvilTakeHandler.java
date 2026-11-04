@@ -19,7 +19,7 @@ public class KogasaAnvilTakeHandler {
         ItemStack output = event.getOutput();
 
         // 普通点击取出：直接检查输出槽的物品
-        if (!output.isEmpty() && output.getItem() instanceof IKogasaEquipment) {
+        if (!output.isEmpty() && net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(output)) {
             KogasaAdvancementHelper.checkAndGrant(player, output);
         }
         // Shift 快捷取出：直接扫全背包

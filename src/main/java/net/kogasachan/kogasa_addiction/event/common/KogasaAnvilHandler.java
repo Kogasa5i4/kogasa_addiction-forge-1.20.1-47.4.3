@@ -7,6 +7,8 @@ import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.item.KogasaAbilityIngotItem;
 import net.kogasachan.kogasa_addiction.item.ModItems;
+import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKind;
+import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKinds;
 import net.kogasachan.kogasa_addiction.item.SakuyaKnifeItem;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
@@ -60,7 +62,7 @@ public class KogasaAnvilHandler {
         }
 
         // 左侧必须是 Kogasa 装备
-        if (!(left.getItem() instanceof IKogasaEquipment)) return;
+        if (!net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(left)) return;
         if (right.isEmpty()) return;
 
         // ========== 分支 1：能力锻造（右侧是能力锭） ==========
@@ -183,8 +185,9 @@ public class KogasaAnvilHandler {
         int maxRe = KogasaEquipmentHelper.getEffectiveMaxReinforcements(left);
 
         // ===== 判断材料是否有效 =====
-        boolean isBowOrCrossbow = left.getItem() instanceof BowItem
-                || left.getItem() instanceof CrossbowItem;
+        KogasaEquipmentKind leftKind = KogasaEquipmentKinds.of(left);
+        boolean isBowOrCrossbow = leftKind == KogasaEquipmentKind.BOW
+                || leftKind == KogasaEquipmentKind.CROSSBOW;
         boolean isArrowMaterial = isBowOrCrossbow && right.is(ItemTags.ARROWS);
 
         String materialId;
@@ -195,8 +198,8 @@ public class KogasaAnvilHandler {
                 ResourceLocation arrowId = ForgeRegistries.ITEMS.getKey(right.getItem());
                 if (arrowId == null) return;
                 materialId = "arrow:" + arrowId;
-            } else if (right.getItem() instanceof BowItem
-                    || right.getItem() instanceof CrossbowItem) {
+            } else if (KogasaEquipmentKinds.of(right) == leftKind) {
+                // 同类型才能当强化材料：弓不能用弩强化，弩也不能用弓
                 ResourceLocation rightId = ForgeRegistries.ITEMS.getKey(right.getItem());
                 if (rightId == null) return;
                 materialId = rightId.toString();

@@ -38,6 +38,7 @@ public class CreativeTabHandler {
             event.accept(ModItems.KOGASA_AXE);
             event.accept(ModItems.KOGASA_SHOVEL);
             event.accept(ModItems.KOGASA_HOE);
+            event.accept(ModItems.KOGASA_MANUAL);
         }
     }
 }

@@ -8,6 +8,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
+import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKind;
+import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKinds;
 import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
@@ -118,7 +120,9 @@ public final class KogasaEquipmentCommands {
         }
 
         // ===== 判断材料类型 =====
-        boolean isRanged = isRangedWeapon(held);
+        KogasaEquipmentKind heldKind = KogasaEquipmentKinds.of(held);
+        boolean isRanged = heldKind == KogasaEquipmentKind.BOW
+                || heldKind == KogasaEquipmentKind.CROSSBOW;
         boolean isArrowMaterial = isRanged && material.is(ItemTags.ARROWS);
 
         String materialId;
@@ -127,8 +131,8 @@ public final class KogasaEquipmentCommands {
             if (isArrowMaterial) {
                 materialId = "arrow:" + ForgeRegistries.ITEMS.getKey(material.getItem());
                 // 箭矢使用独立 materialId，且不检查重复，允许重复使用
-            } else if (material.getItem() instanceof BowItem
-                    || material.getItem() instanceof CrossbowItem) {
+            } else if (KogasaEquipmentKinds.of(material) == heldKind) {
+                // 弓/弩只能吸收同类型
                 ResourceLocation rightId = ForgeRegistries.ITEMS.getKey(material.getItem());
                 if (rightId == null) return 0;
                 materialId = rightId.toString();
@@ -143,8 +147,7 @@ public final class KogasaEquipmentCommands {
                 return 0;
             }
         } else {
-            TagKey<Item> matchTag = KogasaEquipmentHelper.getMatchingTag(held);
-            if (matchTag == null || !material.is(matchTag)) {
+            if (!KogasaEquipmentHelper.matchesReinforcementMaterial(held, material)) {
                 ctx.getSource().sendFailure(Component.translatable(
                         "commands.kogasa_addiction.error.wrong_type"));
                 return 0;

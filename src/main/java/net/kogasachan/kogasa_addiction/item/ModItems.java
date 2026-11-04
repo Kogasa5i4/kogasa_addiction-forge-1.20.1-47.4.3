@@ -40,79 +40,84 @@ public class ModItems {
         return ingot;
     }
 
+    // 手册（独立物品，右键打开帕秋莉手册）
+    public static final RegistryObject<Item> KOGASA_MANUAL = ITEMS.register(
+            "kogasa_manual",
+            () -> new KogasaManualItem(new Item.Properties().fireResistant().stacksTo(1).rarity(Rarity.RARE)));
+
     // 工具/武器
     public static final RegistryObject<Item> KOGASA_SWORD = ITEMS.register(
             "kogasa_sword",
             () -> new KogasaSwordItem(KogasaTier.INSTANCE, 3, -2.4F,
-                    new Item.Properties().rarity(Rarity.EPIC))
+                    new Item.Properties().fireResistant().rarity(Rarity.EPIC))
     );
     public static final RegistryObject<Item> KOGASA_PICKAXE = ITEMS.register(
             "kogasa_pickaxe",
             () -> new KogasaPickaxeItem(KogasaTier.INSTANCE, 1, -2.8F,
-                    new Item.Properties().rarity(Rarity.EPIC))
+                    new Item.Properties().fireResistant().rarity(Rarity.EPIC))
     );
     public static final RegistryObject<Item> KOGASA_AXE = ITEMS.register(
             "kogasa_axe",
             () -> new KogasaAxeItem(KogasaTier.INSTANCE, 6.0F, -3.2F,
-                    new Item.Properties().rarity(Rarity.EPIC))
+                    new Item.Properties().fireResistant().rarity(Rarity.EPIC))
     );
     public static final RegistryObject<Item> KOGASA_SHOVEL = ITEMS.register(
             "kogasa_shovel",
             () -> new KogasaShovelItem(KogasaTier.INSTANCE, 1.5F, -3.0F,
-                    new Item.Properties().rarity(Rarity.EPIC))
+                    new Item.Properties().fireResistant().rarity(Rarity.EPIC))
     );
     public static final RegistryObject<Item> KOGASA_HOE = ITEMS.register(
             "kogasa_hoe",
             () -> new KogasaHoeItem(KogasaTier.INSTANCE, 0, -3.0F,
-                    new Item.Properties().rarity(Rarity.EPIC))
+                    new Item.Properties().fireResistant().rarity(Rarity.EPIC))
     );
 
     // 护甲
     public static final RegistryObject<Item> TENSHI_HELMET = ITEMS.register(
             "tenshi_helmet",
             () -> new KogasaArmorItem(TenshiArmorMaterial.INSTANCE,
-                    ArmorItem.Type.HELMET, new Item.Properties().rarity(Rarity.EPIC))
+                    ArmorItem.Type.HELMET, new Item.Properties().fireResistant().rarity(Rarity.EPIC))
     );
     public static final RegistryObject<Item> TENSHI_CHESTPLATE = ITEMS.register(
             "tenshi_chestplate",
             () -> new KogasaArmorItem(TenshiArmorMaterial.INSTANCE,
-                    ArmorItem.Type.CHESTPLATE, new Item.Properties().rarity(Rarity.EPIC))
+                    ArmorItem.Type.CHESTPLATE, new Item.Properties().fireResistant().rarity(Rarity.EPIC))
     );
     public static final RegistryObject<Item> TENSHI_LEGGINGS = ITEMS.register(
             "tenshi_leggings",
             () -> new KogasaArmorItem(TenshiArmorMaterial.INSTANCE,
-                    ArmorItem.Type.LEGGINGS, new Item.Properties().rarity(Rarity.EPIC))
+                    ArmorItem.Type.LEGGINGS, new Item.Properties().fireResistant().rarity(Rarity.EPIC))
     );
     public static final RegistryObject<Item> TENSHI_BOOTS = ITEMS.register(
             "tenshi_boots",
             () -> new KogasaArmorItem(TenshiArmorMaterial.INSTANCE,
-                    ArmorItem.Type.BOOTS, new Item.Properties().rarity(Rarity.EPIC))
+                    ArmorItem.Type.BOOTS, new Item.Properties().fireResistant().rarity(Rarity.EPIC))
     );
 
     // 远程
     public static final RegistryObject<Item> AYA_BOW = ITEMS.register(
             "aya_bow",
-            () -> new AyaBowItem(new Item.Properties().durability(384).rarity(Rarity.EPIC))
+            () -> new AyaBowItem(new Item.Properties().fireResistant().durability(384).rarity(Rarity.EPIC))
     );
     public static final RegistryObject<Item> AYA_CROSSBOW = ITEMS.register(
             "aya_crossbow",
-            () -> new AyaCrossbowItem(new Item.Properties().durability(465).rarity(Rarity.EPIC))
+            () -> new AyaCrossbowItem(new Item.Properties().fireResistant().durability(465).rarity(Rarity.EPIC))
     );
     public static final RegistryObject<Item> AYA_ARROW = ITEMS.register(
             "aya_arrow",
-            () -> new AyaArrowItem(new Item.Properties().rarity(Rarity.EPIC))
+            () -> new AyaArrowItem(new Item.Properties().fireResistant().rarity(Rarity.EPIC))
     );
 
     // 咲夜飞刀
     public static final RegistryObject<Item> SAKUYA_KNIFE = ITEMS.register(
             "sakuya_knife",
-            () -> new SakuyaKnifeItem(new Item.Properties().stacksTo(3).fireResistant().rarity(Rarity.EPIC))
+            () -> new SakuyaKnifeItem(new Item.Properties().fireResistant().stacksTo(3).fireResistant().rarity(Rarity.EPIC))
     );
 
     // 损坏的咲夜飞刀
     public static final RegistryObject<Item> BROKEN_SAKUYA_KNIFE = ITEMS.register(
             "broken_sakuya_knife",
-            () -> new Item(new Item.Properties().stacksTo(6).fireResistant().rarity(Rarity.EPIC)) {
+            () -> new Item(new Item.Properties().fireResistant().stacksTo(6).fireResistant().rarity(Rarity.EPIC)) {
                 @Override
                 public @NotNull Component getName(@NotNull ItemStack stack) {
                     return super.getName(stack).copy()
@@ -130,6 +135,6 @@ public class ModItems {
     public static final RegistryObject<Item> FUMO = ITEMS.register(
             "fumo",
             () -> new FumoItem(FumoTier.INSTANCE, 5, -2.0F,
-                    new Item.Properties().rarity(Rarity.EPIC))
+                    new Item.Properties().fireResistant().rarity(Rarity.EPIC))
     );
 }

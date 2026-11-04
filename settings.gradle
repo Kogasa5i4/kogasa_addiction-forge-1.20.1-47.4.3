@@ -15,9 +15,9 @@ plugins {
     id 'org.gradle.toolchains.foojay-resolver-convention' version '0.7.0'
 }
 
-// 弹幕附属子工程：作为复合构建（composite build）挂进来。
+// 附属子工程：作为复合构建（composite build）挂进来。
 // 好处：
 //   1. IDEA 里只需要一个 Gradle 入口，子工程任务自动出现在右侧 Gradle 栏；
 //   2. 两个工程统一用本工程的 Gradle 8.8 wrapper，避免 IDEA 用自带的 Gradle 9 跑子工程
 //      （ForgeGradle 6 不支持 Gradle 9，runClient 会在配置阶段直接失败）。
-includeBuild 'kogasa_addiction_danmaku'
+includeBuild 'kogasa_addiction_compat'

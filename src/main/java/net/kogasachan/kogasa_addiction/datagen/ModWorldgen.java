@@ -43,12 +43,12 @@ public final class ModWorldgen {
     }
 
     private static final List<Def> DEFS = List.of(
-            new Def("cirno", "#forge:is_snowy", 0, true, 36, 9, 999951467),
-            new Def("hut", "#minecraft:is_overworld", 0, true, 48, 12, 986751432),
-            new Def("koishi", "#minecraft:is_overworld", 0, true, 32, 8, 102851455),
-            new Def("mystia_izakaya", "#minecraft:is_forest", 0, true, 16, 4, 144233985),
-            new Def("tree", "minecraft:cherry_grove", 0, true, 48, 12, 987652031),
-            new Def("wall", "minecraft:lush_caves", -30, false, 16, 4, 789156432)
+            new Def("cirno", "#forge:is_snowy", 0, true, 72, 18, 999951467),
+            new Def("hut", "#minecraft:is_overworld", 0, true, 96, 24, 986751432),
+            new Def("koishi", "#minecraft:is_overworld", 0, true, 64, 16, 102851455),
+            new Def("mystia_izakaya", "#minecraft:is_forest", 0, true, 32, 8, 144233985),
+            new Def("tree", "minecraft:cherry_grove", 0, true, 96, 24, 987652031),
+            new Def("wall", "minecraft:lush_caves", -30, false, 32, 8, 789156432)
     );
 
     private ModWorldgen() {

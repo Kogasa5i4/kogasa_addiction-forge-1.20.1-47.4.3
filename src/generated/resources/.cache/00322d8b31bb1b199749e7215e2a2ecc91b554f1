@@ -1,7 +1,0 @@
-// 1.20.1	2026-11-03T14:11:11.4696085	Mod Damage Type Tags
-387f861828728eb2cd056526d7389527c4f7a41d data/minecraft/tags/damage_type/always_hurts_ender_dragons.json
-387f861828728eb2cd056526d7389527c4f7a41d data/minecraft/tags/damage_type/bypasses_armor.json
-387f861828728eb2cd056526d7389527c4f7a41d data/minecraft/tags/damage_type/bypasses_effects.json
-387f861828728eb2cd056526d7389527c4f7a41d data/minecraft/tags/damage_type/bypasses_enchantments.json
-387f861828728eb2cd056526d7389527c4f7a41d data/minecraft/tags/damage_type/bypasses_resistance.json
-387f861828728eb2cd056526d7389527c4f7a41d data/minecraft/tags/damage_type/bypasses_shield.json

@@ -7,7 +7,9 @@ import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaDisplayHelper;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.BowItem;
@@ -75,7 +77,7 @@ public final class KogasaCommandSupport {
     public static ItemStack requireKogasaEquipment(CommandContext<CommandSourceStack> ctx)
             throws CommandSyntaxException {
         ItemStack held = ctx.getSource().getPlayerOrException().getMainHandItem();
-        if (!(held.getItem() instanceof IKogasaEquipment)) {
+        if (!net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(held)) {
             ctx.getSource().sendFailure(Component.translatable(
                     "commands.kogasa_addiction.error.not_kogasa"));
             return ItemStack.EMPTY;
@@ -90,5 +92,41 @@ public final class KogasaCommandSupport {
 
     public static Component getMaterialDisplayName(String id) {
         return KogasaDisplayHelper.getItemDisplayName(id);
+    }
+    /**
+     * 通用"主手必须有物品"前置校验：不要求是本模组装备。
+     * 主手为空时发 {@code error.empty_hand} 并返回 {@link ItemStack#EMPTY}。
+     */
+    public static ItemStack requireAnyHeldItem(CommandContext<CommandSourceStack> ctx)
+            throws CommandSyntaxException {
+        ItemStack held = ctx.getSource().getPlayerOrException().getMainHandItem();
+        if (held.isEmpty()) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.empty_hand"));
+            return ItemStack.EMPTY;
+        }
+        return held;
+    }
+
+    /** 给一行文本加上"点击复制整行"与悬停提示 */
+    public static Component copyable(Component line) {
+        // 去掉 § 颜色码与首尾空白，复制到剪贴板的才是"有意义的部分"
+        String plain = net.minecraft.ChatFormatting.stripFormatting(line.getString()).trim();
+        if (plain.isBlank()) {
+            return line;
+        }
+        return line.copy().withStyle(style -> style
+                .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, plain))
+                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                        Component.translatable("commands.kogasa_addiction.copy.hint"))));
+    }
+
+    public static void sendCopyable(CommandSourceStack source, Component line) {
+        source.sendSuccess(() -> copyable(line), false);
+    }
+
+    /** 兼容原来的 sendSuccess(supplier, false) 调用形态，便于批量替换 */
+    public static void sendCopyable(CommandSourceStack source, Component line, boolean broadcast) {
+        source.sendSuccess(() -> copyable(line), broadcast);
     }
 }

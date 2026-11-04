@@ -37,6 +37,21 @@ import java.util.Map;
  */
 public final class KogasaConfigCommands {
 
+    /**
+     * 外部（附属模组）配置项：命令里用 {@code prefix:path} 访问，例如
+     * {@code compat:compat.enableCompatEquipment}。
+     */
+    public record ExternalConfig(String prefix, ForgeConfigSpec spec,
+                                 java.util.function.Supplier<Map<String, ForgeConfigSpec.ConfigValue<?>>> values) {
+    }
+
+    private static final java.util.List<ExternalConfig> EXTERNAL_CONFIGS = new java.util.ArrayList<>();
+
+    public static void registerExternalConfig(String prefix, ForgeConfigSpec spec,
+            java.util.function.Supplier<Map<String, ForgeConfigSpec.ConfigValue<?>>> values) {
+        EXTERNAL_CONFIGS.add(new ExternalConfig(prefix, spec, values));
+    }
+
     /** 路径 → 配置值句柄（首次使用时构建） */
     private static Map<String, ForgeConfigSpec.ConfigValue<?>> values;
 
@@ -131,7 +146,7 @@ public final class KogasaConfigCommands {
             return 0;
         }
 
-        Config.SPEC.save();
+        saveAllSpecs();
         // 缓存是按热路径手写的，改完配置只需要刷新一次
         ModConfigCache.refresh();
         // 把新配置同步给所有客户端（tooltip / 帕秋莉手册要用）
@@ -156,7 +171,7 @@ public final class KogasaConfigCommands {
 
         Object oldValue = value.get();
         setRaw(value, value.getDefault());
-        Config.SPEC.save();
+        saveAllSpecs();
         ModConfigCache.refresh();
         ConfigSyncHandler.broadcastAll(ctx.getSource().getServer());
 
@@ -245,8 +260,23 @@ public final class KogasaConfigCommands {
         ((ForgeConfigSpec.ConfigValue) value).set(newValue);
     }
 
-    /** "路径 → 句柄"表（{@link ConfigEntries} 里统一维护） */
+    /** "路径 → 句柄"表：主模组配置 + 附属注册的外部配置（带 prefix: 前缀） */
     private static Map<String, ForgeConfigSpec.ConfigValue<?>> valueMap() {
-        return ConfigEntries.values();
+        Map<String, ForgeConfigSpec.ConfigValue<?>> merged =
+                new java.util.LinkedHashMap<>(ConfigEntries.values());
+        for (ExternalConfig external : EXTERNAL_CONFIGS) {
+            for (Map.Entry<String, ForgeConfigSpec.ConfigValue<?>> entry : external.values().get().entrySet()) {
+                merged.put(external.prefix() + ":" + entry.getKey(), entry.getValue());
+            }
+        }
+        return merged;
+    }
+
+    /** 保存主模组与所有外部 spec */
+    private static void saveAllSpecs() {
+        Config.SPEC.save();
+        for (ExternalConfig external : EXTERNAL_CONFIGS) {
+            external.spec().save();
+        }
     }
 }

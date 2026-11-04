@@ -73,7 +73,7 @@ public class CirnoAbilityHandler {
 
     private static void checkAndRevive(ServerPlayer player, ItemStack stack) {
         if (stack.isEmpty()) return;
-        if (!(stack.getItem() instanceof IKogasaEquipment)) return;
+        if (!net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(stack)) return;
         if (!KogasaAbilityData.hasAbility(stack, KogasaAbility.CIRNO)) return;
 
         // 耐久是否接近耗尽（下次损坏就会碎）

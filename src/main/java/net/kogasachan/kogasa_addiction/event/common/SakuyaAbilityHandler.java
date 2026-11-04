@@ -24,9 +24,9 @@ public class SakuyaAbilityHandler {
 
         // 获取主手或副手的武器
         ItemStack weapon = player.getMainHandItem();
-        if (!(weapon.getItem() instanceof IKogasaEquipment)) {
+        if (!net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(weapon)) {
             weapon = player.getOffhandItem();
-            if (!(weapon.getItem() instanceof IKogasaEquipment)) return;
+            if (!net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(weapon)) return;
         }
 
         // 检查是否拥有咲夜能力

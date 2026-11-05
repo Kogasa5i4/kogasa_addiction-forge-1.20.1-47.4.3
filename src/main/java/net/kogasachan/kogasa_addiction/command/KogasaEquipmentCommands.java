@@ -7,6 +7,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
+import net.kogasachan.kogasa_addiction.event.common.FirstJoinRewardHandler;
+import net.kogasachan.kogasa_addiction.event.common.ManualGrantHandler;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKind;
 import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKinds;
@@ -18,6 +20,7 @@ import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.item.ItemArgument;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -51,12 +54,7 @@ public final class KogasaEquipmentCommands {
                 .executes(KogasaEquipmentCommands::reset));
         root.then(Commands.literal("resetfirstjoin")
                 .requires(ADMIN)
-                .executes(ctx -> {
-                    ServerPlayer player = ctx.getSource().getPlayerOrException();
-                    player.getPersistentData().remove("KogasaFirstJoinReward");
-                    // 下次登录时由 FirstJoinRewardHandler 重新发放
-                    return 1;
-                }));
+                .executes(KogasaEquipmentCommands::regrantFirstJoin));
         // 封印装备（战利品机制）的测试命令：seal 可指定能力，缺省随机
         root.then(Commands.literal("seal")
                 .requires(ADMIN)
@@ -232,6 +230,31 @@ public final class KogasaEquipmentCommands {
 
         ctx.getSource().sendSuccess(() -> Component.translatable(
                 "commands.kogasa_addiction.unseal.success"), true);
+        return 1;
+    }
+
+    /**
+     * /kogasa resetfirstjoin：
+     * 若装备或手册有任意一个“没发过”，先把两个标记都设为发过（不消耗任何东西），
+     * 然后立即重发一份随机装备 + 一本手册；若两个都发过，则只重发、不改标记。
+     */
+    private static int regrantFirstJoin(CommandContext<CommandSourceStack> ctx)
+            throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        CompoundTag data = player.getPersistentData();
+
+        boolean equipmentGiven = data.getBoolean(FirstJoinRewardHandler.NBT_KEY);
+        boolean manualGiven = data.getBoolean(ManualGrantHandler.NBT_KEY);
+        if (!equipmentGiven || !manualGiven) {
+            data.putBoolean(FirstJoinRewardHandler.NBT_KEY, true);
+            data.putBoolean(ManualGrantHandler.NBT_KEY, true);
+        }
+
+        ItemStack equipment = FirstJoinRewardHandler.giveRandomEquipment(player);
+        ManualGrantHandler.giveManualDirect(player, false);
+
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.resetfirstjoin.success", equipment.getHoverName()), false);
         return 1;
     }
 

@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class FirstJoinRewardHandler {
 
-    private static final String NBT_KEY = "KogasaFirstJoinReward";
+    public static final String NBT_KEY = "KogasaFirstJoinReward";
 
     private static final List<Supplier<Item>> EQUIPMENT_POOL = List.of(
             ModItems.KOGASA_SWORD,
@@ -51,23 +51,7 @@ public class FirstJoinRewardHandler {
         CompoundTag data = player.getPersistentData();
         if (data.getBoolean(NBT_KEY)) return;
 
-        // ===== 1. 随机装备 =====
-        Supplier<Item> chosenSupplier =
-                EQUIPMENT_POOL.get(player.getRandom().nextInt(EQUIPMENT_POOL.size()));
-        Item chosen = chosenSupplier.get();
-        ItemStack stack = new ItemStack(chosen);
-
-        // 随机能力
-        KogasaAbility[] abilities = KogasaAbility.values();
-        KogasaAbility ability = abilities[player.getRandom().nextInt(abilities.length)];
-        KogasaAbilityData.addAbility(stack, ability);
-
-        giveItemToPlayer(player, stack);
-        // 立即结算这件装备相关的成就（不等下一次登录的 scanInventoryAndGrant）
-        KogasaAdvancementHelper.checkAndGrant(player, stack);
-
-        // 兜底：背包里已有/刚发放的所有本模组装备都检查一遍
-        KogasaAdvancementHelper.scanInventoryAndGrant(player);
+        ItemStack stack = giveRandomEquipment(player);
 
         // ===== 2. 标记已领取与反馈 =====
         data.putBoolean(NBT_KEY, true);
@@ -80,10 +64,8 @@ public class FirstJoinRewardHandler {
                         .withStyle(ChatFormatting.LIGHT_PURPLE),
                 true);
 
-        KogasaAddiction.LOGGER.info("First join reward given to {}: {} with {}",
-                player.getName().getString(),
-                chosen,
-                ability.getId());
+        KogasaAddiction.LOGGER.info("First join reward given to {}: {}",
+                player.getName().getString(), stack);
     }
 
     /**
@@ -96,5 +78,22 @@ public class FirstJoinRewardHandler {
             drop.setPickUpDelay(0);
             player.level().addFreshEntity(drop);
         }
+    }
+
+    /** 发放一件随机本模组装备（带随机能力），并结算相关成就。 */
+    public static ItemStack giveRandomEquipment(ServerPlayer player) {
+        Supplier<Item> chosenSupplier =
+                EQUIPMENT_POOL.get(player.getRandom().nextInt(EQUIPMENT_POOL.size()));
+        Item chosen = chosenSupplier.get();
+        ItemStack stack = new ItemStack(chosen);
+
+        KogasaAbility[] abilities = KogasaAbility.values();
+        KogasaAbility ability = abilities[player.getRandom().nextInt(abilities.length)];
+        KogasaAbilityData.addAbility(stack, ability);
+
+        giveItemToPlayer(player, stack);
+        KogasaAdvancementHelper.checkAndGrant(player, stack);
+        KogasaAdvancementHelper.scanInventoryAndGrant(player);
+        return stack;
     }
 }

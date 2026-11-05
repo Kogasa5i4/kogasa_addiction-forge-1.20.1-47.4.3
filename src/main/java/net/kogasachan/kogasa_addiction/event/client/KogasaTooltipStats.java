@@ -48,7 +48,7 @@ public final class KogasaTooltipStats {
 
         // ========== 2. 插入自定义攻速行（紧跟在攻击伤害行之后） ==========
         int speedLineIdx = -1;
-        if (isKogasa && hasAttackSpeed(item)) {
+        if (isKogasa && hasAttackSpeed(stack)) {
             double speed = KogasaEquipmentHelper.getDisplayAttackSpeed(stack);
             ChatFormatting color = KogasaEquipmentHelper.isAttackSpeedCapped(stack)
                     ? ChatFormatting.GOLD : ChatFormatting.DARK_GREEN;
@@ -213,11 +213,14 @@ public final class KogasaTooltipStats {
         return Component.translatable(key).getString();
     }
 
-    private static boolean hasAttackSpeed(Item item) {
+    private static boolean hasAttackSpeed(ItemStack stack) {
+        Item item = stack.getItem();
         return item instanceof SwordItem
                 || item instanceof DiggerItem
                 || item instanceof HoeItem
-                || item instanceof TridentItem;
+                || item instanceof TridentItem
+                // 普通 Item 的通用装备（如灾变武器）从它自己的属性表读基础攻速
+                || KogasaEquipmentHelper.getAttributeAttackSpeedBase(stack) != 0.0D;
     }
 
     /**

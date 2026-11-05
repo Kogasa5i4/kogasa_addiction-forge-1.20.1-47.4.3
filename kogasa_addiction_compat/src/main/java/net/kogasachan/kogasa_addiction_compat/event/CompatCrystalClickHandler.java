@@ -9,6 +9,7 @@ import net.kogasachan.kogasa_addiction_compat.network.CompatNetwork;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -52,6 +53,15 @@ public final class CompatCrystalClickHandler {
         ItemStack target = slot.getItem();
         if (target.getItem() instanceof IKogasaEquipment || KogasaCompat.hasMarker(target)) {
             return false;
+        }
+        if (!KogasaCompat.canCombine(target)) {
+            Minecraft minecraft = Minecraft.getInstance();
+            if (minecraft.player != null) {
+                minecraft.player.displayClientMessage(Component.translatable(
+                        "message.kogasa_addiction_compat.not_compatible"), true);
+            }
+            // 吃掉这次点击，避免水晶和不可兼容物品换位
+            return true;
         }
 
         if (screen instanceof CreativeModeInventoryScreen) {

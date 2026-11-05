@@ -20,6 +20,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraftforge.event.AnvilUpdateEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -330,5 +331,25 @@ public class KogasaAnvilHandler {
         }
 
         return false;
+    }
+
+    /**
+     * 模式 1 的绝对黑名单：铁砧不允许产出带黑名单附魔的物品
+     * （在其它铁砧逻辑之后执行，直接清空输出）。
+     */
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void blockBlacklistedAnvilOutput(AnvilUpdateEvent event) {
+        ItemStack output = event.getOutput();
+        if (output.isEmpty()) return;
+
+        for (Enchantment enchantment : EnchantmentHelper.getEnchantments(output).keySet()) {
+            ResourceLocation id = ForgeRegistries.ENCHANTMENTS.getKey(enchantment);
+            if (KogasaGrowthHandler.isBlacklisted(id)) {
+                event.setOutput(ItemStack.EMPTY);
+                event.setCost(0);
+                event.setMaterialCost(0);
+                return;
+            }
+        }
     }
 }

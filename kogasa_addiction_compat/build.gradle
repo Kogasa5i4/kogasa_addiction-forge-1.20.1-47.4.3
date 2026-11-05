@@ -89,6 +89,14 @@ repositories {
             includeGroup "curse.maven"
         }
     }
+
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content {
+            includeGroup "maven.modrinth"
+        }
+    }
 }
 
 dependencies {
@@ -110,6 +118,13 @@ dependencies {
 
     compileOnly fg.deobf("teamtwilight:twilightforest:${twilight_forest_version}:universal")
     runtimeOnly fg.deobf("teamtwilight:twilightforest:${twilight_forest_version}:universal")
+
+    // ===== 灾变（L_Ender's Cataclysm）本体：构建 + 运行都用这个 jar =====
+    compileOnly fg.deobf("maven.modrinth:l_enders-cataclysm:${cataclysm_version}")
+    runtimeOnly fg.deobf("maven.modrinth:l_enders-cataclysm:${cataclysm_version}")
+    // 灾变运行需要的库：只放运行期，编译期不需要
+    runtimeOnly fg.deobf("maven.modrinth:lionfish-api:${lionfish_version}")
+    runtimeOnly fg.deobf("maven.modrinth:curios:${curios_version}")
 
     // Mixin 注解处理器（与主模组一致）
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'

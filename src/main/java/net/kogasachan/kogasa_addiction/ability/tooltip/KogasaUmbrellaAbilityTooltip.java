@@ -16,16 +16,11 @@ public final class KogasaUmbrellaAbilityTooltip implements KogasaAbilityTooltip 
     @Override
     public void append(KogasaAbilityTooltipContext ctx) {
         double reMult = KogasaEquipmentHelper.getReinforcementMultiplier(ctx.stack());
-        double totalMult = KogasaEquipmentHelper.getTotalMultiplier(ctx.stack());
 
+        // 综合倍率已移到 Shift 区（KogasaTooltipReinforcement），这里只保留强化倍率
         ctx.add(Component.translatable(
                         "tooltip.kogasa_addiction.multiplier.reinforcement",
                         KogasaNumberFormatHelper.formatTrimmed(reMult, 2))
                 .withStyle(ChatFormatting.YELLOW));
-
-        ctx.add(Component.translatable(
-                        "tooltip.kogasa_addiction.multiplier.total",
-                        KogasaNumberFormatHelper.formatTrimmed(totalMult, 3))
-                .withStyle(ChatFormatting.GOLD));
     }
 }

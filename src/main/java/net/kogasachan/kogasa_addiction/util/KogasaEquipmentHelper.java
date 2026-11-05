@@ -3,12 +3,14 @@ package net.kogasachan.kogasa_addiction.util;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.kogasachan.kogasa_addiction.Config;
+import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKind;
 import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKinds;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -17,10 +19,13 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.*;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 public class KogasaEquipmentHelper {
@@ -37,6 +42,9 @@ public class KogasaEquipmentHelper {
      */
     private static final Multimap<Attribute, AttributeModifier> EMPTY_MODIFIERS =
             ImmutableMultimap.of();
+
+    /** 已警告过的动态数值材料 id，避免每次铁砧都刷日志。 */
+    private static final Set<String> WARNED_DYNAMIC_MATERIALS = ConcurrentHashMap.newKeySet();
 
     /** 原版三叉戟基准攻击伤害的惰性缓存（首次属性计算时读取注册表，之后复用）。 */
     private static Double vanillaTridentDamage = null;
@@ -385,12 +393,25 @@ public class KogasaEquipmentHelper {
 
     /**
      * 获取一件装备的“基础价值”，用于铁砧强化时累加。
-     * - 剑/工具：物品自身的攻击伤害
-     * - 护甲：防御值
-     * - 三叉戟：原版基准攻击伤害（动态读取，见 {@link #getVanillaTridentDamage()}）
-     * - 其他：0
+     *
+     * <p>判定顺序固定为：
+     * <ol>
+     *   <li>配置的 dynamicStatMaterials：读当前主手攻击伤害属性；</li>
+     *   <li>原版剑/工具/护甲/三叉戟：读各自稳定数值；</li>
+     *   <li>可穿戴到护甲槽、但不是 {@link ArmorItem} 的普通 Item：读其默认 ARMOR 属性；</li>
+     *   <li>其他：0。</li>
+     * </ol>
      */
     public static double getEquipmentBaseValue(ItemStack stack) {
+        // 1) 动态数值材料：按配置列表，用当前主手攻击伤害属性表作为吸收基准
+        if (isDynamicStatMaterial(stack)) {
+            double dynamicDamage = getAttributeAttackDamage(stack);
+            if (dynamicDamage > 0.0D) {
+                warnDynamicMaterial(stack);
+                return dynamicDamage;
+            }
+        }
+
         Item item = stack.getItem();
 
         if (item instanceof SwordItem sword) {
@@ -405,7 +426,43 @@ public class KogasaEquipmentHelper {
         if (item instanceof TridentItem) {
             return getVanillaTridentDamage();
         }
+
+        // 3) 非 ArmorItem、但能进护甲槽的普通 Item：按 ARMOR 属性算护甲价值
+        if (getArmorEquipmentSlot(stack) != null) {
+            double armor = getAttributeArmorValue(stack);
+            if (armor > 0.0D) {
+                return armor;
+            }
+        }
         return 0;
+    }
+
+    /** 该物品是否在 dynamicStatMaterials 列表中，强化时读取动态属性表。 */
+    public static boolean isDynamicStatMaterial(ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
+        return KogasaIdListMatcher.matches(id, Config.DYNAMIC_STAT_MATERIALS.get());
+    }
+
+    /** 主手攻击伤害的 ADDITION 修饰符之和（调用物品自己的属性表）。 */
+    public static double getAttributeAttackDamage(ItemStack stack) {
+        double sum = 0.0D;
+        for (var entry : stack.getAttributeModifiers(EquipmentSlot.MAINHAND).entries()) {
+            if (entry.getKey() == Attributes.ATTACK_DAMAGE
+                    && entry.getValue().getOperation() == AttributeModifier.Operation.ADDITION) {
+                sum += entry.getValue().getAmount();
+            }
+        }
+        return sum;
+    }
+
+    private static void warnDynamicMaterial(ItemStack stack) {
+        ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
+        if (id != null && WARNED_DYNAMIC_MATERIALS.add(id.toString())) {
+            KogasaAddiction.LOGGER.warn(
+                    "Dynamic-stat material {} uses its current ATTACK_DAMAGE attribute as reinforcement base; items with NBT/growth-driven stats can produce extremely high values.",
+                    id);
+        }
     }
 
     /**
@@ -444,6 +501,8 @@ public class KogasaEquipmentHelper {
             baseDamage = emptyHandBonus(stack) + digger.getAttackDamage();
         } else if (item instanceof TridentItem) {
             baseDamage = emptyHandBonus(stack) + getVanillaTridentDamage();
+        } else if (isKogasaEquipment(stack)) {
+            baseDamage = getAttributeAttackDamageBase(stack);
         }
         double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
         if (Config.ABSORBED_VALUE_INCLUDED_IN_MULTIPLIER.get()) {
@@ -463,7 +522,22 @@ public class KogasaEquipmentHelper {
      * 物品的基础攻速修饰符，由装备类型表统一给出。
      */
     public static double getBaseAttackSpeed(ItemStack stack) {
+        Item item = stack.getItem();
         KogasaEquipmentKind kind = KogasaEquipmentKinds.of(stack);
+
+        // 原版武器/工具仍按类型表；普通 Item 的通用装备从它自己的属性表读基础攻速
+        boolean vanillaClass = item instanceof SwordItem
+                || item instanceof DiggerItem
+                || item instanceof TridentItem
+                || item instanceof ArmorItem
+                || item instanceof BowItem
+                || item instanceof CrossbowItem;
+        if (!vanillaClass) {
+            double attributeSpeed = getAttributeAttackSpeedBase(stack);
+            if (attributeSpeed != 0.0D) {
+                return attributeSpeed;
+            }
+        }
         return kind == null ? -2.8D : kind.baseAttackSpeed();
     }
 
@@ -565,20 +639,139 @@ public class KogasaEquipmentHelper {
     /**
      * 判断 right 是否是 left 的有效强化材料。
      *
-     * <p>宽容匹配：先按宽容规则判定左侧的装备类型，再由该类型判断材料是否可接受 ——
-     * 类身份 / 物品 tag / 注册名后缀三者任一成立即可。飞刀另有"接受剑/三叉戟/刀"的特例。
+     * <p>判定顺序（顺序不要随意调换）：
+     * <ol>
+     *   <li><b>通用装备</b>：left 已兼容、且不是原版武器/工具/护甲/弓弩基类 →
+     *       接受“任意装备类材料”；</li>
+     *   <li><b>类型匹配</b>：由 {@link KogasaEquipmentKinds#of(ItemStack)} 得出 left 的类型，
+     *       再按该类型的 tag / 后缀 / 类身份规则判断；</li>
+     *   <li><b>类家族兜底</b>：left 的 item 类（匿名类先上溯到非匿名父类）作为基类，
+     *       right 是它的实例即可。过宽根类（Item/BlockItem/Object）直接拒绝。</li>
+     * </ol>
      */
     public static boolean matchesReinforcementMaterial(ItemStack left, ItemStack right) {
+        // 1) 通用装备（如灾变直接继承 Item 的武器）：类不是原版基类时，先看通用材料
+        if (isKogasaEquipment(left) && !isVanillaEquipmentClass(left.getItem())) {
+            if (isGenericReinforcementMaterial(right)) return true;
+            return matchesClassFamilyMaterial(left, right);
+        }
+
+        // 2) 原版类型匹配
         KogasaEquipmentKind kind = KogasaEquipmentKinds.of(left);
-        if (kind == null) return false;
-        return kind.acceptsMaterial(right);
+        if (kind != null && kind.acceptsMaterial(right)) {
+            return true;
+        }
+
+        // 3) 类家族兜底（只对已兼容左件启用，且拒绝过宽根类）
+        return isKogasaEquipment(left) && matchesClassFamilyMaterial(left, right);
+    }
+
+    /**
+     * 类家族兜底：取 left 的物品类，匿名类一路找非匿名父类；right 是该类实例即可。
+     *
+     * <p>只作为最后兜底：父类若是 {@link Item}/{@link BlockItem}/Object 这种所有物品共享的根类，
+     * 会退化成“万物皆材料”，因此直接拒绝。
+     */
+    public static boolean matchesClassFamilyMaterial(ItemStack left, ItemStack right) {
+        if (left.isEmpty() || right.isEmpty()) return false;
+
+        Class<?> clazz = left.getItem().getClass();
+        int guard = 0;
+        while (clazz != null
+                && (clazz.isAnonymousClass() || clazz.isSynthetic())
+                && guard++ < 8) {
+            clazz = clazz.getSuperclass();
+        }
+
+        if (clazz == null || clazz == Object.class
+                || clazz == Item.class || clazz == BlockItem.class) {
+            return false;
+        }
+        return clazz.isInstance(right.getItem());
+    }
+
+    /** 是否走原版武器/工具/护甲/弓弩基类的安全属性路径。 */
+    public static boolean isVanillaEquipmentClass(Item item) {
+        return item instanceof SwordItem
+                || item instanceof DiggerItem
+                || item instanceof TridentItem
+                || item instanceof ArmorItem
+                || item instanceof BowItem
+                || item instanceof CrossbowItem;
+    }
+
+    /** 普通 Item 通用装备的强化材料：已识别装备、本模组装备、动态材料、有攻击属性或可穿护甲槽。 */
+    public static boolean isGenericReinforcementMaterial(ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        if (stack.getItem() instanceof IKogasaEquipment) return true;
+        if (KogasaEquipmentKinds.of(stack) != null) return true;
+        if (isDynamicStatMaterial(stack)) return true;
+        if (getArmorEquipmentSlot(stack) != null) return true;
+        return getAttributeAttackDamageBase(stack) > 0.0D;
+    }
+
+    /**
+     * 是否是“能进护甲槽”的对应槽位装备。
+     *
+     * <p>只看 HEAD/CHEST/LEGS/FEET；MAINHAND/OFFHAND 几乎任何物品都能拿，不能作为装备判据。
+     * 不包含 Curios 槽位（需要 Curios API）。
+     */
+    @javax.annotation.Nullable
+    public static EquipmentSlot getArmorEquipmentSlot(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return null;
+        EquipmentSlot slot = stack.getEquipmentSlot();
+        if (slot == EquipmentSlot.HEAD
+                || slot == EquipmentSlot.CHEST
+                || slot == EquipmentSlot.LEGS
+                || slot == EquipmentSlot.FEET) {
+            return slot;
+        }
+        return null;
+    }
+
+    /** 默认属性表中的 ARMOR 值（供非 ArmorItem 的可穿戴物品使用）。 */
+    public static double getAttributeArmorValue(ItemStack stack) {
+        EquipmentSlot armorSlot = getArmorEquipmentSlot(stack);
+        if (armorSlot == null) return 0.0D;
+
+        double sum = 0.0D;
+        for (var entry : stack.getItem()
+                .getDefaultAttributeModifiers(armorSlot).entries()) {
+            if (entry.getKey() == Attributes.ARMOR
+                    && entry.getValue().getOperation() == AttributeModifier.Operation.ADDITION) {
+                sum += entry.getValue().getAmount();
+            }
+        }
+        return sum;
+    }
+
+    /** 从物品自己的默认属性表读主手攻击伤害（不触发 ItemAttributeModifierEvent）。 */
+    public static double getAttributeAttackDamageBase(ItemStack stack) {
+        return sumDefaultAddition(stack, Attributes.ATTACK_DAMAGE);
+    }
+
+    /** 从物品自己的默认属性表读主手攻速（不触发 ItemAttributeModifierEvent）。 */
+    public static double getAttributeAttackSpeedBase(ItemStack stack) {
+        return sumDefaultAddition(stack, Attributes.ATTACK_SPEED);
+    }
+
+    private static double sumDefaultAddition(ItemStack stack, Attribute attribute) {
+        double sum = 0.0D;
+        for (var entry : stack.getItem()
+                .getDefaultAttributeModifiers(EquipmentSlot.MAINHAND).entries()) {
+            if (entry.getKey() == attribute
+                    && entry.getValue().getOperation() == AttributeModifier.Operation.ADDITION) {
+                sum += entry.getValue().getAmount();
+            }
+        }
+        return sum;
     }
 
     /**
      * 根据材料类型返回吸收值比例
      */
     public static double getAbsorbedRatio(ItemStack material) {
-        if (material.getItem() instanceof ArmorItem) {
+        if (material.getItem() instanceof ArmorItem || getArmorEquipmentSlot(material) != null) {
             return Config.ARMOR_ABSORBED_RATIO.get();
         }
         return Config.WEAPON_ABSORBED_RATIO.get();

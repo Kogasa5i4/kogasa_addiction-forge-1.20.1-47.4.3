@@ -25,7 +25,7 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class ManualGrantHandler {
 
-    private static final String NBT_KEY = "KogasaManualGranted";
+    public static final String NBT_KEY = "KogasaManualGranted";
 
     private ManualGrantHandler() {
     }
@@ -44,6 +44,11 @@ public final class ManualGrantHandler {
             return;
         }
 
+        giveManualDirect(player, true);
+    }
+
+    /** 发一本手册；markGranted=true 时同时写入“已发放”标记。 */
+    public static void giveManualDirect(ServerPlayer player, boolean markGranted) {
         ItemStack manual = new ItemStack(ModItems.KOGASA_MANUAL.get());
         if (!player.getInventory().add(manual)) {
             ItemEntity drop = new ItemEntity(player.level(),
@@ -51,7 +56,9 @@ public final class ManualGrantHandler {
             drop.setPickUpDelay(0);
             player.level().addFreshEntity(drop);
         }
-        data.putBoolean(NBT_KEY, true);
+        if (markGranted) {
+            player.getPersistentData().putBoolean(NBT_KEY, true);
+        }
 
         player.displayClientMessage(
                 Component.translatable("message.kogasa_addiction.manual.granted")

@@ -34,6 +34,13 @@ public final class KogasaTooltipReinforcement {
                             KogasaNumberFormatHelper.formatTrimmed(growthMult, 2))
                     .withStyle(ChatFormatting.YELLOW));
 
+            // 综合倍率：跟随 Shift 区，不再放在 Alt 的能力信息里
+            double totalMult = KogasaEquipmentHelper.getTotalMultiplier(stack);
+            tooltip.add(Component.translatable(
+                            "tooltip.kogasa_addiction.multiplier.total",
+                            KogasaNumberFormatHelper.formatTrimmed(totalMult, 3))
+                    .withStyle(ChatFormatting.GOLD));
+
             // 已吸收装备
             if (used.isEmpty()) {
                 tooltip.add(Component.translatable(

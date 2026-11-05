@@ -5,9 +5,14 @@ import net.kogasachan.kogasa_addiction.item.FumoItem;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.Locale;
 
 /**
  * 装备类型，以及"这件物品算不算该类型"的判定。
@@ -106,9 +111,9 @@ public enum KogasaEquipmentKind {
     public boolean acceptsMaterial(ItemStack material) {
         if (material.isEmpty()) return false;
 
-        // Fumo：旧行为就是"接受所有工具类"，保持
+        // Fumo：不再依赖 #forge:tools 标签，改为“有攻击伤害 / 攻击速度 / 挖掘速度任一属性”即兼容
         if (this == FUMO) {
-            return material.is(Tags.Items.TOOLS) || material.getItem() instanceof FumoItem;
+            return material.getItem() instanceof FumoItem || hasEquipmentAttributes(material);
         }
 
         // 飞刀：保留旧的三叉戟特例，额外接受剑 / 三叉戟 / 刀
@@ -156,6 +161,28 @@ public enum KogasaEquipmentKind {
     private static boolean nameEndsWith(Item item, String suffix) {
         ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
         return id != null && id.getPath().endsWith(suffix);
+    }
+
+    /**
+     * Fumo 的材料判定：不再依赖通用工具 tag，只要物品带攻击伤害 / 攻击速度 / 挖掘速度中任意一种属性即可。
+     *
+     * <p>原版挖掘速度不是 Attribute，所以额外用 {@link DiggerItem} 与常见方块 destroy speed 兜底；
+     * 模组的挖掘速度属性则按属性 id 里的 {@code mining_speed} 识别。
+     */
+    private static boolean hasEquipmentAttributes(ItemStack stack) {
+        for (Attribute attribute : stack.getAttributeModifiers(EquipmentSlot.MAINHAND).keySet()) {
+            String id = attribute.getDescriptionId().toLowerCase(Locale.ROOT);
+            if (id.contains("attack_damage") || id.contains("attack_speed") || id.contains("mining_speed")) {
+                return true;
+            }
+        }
+
+        if (stack.getItem() instanceof DiggerItem) {
+            return true;
+        }
+        return stack.getDestroySpeed(Blocks.STONE.defaultBlockState()) > 1.0F
+                || stack.getDestroySpeed(Blocks.DIRT.defaultBlockState()) > 1.0F
+                || stack.getDestroySpeed(Blocks.OAK_LOG.defaultBlockState()) > 1.0F;
     }
 
     private static boolean nameEndsWithAny(Item item, String[] suffixes) {

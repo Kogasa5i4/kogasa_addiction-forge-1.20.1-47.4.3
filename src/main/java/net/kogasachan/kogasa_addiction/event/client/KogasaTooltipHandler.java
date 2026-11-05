@@ -54,5 +54,6 @@ public final class KogasaTooltipHandler {
         KogasaTooltipReinforcement.apply(stack, tooltip, re, maxRe, used, absorbed);
         KogasaTooltipGrowth.apply(stack, tooltip, re, growth);
         KogasaTooltipAlt.apply(stack, tooltip, growth);
+
     }
 }

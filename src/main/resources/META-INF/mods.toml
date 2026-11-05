@@ -44,3 +44,11 @@ mandatory = false
 versionRange = "[4.3.0,)"
 ordering = "NONE"
 side = "BOTH"
+
+# 可选兼容：灾变（本体）。未安装时不加载兼容逻辑。
+[[dependencies.${ mod_id }]]
+modId = "cataclysm"
+mandatory = false
+versionRange = "[3.0,)"
+ordering = "AFTER"
+side = "BOTH"

@@ -16,11 +16,11 @@ public class KogasaAddiction {
     public static final String MODID = "kogasa_addiction";
 
     /**
-     * 配置文件版本号，**与模组版本无关**：它只决定配置文件名（kogasa_addiction_2.6.toml）。
+     * 配置文件版本号，**与模组版本无关**：它只决定配置文件名（kogasa_addiction_3.toml）。
      * 改动它会让所有玩家生成一份新的配置文件（旧配置里的调整看起来"被重置"），
      * 因此只有在配置项发生不兼容变更时才应该 +1。
      */
-    public static final String CONFIG_VERSION = "2.6";
+    public static final String CONFIG_VERSION = "3";
 
     public static final Logger LOGGER = LogUtils.getLogger();
 

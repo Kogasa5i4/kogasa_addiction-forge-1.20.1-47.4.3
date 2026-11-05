@@ -5,6 +5,7 @@ import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.item.SakuyaKnifeItem;
 import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
+import net.kogasachan.kogasa_addiction.util.KogasaIdListMatcher;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -32,20 +33,15 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
-import java.util.regex.Pattern;
 
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class KogasaGrowthHandler {
 
-    private static volatile Set<ResourceLocation> cachedExactIds;
-    private static volatile List<Pattern> cachedPatterns;
-
     /**
-     * 配置重载后由 KogasaConfigEvents 调用（ModConfigEvent 属于 MOD 总线）。
+     * 配置重载后由 KogasaConfigEvents 调用；现在列表直接读配置，无需清缓存。
      */
     public static void invalidateCache() {
-        cachedExactIds = null;
-        cachedPatterns = null;
+        // 保留方法供配置事件调用；匹配实时读取配置
     }
 
     // 攻击命中
@@ -246,7 +242,7 @@ public class KogasaGrowthHandler {
         List<Enchantment> upgradeable = new ArrayList<>();
         for (Map.Entry<Enchantment, Integer> entry : existing.entrySet()) {
             ResourceLocation id = ForgeRegistries.ENCHANTMENTS.getKey(entry.getKey());
-            if (isBlacklisted(id)) continue;
+            if (isBlacklisted(id) || isFrozen(id)) continue;
             if (entry.getValue() < entry.getKey().getMaxLevel() + 1) {
                 upgradeable.add(entry.getKey());
             }
@@ -289,7 +285,7 @@ public class KogasaGrowthHandler {
             if (existing.containsKey(ench)) continue;
 
             ResourceLocation id = ForgeRegistries.ENCHANTMENTS.getKey(ench);
-            if (isBlacklisted(id)) continue;   // ← 黑名单过滤
+            if (isBlacklisted(id) || isUpgradeOnly(id) || isFrozen(id)) continue;   // ← 黑名单 / 只升级 / 冻结过滤
 
             if (stack.getItem() instanceof SakuyaKnifeItem && ench == Enchantments.RIPTIDE) {
                 continue;
@@ -301,52 +297,18 @@ public class KogasaGrowthHandler {
         return candidates.get(player.getRandom().nextInt(candidates.size()));
     }
 
-    private static void rebuildBlacklistCache() {
-        Set<ResourceLocation> exact = new HashSet<>();
-        List<Pattern> patterns = new ArrayList<>();
-
-        for (String raw : Config.GROWTH_ENCHANT_BLACKLIST.get()) {
-            String s = raw.trim();
-            if (s.isEmpty()) continue;
-
-            if (s.indexOf('*') >= 0 || s.indexOf('?') >= 0) {
-                // 含通配符 → 转成正则
-                patterns.add(Pattern.compile(globToRegex(s)));
-            } else {
-                // 无通配符 → 精确 ID
-                ResourceLocation id = ResourceLocation.tryParse(s);
-                if (id != null) exact.add(id);
-            }
-        }
-
-        cachedExactIds = exact;
-        cachedPatterns = List.copyOf(patterns);
+    /** 模式 1：绝对黑名单。 */
+    public static boolean isBlacklisted(ResourceLocation id) {
+        return KogasaIdListMatcher.matches(id, Config.GROWTH_ENCHANT_BLACKLIST.get());
     }
 
-    private static String globToRegex(String glob) {
-        StringBuilder sb = new StringBuilder();
-        for (char c : glob.toCharArray()) {
-            switch (c) {
-                case '*' -> sb.append(".*");
-                case '?' -> sb.append('.');
-                case '.', '(', ')', '[', ']', '{', '}', '+', '^', '$', '|', '\\' -> sb.append('\\').append(c);
-                default -> sb.append(c);
-            }
-        }
-        return sb.toString();
+    /** 模式 2：本来没有就不给，有的可以升级。 */
+    private static boolean isUpgradeOnly(ResourceLocation id) {
+        return KogasaIdListMatcher.matches(id, Config.GROWTH_ENCHANT_UPGRADE_ONLY.get());
     }
 
-    private static boolean isBlacklisted(ResourceLocation id) {
-        if (id == null) return false;
-        if (cachedExactIds == null || cachedPatterns == null) {
-            rebuildBlacklistCache();
-        }
-        if (cachedExactIds.contains(id)) return true;
-
-        String full = id.toString();
-        for (Pattern p : cachedPatterns) {
-            if (p.matcher(full).matches()) return true;
-        }
-        return false;
+    /** 模式 3：本来有也不动、不升级；没有也不给。 */
+    private static boolean isFrozen(ResourceLocation id) {
+        return KogasaIdListMatcher.matches(id, Config.GROWTH_ENCHANT_FROZEN.get());
     }
 }

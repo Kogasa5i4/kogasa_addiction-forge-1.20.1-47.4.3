@@ -136,6 +136,11 @@ public class CombineCrystalPacket {
                     "message.kogasa_addiction_compat.compat_disabled"), true);
             return false;
         }
+        if (!KogasaCompat.canCombine(target)) {
+            player.displayClientMessage(Component.translatable(
+                    "message.kogasa_addiction_compat.not_compatible"), true);
+            return false;
+        }
         return true;
     }
 

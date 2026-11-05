@@ -3,12 +3,13 @@
   "book.kogasa_addiction_compat.category.compat.desc": "Master switch, combining and the rainbow crystal.",
   "book.kogasa_addiction_compat.category.compat.name": "Compatibility",
   "book.kogasa_addiction_compat.entry.overview.name": "How compatibility works",
-  "book.kogasa_addiction_compat.entry.overview.page1": "The master switch is $(6)compat.enableCompatEquipment$(0) (enabled by default). Only whitelisted items get Kogasa mechanics: $(li)Kogasa's own equipment; $(li)items combined with a rainbow crystal; $(li)items added to the $(6)#kogasa_addiction_compat:compatible$(0) item tag by a datapack.",
-  "book.kogasa_addiction_compat.entry.overview.page2": "To combine: pick up a rainbow crystal with your cursor, then $(6)right-click$(0) the target item slot in your inventory. Survival consumes 1 crystal; creative only marks the item.$(br2)Compatible items gain growth, reinforcement, sealing and attribute bonuses, and their tooltip shows Kogasa's stat lines.",
+  "book.kogasa_addiction_compat.entry.overview.page1": "The master switch is $(6)compat.enableCompatEquipment$(0) (enabled by default). Only whitelisted items get Kogasa mechanics: $(li)Kogasa's own equipment; $(li)items combined with a rainbow crystal; $(li)items added to the $(6)#kogasa_addiction_compat:compatible$(0) item tag by a datapack.$(br2)Items without a vanilla weapon/tool base class can be allowed through the $(6)compat.genericEquipment$(0) list.",
+  "book.kogasa_addiction_compat.entry.overview.page2": "To combine: pick up a rainbow crystal with your cursor, then $(6)right-click$(0) the target item slot in your inventory. Survival consumes 1 crystal; creative only marks the item.$(br2)Only equipment-like targets are accepted: weapons, tools, bows/crossbows and wearable armor; buckets, blocks and food are rejected.",
+  "book.kogasa_addiction_compat.entry.overview.page3": "The compat layer only adds growth/reinforcement deltas and does not replace the mod's own attributes; armor merges its attribute lines into one set.",
   "book.kogasa_addiction_compat.entry.rainbow_crystal.name": "Rainbow Ore & Crystal",
   "book.kogasa_addiction_compat.entry.rainbow_crystal.page1": "Rainbow ore only generates high up (above Y 128), following iron ore's style, and needs a stone pickaxe or better. Without silk touch it drops 1 rainbow crystal.",
   "book.kogasa_addiction_compat.entry.rainbow_crystal.page2": "Drop a rainbow crystal into $(6)lava$(0) or a $(6)lava cauldron$(0) to convert it into a random ability ingot, with a configurable chance (100%% by default).$(br2)See the $(6)rainbow$(0) config section.",
-  "book.kogasa_addiction_compat.manual.landing": "This addon lets growth, reinforcement, sealing and attribute mechanics apply to other mods' tools and weapons — but by default only to items combined with a rainbow crystal.",
+  "book.kogasa_addiction_compat.manual.landing": "This addon lets growth, reinforcement, sealing and attribute mechanics apply to other mods' tools, weapons and armor — but by default only to equipment combined with a rainbow crystal.",
   "book.kogasa_addiction_compat.manual.name": "Kogasa Addiction: Compat Manual",
   "item.kogasa_addiction_compat.rainbow_crystal": "Rainbow Crystal",
   "item.kogasa_addiction_compat.rainbow_crystal.tooltip": "§7Pick up the crystal with your cursor, then right-click a target item in the inventory to combine it and enable all Kogasa mechanics",
@@ -16,5 +17,6 @@
   "message.kogasa_addiction_compat.already_compatible": "This item is already compatible",
   "message.kogasa_addiction_compat.combined": "Combined rainbow crystal with %s: all Kogasa mechanics are now enabled on it",
   "message.kogasa_addiction_compat.compat_disabled": "Compatibility master switch is disabled (compat.enableCompatEquipment)",
+  "message.kogasa_addiction_compat.not_compatible": "This item cannot be combined with a rainbow crystal",
   "message.kogasa_addiction_compat.reverted": "Reverted to its original state"
 }

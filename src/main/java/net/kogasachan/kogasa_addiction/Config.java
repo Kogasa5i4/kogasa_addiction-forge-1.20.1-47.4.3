@@ -39,10 +39,9 @@ public class Config {
      * 成长达到该值时自动解封（恢复全力 + 结算成长附魔）。
      */
     public static final ForgeConfigSpec.DoubleValue LOCKED_EQUIPMENT_UNLOCK_GROWTH = BUILDER
-            .comment("""
-                    Growth value at which loot "sealed" equipment automatically unlocks.
-                    Sealed equipment has -50% attributes and inactive abilities until then.
-                    战利品开出的封印装备在封印期间属性 -50% 且能力不生效，成长达到该值时自动解封。""")
+            .comment("Growth value at which loot \"sealed\" equipment automatically unlocks.\n" +
+                    "Sealed equipment has -50% attributes and inactive abilities until then.\n" +
+                    "战利品开出的封印装备在封印期间属性 -50% 且能力不生效，成长达到该值时自动解封。")
             .defineInRange("lockedEquipmentUnlockGrowth", 0.5, 0.0, 1.0);
 
     static {
@@ -139,6 +138,18 @@ public class Config {
                     "强化时吸收的护甲属性比例。")
             .defineInRange("armorAbsorbedRatio", 0.5, 0.0, Double.MAX_VALUE);
 
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> DYNAMIC_STAT_MATERIALS = BUILDER
+            .comment("Items listed here use their current main-hand ATTACK_DAMAGE attribute as the base absorption value when used as reinforcement material. Supports * wildcards.\n" +
+                    "Use *:* to apply this logic to every item. Use modid:* for a whole mod (default: cataclysm:*).\n" +
+                    "WARNING: do NOT add items whose stats change with NBT/growth (this mod's own equipment, Star Meow Craft's Uniforged, etc.). Their current value would be absorbed directly and become extremely overpowered.\n" +
+                    "此处列出的物品作为强化材料时，会用当前主手攻击伤害属性作为吸收基准。支持 * 通配符。\n" +
+                    "填 *:* 可对所有物品生效；按模组用 modid:*（默认 cataclysm:*）。\n" +
+                    "警告：不要加入数值会随 NBT/成长变化的物品（本模组装备、星喵工艺的千刃锻锋等），否则吸收值会非常超模。\n" +
+                    "Format: modid:item_id, e.g. cataclysm:*")
+            .defineListAllowEmpty("dynamicStatMaterials",
+                    List.of("cataclysm:*"),
+                    o -> o instanceof String s && !s.isBlank());
+
     static {
         BUILDER.pop();
     }
@@ -203,23 +214,35 @@ public class Config {
             .define("allowMaxLevelEnchants", true);
 
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> GROWTH_ENCHANT_BLACKLIST = BUILDER
-            .comment("Enchantments listed here will not be granted or upgraded by the growth system. Supports * wildcards (e.g. *:*curse).",
-                    "此处列出的附魔不会被成长系统授予或升级。支持 * 通配符（例如 *:*curse）。",
-                    "Existing config files are not migrated automatically when this default list changes.",
-                    "默认列表更新不会自动写入已有配置文件，升级后请手动补充。",
-                    "Format: modid:enchantment_id, e.g. minecraft:riptide",
-                    "格式：模组ID:附魔ID，例如 minecraft:riptide")
-            .defineListAllowEmpty(
-                    "growthEnchantBlacklist",
-                    List.of("minecraft:riptide",
+            .comment("Mode 1 (absolute blacklist): never granted by growth; existing copies are removed when the player logs in; the anvil will not produce items carrying them. Supports * wildcards.\n" +
+                    "Existing config files are not migrated automatically when this default list changes.\n" +
+                    "模式 1（绝对黑名单）：成长系统绝对不会授予；玩家进存档时清除已有附魔；铁砧也不会产出带这些附魔的物品。支持 * 通配符。\n" +
+                    "默认列表更新不会自动写入已有配置文件，升级后请手动补充。\n" +
+                    "Format: modid:enchantment_id, e.g. minecraft:riptide")
+            .defineListAllowEmpty("growthEnchantBlacklist", List.of(),
+                    o -> o instanceof String s && !s.isBlank());
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> GROWTH_ENCHANT_UPGRADE_ONLY = BUILDER
+            .comment("Mode 2: if the item already has this enchantment it may still be upgraded; if it does not have it, it will never be granted. Supports * wildcards.\n" +
+                    "模式 2：本来没有就不给；本来就有的会正常升级。支持 * 通配符。\n" +
+                    "Format: modid:enchantment_id")
+            .defineListAllowEmpty("growthEnchantUpgradeOnly", List.of(
+                            "minecraft:riptide",
                             "minecraft:silk_touch",
                             "minecraft:frost_walker",
-                            "*:*curse",
-                            "*:curse*",
-                            "l2complements:*",
                             "apotheosis:knowledge",
                             "deeperdarker:catalysis",
                             "kaleidoscope_end:void_walker"),
+                    o -> o instanceof String s && !s.isBlank());
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> GROWTH_ENCHANT_FROZEN = BUILDER
+            .comment("Mode 3: if present, keep it unchanged and never upgrade it; if absent, never grant it. Supports * wildcards.\n" +
+                    "模式 3：本来有也不动、不升级；本来没有也不会给。支持 * 通配符。\n" +
+                    "Format: modid:enchantment_id")
+            .defineListAllowEmpty("growthEnchantFrozen", List.of(
+                            "*:*curse",
+                            "*:curse*",
+                            "l2complements:*"),
                     o -> o instanceof String s && !s.isBlank());
 
     static {
@@ -296,11 +319,10 @@ public class Config {
             .defineInRange("bowPierceGrowth", 0.5, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue RANGED_DRAW_SPEED_ABSORB_RATIO = BUILDER
-            .comment("""
-                    Fraction of the vanilla full-draw time absorbed as "draw speed" per bow/crossbow reinforcement.
-                    0.1 = every reinforcement absorbs 10% of the 20 (bow) / 25 (crossbow) ticks needed to draw fully.
-                    弓弩每次强化吸收的拉弓速度比例（相对原版拉满时间）。
-                    0.1 = 每次强化吸收 20（弓）/ 25（弩）tick 的 10%，即拉满时间缩短 1 tick。""")
+            .comment("Fraction of the vanilla full-draw time absorbed as \"draw speed\" per bow/crossbow reinforcement.\n" +
+                    "0.1 = every reinforcement absorbs 10% of the 20 (bow) / 25 (crossbow) ticks needed to draw fully.\n" +
+                    "弓弩每次强化吸收的拉弓速度比例（相对原版拉满时间）。\n" +
+                    "0.1 = 每次强化吸收 20（弓）/ 25（弩）tick 的 10%，即拉满时间缩短 1 tick。")
             .defineInRange("rangedDrawSpeedAbsorbRatio", 0.1, 0.0, 1.0);
 
     public static final ForgeConfigSpec.DoubleValue BOW_MULTISHOT_2_GROWTH = BUILDER
@@ -342,13 +364,13 @@ public class Config {
     }
 
     public static final ForgeConfigSpec.DoubleValue SAKUYA_KNIFE_BASE_BREAK_CHANCE = BUILDER
-            .comment("Base chance for the knife to break into a broken state upon pickup. 0.3 = 30%.")
-            .comment("咲夜飞刀拾取时变为损坏状态的基础概率。0.3 = 30%。")
+            .comment("Base chance for the knife to break into a broken state upon pickup. 0.3 = 30%.\n" +
+                    "咲夜飞刀拾取时变为损坏状态的基础概率。0.3 = 30%。")
             .defineInRange("sakuyaKnifeBaseBreakChance", 0.3, 0.0, 1.0);
 
     public static final ForgeConfigSpec.DoubleValue SAKUYA_KNIFE_BREAK_REDUCTION = BUILDER
-            .comment("Break chance reduction per reinforcement/growth point. 0.01 = 1%.")
-            .comment("每点强化/成长值降低的损坏概率。0.01 = 1%。")
+            .comment("Break chance reduction per reinforcement/growth point. 0.01 = 1%.\n" +
+                    "每点强化/成长值降低的损坏概率。0.01 = 1%。")
             .defineInRange("sakuyaKnifeBreakReduction", 0.01, 0.0, 1.0);
 
     public static final ForgeConfigSpec.IntValue SAKUYA_KNIFE_REPAIR_COST = BUILDER
@@ -357,8 +379,8 @@ public class Config {
             .defineInRange("sakuyaKnifeRepairCost", 3, 0, Integer.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue SAKUYA_KNIFE_THROW_VELOCITY = BUILDER
-            .comment("Initial throw velocity for Sakuya Knife. Vanilla trident is ~2.5.")
-            .comment("咲夜飞刀的初始投掷速度。原版三叉戟约为2.5。")
+            .comment("Initial throw velocity for Sakuya Knife. Vanilla trident is ~2.5.\n" +
+                    "咲夜飞刀的初始投掷速度。原版三叉戟约为2.5。")
             .defineInRange("sakuyaKnifeThrowVelocity", 3.0, 0.5, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue SAKUYA_KNIFE_MENDING_REPAIR_CHANCE = BUILDER
@@ -385,12 +407,11 @@ public class Config {
             .defineInRange("abilitySlotInitialGrowth", 0.0, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue ABILITY_SLOT_GROWTH_INCREMENT = BUILDER
-            .comment("""
-                    Extra growth required for each additional ability slot (arithmetic progression).
-                    Slot N unlocks at: abilitySlotInitialGrowth + (N-1) * abilitySlotGrowthIncrement.
-                    Defaults 0 / 0.5: slots unlock at 0, 0.5, 1.0, 1.5 ... (capped by abilitySlotMax).
-                    每个额外能力槽所需的成长增量（等差数列解锁）。
-                    第 N 个槽在 初始值 + (N-1) × 增量 处解锁。默认 0 / 0.5：0、0.5、1.0、1.5 ...（受 abilitySlotMax 封顶）。""")
+            .comment("Extra growth required for each additional ability slot (arithmetic progression).\n" +
+                    "Slot N unlocks at: abilitySlotInitialGrowth + (N-1) * abilitySlotGrowthIncrement.\n" +
+                    "Defaults 0 / 0.5: slots unlock at 0, 0.5, 1.0, 1.5 ... (capped by abilitySlotMax).\n" +
+                    "每个额外能力槽所需的成长增量（等差数列解锁）。\n" +
+                    "第 N 个槽在 初始值 + (N-1) × 增量 处解锁。默认 0 / 0.5：0、0.5、1.0、1.5 ...（受 abilitySlotMax 封顶）。")
             .defineInRange("abilitySlotGrowthIncrement", 0.5, 0.0001, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.IntValue ABILITY_SLOT_MAX = BUILDER
@@ -530,45 +551,44 @@ public class Config {
     }
 
     public static final ForgeConfigSpec.IntValue TENSHI_INGOT_MIN_Y = BUILDER
-            .comment("The minimum Y level required to obtain a Tenshi Ingot by placing beacon base blocks.")
-            .comment("放置信标基座方块获取天子锭的最低 Y 轴高度。")
+            .comment("The minimum Y level required to obtain a Tenshi Ingot by placing beacon base blocks.\n" +
+                    "放置信标基座方块获取天子锭的最低 Y 轴高度。")
             .defineInRange("tenshiIngotMinY", 128, 0, 320);
 
     public static final ForgeConfigSpec.DoubleValue TENSHI_INGOT_CHANCE = BUILDER
-            .comment("Chance to get a Tenshi Ingot. 0.105 = 10.5%.")
-            .comment("放置信标基座方块获取天子锭的概率。0.105 = 10.5%。")
+            .comment("Chance to get a Tenshi Ingot. 0.105 = 10.5%.\n" +
+                    "放置信标基座方块获取天子锭的概率。0.105 = 10.5%。")
             .defineInRange("tenshiIngotChance", 0.105, 0.0, 1.0);
 
     public static final ForgeConfigSpec.BooleanValue TENSHI_INGOT_CONSUME_BLOCK = BUILDER
-            .comment("""
-                    If true, the placed beacon-base block item is consumed when the ingot triggers.
-                    Default false: the block is not consumed (pure bonus loot), which is the historic behavior.
-                    NOTE: keeping this false means the player can repeatedly place the same block to keep rolling;
-                    set it to true if you want each roll to cost one block.
-                    天子锭触发时是否消耗被放置的方块物品。
-                    默认 false：不消耗方块（纯额外奖励，与历史行为一致）。
-                    注意：保持 false 意味着玩家可以反复放置同一方块持续触发；
-                    如果希望每次触发消耗一个方块，请设为 true。""")
+            .comment("If true, the placed beacon-base block item is consumed when the ingot triggers.\n" +
+                    "Default false: the block is not consumed (pure bonus loot), which is the historic behavior.\n" +
+                    "NOTE: keeping this false means the player can repeatedly place the same block to keep rolling;\n" +
+                    "set it to true if you want each roll to cost one block.\n" +
+                    "天子锭触发时是否消耗被放置的方块物品。\n" +
+                    "默认 false：不消耗方块（纯额外奖励，与历史行为一致）。\n" +
+                    "注意：保持 false 意味着玩家可以反复放置同一方块持续触发；\n" +
+                    "如果希望每次触发消耗一个方块，请设为 true。")
             .define("tenshiIngotConsumeBlock", false);
 
     public static final ForgeConfigSpec.DoubleValue TENSHI_DOMAIN_THRESHOLD = BUILDER
-            .comment("Damage required to charge the 'State of No-Thought, No-Mind' (20 in default).")
-            .comment("无念无想的境界所需的蓄力伤害值（默认20）。")
+            .comment("Damage required to charge the 'State of No-Thought, No-Mind' (20 in default).\n" +
+                    "无念无想的境界所需的蓄力伤害值（默认20）。")
             .defineInRange("tenshiDomainThreshold", 20.0, 1.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue TENSHI_BURST_DAMAGE_RATIO = BUILDER
-            .comment("Percentage of target's max health dealt as extra damage when burst triggers. 0.1 = 10%.")
-            .comment("境界蓄满后，下一次命中造成目标最大生命值的额外伤害比例。0.1 = 10%。")
+            .comment("Percentage of target's max health dealt as extra damage when burst triggers. 0.1 = 10%.\n" +
+                    "境界蓄满后，下一次命中造成目标最大生命值的额外伤害比例。0.1 = 10%。")
             .defineInRange("tenshiBurstDamageRatio", 0.1, 0.0, 1.0);
 
     public static final ForgeConfigSpec.IntValue TENSHI_DEBUFF_DURATION_SECONDS = BUILDER
-            .comment("Duration of Slowness and Mining Fatigue applied on hit (in seconds).")
-            .comment("攻击命中时施加的缓慢与挖掘疲劳持续时间（秒）。")
+            .comment("Duration of Slowness and Mining Fatigue applied on hit (in seconds).\n" +
+                    "攻击命中时施加的缓慢与挖掘疲劳持续时间（秒）。")
             .defineInRange("tenshiDebuffDurationSeconds", 5, 1, Integer.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue TENSHI_FLYING_MOB_MULTIPLIER = BUILDER
-            .comment("Damage multiplier against non-boss flying mobs. 2.0 = 200%.")
-            .comment("对非 Boss 飞行生物的伤害倍率。2.0 = 200%。")
+            .comment("Damage multiplier against non-boss flying mobs. 2.0 = 200%.\n" +
+                    "对非 Boss 飞行生物的伤害倍率。2.0 = 200%。")
             .defineInRange("tenshiFlyingMobMultiplier", 2.0, 1.0, Double.MAX_VALUE);
 
     static {
@@ -580,18 +600,18 @@ public class Config {
     }
 
     public static final ForgeConfigSpec.DoubleValue SAKUYA_INGOT_CHANCE = BUILDER
-            .comment("Chance to get a Sakuya Ingot at the start of each day if the coordinate condition is met. 0.1 = 10%.")
-            .comment("每天开始时，满足坐标条件获取咲夜锭的概率。0.1 = 10%。")
+            .comment("Chance to get a Sakuya Ingot at the start of each day if the coordinate condition is met. 0.1 = 10%.\n" +
+                    "每天开始时，满足坐标条件获取咲夜锭的概率。0.1 = 10%。")
             .defineInRange("sakuyaIngotChance", 1 / 3D, 0.0, 1.0);
 
     public static final ForgeConfigSpec.IntValue SAKUYA_TIMESTOP_SECONDS_PER_EQUIPMENT = BUILDER
-            .comment("Timestop duration per piece of Sakuya equipment (in seconds).")
-            .comment("每件咲夜能力装备提供的时停时间（秒）。")
+            .comment("Timestop duration per piece of Sakuya equipment (in seconds).\n" +
+                    "每件咲夜能力装备提供的时停时间（秒）。")
             .defineInRange("sakuyaTimestopSecondsPerEquipment", 5, 1, 60);
 
     public static final ForgeConfigSpec.IntValue SAKUYA_TIMESTOP_RADIUS = BUILDER
-            .comment("Timestop radius in blocks. 20 = 20 blocks.")
-            .comment("时停作用半径（格）。20 = 20 格。")
+            .comment("Timestop radius in blocks. 20 = 20 blocks.\n" +
+                    "时停作用半径（格）。20 = 20 格。")
             .defineInRange("sakuyaTimestopRadius", 20, 1, 128);
 
     public static final ForgeConfigSpec.IntValue SAKUYA_TIMESTOP_COOLDOWN_SECONDS = BUILDER

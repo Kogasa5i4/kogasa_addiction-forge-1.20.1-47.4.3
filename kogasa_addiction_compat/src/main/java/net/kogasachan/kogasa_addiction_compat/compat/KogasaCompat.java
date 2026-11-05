@@ -2,6 +2,12 @@ package net.kogasachan.kogasa_addiction_compat.compat;
 
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
+import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKinds;
+import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
+import net.kogasachan.kogasa_addiction.util.KogasaIdListMatcher;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
@@ -54,6 +60,45 @@ public final class KogasaCompat {
      */
     public static boolean isCompatOnly(ItemStack stack) {
         return isCompatible(stack) && !(stack.getItem() instanceof IKogasaEquipment);
+    }
+
+    /**
+     * 彩虹水晶可以结合的目标边界。
+     *
+     * <p>只接受“装备型”物品：原版武器/工具/弓弩、带攻击属性或挖掘速度的物品、
+     * 有耐久的可损坏物品，或 genericEquipment 列表内明确放行的物品。
+     * 水桶/方块/食物等没有耐久也没有装备属性的物品会被拒绝；护甲暂不接管。
+     */
+    public static boolean canCombine(ItemStack stack) {
+        if (stack.isEmpty() || !isEnabled()) {
+            return false;
+        }
+        if (stack.getItem() instanceof IKogasaEquipment || hasMarker(stack)) {
+            return false;
+        }
+        // 能进护甲槽的物品（含非 ArmorItem 的自定义护甲）也允许结合
+        if (KogasaEquipmentHelper.getArmorEquipmentSlot(stack) != null) {
+            return true;
+        }
+
+        if (KogasaEquipmentKinds.of(stack) != null) {
+            return true;
+        }
+        if (stack.getMaxDamage() > 0) {
+            return true;
+        }
+        if (KogasaEquipmentHelper.getAttributeAttackDamageBase(stack) != 0.0D
+                || KogasaEquipmentHelper.getAttributeAttackSpeedBase(stack) != 0.0D) {
+            return true;
+        }
+        if (stack.getDestroySpeed(Blocks.STONE.defaultBlockState()) > 1.0F
+                || stack.getDestroySpeed(Blocks.DIRT.defaultBlockState()) > 1.0F
+                || stack.getDestroySpeed(Blocks.OAK_LOG.defaultBlockState()) > 1.0F) {
+            return true;
+        }
+
+        ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
+        return KogasaIdListMatcher.matches(id, CompatConfig.GENERIC_EQUIPMENT.get());
     }
 
     public static boolean hasMarker(ItemStack stack) {

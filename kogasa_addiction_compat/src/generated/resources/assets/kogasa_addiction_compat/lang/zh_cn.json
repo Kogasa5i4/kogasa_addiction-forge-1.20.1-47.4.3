@@ -3,12 +3,13 @@
   "book.kogasa_addiction_compat.category.compat.desc": "兼容总开关、结合方式与彩虹水晶。",
   "book.kogasa_addiction_compat.category.compat.name": "兼容机制",
   "book.kogasa_addiction_compat.entry.overview.name": "兼容是怎么生效的",
-  "book.kogasa_addiction_compat.entry.overview.page1": "兼容总开关在配置文件 $(6)compat.enableCompatEquipment$(0)，默认开启。只有在白名单里的物品才会应用本模组机制：$(li)本模组自己的装备；$(li)用彩虹水晶结合过的物品；$(li)数据包写进 $(6)#kogasa_addiction_compat:compatible$(0) 标签的物品。",
-  "book.kogasa_addiction_compat.entry.overview.page2": "结合方法：把彩虹水晶拿在鼠标上（左键拿起），在物品栏里用$(6)右键$(0)点击目标物品槽位。生存模式消耗 1 个水晶，创造模式只打标记不消耗。$(br2)兼容后的物品会获得成长、强化、封印与属性加成，tooltip 也会显示本模组的数值行。",
+  "book.kogasa_addiction_compat.entry.overview.page1": "兼容总开关在配置文件 $(6)compat.enableCompatEquipment$(0)，默认开启。只有在白名单里的物品才会应用本模组机制：$(li)本模组自己的装备；$(li)用彩虹水晶结合过的物品；$(li)数据包写进 $(6)#kogasa_addiction_compat:compatible$(0) 标签的物品。$(br2)没有继承原版武器/工具基类的通用装备，可以用 $(6)compat.genericEquipment$(0) 列表放行。",
+  "book.kogasa_addiction_compat.entry.overview.page2": "结合方法：把彩虹水晶拿在鼠标上（左键拿起），在物品栏里用$(6)右键$(0)点击目标物品槽位。生存模式消耗 1 个水晶，创造模式只打标记不消耗。$(br2)只接受装备型目标：武器/工具/弓弩/可穿戴护甲等；水桶、方块、食物之类会被拒绝。",
+  "book.kogasa_addiction_compat.entry.overview.page3": "兼容层只叠加成长/强化增量，不替换模组自带的属性；护甲会把同一件装备的多条属性合并成一套显示。",
   "book.kogasa_addiction_compat.entry.rainbow_crystal.name": "彩虹矿石与彩虹水晶",
   "book.kogasa_addiction_compat.entry.rainbow_crystal.page1": "彩虹矿石只在高空生成（Y 坐标 128 以上），外观和生成方式参考铁矿石，挖掘需要石镐或更好。破坏后用精准采集会掉落矿石本体，否则掉落 1 个彩虹水晶。",
   "book.kogasa_addiction_compat.entry.rainbow_crystal.page2": "把彩虹水晶丢进$(6)熔岩$(0)或$(6)熔岩炼药锅$(0)，会按配置概率（默认 100%%）转化为随机一种能力锭。$(br2)转化概率与开关在 $(6)rainbow$(0) 配置段里。",
-  "book.kogasa_addiction_compat.manual.landing": "这个附属让成长、强化、封印与属性机制可以作用到其他模组的工具武器上——但默认只对“被彩虹水晶结合过”的物品生效。",
+  "book.kogasa_addiction_compat.manual.landing": "这个附属让成长、强化、封印与属性机制可以作用到其他模组的工具、武器与护甲上——但默认只对“被彩虹水晶结合过”的装备生效。",
   "book.kogasa_addiction_compat.manual.name": "Kogasa Addiction: Compat 手册",
   "item.kogasa_addiction_compat.rainbow_crystal": "彩虹水晶",
   "item.kogasa_addiction_compat.rainbow_crystal.tooltip": "§7在物品栏里用鼠标拿起水晶，右键目标物品即可“结合”，开启全部本模组机制",
@@ -16,5 +17,6 @@
   "message.kogasa_addiction_compat.already_compatible": "这个物品已经兼容本模组机制了",
   "message.kogasa_addiction_compat.combined": "已将彩虹水晶与 %s 结合：现在它能使用全部本模组功能",
   "message.kogasa_addiction_compat.compat_disabled": "兼容总开关未开启（compat.enableCompatEquipment）",
+  "message.kogasa_addiction_compat.not_compatible": "该物品不能与彩虹水晶结合",
   "message.kogasa_addiction_compat.reverted": "已恢复为原始状态"
 }

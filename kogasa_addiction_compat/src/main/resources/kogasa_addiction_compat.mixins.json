@@ -9,8 +9,7 @@
     "ItemStackMixin"
   ],
   "client": [
-    "AbstractContainerScreenMixin",
-    "CreativeModeInventoryScreenMixin"
+    "AbstractContainerScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

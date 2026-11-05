@@ -1,7 +1,6 @@
 package net.kogasachan.kogasa_addiction.event.client;
 
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
-import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.minecraft.network.chat.Component;

@@ -2,7 +2,6 @@ package net.kogasachan.kogasa_addiction.event.common;
 
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
-import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.item.SakuyaKnifeItem;
 import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;

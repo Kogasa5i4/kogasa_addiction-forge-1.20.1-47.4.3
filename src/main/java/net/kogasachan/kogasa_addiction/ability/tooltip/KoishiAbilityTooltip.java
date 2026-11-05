@@ -1,7 +1,7 @@
 package net.kogasachan.kogasa_addiction.ability.tooltip;
-import net.kogasachan.kogasa_addiction.event.client.ClientConfigCache;
 
 import net.kogasachan.kogasa_addiction.Config;
+import net.kogasachan.kogasa_addiction.event.client.ClientConfigCache;
 import net.kogasachan.kogasa_addiction.util.KogasaNumberFormatHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;

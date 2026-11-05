@@ -15,5 +15,6 @@
   "item.kogasa_addiction_compat.rainbow_crystal.tooltip2": "§8丢进熔岩/熔岩炼药锅可转化为随机能力锭",
   "message.kogasa_addiction_compat.already_compatible": "这个物品已经兼容本模组机制了",
   "message.kogasa_addiction_compat.combined": "已将彩虹水晶与 %s 结合：现在它能使用全部本模组功能",
-  "message.kogasa_addiction_compat.compat_disabled": "兼容总开关未开启（compat.enableCompatEquipment）"
+  "message.kogasa_addiction_compat.compat_disabled": "兼容总开关未开启（compat.enableCompatEquipment）",
+  "message.kogasa_addiction_compat.reverted": "已恢复为原始状态"
 }

@@ -1,6 +1,8 @@
 package net.kogasachan.kogasa_addiction_compat.compat;
 
+import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
+import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 
@@ -65,5 +67,31 @@ public final class KogasaCompat {
             return;
         }
         stack.getOrCreateTag().putBoolean(MARKER_KEY, true);
+    }
+
+    /** 这件非本模组物品上是否有本模组添加的数据（标记/强化/成长/能力/弹药）。 */
+    public static boolean hasKogasaData(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return false;
+        }
+        return hasMarker(stack)
+                || KogasaEquipmentData.hasData(stack)
+                || KogasaAbilityData.hasData(stack);
+    }
+
+    /** 删除本模组给非本模组物品添加的全部 NBT（恢复原始状态）。 */
+    public static void clearAddedData(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return;
+        }
+        CompoundTag tag = stack.getTag();
+        if (tag != null) {
+            tag.remove(MARKER_KEY);
+            if (tag.isEmpty()) {
+                stack.setTag(null);
+            }
+        }
+        KogasaEquipmentData.clearAll(stack);
+        KogasaAbilityData.clearAllData(stack);
     }
 }

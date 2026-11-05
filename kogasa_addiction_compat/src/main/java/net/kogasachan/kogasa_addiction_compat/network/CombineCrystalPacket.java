@@ -30,20 +30,29 @@ public class CombineCrystalPacket {
 
     private final int slotIndex;
     private final boolean inventorySlot;
+    /** 创造模式专用：客户端看到的目标物品，服务端槽位为空时用它兜底 */
+    private final ItemStack targetStack;
 
     public CombineCrystalPacket(int slotIndex, boolean inventorySlot) {
+        this(slotIndex, inventorySlot, ItemStack.EMPTY);
+    }
+
+    public CombineCrystalPacket(int slotIndex, boolean inventorySlot, ItemStack targetStack) {
         this.slotIndex = slotIndex;
         this.inventorySlot = inventorySlot;
+        this.targetStack = targetStack;
     }
 
     public CombineCrystalPacket(FriendlyByteBuf buf) {
         this.slotIndex = buf.readVarInt();
         this.inventorySlot = buf.readBoolean();
+        this.targetStack = buf.readItem();
     }
 
     public void encode(FriendlyByteBuf buf) {
         buf.writeVarInt(slotIndex);
         buf.writeBoolean(inventorySlot);
+        buf.writeItem(targetStack);
     }
 
     public static void handle(CombineCrystalPacket msg, Supplier<NetworkEvent.Context> ctx) {
@@ -56,14 +65,14 @@ public class CombineCrystalPacket {
             return;
         }
         if (msg.inventorySlot) {
-            handleCreative(player, msg.slotIndex);
+            handleCreative(player, msg.slotIndex, msg.targetStack);
         } else {
             handleSurvival(player, msg.slotIndex);
         }
     }
 
     /** 创造模式：按背包槽位定位目标，不消耗水晶 */
-    private static void handleCreative(ServerPlayer player, int inventorySlot) {
+    private static void handleCreative(ServerPlayer player, int inventorySlot, ItemStack provided) {
         // 只接受创造模式玩家，避免生存模式借此绕过水晶消耗
         if (!player.getAbilities().instabuild) {
             return;
@@ -71,12 +80,16 @@ public class CombineCrystalPacket {
         if (inventorySlot < 0 || inventorySlot >= player.getInventory().getContainerSize()) {
             return;
         }
-        ItemStack target = player.getInventory().getItem(inventorySlot);
+        // 创造模式里客户端快捷栏可能是“客户端先行”的，服务端槽位有时还是空的；
+        // 这时用客户端带上来的物品兜底，保证结合一定生效。
+        ItemStack serverStack = player.getInventory().getItem(inventorySlot);
+        ItemStack target = serverStack.isEmpty() ? provided.copy() : serverStack;
         if (!checkTarget(player, target)) {
             return;
         }
 
         KogasaCompat.markCompatible(target);
+        player.getInventory().setItem(inventorySlot, target);
         // 容器 id -2 = 直接更新玩家背包槽位
         player.connection.send(new ClientboundContainerSetSlotPacket(-2, 0, inventorySlot, target));
         playSuccess(player);

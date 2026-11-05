@@ -407,9 +407,8 @@
   "tooltip.kogasa_addiction.tenshi.ready": "  当前境界：§c已蓄满§r（下一次命中触发爆发并清空）",
   "tooltip.kogasa_addiction.timestop.available": "  时停能力目前可用。",
   "tooltip.kogasa_addiction.timestop.unavailable": "  时停能力目前不可用。",
-  "tooltip.kogasa_addiction.vanilla_attack_damage": " %s 攻击伤害",
-  "tooltip.kogasa_addiction.vanilla_attack_speed": " %s 攻击速度",
   "item.kogasa_addiction.kogasa_manual": "小伞的帕秋莉手册",
   "message.kogasa_addiction.manual.no_patchouli": "需要安装 Patchouli 才能阅读手册",
-  "book.kogasa_addiction.entry.admin_commands.page8": "【兼容附属配置】$(br)装了 Kogasa Addiction: Compat 之后，它的配置也挂在 $(6)/kogasa config$(0) 下，路径带 $(6)compat:$(0) 前缀。$(br2)$(li)$(6)/kogasa config list compat:$(0) 列出全部附属配置项。$(li)$(6)compat:compat.enableCompatEquipment$(0)：兼容总开关（默认开启）。$(li)$(6)compat:rainbow.lavaConversionEnabled$(0)：熔岩转化开关。$(li)$(6)compat:rainbow.lavaConversionChance$(0)：熔岩转化概率（0~1）。$(li)$(6)compat:rainbow$(0)：整个彩虹相关配置段。"
+  "book.kogasa_addiction.entry.admin_commands.page8": "【兼容附属配置】$(br)装了 Kogasa Addiction: Compat 之后，它的配置也挂在 $(6)/kogasa config$(0) 下，路径带 $(6)compat:$(0) 前缀。$(br2)$(li)$(6)/kogasa config list compat:$(0) 列出全部附属配置项。$(li)$(6)compat:compat.enableCompatEquipment$(0)：兼容总开关（默认开启）。$(li)$(6)compat:rainbow.lavaConversionEnabled$(0)：熔岩转化开关。$(li)$(6)compat:rainbow.lavaConversionChance$(0)：熔岩转化概率（0~1）。$(li)$(6)compat:rainbow$(0)：整个彩虹相关配置段。",
+  "message.kogasa_addiction.manual.granted": "已补发 Kogasa 手册"
 }

@@ -4,7 +4,6 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
-import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.network.PacketHandler;
 import net.kogasachan.kogasa_addiction.network.TimestopStatePacket;
 import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;

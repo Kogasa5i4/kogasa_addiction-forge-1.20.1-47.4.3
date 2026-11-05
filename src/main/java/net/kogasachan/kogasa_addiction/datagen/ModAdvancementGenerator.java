@@ -2,11 +2,7 @@ package net.kogasachan.kogasa_addiction.datagen;
 
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.item.ModItems;
-import net.minecraft.advancements.Advancement;
-import net.minecraft.advancements.AdvancementRewards;
-import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.advancements.DisplayInfo;
-import net.minecraft.advancements.FrameType;
+import net.minecraft.advancements.*;
 import net.minecraft.advancements.critereon.*;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;

@@ -5,10 +5,10 @@ import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.item.ModItems;
+import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -17,9 +17,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -65,11 +63,13 @@ public class FirstJoinRewardHandler {
         KogasaAbilityData.addAbility(stack, ability);
 
         giveItemToPlayer(player, stack);
+        // 立即结算这件装备相关的成就（不等下一次登录的 scanInventoryAndGrant）
+        KogasaAdvancementHelper.checkAndGrant(player, stack);
 
-        // ===== 2. 发放本模组手册 =====
-        giveItemToPlayer(player, new ItemStack(ModItems.KOGASA_MANUAL.get()));
+        // 兜底：背包里已有/刚发放的所有本模组装备都检查一遍
+        KogasaAdvancementHelper.scanInventoryAndGrant(player);
 
-        // ===== 3. 标记已领取与反馈 =====
+        // ===== 2. 标记已领取与反馈 =====
         data.putBoolean(NBT_KEY, true);
 
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),

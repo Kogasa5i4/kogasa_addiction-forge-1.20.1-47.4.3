@@ -319,6 +319,7 @@
   "message.kogasa_addiction.koishi_ingot.earned": "Release of the Id: Bonus got!",
   "message.kogasa_addiction.koishi_ingot.progress": "Release of the Id: %s/%s",
   "message.kogasa_addiction.locked_equipment.unlocked": "Seal broken! The equipment has regained its full power",
+  "message.kogasa_addiction.manual.granted": "Kogasa manual granted",
   "message.kogasa_addiction.manual.no_patchouli": "Install Patchouli to read this manual",
   "message.kogasa_addiction.sakuya_ingot_found": "✦ A moment of destiny! You obtained a Sakuya Ingot",
   "message.kogasa_addiction.screenshot.miss": "📷 Miss",
@@ -409,7 +410,5 @@
   "tooltip.kogasa_addiction.tenshi.charge": "  Current State: %1$s / %2$s (§aResistance %3$s§r)",
   "tooltip.kogasa_addiction.tenshi.ready": "  Current State: §cFully Charged§r (Next hit unleashes burst and resets)",
   "tooltip.kogasa_addiction.timestop.available": "  The time stop ability is available.",
-  "tooltip.kogasa_addiction.timestop.unavailable": "  The time stop ability is unavailable.",
-  "tooltip.kogasa_addiction.vanilla_attack_damage": " %s Attack Damage",
-  "tooltip.kogasa_addiction.vanilla_attack_speed": " %s Attack Speed"
+  "tooltip.kogasa_addiction.timestop.unavailable": "  The time stop ability is unavailable."
 }

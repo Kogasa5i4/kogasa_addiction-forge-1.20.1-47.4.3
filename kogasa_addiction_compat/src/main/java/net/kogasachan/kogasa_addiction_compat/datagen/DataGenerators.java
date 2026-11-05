@@ -1,7 +1,6 @@
 package net.kogasachan.kogasa_addiction_compat.datagen;
 
 import net.kogasachan.kogasa_addiction_compat.KogasaCompatAddon;
-import net.kogasachan.kogasa_addiction_compat.compat.CompatRegistry;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;

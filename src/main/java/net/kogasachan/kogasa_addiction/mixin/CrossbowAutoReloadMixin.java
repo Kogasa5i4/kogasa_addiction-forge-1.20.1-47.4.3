@@ -1,6 +1,5 @@
 package net.kogasachan.kogasa_addiction.mixin;
 
-import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;

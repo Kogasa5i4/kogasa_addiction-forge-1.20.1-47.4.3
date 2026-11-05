@@ -11,7 +11,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
  */
 public final class CompatNetwork {
 
-    private static final String PROTOCOL_VERSION = "1";
+    private static final String PROTOCOL_VERSION = "3";
 
     public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
             ResourceLocation.fromNamespaceAndPath(KogasaCompatAddon.MODID, "main"),
@@ -29,6 +29,11 @@ public final class CompatNetwork {
                 .encoder(CombineCrystalPacket::encode)
                 .decoder(CombineCrystalPacket::new)
                 .consumerMainThread(CombineCrystalPacket::handle)
+                .add();
+        INSTANCE.messageBuilder(ClearCompatPacket.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(ClearCompatPacket::encode)
+                .decoder(ClearCompatPacket::new)
+                .consumerMainThread(ClearCompatPacket::handle)
                 .add();
     }
 }

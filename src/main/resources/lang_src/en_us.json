@@ -407,9 +407,8 @@
   "tooltip.kogasa_addiction.tenshi.ready": "  Current State: §cFully Charged§r (Next hit unleashes burst and resets)",
   "tooltip.kogasa_addiction.timestop.available": "  The time stop ability is available.",
   "tooltip.kogasa_addiction.timestop.unavailable": "  The time stop ability is unavailable.",
-  "tooltip.kogasa_addiction.vanilla_attack_damage": " %s Attack Damage",
-  "tooltip.kogasa_addiction.vanilla_attack_speed": " %s Attack Speed",
   "item.kogasa_addiction.kogasa_manual": "Kogasa's Patchouli Manual",
   "message.kogasa_addiction.manual.no_patchouli": "Install Patchouli to read this manual",
-  "book.kogasa_addiction.entry.admin_commands.page8": "Compat addon config$(br)When Kogasa Addiction: Compat is installed, its config is available under $(6)/kogasa config$(0) with the $(6)compat:$(0) prefix.$(br2)$(li)$(6)/kogasa config list compat:$(0) lists every addon entry.$(li)$(6)compat:compat.enableCompatEquipment$(0): master compatibility switch (enabled by default).$(li)$(6)compat:rainbow.lavaConversionEnabled$(0): lava conversion toggle.$(li)$(6)compat:rainbow.lavaConversionChance$(0): lava conversion chance (0~1).$(li)$(6)compat:rainbow$(0): the whole rainbow config section."
+  "book.kogasa_addiction.entry.admin_commands.page8": "Compat addon config$(br)When Kogasa Addiction: Compat is installed, its config is available under $(6)/kogasa config$(0) with the $(6)compat:$(0) prefix.$(br2)$(li)$(6)/kogasa config list compat:$(0) lists every addon entry.$(li)$(6)compat:compat.enableCompatEquipment$(0): master compatibility switch (enabled by default).$(li)$(6)compat:rainbow.lavaConversionEnabled$(0): lava conversion toggle.$(li)$(6)compat:rainbow.lavaConversionChance$(0): lava conversion chance (0~1).$(li)$(6)compat:rainbow$(0): the whole rainbow config section.",
+  "message.kogasa_addiction.manual.granted": "Kogasa manual granted"
 }

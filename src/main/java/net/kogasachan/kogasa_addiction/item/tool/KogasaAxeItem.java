@@ -3,6 +3,8 @@ package net.kogasachan.kogasa_addiction.item.tool;
 import com.google.common.collect.Multimap;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -41,5 +43,11 @@ public class KogasaAxeItem extends AxeItem implements IKogasaEquipment {
         return IKogasaEquipment.isCorrectToolForDrops(
                 stack, state, this.getTier(),
                 () -> super.isCorrectToolForDrops(stack, state));
+    }
+
+    @Override
+    public @NotNull Component getName(@NotNull ItemStack stack) {
+        return super.getName(stack).copy()
+                .withStyle(style -> style.withColor(ChatFormatting.GOLD));
     }
 }

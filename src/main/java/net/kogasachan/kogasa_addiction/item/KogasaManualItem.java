@@ -1,6 +1,7 @@
 package net.kogasachan.kogasa_addiction.item;
 
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,6 +12,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.ModList;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * 本模组的帕秋莉手册物品（独立物品，不再借用 {@code patchouli:guide_book}）。
@@ -45,5 +47,11 @@ public class KogasaManualItem extends Item {
             }
         }
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+    }
+
+    @Override
+    public @NotNull Component getName(@NotNull ItemStack stack) {
+        return super.getName(stack).copy()
+                .withStyle(style -> style.withColor(ChatFormatting.GOLD));
     }
 }

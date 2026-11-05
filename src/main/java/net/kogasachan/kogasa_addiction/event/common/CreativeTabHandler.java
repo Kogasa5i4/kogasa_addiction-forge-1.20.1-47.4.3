@@ -5,6 +5,7 @@ import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -38,7 +39,10 @@ public class CreativeTabHandler {
             event.accept(ModItems.KOGASA_AXE);
             event.accept(ModItems.KOGASA_SHOVEL);
             event.accept(ModItems.KOGASA_HOE);
-            event.accept(ModItems.KOGASA_MANUAL);
+            // 手册靠 Patchouli 打开；没装 Patchouli 时不在创造模式物品栏里出现
+            if (ModList.get().isLoaded("patchouli")) {
+                event.accept(ModItems.KOGASA_MANUAL);
+            }
         }
     }
 }

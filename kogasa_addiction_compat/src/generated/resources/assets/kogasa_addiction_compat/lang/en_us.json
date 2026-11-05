@@ -15,5 +15,6 @@
   "item.kogasa_addiction_compat.rainbow_crystal.tooltip2": "§8Drop into lava / lava cauldron to convert into a random ability ingot",
   "message.kogasa_addiction_compat.already_compatible": "This item is already compatible",
   "message.kogasa_addiction_compat.combined": "Combined rainbow crystal with %s: all Kogasa mechanics are now enabled on it",
-  "message.kogasa_addiction_compat.compat_disabled": "Compatibility master switch is disabled (compat.enableCompatEquipment)"
+  "message.kogasa_addiction_compat.compat_disabled": "Compatibility master switch is disabled (compat.enableCompatEquipment)",
+  "message.kogasa_addiction_compat.reverted": "Reverted to its original state"
 }

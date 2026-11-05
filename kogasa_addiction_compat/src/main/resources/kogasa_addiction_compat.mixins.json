@@ -5,11 +5,12 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "kogasa_addiction_compat.refmap.json",
   "mixins": [
-    "ItemStackMixin",
-    "ItemEntityMixin"
+    "ItemEntityMixin",
+    "ItemStackMixin"
   ],
   "client": [
-    "AbstractContainerScreenMixin"
+    "AbstractContainerScreenMixin",
+    "CreativeModeInventoryScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

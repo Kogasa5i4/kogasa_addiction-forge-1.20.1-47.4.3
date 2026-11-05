@@ -22,16 +22,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.CrossbowItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 
-import static net.kogasachan.kogasa_addiction.command.KogasaCommandSupport.*;
+import static net.kogasachan.kogasa_addiction.command.KogasaCommandSupport.ABILITY_SUGGESTIONS;
+import static net.kogasachan.kogasa_addiction.command.KogasaCommandSupport.ADMIN;
 
 /** /kogasa grow|reinforce|reset|resetfirstjoin|seal|unseal —— 修改装备本体数据的命令组。 */
 public final class KogasaEquipmentCommands {

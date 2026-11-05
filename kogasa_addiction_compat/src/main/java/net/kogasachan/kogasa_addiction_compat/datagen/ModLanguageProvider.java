@@ -24,6 +24,7 @@ public class ModLanguageProvider extends LanguageProvider {
             add("block.kogasa_addiction_compat.rainbow_ore", "彩虹矿石");
             add("item.kogasa_addiction_compat.rainbow_crystal.tooltip", "§7在物品栏里用鼠标拿起水晶，右键目标物品即可“结合”，开启全部本模组机制");
             add("item.kogasa_addiction_compat.rainbow_crystal.tooltip2", "§8丢进熔岩/熔岩炼药锅可转化为随机能力锭");
+            add("message.kogasa_addiction_compat.reverted", "已恢复为原始状态");
             add("message.kogasa_addiction_compat.combined", "已将彩虹水晶与 %s 结合：现在它能使用全部本模组功能");
             add("message.kogasa_addiction_compat.already_compatible", "这个物品已经兼容本模组机制了");
             add("message.kogasa_addiction_compat.compat_disabled", "兼容总开关未开启（compat.enableCompatEquipment）");
@@ -42,6 +43,7 @@ public class ModLanguageProvider extends LanguageProvider {
             add("block.kogasa_addiction_compat.rainbow_ore", "Rainbow Ore");
             add("item.kogasa_addiction_compat.rainbow_crystal.tooltip", "§7Pick up the crystal with your cursor, then right-click a target item in the inventory to combine it and enable all Kogasa mechanics");
             add("item.kogasa_addiction_compat.rainbow_crystal.tooltip2", "§8Drop into lava / lava cauldron to convert into a random ability ingot");
+            add("message.kogasa_addiction_compat.reverted", "Reverted to its original state");
             add("message.kogasa_addiction_compat.combined", "Combined rainbow crystal with %s: all Kogasa mechanics are now enabled on it");
             add("message.kogasa_addiction_compat.already_compatible", "This item is already compatible");
             add("message.kogasa_addiction_compat.compat_disabled", "Compatibility master switch is disabled (compat.enableCompatEquipment)");

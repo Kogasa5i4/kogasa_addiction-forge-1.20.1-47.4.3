@@ -2,7 +2,6 @@ package net.kogasachan.kogasa_addiction.mixin;
 
 import net.kogasachan.kogasa_addiction.event.common.CrossbowProjectileHandler;
 import net.kogasachan.kogasa_addiction.event.common.KogasaGrowthHandler;
-import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.minecraft.server.level.ServerPlayer;

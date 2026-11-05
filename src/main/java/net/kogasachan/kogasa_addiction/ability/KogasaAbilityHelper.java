@@ -1,6 +1,5 @@
 package net.kogasachan.kogasa_addiction.ability;
 
-import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;

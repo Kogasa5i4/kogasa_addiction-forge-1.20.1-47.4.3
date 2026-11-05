@@ -35,38 +35,14 @@ public class AnvilReinforcementCategory implements IRecipeCategory<AnvilReinforc
     public AnvilReinforcementCategory(IGuiHelper guiHelper) {
         this.icon = guiHelper.createDrawableItemStack(new ItemStack(Items.ANVIL));
 
-        // 背景
-        this.background = guiHelper.createDrawable(
-                ResourceLocation.fromNamespaceAndPath("jei", "textures/jei/atlas/gui/gui_background.png"),
-                0, 168, 125, 18);
-
-        // 槽位边框（18×18）
-        this.border = guiHelper.drawableBuilder(
-                        ResourceLocation.fromNamespaceAndPath("jei", "textures/jei/atlas/gui/slot.png"),
-                        0, 0, 18, 18)
-                .setTextureSize(18, 18)   // 关键：告诉 JEI 纹理实际尺寸
-                .build();
-
-        // 输出槽位边框（18×18）
-        this.outputBorder = guiHelper.drawableBuilder(
-                        ResourceLocation.fromNamespaceAndPath("jei", "textures/jei/atlas/gui/output_slot.png"),
-                        0, 0, 18, 18)
-                .setTextureSize(18, 18)
-                .build();
-
-        // 箭头（22×16）
-        this.arrow = guiHelper.drawableBuilder(
-                        ResourceLocation.fromNamespaceAndPath("jei", "textures/jei/atlas/gui/recipe_arrow.png"),
-                        0, 0, 22, 16)
-                .setTextureSize(22, 16)
-                .build();
-
-        // 加号（13×13）
-        this.plus = guiHelper.drawableBuilder(
-                        ResourceLocation.fromNamespaceAndPath("jei", "textures/jei/atlas/gui/recipe_plus_sign.png"),
-                        0, 0, 13, 13)
-                .setTextureSize(13, 13)
-                .build();
+        // 不再引用 JEI 内部 atlas 路径（15.74 已把 textures/jei/atlas/gui/* 改为
+        // textures/gui/sprites/*，写死旧路径会在新版 JEI 上丢贴图）。改用 JEI 提供的 drawable。
+        this.background = guiHelper.createBlankDrawable(125, 38);
+        this.border = guiHelper.getSlotDrawable();
+        // 输出槽也用普通槽位框：JEI 的 getOutputSlot() 是加大的 26x26，会和 18x18 的物品格不匹配
+        this.outputBorder = guiHelper.getSlotDrawable();
+        this.arrow = guiHelper.getRecipeArrow();
+        this.plus = guiHelper.getRecipePlusSign();
     }
 
     /**

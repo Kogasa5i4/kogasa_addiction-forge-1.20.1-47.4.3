@@ -1,10 +1,10 @@
 package net.kogasachan.kogasa_addiction.event.client;
 
 import net.kogasachan.kogasa_addiction.Config;
-import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.kogasachan.kogasa_addiction.util.KogasaNumberFormatHelper;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -52,9 +52,13 @@ public final class KogasaTooltipStats {
             double speed = KogasaEquipmentHelper.getDisplayAttackSpeed(stack);
             ChatFormatting color = KogasaEquipmentHelper.isAttackSpeedCapped(stack)
                     ? ChatFormatting.GOLD : ChatFormatting.DARK_GREEN;
-            MutableComponent speedLine = Component.translatable(
-                    "tooltip.kogasa_addiction.vanilla_attack_speed",
-                    KogasaNumberFormatHelper.formatTrimmed(speed, 1)).withStyle(color);
+            // 原版属性行前面有一个空格（CommonComponents.space()），这里补上，保持缩进一致
+            MutableComponent speedLine = CommonComponents.space().append(
+                    Component.translatable(
+                            "attribute.modifier.equals.0",
+                            KogasaNumberFormatHelper.formatTrimmed(speed, 1),
+                            Component.translatable("attribute.name.generic.attack_speed"))
+                            .withStyle(color));
 
             int insertAt = insertionPoint(tooltip, damageLineIdx);
             tooltip.add(insertAt, speedLine);
@@ -63,7 +67,7 @@ public final class KogasaTooltipStats {
 
         // ========== 3. 挖掘速度（0/1/2 配置，紧跟攻速行） ==========
         int miningSpeedMode = ClientConfigCache.get(Config.MINING_SPEED_TOOLTIP_MODE);
-        boolean showMiningSpeed = item instanceof DiggerItem
+        boolean showMiningSpeed = hasMiningSpeed(stack)
                 && (miningSpeedMode == 1 || (miningSpeedMode == 2 && isKogasa));
         if (showMiningSpeed) {
             Component miningLine = Component.translatable(
@@ -74,7 +78,13 @@ public final class KogasaTooltipStats {
             if (speedLineIdx >= 0) {
                 tooltip.add(speedLineIdx + 1, miningLine);
             } else {
-                tooltip.add(miningLine);
+                // 非本模组装备没有自定义攻速行：插到原版属性区块之后、F3+H 高级提示之前，
+                // 不能直接 add 到末尾（否则会跑到耐久度/item id/NBT 下面）。
+                int header = findMainHandHeader(tooltip);
+                int at = header >= 0
+                        ? attributeBlockEnd(tooltip, header)
+                        : advancedTooltipStart(tooltip, stack);
+                tooltip.add(at, miningLine);
             }
         }
 
@@ -115,11 +125,13 @@ public final class KogasaTooltipStats {
 
             if (damageLineIdx < 0 && text.contains(damageKey)) {
                 double damage = KogasaEquipmentHelper.getDisplayAttackDamage(stack) + 1.0;
-                tooltip.set(i, Component.translatable(
-                                "tooltip.kogasa_addiction.vanilla_attack_damage",
-                                KogasaNumberFormatHelper.formatTrimmed(damage, 1))
-                        .withStyle(tooltip.get(i).getStyle())
-                        .withStyle(ChatFormatting.DARK_GREEN));
+                tooltip.set(i, CommonComponents.space().append(
+                        Component.translatable(
+                                        "attribute.modifier.equals.0",
+                                        KogasaNumberFormatHelper.formatTrimmed(damage, 1),
+                                        Component.translatable("attribute.name.generic.attack_damage"))
+                                .withStyle(tooltip.get(i).getStyle())
+                                .withStyle(ChatFormatting.DARK_GREEN)));
                 damageLineIdx = i;
             }
         }
@@ -208,14 +220,32 @@ public final class KogasaTooltipStats {
                 || item instanceof TridentItem;
     }
 
-    private static float getMiningSpeed(ItemStack stack) {
-        if (!(stack.getItem() instanceof DiggerItem digger)) return 1.0F;
+    /**
+     * 是否值得显示“挖掘速度”：原版工具，或任何在常见方块上挖掘速度 >1 的物品。
+     * 用于覆盖不继承 DiggerItem 的模组工具。
+     */
+    private static boolean hasMiningSpeed(ItemStack stack) {
+        return stack.getItem() instanceof DiggerItem || getMiningSpeed(stack) > 1.0F;
+    }
 
-        float speed = digger.getTier().getSpeed();
-        if (net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(stack)) {
-            speed = KogasaEquipmentHelper.getDestroySpeed(stack, speed);
+    private static float getMiningSpeed(ItemStack stack) {
+        if (stack.getItem() instanceof DiggerItem digger) {
+            float speed = digger.getTier().getSpeed();
+            if (KogasaEquipmentHelper.isKogasaEquipment(stack)) {
+                speed = KogasaEquipmentHelper.getDestroySpeed(stack, speed);
+            }
+            return speed;
         }
-        return speed;
+
+        // 非 DiggerItem：取常见方块里的最高挖掘速度
+        float max = 1.0F;
+        for (var state : new net.minecraft.world.level.block.state.BlockState[]{
+                net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),
+                net.minecraft.world.level.block.Blocks.DIRT.defaultBlockState(),
+                net.minecraft.world.level.block.Blocks.OAK_LOG.defaultBlockState()}) {
+            max = Math.max(max, stack.getDestroySpeed(state));
+        }
+        return max;
     }
 
     /** 弓/弩/三叉戟（用于蓄力/弹速 tooltip 的范围判断） */
@@ -233,21 +263,53 @@ public final class KogasaTooltipStats {
         double velocity = KogasaEquipmentHelper.getDisplayProjectileVelocity(stack);
         if (ticks <= 0 && velocity <= 0.0D) return;
 
-        tooltip.add(Component.translatable("tooltip.kogasa_addiction.ranged.when_in_hand")
+        List<Component> lines = new ArrayList<>();
+        // 远程属性前留一个空行，和上方区块分隔
+        lines.add(Component.empty());
+        lines.add(Component.translatable("tooltip.kogasa_addiction.ranged.when_in_hand")
                 .withStyle(ChatFormatting.GRAY));
 
         if (ticks > 0) {
-            tooltip.add(Component.translatable(
+            lines.add(Component.translatable(
                             "tooltip.kogasa_addiction.ranged.charge_time",
                             KogasaNumberFormatHelper.formatTrimmed(ticks / 20.0D, 2))
                     .withStyle(ChatFormatting.DARK_GREEN));
         }
 
         if (velocity > 0.0D) {
-            tooltip.add(Component.translatable(
+            lines.add(Component.translatable(
                             "tooltip.kogasa_addiction.ranged.projectile_velocity",
                             KogasaNumberFormatHelper.formatTrimmed(velocity, 2))
                     .withStyle(ChatFormatting.DARK_GREEN));
         }
+
+        // 和武器/工具保持一致的顺序：放在原版属性区块（“在主手时：…”）之前，
+        // 而不是追加到 tooltip 末尾（那样会跑到原版属性/F3+H 信息下面）。
+        // 目标顺序：物品名 → 附魔 → 近战属性（如有）→ 远程属性 → 高级提示
+        int header = findMainHandHeader(tooltip);
+        int insertAt;
+        if (header >= 0) {
+            // 有近战属性区块：插在区块末尾（近战属性之后、高级提示之前）
+            insertAt = attributeBlockEnd(tooltip, header);
+        } else {
+            // 弓弩没有近战属性：插在高级提示（F3+H 的 item id 行）之前
+            insertAt = advancedTooltipStart(tooltip, stack);
+        }
+        tooltip.addAll(insertAt, lines);
+    }
+
+    /** 原版 F3+H 高级提示区块的起点（item id 行）；找不到就返回末尾 */
+    private static int advancedTooltipStart(List<Component> tooltip, ItemStack stack) {
+        net.minecraft.resources.ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
+        if (id == null) {
+            return tooltip.size();
+        }
+        String idText = id.toString();
+        for (int i = tooltip.size() - 1; i >= 0; i--) {
+            if (tooltip.get(i).getString().equals(idText)) {
+                return i;
+            }
+        }
+        return tooltip.size();
     }
 }

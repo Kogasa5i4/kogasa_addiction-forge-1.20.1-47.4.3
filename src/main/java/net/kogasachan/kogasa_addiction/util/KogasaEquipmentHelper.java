@@ -19,10 +19,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.*;
 
 import java.util.ArrayList;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 public class KogasaEquipmentHelper {
 

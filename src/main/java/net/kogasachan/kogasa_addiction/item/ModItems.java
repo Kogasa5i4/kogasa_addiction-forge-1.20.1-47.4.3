@@ -123,11 +123,6 @@ public class ModItems {
                     return super.getName(stack).copy()
                             .withStyle(style -> style.withColor(ChatFormatting.GOLD));
                 }
-
-                @Override
-                public @NotNull Rarity getRarity(@NotNull ItemStack pStack) {
-                    return Rarity.EPIC;
-                }
             }
     );
 

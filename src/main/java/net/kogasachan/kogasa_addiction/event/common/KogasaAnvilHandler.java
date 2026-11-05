@@ -4,12 +4,11 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
-import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.item.KogasaAbilityIngotItem;
 import net.kogasachan.kogasa_addiction.item.ModItems;
+import net.kogasachan.kogasa_addiction.item.SakuyaKnifeItem;
 import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKind;
 import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKinds;
-import net.kogasachan.kogasa_addiction.item.SakuyaKnifeItem;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.minecraft.nbt.CompoundTag;
@@ -65,19 +64,25 @@ public class KogasaAnvilHandler {
         if (!net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(left)) return;
         if (right.isEmpty()) return;
 
-        // ========== 分支 1：能力锻造（右侧是能力锭） ==========
+        // ========== 分支 1：桶清除（独立模块：水桶清强化 / 奶桶清能力） ==========
+        if (right.is(Items.WATER_BUCKET) || right.is(Items.MILK_BUCKET)) {
+            handleBucketClearing(event, left, right);
+            return;
+        }
+
+        // ========== 分支 2：能力锻造（右侧是能力锭） ==========
         if (right.getItem() instanceof KogasaAbilityIngotItem ingotItem) {
             handleAbilityInfusion(event, left, ingotItem.getAbility());
             return;
         }
 
-        // ========== 分支 2：封印（右侧是木棍） ==========
+        // ========== 分支 3：封印（右侧是木棍） ==========
         if (right.is(Items.STICK)) {
             handleSeal(event, left);
             return;
         }
 
-        // ========== 分支 3：弓弩弹药装载 ==========
+        // ========== 分支 4：弓弩弹药装载 ==========
         if (isRangedWeapon(left)) {
             if (handleAmmoInfusion(event, left, right)) return;
         }
@@ -86,7 +91,7 @@ public class KogasaAnvilHandler {
         // 若耐久修复或右侧附魔合并有意义，就让原版铁砧继续计算。
         if (shouldUseVanillaCombination(left, right)) return;
 
-        // ========== 分支 4：强化（右侧是同类型装备） ==========
+        // ========== 分支 5：强化（右侧是同类型装备） ==========
         handleReinforcement(event, left, right);
     }
 
@@ -131,6 +136,46 @@ public class KogasaAnvilHandler {
     }
 
     /**
+     * 桶清除：装备 + 水桶/奶桶 → 清空对应数据（与强化完全独立的一个分支）。
+     *
+     * <ul>
+     *   <li>水桶：清强化次数 / 已吸收材料 / 吸收值 / 拉弓速度，保留成长与附魔；</li>
+     *   <li>奶桶：清能力侧数据（能力列表、新闻值与记录、弹药），保留强化与成长；</li>
+     *   <li>取出结果时由 {@link KogasaAnvilTakeHandler} 返还空铁桶。</li>
+     * </ul>
+     */
+    private static void handleBucketClearing(AnvilUpdateEvent event, ItemStack left, ItemStack right) {
+        // 对应数据已经是空的：直接阻止，避免白白消耗水桶/奶桶
+        boolean hasData;
+        if (right.is(Items.WATER_BUCKET)) {
+            hasData = KogasaEquipmentData.getReinforcements(left) > 0
+                    || !KogasaEquipmentData.getUsedMaterials(left).isEmpty()
+                    || KogasaEquipmentData.getAbsorbedValue(left) != 0.0D
+                    || KogasaEquipmentData.getDrawSpeedValue(left) != 0.0D;
+        } else {
+            hasData = KogasaAbilityData.hasData(left);
+        }
+        if (!hasData) {
+            event.setOutput(ItemStack.EMPTY);
+            event.setCost(0);
+            event.setMaterialCost(0);
+            return;
+        }
+
+        ItemStack result = left.copy();
+
+        if (right.is(Items.WATER_BUCKET)) {
+            KogasaEquipmentData.clearReinforcementData(result);
+        } else {
+            KogasaAbilityData.clearAllData(result);
+        }
+
+        event.setOutput(result);
+        event.setCost(Config.CLEAR_COST.get());
+        event.setMaterialCost(1); // 消耗 1 个水桶或奶桶，空桶在取出时返还
+    }
+
+    /**
      * 封印：装备 + 木棍 → 属性 -50%、能力暂失效，成长达到阈值后自动解封。
      * 这是"绕过强化解锁成长"的捷径：封印装备无需 3 次强化即可直接积累成长。
      */
@@ -151,33 +196,12 @@ public class KogasaAnvilHandler {
 
     /**
      * 强化：装备 + 同类型装备 → 装备强化 1 级
-     * 水桶清强化（含吸收值/材料记录），奶桶清能力，保留成长、附魔等其他数据
      */
     private static void handleReinforcement(AnvilUpdateEvent event,
                                             ItemStack left, ItemStack right) {
         if (left.getItem() == right.getItem()) {
             event.setOutput(ItemStack.EMPTY);
             event.setCost(0);
-            return;
-        }
-
-        // ===== 清除数据逻辑：水桶清强化，奶桶清能力 =====
-        // 一律走 KogasaEquipmentData / KogasaAbilityData 的封装，不再在这里硬编码 NBT 键名：
-        // 键名一旦在数据层改动，写死在这里的字符串会静默失效。
-        if (right.is(Items.WATER_BUCKET) || right.is(Items.MILK_BUCKET)) {
-            ItemStack result = left.copy();
-
-            if (right.is(Items.WATER_BUCKET)) {
-                // 水桶：清强化次数 / 已吸收材料 / 吸收值 / 拉弓速度，保留成长与附魔
-                KogasaEquipmentData.clearReinforcementData(result);
-            } else {
-                // 奶桶：清能力侧数据（能力列表、新闻值与记录、弹药），保留强化与成长
-                KogasaAbilityData.clearAllData(result);
-            }
-
-            event.setOutput(result);
-            event.setCost(Config.CLEAR_COST.get());
-            event.setMaterialCost(1); // 消耗 1 个水桶或奶桶
             return;
         }
 

@@ -43,6 +43,10 @@ public class DataGenerators {
         generator.addProvider(event.includeServer(),
                 new ModItemTagsProvider(output, lookupProvider, blockTagLookup, existingFileHelper));
 
+        // 结构用群系组合标签（基础群系 - 海洋）
+        generator.addProvider(event.includeServer(),
+                new ModBiomeTagsProvider(output, lookupProvider, existingFileHelper));
+
         // 配方
         generator.addProvider(event.includeServer(), new ModRecipeProvider(output));
 

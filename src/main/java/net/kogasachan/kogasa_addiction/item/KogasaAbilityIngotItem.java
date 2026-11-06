@@ -48,15 +48,10 @@ public class KogasaAbilityIngotItem extends Item {
                         ability.getDisplayName())
                 .withStyle(ChatFormatting.AQUA));
 
-        // 2. 能力描述
-        tooltip.add(ability.getDescription()
-                .copy()
-                .withStyle(ChatFormatting.GRAY));
-
-        // 3. 空行分隔
+        // 2. 空行分隔（具体效果说明见 JEI “能力锭”分类）
         tooltip.add(Component.empty());
 
-        // 4. 获取方式（剧透）：按住 Shift 才展开，避免提前剧透
+        // 3. 获取方式（剧透）：按住 Shift 才展开，避免提前剧透
         if (net.minecraft.client.gui.screens.Screen.hasShiftDown()) {
             tooltip.add(Component.translatable(
                             "tooltip.kogasa_addiction.ability_ingot.obtain.header")
@@ -70,7 +65,7 @@ public class KogasaAbilityIngotItem extends Item {
                     .withStyle(ChatFormatting.DARK_GRAY));
         }
 
-        // 5. 空行 + 使用提示
+        // 4. 空行 + 使用提示
         tooltip.add(Component.empty());
         tooltip.add(Component.translatable(
                         "tooltip.kogasa_addiction.ability_ingot.usage")

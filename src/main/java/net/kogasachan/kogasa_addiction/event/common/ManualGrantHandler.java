@@ -2,9 +2,7 @@ package net.kogasachan.kogasa_addiction.event.common;
 
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.item.ModItems;
-import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -60,10 +58,6 @@ public final class ManualGrantHandler {
             player.getPersistentData().putBoolean(NBT_KEY, true);
         }
 
-        player.displayClientMessage(
-                Component.translatable("message.kogasa_addiction.manual.granted")
-                        .withStyle(ChatFormatting.LIGHT_PURPLE),
-                true);
     }
 
     private static boolean hasManual(ServerPlayer player) {

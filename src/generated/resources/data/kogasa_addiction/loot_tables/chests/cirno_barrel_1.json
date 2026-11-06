@@ -11,13 +11,29 @@
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 4.0,
-                "min": 1.0
+                "max": 12.0,
+                "min": 4.0
               },
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:book",
+          "name": "minecraft:ice",
+          "weight": 20
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 6.0,
+                "min": 2.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:packed_ice",
           "weight": 12
         },
         {
@@ -27,14 +43,14 @@
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 8.0,
-                "min": 2.0
+                "max": 16.0,
+                "min": 4.0
               },
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:paper",
-          "weight": 10
+          "name": "minecraft:snowball",
+          "weight": 15
         },
         {
           "type": "minecraft:item",
@@ -49,12 +65,30 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:ink_sac",
-          "weight": 8
+          "name": "minecraft:blue_ice",
+          "weight": 5
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:writable_book",
+          "name": "minecraft:powder_snow_bucket",
+          "weight": 6
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kogasa_addiction:cirno_ingot"
+        }
+      ],
+      "rolls": {
+        "type": "minecraft:uniform",
+        "max": 8.0,
+        "min": 5.0
+      }
+    },
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:empty",
           "weight": 6
         },
         {
@@ -64,79 +98,14 @@
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 6.0,
-                "min": 2.0
-              },
-              "function": "minecraft:set_count"
-            }
-          ],
-          "name": "minecraft:feather",
-          "weight": 8
-        }
-      ],
-      "rolls": {
-        "type": "minecraft:uniform",
-        "max": 3.0,
-        "min": 2.0
-      }
-    },
-    {
-      "bonus_rolls": 0.0,
-      "entries": [
-        {
-          "type": "minecraft:item",
-          "functions": [
-            {
-              "enchantments": [
-                "minecraft:mending"
-              ],
-              "function": "minecraft:enchant_randomly"
-            }
-          ],
-          "name": "minecraft:enchanted_book",
-          "weight": 10
-        }
-      ],
-      "rolls": {
-        "type": "minecraft:uniform",
-        "max": 2.0,
-        "min": 1.0
-      }
-    },
-    {
-      "bonus_rolls": 0.0,
-      "entries": [
-        {
-          "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 6.0,
-                "min": 2.0
-              },
-              "function": "minecraft:set_count"
-            }
-          ],
-          "name": "minecraft:soul_sand",
-          "weight": 10
-        },
-        {
-          "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 4.0,
+                "max": 3.0,
                 "min": 1.0
               },
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:glowstone",
-          "weight": 8
+          "name": "minecraft:diamond",
+          "weight": 4
         },
         {
           "type": "minecraft:item",
@@ -151,7 +120,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:nether_bricks",
+          "name": "minecraft:lapis_lazuli",
           "weight": 6
         },
         {
@@ -161,44 +130,45 @@
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 6.0,
+                "max": 5.0,
                 "min": 2.0
               },
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:quartz",
-          "weight": 6
+          "name": "minecraft:prismarine_crystals",
+          "weight": 5
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:heart_of_the_sea"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 3.0,
+                "min": 1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "kogasa_addiction:cirno_ingot",
+          "weight": 9
         }
       ],
-      "rolls": {
-        "type": "minecraft:uniform",
-        "max": 2.0,
-        "min": 1.0
-      }
+      "rolls": 3.0
     },
     {
       "bonus_rolls": 0.0,
       "entries": [
         {
           "type": "minecraft:empty",
-          "weight": 3
+          "weight": 5
         },
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:golden_apple",
-          "weight": 2
-        },
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:enchanted_golden_apple"
-        }
-      ],
-      "rolls": 1.0
-    },
-    {
-      "bonus_rolls": 0.0,
-      "entries": [
         {
           "type": "minecraft:item",
           "functions": [
@@ -206,17 +176,25 @@
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 6.0,
-                "min": 2.0
+                "max": 1.0,
+                "min": 1.0
               },
               "function": "minecraft:set_count"
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "color": "aqua",
+                "italic": false,
+                "translate": "item.kogasa_addiction.cirno_treasure"
+              }
             }
           ],
-          "name": "kogasa_addiction:koishi_ingot"
+          "name": "minecraft:blue_ice"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "kogasa_addiction:chests/satori"
+  "random_sequence": "kogasa_addiction:chests/cirno_barrel_1"
 }

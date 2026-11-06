@@ -17,8 +17,8 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:diamond_block",
-          "weight": 10
+          "name": "minecraft:gold_ingot",
+          "weight": 20
         },
         {
           "type": "minecraft:item",
@@ -27,13 +27,13 @@
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 3.0,
+                "max": 2.0,
                 "min": 1.0
               },
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:emerald_block",
+          "name": "minecraft:ender_pearl",
           "weight": 15
         },
         {
@@ -43,35 +43,14 @@
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 3.0,
-                "min": 1.0
+                "max": 6.0,
+                "min": 2.0
               },
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:golden_apple",
-          "weight": 10
-        },
-        {
-          "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 3.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
-            }
-          ],
-          "name": "minecraft:enchanted_golden_apple",
-          "weight": 8
-        },
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:netherite_block",
-          "weight": 3
+          "name": "minecraft:lapis_lazuli",
+          "weight": 18
         },
         {
           "type": "minecraft:item",
@@ -81,13 +60,65 @@
               "count": {
                 "type": "minecraft:uniform",
                 "max": 5.0,
-                "min": 3.0
+                "min": 2.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:nether_wart",
+          "weight": 14
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 2.0,
+                "min": 1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:blaze_rod",
+          "weight": 12
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 6.0,
+                "min": 2.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:blaze_powder",
+          "weight": 16
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:wither_skeleton_skull"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 3.0,
+                "min": 1.0
               },
               "function": "minecraft:set_count"
             }
           ],
           "name": "kogasa_addiction:kogasa_ingot",
-          "weight": 5
+          "weight": 2
         },
         {
           "type": "minecraft:item",
@@ -96,14 +127,14 @@
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 5.0,
-                "min": 3.0
+                "max": 3.0,
+                "min": 1.0
               },
               "function": "minecraft:set_count"
             }
           ],
           "name": "kogasa_addiction:aya_ingot",
-          "weight": 5
+          "weight": 2
         },
         {
           "type": "minecraft:item",
@@ -112,14 +143,14 @@
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 5.0,
-                "min": 3.0
+                "max": 3.0,
+                "min": 1.0
               },
               "function": "minecraft:set_count"
             }
           ],
           "name": "kogasa_addiction:koishi_ingot",
-          "weight": 5
+          "weight": 2
         },
         {
           "type": "minecraft:item",
@@ -128,14 +159,14 @@
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 5.0,
-                "min": 3.0
+                "max": 3.0,
+                "min": 1.0
               },
               "function": "minecraft:set_count"
             }
           ],
           "name": "kogasa_addiction:cirno_ingot",
-          "weight": 5
+          "weight": 2
         },
         {
           "type": "minecraft:item",
@@ -144,14 +175,14 @@
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 5.0,
-                "min": 3.0
+                "max": 3.0,
+                "min": 1.0
               },
               "function": "minecraft:set_count"
             }
           ],
           "name": "kogasa_addiction:tenshi_ingot",
-          "weight": 5
+          "weight": 2
         },
         {
           "type": "minecraft:item",
@@ -160,14 +191,14 @@
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 5.0,
-                "min": 3.0
+                "max": 3.0,
+                "min": 1.0
               },
               "function": "minecraft:set_count"
             }
           ],
           "name": "kogasa_addiction:sakuya_ingot",
-          "weight": 5
+          "weight": 2
         },
         {
           "type": "minecraft:item",
@@ -182,10 +213,10 @@
       ],
       "rolls": {
         "type": "minecraft:uniform",
-        "max": 25.0,
-        "min": 12.0
+        "max": 8.0,
+        "min": 3.0
       }
     }
   ],
-  "random_sequence": "kogasa_addiction:chests/tree"
+  "random_sequence": "kogasa_addiction:chests/wall_chest"
 }

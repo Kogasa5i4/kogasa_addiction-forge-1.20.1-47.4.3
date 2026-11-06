@@ -2,14 +2,14 @@ package net.kogasachan.kogasa_addiction.ability.tooltip;
 
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.event.client.ClientConfigCache;
-import net.kogasachan.kogasa_addiction.util.KogasaNumberFormatHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.CrossbowItem;
 
 /**
- * KOISHI（紧闭的恋之瞳）的 tooltip：近战暴击 / 远程穿甲暴击与特殊目标。
+ * KOISHI（紧闭的恋之瞳）的 Alt 提示：只保留“远程能力已关闭”这一状态指示；
+ * 具体暴击率/倍率/特攻说明已移到 JEI 能力锭分类。
  */
 public final class KoishiAbilityTooltip implements KogasaAbilityTooltip {
 
@@ -18,32 +18,9 @@ public final class KoishiAbilityTooltip implements KogasaAbilityTooltip {
         boolean isRangedWeapon = ctx.stack().getItem() instanceof BowItem
                 || ctx.stack().getItem() instanceof CrossbowItem;
 
-        if (isRangedWeapon) {
-            if (ClientConfigCache.get(Config.ENABLE_KOISHI_RANGED)) {
-                double mult = ClientConfigCache.get(Config.KOISHI_RANGED_CRIT_MULTIPLIER);
-                double specialTargetMult = ClientConfigCache.get(Config.KOISHI_PROJECTILE_IMMUNE_MULTIPLIER);
-                ctx.add(Component.translatable(
-                                "tooltip.kogasa_addiction.koishi.ranged_crit_info",
-                                KogasaNumberFormatHelper.formatPercentTrimmed(ClientConfigCache.get(Config.KOISHI_RANGED_CRIT_CHANCE), 0),
-                                KogasaNumberFormatHelper.formatTrimmed(mult, 2))
-                        .withStyle(ChatFormatting.LIGHT_PURPLE));
-                ctx.add(Component.translatable(
-                                "tooltip.kogasa_addiction.koishi.ranged_special_targets",
-                                KogasaNumberFormatHelper.formatTrimmed(specialTargetMult, 2),
-                                KogasaNumberFormatHelper.formatTrimmed(specialTargetMult * specialTargetMult, 2))
-                        .withStyle(ChatFormatting.GRAY));
-            } else {
-                ctx.add(Component.translatable(
-                                "tooltip.kogasa_addiction.koishi.ranged_disabled")
-                        .withStyle(ChatFormatting.DARK_GRAY));
-            }
-        } else {
-            double mult = ClientConfigCache.get(Config.KOISHI_CRIT_MULTIPLIER);
-            ctx.add(Component.translatable(
-                            "tooltip.kogasa_addiction.koishi.crit_info",
-                            KogasaNumberFormatHelper.formatPercentTrimmed(ClientConfigCache.get(Config.KOISHI_CRIT_CHANCE), 0),
-                            KogasaNumberFormatHelper.formatTrimmed(mult, 2))
-                    .withStyle(ChatFormatting.LIGHT_PURPLE));
+        if (isRangedWeapon && !ClientConfigCache.get(Config.ENABLE_KOISHI_RANGED)) {
+            ctx.add(Component.translatable("tooltip.kogasa_addiction.koishi.ranged_disabled")
+                    .withStyle(ChatFormatting.DARK_GRAY));
         }
     }
 }

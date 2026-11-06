@@ -1,0 +1,46 @@
+{
+  "parent": "kogasa_addiction:root",
+  "criteria": {
+    "find_tengu_sword": {
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "structure": "kogasa_addiction:tengu_sword"
+              }
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:location"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.kogasa_addiction.tengu_staring.description"
+    },
+    "frame": "challenge",
+    "hidden": true,
+    "icon": {
+      "item": "minecraft:netherite_sword",
+      "nbt": "{Damage:0}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.kogasa_addiction.tengu_staring.title"
+    }
+  },
+  "requirements": [
+    [
+      "find_tengu_sword"
+    ]
+  ],
+  "rewards": {
+    "experience": 723
+  },
+  "sends_telemetry_event": true
+}

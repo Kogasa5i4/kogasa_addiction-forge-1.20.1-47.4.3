@@ -42,12 +42,16 @@ public final class ModWorldgen {
     }
 
     private static final List<Def> DEFS = List.of(
-            new Def("cirno", "#forge:is_snowy", 0, true, 72, 18, 999951467),
-            new Def("hut", "#minecraft:is_overworld", 0, true, 96, 24, 986751432),
-            new Def("koishi", "#minecraft:is_overworld", 0, true, 64, 16, 102851455),
+            // 雪原群系，但排除海洋（含冻洋）
+            new Def("cirno", "#kogasa_addiction:snowy_no_ocean", 0, true, 72, 18, 999951467),
+            // 全主世界，但排除海洋
+            new Def("hut", "#kogasa_addiction:overworld_no_ocean", -1, true, 96, 24, 986751432),
+            new Def("koishi", "#kogasa_addiction:overworld_no_ocean", 0, true, 64, 16, 102851455),
             new Def("mystia_izakaya", "#minecraft:is_forest", 0, true, 32, 8, 144233985),
             new Def("tree", "minecraft:cherry_grove", 0, true, 96, 24, 987652031),
-            new Def("wall", "minecraft:lush_caves", -30, false, 32, 8, 789156432)
+            new Def("wall", "minecraft:lush_caves", -30, false, 32, 8, 789156432),
+            // 平原；1.20.1 原版没有 #minecraft:is_plains，用 Forge 的 #forge:is_plains
+            new Def("tengu_sword", "#forge:is_plains", -9, true, 80, 20, 140721508)
     );
 
     private ModWorldgen() {

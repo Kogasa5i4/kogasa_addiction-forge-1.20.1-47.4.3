@@ -37,7 +37,7 @@ public class ModChestLootTables implements LootTableSubProvider {
 
     @Override
     public void generate(BiConsumer<ResourceLocation, LootTable.Builder> output) {
-        output.accept(id("cirno"), chest()
+        output.accept(id("cirno_barrel_1"), chest()
                 .withPool(pool(UniformGenerator.between(5, 8))
                         .add(count(Items.ICE, 20, 4, 12))
                         .add(count(Items.PACKED_ICE, 12, 2, 6))
@@ -57,14 +57,14 @@ public class ModChestLootTables implements LootTableSubProvider {
                         .add(named(count(Items.BLUE_ICE, 1, 1, 1),
                                 "item.kogasa_addiction.cirno_treasure", ChatFormatting.AQUA))));
 
-        output.accept(id("cirno_barrel"), chest()
+        output.accept(id("cirno_barrel_2"), chest()
                 .withPool(pool(UniformGenerator.between(3, 7))
                         .add(count(Items.ICE, 20, 2, 6))
                         .add(count(Items.PACKED_ICE, 12, 1, 2))
                         .add(count(Items.SNOWBALL, 15, 1, 4))
                         .add(item(ModItems.CIRNO_INGOT.get(), 1))));
 
-        output.accept(id("daiyousei"), chest()
+        output.accept(id("cirno_barrel_3"), chest()
                 .withPool(pool(UniformGenerator.between(5, 8))
                         .add(count(Items.POPPY, 12, 2, 6))
                         .add(count(Items.DANDELION, 12, 2, 6))
@@ -91,7 +91,7 @@ public class ModChestLootTables implements LootTableSubProvider {
                         .add(empty(2))
                         .add(item(ModItems.CIRNO_INGOT.get(), 1))));
 
-        output.accept(id("hat"), chest()
+        output.accept(id("koishi_barrel_3"), chest()
                 .withPool(pool(UniformGenerator.between(1, 2))
                         .add(count(Items.IRON_INGOT, 12, 2, 6))
                         .add(count(Items.GOLD_INGOT, 10, 1, 4))
@@ -116,7 +116,7 @@ public class ModChestLootTables implements LootTableSubProvider {
                         .add(item(Items.ENCHANTED_GOLDEN_APPLE, 10))
                         .add(item(Items.DRAGON_HEAD, 1))));
 
-        output.accept(id("hut"), chest()
+        output.accept(id("hut_chest"), chest()
                 .withPool(pool(UniformGenerator.between(5, 8))
                         .add(count(Items.IRON_INGOT, 10, 1, 4))
                         .add(count(Items.EMERALD, 5, 1, 3))
@@ -127,7 +127,7 @@ public class ModChestLootTables implements LootTableSubProvider {
                         .add(count(Items.TORCH, 12, 4, 12))
                         .add(count(Items.STICK, 8, 4, 10))));
 
-        output.accept(id("hut_barrel"), chest()
+        output.accept(id("hut_barrel_1"), chest()
                 .withPool(pool(UniformGenerator.between(6, 12))
                         .add(count(Items.DIAMOND, 8, 1, 3))
                         .add(count(Items.NETHERITE_SCRAP, 3, 1, 2))
@@ -135,7 +135,7 @@ public class ModChestLootTables implements LootTableSubProvider {
                         .add(item(Items.ENCHANTED_GOLDEN_APPLE, 1))
                         .add(item(ModItems.FUMO.get(), 1))));
 
-        output.accept(id("koishi"), chest()
+        output.accept(id("koishi_barrel_1"), chest()
                 .withPool(pool(ConstantValue.exactly(1))
                         .add(item(Items.GOLDEN_SWORD, 2))
                         .add(item(Items.IRON_SWORD, 6))
@@ -161,7 +161,7 @@ public class ModChestLootTables implements LootTableSubProvider {
                         .add(count(Items.NETHERITE_BLOCK, 1, 1, 16))
                         .add(count(Items.NETHER_STAR, 4, 1, 4))));
 
-        output.accept(id("mystia"), chest()
+        output.accept(id("mystia_izakaya_barrel_1"), chest()
                 .withPool(pool(UniformGenerator.between(3, 4))
                         .add(count(Items.GOLDEN_CARROT, 10, 2, 4))
                         .add(count(Items.PUMPKIN_PIE, 10, 1, 3))
@@ -172,7 +172,7 @@ public class ModChestLootTables implements LootTableSubProvider {
                         .add(item(Items.GOLDEN_APPLE, 3))
                         .add(item(Items.ENCHANTED_GOLDEN_APPLE, 1))));
 
-        output.accept(id("mystia_cooked"), chest()
+        output.accept(id("mystia_izakaya_barrel_4"), chest()
                 .withPool(pool(UniformGenerator.between(6, 12))
                         .add(count(Items.COOKED_BEEF, 12, 2, 4))
                         .add(count(Items.COOKED_PORKCHOP, 12, 2, 4))
@@ -182,7 +182,7 @@ public class ModChestLootTables implements LootTableSubProvider {
                         .add(count(Items.COOKED_SALMON, 6, 1, 2))
                         .add(count(Items.BAKED_POTATO, 6, 2, 4))));
 
-        output.accept(id("mystia_feature"), chest()
+        output.accept(id("mystia_izakaya_chest"), chest()
                 .withPool(pool(UniformGenerator.between(6, 12))
                         .add(item(Items.ENDER_PEARL, 10))
                         .add(item(Items.BLAZE_POWDER, 10))
@@ -216,7 +216,7 @@ public class ModChestLootTables implements LootTableSubProvider {
                         .add(item(Items.ENDER_EYE, 2))
                         .add(item(Items.SHULKER_SHELL, 2))));
 
-        output.accept(id("mystia_raw"), chest()
+        output.accept(id("mystia_izakaya_barrel_2"), chest()
                 .withPool(pool(UniformGenerator.between(6, 12))
                         .add(count(Items.BEEF, 12, 2, 4))
                         .add(count(Items.PORKCHOP, 12, 2, 4))
@@ -225,7 +225,7 @@ public class ModChestLootTables implements LootTableSubProvider {
                         .add(count(Items.COD, 8, 1, 3))
                         .add(count(Items.SALMON, 6, 1, 2))));
 
-        output.accept(id("mystia_veg"), chest()
+        output.accept(id("mystia_izakaya_barrel_3"), chest()
                 .withPool(pool(UniformGenerator.between(6, 12))
                         .add(count(Items.CARROT, 12, 2, 5))
                         .add(count(Items.POTATO, 12, 2, 5))
@@ -236,7 +236,7 @@ public class ModChestLootTables implements LootTableSubProvider {
                         .add(count(Items.PUMPKIN, 4, 1, 2))
                         .add(item(Items.GOLDEN_APPLE, 1))));
 
-        output.accept(id("satori"), chest()
+        output.accept(id("koishi_barrel_2"), chest()
                 .withPool(pool(UniformGenerator.between(2, 3))
                         .add(count(Items.BOOK, 12, 1, 4))
                         .add(count(Items.PAPER, 10, 2, 8))
@@ -257,7 +257,7 @@ public class ModChestLootTables implements LootTableSubProvider {
                 .withPool(pool(ConstantValue.exactly(1))
                         .add(count(ModItems.KOISHI_INGOT.get(), 1, 2, 6))));
 
-        output.accept(id("tree"), chest()
+        output.accept(id("tree_barrel_1"), chest()
                 .withPool(pool(UniformGenerator.between(12, 25))
                         .add(count(Items.DIAMOND_BLOCK, 10, 1, 4))
                         .add(count(Items.EMERALD_BLOCK, 15, 1, 3))
@@ -272,7 +272,7 @@ public class ModChestLootTables implements LootTableSubProvider {
                         .add(count(ModItems.SAKUYA_INGOT.get(), 5, 3, 5))
                         .add(lockedEquipment(Items.AIR, 2))));
 
-        output.accept(id("wall"), chest()
+        output.accept(id("wall_chest"), chest()
                 .withPool(pool(UniformGenerator.between(3, 8))
                         .add(count(Items.GOLD_INGOT, 20, 1, 4))
                         .add(count(Items.ENDER_PEARL, 15, 1, 2))
@@ -289,7 +289,7 @@ public class ModChestLootTables implements LootTableSubProvider {
                         .add(count(ModItems.SAKUYA_INGOT.get(), 2, 1, 3))
                         .add(lockedEquipment(Items.AIR, 2))));
 
-        output.accept(id("wall_barrel"), chest()
+        output.accept(id("wall_barrel_1"), chest()
                 .withPool(pool(UniformGenerator.between(5, 16))
                         .add(item(Items.DIAMOND_BLOCK, 3))
                         .add(item(Items.EMERALD_BLOCK, 5))
@@ -305,6 +305,58 @@ public class ModChestLootTables implements LootTableSubProvider {
                         .add(count(ModItems.TENSHI_INGOT.get(), 5, 3, 5))
                         .add(count(ModItems.SAKUYA_INGOT.get(), 5, 3, 5))
                         .add(lockedEquipment(Items.AIR, 2))));
+
+        // tengu_sword 结构里的两个木桶
+        // 1 号桶：极稀有，大量能力锭 / 稀有矿块 / 合金升级模板 / 附魔金苹果
+        output.accept(id("tengu_sword_barrel_1"), chest()
+                .withPool(pool(ConstantValue.exactly(2))
+                        .add(item(Items.ENCHANTED_GOLDEN_APPLE, 8))
+                        .add(count(Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE, 6, 2, 3))
+                        .add(count(Items.DIAMOND_BLOCK, 6, 3, 6))
+                        .add(count(Items.EMERALD_BLOCK, 6, 3, 6))
+                        .add(count(Items.ANCIENT_DEBRIS, 5, 3, 6))
+                        .add(count(Items.NETHERITE_INGOT, 5, 2, 4))
+                        .add(count(Items.NETHERITE_SCRAP, 5, 4, 8))
+                        .add(count(Items.NETHERITE_BLOCK, 3, 1, 2))
+                        .add(count(Items.DIAMOND, 6, 8, 16))
+                        .add(count(Items.EMERALD, 6, 8, 16))
+                        .add(count(Items.WITHER_SKELETON_SKULL, 3, 1, 2))
+                        .add(item(Items.NETHER_STAR, 2))
+                        .add(item(Items.BEACON, 2))
+                        .add(item(Items.DRAGON_HEAD, 1)))
+                // 龙蛋单独 0.5% 池（199 空 + 1 龙蛋）
+                .withPool(pool(ConstantValue.exactly(1))
+                        .add(empty(199))
+                        .add(item(Items.DRAGON_EGG, 1)))
+                .withPool(pool(UniformGenerator.between(3, 5))
+                        .add(count(ModItems.KOGASA_INGOT.get(), 6, 4, 8))
+                        .add(count(ModItems.AYA_INGOT.get(), 6, 4, 8))
+                        .add(count(ModItems.CIRNO_INGOT.get(), 6, 4, 8))
+                        .add(count(ModItems.KOISHI_INGOT.get(), 6, 4, 8))
+                        .add(count(ModItems.TENSHI_INGOT.get(), 6, 4, 8))
+                        .add(count(ModItems.SAKUYA_INGOT.get(), 6, 4, 8))));
+
+        // 2 号桶：一般，羽毛 / 极少量文文锭 / 少量矿物粒 / 0~1 件铁质装备
+        output.accept(id("tengu_sword_barrel_2"), chest()
+                .withPool(pool(UniformGenerator.between(5, 8))
+                        .add(count(Items.FEATHER, 20, 4, 12))
+                        .add(count(Items.IRON_NUGGET, 16, 3, 10))
+                        .add(count(Items.GOLD_NUGGET, 12, 3, 8))
+                        .add(count(Items.COAL, 10, 2, 6))
+                        .add(count(Items.COPPER_INGOT, 5, 1, 3))
+                        .add(count(Items.IRON_INGOT, 12, 2, 6))
+                        .add(count(Items.GOLD_INGOT, 8, 2, 5))
+                        .add(count(Items.STRING, 8, 2, 6))
+                        .add(count(Items.BREAD, 6, 2, 4))
+                        .add(count(ModItems.AYA_INGOT.get(), 3, 1, 2)))
+                .withPool(pool(ConstantValue.exactly(1))
+                        .add(empty(5))
+                        .add(item(Items.IRON_SWORD, 1))
+                        .add(item(Items.IRON_PICKAXE, 1))
+                        .add(item(Items.IRON_AXE, 1))
+                        .add(item(Items.IRON_SHOVEL, 1))
+                        .add(item(Items.IRON_HOE, 1))
+                        .add(item(Items.SHIELD, 1))));
     }
 
     // ===== 构建辅助 =====
@@ -353,7 +405,7 @@ public class ModChestLootTables implements LootTableSubProvider {
 
     private static LootPoolSingletonContainer.Builder<?> lockedEquipment(Item item, int weight) {
         LootPoolSingletonContainer.Builder<?> builder = LootItem.lootTableItem(item).setWeight(weight);
-        builder.apply(() -> new KogasaLockedEquipmentFunction());
+        builder.apply(KogasaLockedEquipmentFunction::new);
         return builder;
     }
 }

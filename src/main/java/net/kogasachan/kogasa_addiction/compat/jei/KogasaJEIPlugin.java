@@ -8,6 +8,8 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
+import net.kogasachan.kogasa_addiction.ability.KogasaAbilityRegistry;
+import net.kogasachan.kogasa_addiction.ability.effect.KogasaAbilityEffects;
 import net.kogasachan.kogasa_addiction.datagen.ModItemTagsProvider;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.item.KogasaAbilityIngotItem;
@@ -266,7 +268,9 @@ public class KogasaJEIPlugin implements IModPlugin {
     @Override
     public void registerCategories(@NotNull IRecipeCategoryRegistration registration) {
         if (!ModList.get().isLoaded("jei")) return;
-        registration.addRecipeCategories(new AnvilReinforcementCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(
+                new AnvilReinforcementCategory(registration.getJeiHelpers().getGuiHelper()),
+                new AbilityIngotCategory(registration.getJeiHelpers().getGuiHelper()));
     }
 
     @Override
@@ -290,6 +294,38 @@ public class KogasaJEIPlugin implements IModPlugin {
 
         KogasaAddiction.LOGGER.info("Registered {} JEI anvil recipes", recipes.size());
         registration.addRecipes(AnvilReinforcementCategory.RECIPE_TYPE, recipes);
+
+        // ===== 能力锭信息分类：六种能力各一条 =====
+        List<AbilityIngotRecipe> abilityRecipes = new ArrayList<>();
+        List<Item> abilityEquipment = List.of(
+                ModItems.KOGASA_SWORD.get(),
+                ModItems.KOGASA_PICKAXE.get(),
+                ModItems.KOGASA_AXE.get(),
+                ModItems.KOGASA_SHOVEL.get(),
+                ModItems.KOGASA_HOE.get(),
+                ModItems.TENSHI_HELMET.get(),
+                ModItems.TENSHI_CHESTPLATE.get(),
+                ModItems.TENSHI_LEGGINGS.get(),
+                ModItems.TENSHI_BOOTS.get(),
+                ModItems.AYA_BOW.get(),
+                ModItems.AYA_CROSSBOW.get(),
+                ModItems.SAKUYA_KNIFE.get());
+
+        KogasaAbilityRegistry.ingots().forEach((ability, ingot) -> {
+            List<ItemStack> outputs = new ArrayList<>();
+            for (Item equipment : abilityEquipment) {
+                ItemStack output = new ItemStack(equipment);
+                KogasaAbilityData.addAbility(output, ability);
+                outputs.add(output);
+            }
+            abilityRecipes.add(new AbilityIngotRecipe(
+                    ability,
+                    new ItemStack(ingot.get()),
+                    outputs,
+                    KogasaAbilityEffects.get(ability)));
+        });
+
+        registration.addRecipes(AbilityIngotCategory.RECIPE_TYPE, abilityRecipes);
     }
 
     @Override
@@ -297,5 +333,9 @@ public class KogasaJEIPlugin implements IModPlugin {
         if (!ModList.get().isLoaded("jei")) return;
         // 将铁砧注册为“铁砧强化”类别的催化剂
         registration.addRecipeCatalyst(new ItemStack(Items.ANVIL), AnvilReinforcementCategory.RECIPE_TYPE);
+
+        // 六种能力锭作为“能力锭”信息分类的催化剂
+        KogasaAbilityRegistry.ingots().values().forEach(ingot ->
+                registration.addRecipeCatalyst(new ItemStack(ingot.get()), AbilityIngotCategory.RECIPE_TYPE));
     }
 }

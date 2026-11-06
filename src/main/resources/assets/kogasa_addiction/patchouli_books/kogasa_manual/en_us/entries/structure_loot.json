@@ -1,0 +1,16 @@
+{
+  "name": "book.kogasa_addiction.entry.structure_loot.name",
+  "category": "kogasa_addiction:structures",
+  "icon": "minecraft:chest",
+  "sortnum": 7,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.structure_loot.page1"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.structure_loot.page2"
+    }
+  ]
+}

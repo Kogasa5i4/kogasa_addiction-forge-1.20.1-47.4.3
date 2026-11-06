@@ -9,6 +9,7 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
+import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -16,7 +17,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,7 +33,7 @@ public class AnvilReinforcementCategory implements IRecipeCategory<AnvilReinforc
     private final IDrawable plus;
 
     public AnvilReinforcementCategory(IGuiHelper guiHelper) {
-        this.icon = guiHelper.createDrawableItemStack(new ItemStack(Items.ANVIL));
+        this.icon = guiHelper.createDrawableItemStack(new ItemStack(ModItems.KOGASA_SWORD.get()));
 
         // 不再引用 JEI 内部 atlas 路径（15.74 已把 textures/jei/atlas/gui/* 改为
         // textures/gui/sprites/*，写死旧路径会在新版 JEI 上丢贴图）。改用 JEI 提供的 drawable。

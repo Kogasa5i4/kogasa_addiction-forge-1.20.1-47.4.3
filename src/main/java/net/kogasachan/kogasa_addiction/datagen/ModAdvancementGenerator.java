@@ -5,10 +5,13 @@ import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.minecraft.advancements.*;
 import net.minecraft.advancements.critereon.*;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemEntityPropertyCondition;
@@ -392,7 +395,26 @@ public class ModAdvancementGenerator implements ForgeAdvancementProvider.Advance
                 .addCriterion("obtain_sealed_equipment", new ImpossibleTrigger.TriggerInstance())
                 .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "obtain_sealed_equipment"), existingFileHelper);
 
-        // ===== 26. 配方解锁：手册（登录即解锁） =====
+        // ===== 26. 天狗正凝视着（隐藏） =====
+        ResourceKey<Structure> tenguSwordStructure = ResourceKey.create(
+                Registries.STRUCTURE,
+                ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "tengu_sword"));
+
+        Advancement tengu_staring = Advancement.Builder.advancement()
+                .display(new DisplayInfo(
+                        new ItemStack(Items.NETHERITE_SWORD),
+                        Component.translatable("advancements.kogasa_addiction.tengu_staring.title"),
+                        Component.translatable("advancements.kogasa_addiction.tengu_staring.description"),
+                        null, FrameType.CHALLENGE, true, true, true
+                ))
+                .parent(root)
+                .addCriterion("find_tengu_sword", PlayerTrigger.TriggerInstance.located(
+                        LocationPredicate.inStructure(tenguSwordStructure)))
+                .rewards(AdvancementRewards.Builder.experience(723))
+                .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "tengu_staring"),
+                        existingFileHelper);
+
+        // ===== 98. 配方解锁：手册（登录即解锁） =====
         Advancement.Builder.advancement()
                 .addCriterion("tick",
                         new PlayerTrigger.TriggerInstance(CriteriaTriggers.TICK.getId(), ContextAwarePredicate.ANY))
@@ -401,7 +423,7 @@ public class ModAdvancementGenerator implements ForgeAdvancementProvider.Advance
                 .save(writer, ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "recipes/kogasa_manual"),
                         existingFileHelper);
 
-        // ===== 27. 配方解锁：文文箭染色 =====
+        // ===== 99. 配方解锁：文文箭染色 =====
         Advancement.Builder.advancement()
                 .parent(ResourceLocation.withDefaultNamespace("recipes/root"))
                 .addCriterion("has_aya_arrow",

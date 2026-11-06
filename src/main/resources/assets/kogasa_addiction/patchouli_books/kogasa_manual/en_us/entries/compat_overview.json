@@ -16,5 +16,6 @@
       "type": "patchouli:text",
       "text": "book.kogasa_addiction_compat.entry.overview.page3"
     }
-  ]
+  ],
+  "flag": "kogasa_addiction:compat_entries"
 }

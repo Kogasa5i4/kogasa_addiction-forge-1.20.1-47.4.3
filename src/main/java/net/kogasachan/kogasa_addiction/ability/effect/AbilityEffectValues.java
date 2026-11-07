@@ -90,9 +90,14 @@ public final class AbilityEffectValues {
             case "tenshi.burst" -> Component.translatable(PREFIX + "tenshi.burst",
                     percent(ClientConfigCache.get(Config.TENSHI_BURST_DAMAGE_RATIO)));
             case "tenshi.debuff" -> Component.translatable(PREFIX + "tenshi.debuff",
-                    ClientConfigCache.get(Config.TENSHI_DEBUFF_DURATION_SECONDS));
+                    ClientConfigCache.get(Config.TENSHI_DEBUFF_DURATION_SECONDS),
+                    ClientConfigCache.get(Config.TENSHI_DEBUFF_LEVEL));
             case "tenshi.flying" -> Component.translatable(PREFIX + "tenshi.flying",
                     KogasaNumberFormatHelper.formatTrimmed(ClientConfigCache.get(Config.TENSHI_FLYING_MOB_MULTIPLIER), 2));
+            case "tenshi.buff" -> Component.translatable(PREFIX + "tenshi.buff",
+                    ClientConfigCache.get(Config.TENSHI_BUFF_DURATION_SECONDS),
+                    ClientConfigCache.get(Config.TENSHI_BUFF_DURATION_CAP_SECONDS),
+                    ClientConfigCache.get(Config.TENSHI_BUFF_LEVEL_CAP));
             default -> null;
         };
     }

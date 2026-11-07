@@ -7,10 +7,12 @@ import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.kogasachan.kogasa_addiction.util.KogasaIdListMatcher;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
+import top.theillusivec4.curios.api.CuriosApi;
 
 /**
  * 兼容层判定入口。
@@ -78,6 +80,11 @@ public final class KogasaCompat {
         }
         // 能进护甲槽的物品（含非 ArmorItem 的自定义护甲）也允许结合
         if (KogasaEquipmentHelper.getArmorEquipmentSlot(stack) != null) {
+            return true;
+        }
+
+        // 法术书/戒指等 Curios 装备没有耐久、没有攻击属性，必须单独放行。
+        if (ModList.get().isLoaded("curios") && CuriosApi.getCurio(stack).isPresent()) {
             return true;
         }
 

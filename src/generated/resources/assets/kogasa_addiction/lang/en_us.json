@@ -334,9 +334,10 @@
   "jei.kogasa_addiction.ability_effect.current.koishi.ranged_crit": "Current: %1$s armor-piercing crit chance, x%2$s multiplier",
   "jei.kogasa_addiction.ability_effect.current.koishi.special": "Current: x%1$s vs Endermen/Withers, x%2$s vs Ender Dragon",
   "jei.kogasa_addiction.ability_effect.current.sakuya.time_stop": "Current: %1$ss per equipment, %2$s block radius, %3$ss cooldown",
+  "jei.kogasa_addiction.ability_effect.current.tenshi.buff": "Current: +%1$s seconds per application, cap %2$s seconds, level %3$s",
   "jei.kogasa_addiction.ability_effect.current.tenshi.burst": "Current: %1$s of target max health",
   "jei.kogasa_addiction.ability_effect.current.tenshi.charge": "Current: %1$s damage threshold",
-  "jei.kogasa_addiction.ability_effect.current.tenshi.debuff": "Current: %1$s seconds",
+  "jei.kogasa_addiction.ability_effect.current.tenshi.debuff": "Current: %1$s seconds at level %2$s",
   "jei.kogasa_addiction.ability_effect.current.tenshi.flying": "Current: x%1$s",
   "jei.kogasa_addiction.ability_effect.kogasa.combo.desc": "Ranged hits build a combo; bonus, reset time, and maximum stacks depend on config.",
   "jei.kogasa_addiction.ability_effect.kogasa.combo.name": "Handling",
@@ -476,5 +477,6 @@
   "tooltip.kogasa_addiction.tenshi.charge": "  Current State: %1$s / %2$s (§aResistance %3$s§r)",
   "tooltip.kogasa_addiction.tenshi.ready": "  Current State: §cFully Charged§r (Next hit unleashes burst and resets)",
   "tooltip.kogasa_addiction.timestop.available": "  The time stop ability is available.",
-  "tooltip.kogasa_addiction.timestop.unavailable": "  The time stop ability is unavailable."
+  "tooltip.kogasa_addiction.timestop.unavailable": "  The time stop ability is unavailable.",
+  "tooltip.kogasa_addiction.absorbed.attribute": "  · %1$s +%2$s"
 }

@@ -4,6 +4,7 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.item.SakuyaKnifeItem;
 import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
+import net.kogasachan.kogasa_addiction.util.KogasaCuriosHelper;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaIdListMatcher;
 import net.minecraft.ChatFormatting;
@@ -124,6 +125,13 @@ public class KogasaGrowthHandler {
                 player.getInventory().setChanged();
             }
         }
+
+        // Curios 槽位与 EquipmentSlot 平行遍历；法术书/戒指等也能积累成长。
+        KogasaCuriosHelper.forEachEquipped(player, stack -> {
+            if (net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(stack)) {
+                addGrowth(stack, player);
+            }
+        });
     }
 
     public static void addGrowth(ItemStack stack, ServerPlayer player) {

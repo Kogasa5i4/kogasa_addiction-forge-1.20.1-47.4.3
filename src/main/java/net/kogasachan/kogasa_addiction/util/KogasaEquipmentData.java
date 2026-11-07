@@ -3,10 +3,14 @@ package net.kogasachan.kogasa_addiction.util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class KogasaEquipmentData {
 
@@ -15,6 +19,8 @@ public class KogasaEquipmentData {
     private static final String USED_MATERIALS = "UsedMaterials";
     private static final String GROWTH = "Growth";
     private static final String ABSORBED_VALUE = "AbsorbedValue";
+    private static final String ABSORBED_ATTRIBUTES = "AbsorbedAttributes";
+    private static final String ABSORBED_ATTRIBUTE_MULTIPLIERS = "AbsorbedAttributeMultipliers";
     /** 弓弩专用：累积吸收的"拉弓速度"（单位 tick，从原版拉满时间中扣减） */
     private static final String DRAW_SPEED_VALUE = "DrawSpeedValue";
     private static final String GROWTH_ENCHANTS_GRANTED = "GrowthEnchantsGranted";
@@ -89,7 +95,101 @@ public class KogasaEquipmentData {
     }
 
     public static double getAbsorbedValue(ItemStack stack) {
-        return getTag(stack).getDouble(ABSORBED_VALUE);
+        CompoundTag tag = getTag(stack);
+        CompoundTag attributes = tag.getCompound(ABSORBED_ATTRIBUTES);
+        if (attributes.contains("minecraft:generic.attack_damage")) {
+            return attributes.getDouble("minecraft:generic.attack_damage");
+        }
+        if (attributes.contains("minecraft:generic.armor")) {
+            return attributes.getDouble("minecraft:generic.armor");
+        }
+        return tag.getDouble(ABSORBED_VALUE);
+    }
+
+    /** 指定属性的吸收值；旧装备的 scalar 只作为 attack/armor 的兼容回退。 */
+    public static double getAbsorbedValue(ItemStack stack, ResourceLocation attributeId) {
+        CompoundTag tag = getTag(stack);
+        CompoundTag attributes = tag.getCompound(ABSORBED_ATTRIBUTES);
+        if (attributes.contains(attributeId.toString())) {
+            return attributes.getDouble(attributeId.toString());
+        }
+        double legacy = tag.getDouble(ABSORBED_VALUE);
+        if (legacy <= 0.0D) return 0.0D;
+        if (attributeId.equals(ResourceLocation.withDefaultNamespace("generic.attack_damage"))
+                && !(stack.getItem() instanceof ArmorItem)) {
+            return legacy;
+        }
+        if (attributeId.equals(ResourceLocation.withDefaultNamespace("generic.armor"))
+                && stack.getItem() instanceof ArmorItem) {
+            return legacy;
+        }
+        return 0.0D;
+    }
+
+    /** 已吸收的额外属性（attribute id → value），不包含旧 scalar。 */
+    public static Map<ResourceLocation, Double> getAbsorbedAttributes(ItemStack stack) {
+        CompoundTag attributes = getTag(stack).getCompound(ABSORBED_ATTRIBUTES);
+        Map<ResourceLocation, Double> result = new LinkedHashMap<>();
+        for (String key : attributes.getAllKeys()) {
+            ResourceLocation id = ResourceLocation.tryParse(key);
+            if (id != null) {
+                result.put(id, attributes.getDouble(key));
+            }
+        }
+        return result;
+    }
+
+    public static void addAbsorbedAttribute(ItemStack stack, ResourceLocation attributeId, double value) {
+        if (value <= 0.0D) return;
+        CompoundTag tag = getTag(stack);
+        CompoundTag attributes = tag.getCompound(ABSORBED_ATTRIBUTES);
+        String key = attributeId.toString();
+        attributes.putDouble(key, attributes.getDouble(key) + value);
+        tag.put(ABSORBED_ATTRIBUTES, attributes);
+        saveTag(stack, tag);
+    }
+
+    public static void setAbsorbedAttribute(ItemStack stack, ResourceLocation attributeId, double value) {
+        CompoundTag tag = getTag(stack);
+        CompoundTag attributes = tag.getCompound(ABSORBED_ATTRIBUTES);
+        String key = attributeId.toString();
+        if (value <= 0.0D) {
+            attributes.remove(key);
+        } else {
+            attributes.putDouble(key, value);
+        }
+        if (attributes.isEmpty()) {
+            tag.remove(ABSORBED_ATTRIBUTES);
+        } else {
+            tag.put(ABSORBED_ATTRIBUTES, attributes);
+        }
+        saveTag(stack, tag);
+    }
+
+    public static boolean hasAbsorbedAttributes(ItemStack stack) {
+        return !getTag(stack).getCompound(ABSORBED_ATTRIBUTES).isEmpty();
+    }
+
+    public static Map<ResourceLocation, Double> getAbsorbedAttributeMultipliers(ItemStack stack) {
+        CompoundTag attributes = getTag(stack).getCompound(ABSORBED_ATTRIBUTE_MULTIPLIERS);
+        Map<ResourceLocation, Double> result = new LinkedHashMap<>();
+        for (String key : attributes.getAllKeys()) {
+            ResourceLocation id = ResourceLocation.tryParse(key);
+            if (id != null) {
+                result.put(id, attributes.getDouble(key));
+            }
+        }
+        return result;
+    }
+
+    public static void addAbsorbedAttributeMultiplier(ItemStack stack, ResourceLocation attributeId, double value) {
+        if (value <= 0.0D) return;
+        CompoundTag tag = getTag(stack);
+        CompoundTag attributes = tag.getCompound(ABSORBED_ATTRIBUTE_MULTIPLIERS);
+        String key = attributeId.toString();
+        attributes.putDouble(key, attributes.getDouble(key) + value);
+        tag.put(ABSORBED_ATTRIBUTE_MULTIPLIERS, attributes);
+        saveTag(stack, tag);
     }
 
     /**
@@ -124,6 +224,8 @@ public class KogasaEquipmentData {
         tag.remove(REINFORCEMENTS);
         tag.remove(USED_MATERIALS);
         tag.remove(ABSORBED_VALUE);
+        tag.remove(ABSORBED_ATTRIBUTES);
+        tag.remove(ABSORBED_ATTRIBUTE_MULTIPLIERS);
         tag.remove(DRAW_SPEED_VALUE);
 
         if (isEmptyIgnoringVersion(tag)) {
@@ -140,7 +242,7 @@ public class KogasaEquipmentData {
     }
 
     /** 装备数据模式版本（存于 KogasaEquipment 根内）。结构变更时 +1，并在 {@link #migrate} 里补步骤。 */
-    public static final int SCHEMA_VERSION = 2;
+    public static final int SCHEMA_VERSION = 3;
     private static final String KEY_SCHEMA_VERSION = "SchemaVersion";
 
     public static CompoundTag getTag(ItemStack stack) {
@@ -149,7 +251,7 @@ public class KogasaEquipmentData {
         if (tag == null) return new CompoundTag();
 
         CompoundTag root = tag.getCompound(ROOT);
-        ensureMigrated(root);
+        ensureMigrated(stack, root);
         return root;
     }
 
@@ -157,17 +259,17 @@ public class KogasaEquipmentData {
      * 幂等迁移：把根标签从旧版本逐步升级到 {@link #SCHEMA_VERSION}。
      * 以后改数据结构时：SCHEMA_VERSION +1，并在 {@link #migrate} 里为旧版本号加一个 case。
      */
-    private static void ensureMigrated(CompoundTag root) {
+    private static void ensureMigrated(ItemStack stack, CompoundTag root) {
         int version = root.getInt(KEY_SCHEMA_VERSION);
         while (version < SCHEMA_VERSION) {
-            version = migrate(root, version);
+            version = migrate(stack, root, version);
         }
         if (root.getInt(KEY_SCHEMA_VERSION) != SCHEMA_VERSION) {
             root.putInt(KEY_SCHEMA_VERSION, SCHEMA_VERSION);
         }
     }
 
-    private static int migrate(CompoundTag root, int from) {
+    private static int migrate(ItemStack stack, CompoundTag root, int from) {
         return switch (from) {
             // v0 → v1：旧版没有版本字段，结构本身未变，仅盖章。
             // 顶层遗留的 GrowthEnchantFailNotified 由 hasGrowthEnchantFailNotified /
@@ -175,8 +277,32 @@ public class KogasaEquipmentData {
             case 0 -> 1;
             // v1 → v2：新增 Locked 键（无旧数据需要搬运，仅盖章）。
             case 1 -> 2;
+            // v2 → v3：旧的单个 AbsorbedValue 迁移到 AbsorbedAttributes。
+            case 2 -> {
+                migrateLegacyAbsorbedValue(stack, root);
+                yield 3;
+            }
             default -> SCHEMA_VERSION; // 未知版本号，保守跳到最新
         };
+    }
+
+    private static void migrateLegacyAbsorbedValue(ItemStack stack, CompoundTag root) {
+        double legacy = root.getDouble(ABSORBED_VALUE);
+        if (legacy <= 0.0D) return;
+
+        CompoundTag attributes = root.getCompound(ABSORBED_ATTRIBUTES);
+        String key = stack.getItem() instanceof ArmorItem
+                ? "minecraft:generic.armor"
+                : "minecraft:generic.attack_damage";
+        if (!attributes.contains(key)) {
+            attributes.putDouble(key, legacy);
+        }
+        if (attributes.isEmpty()) {
+            root.remove(ABSORBED_ATTRIBUTES);
+        } else {
+            root.put(ABSORBED_ATTRIBUTES, attributes);
+        }
+        root.remove(ABSORBED_VALUE);
     }
 
     public static void saveTag(ItemStack stack, CompoundTag tag) {

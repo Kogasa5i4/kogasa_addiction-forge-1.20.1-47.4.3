@@ -9,6 +9,8 @@ import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.kogasachan.kogasa_addiction.item.SakuyaKnifeItem;
 import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKind;
 import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKinds;
+import net.kogasachan.kogasa_addiction.util.KogasaAttributeAbsorption;
+import net.kogasachan.kogasa_addiction.util.KogasaCuriosHelper;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.minecraft.nbt.CompoundTag;
@@ -200,7 +202,8 @@ public class KogasaAnvilHandler {
      */
     private static void handleReinforcement(AnvilUpdateEvent event,
                                             ItemStack left, ItemStack right) {
-        if (left.getItem() == right.getItem()) {
+        if (left.getItem() == right.getItem()
+                && !KogasaCuriosHelper.sharesSlot(left, right)) {
             event.setOutput(ItemStack.EMPTY);
             event.setCost(0);
             return;
@@ -277,6 +280,53 @@ public class KogasaAnvilHandler {
         double absorb = baseValue * ratio;
         if (absorb > 0) {
             KogasaEquipmentData.addAbsorbedValue(result, absorb);
+        }
+
+        // 额外属性：攻击/护甲仍走上面的 legacy scalar，其余属性进入 AbsorbedAttributes。
+        KogasaAttributeAbsorption.Category absorbCategory;
+        if (isBowOrCrossbow) {
+            absorbCategory = KogasaAttributeAbsorption.Category.RANGED;
+        } else if (KogasaEquipmentHelper.getArmorEquipmentSlot(left) != null) {
+            absorbCategory = KogasaAttributeAbsorption.Category.ARMOR;
+        } else if (left.getItem() instanceof SwordItem
+                || left.getItem() instanceof DiggerItem
+                || left.getItem() instanceof TridentItem) {
+            absorbCategory = KogasaAttributeAbsorption.Category.MELEE;
+        } else {
+            // 不属于近战/远程/护甲的装备：属性全放行
+            absorbCategory = KogasaAttributeAbsorption.Category.OTHER;
+        }
+        KogasaAttributeAbsorption.Result absorbed =
+                KogasaAttributeAbsorption.collect(right, absorbCategory, event.getPlayer());
+        double materialMultiplier = KogasaEquipmentHelper.getTotalMultiplier(right);
+        if (materialMultiplier <= 0.0D) materialMultiplier = 1.0D;
+
+        for (var entry : absorbed.additive().entrySet()) {
+            String id = entry.getKey().toString();
+            if (absorbCategory != KogasaAttributeAbsorption.Category.OTHER
+                    && (id.equals("minecraft:generic.attack_damage")
+                            || id.equals("minecraft:generic.armor"))) {
+                continue;
+            }
+            // 材料自身的成长/强化倍率已经体现在 modifier 数值里，吸收前剥离，避免双重成长。
+            double raw = entry.getValue() / materialMultiplier;
+            double value = raw * ratio * KogasaAttributeAbsorption.scale(entry.getKey());
+            if (value > 0.0D) {
+                KogasaEquipmentData.addAbsorbedAttribute(result, entry.getKey(), value);
+            }
+        }
+
+        for (var entry : absorbed.multiplicative().entrySet()) {
+            String id = entry.getKey().toString();
+            if (absorbCategory != KogasaAttributeAbsorption.Category.OTHER
+                    && (id.equals("minecraft:generic.attack_damage")
+                            || id.equals("minecraft:generic.armor"))) {
+                continue;
+            }
+            double value = entry.getValue() * ratio * KogasaAttributeAbsorption.scale(entry.getKey());
+            if (value > 0.0D) {
+                KogasaEquipmentData.addAbsorbedAttributeMultiplier(result, entry.getKey(), value);
+            }
         }
 
         double drawAbsorb = drawValue * ratio;

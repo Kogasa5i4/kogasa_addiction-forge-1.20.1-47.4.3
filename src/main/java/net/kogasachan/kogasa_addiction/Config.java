@@ -131,12 +131,44 @@ public class Config {
     public static final ForgeConfigSpec.DoubleValue WEAPON_ABSORBED_RATIO = BUILDER
             .comment("Absorbed value ratio for weapons and tools.\n" +
                     "强化时吸收的武器/工具属性比例。")
-            .defineInRange("weaponAbsorbedRatio", 0.5, 0.0, Double.MAX_VALUE);
+            .defineInRange("weaponAbsorbedRatio", 1.0, 0.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue ARMOR_ABSORBED_RATIO = BUILDER
             .comment("Absorbed value ratio for armor.\n" +
                     "强化时吸收的护甲属性比例。")
-            .defineInRange("armorAbsorbedRatio", 0.5, 0.0, Double.MAX_VALUE);
+            .defineInRange("armorAbsorbedRatio", 1.0, 0.0, Double.MAX_VALUE);
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ATTRIBUTE_ABSORB_MELEE_BLACKLIST = BUILDER
+            .comment("Attributes never absorbed when the output is melee. Supports * and ? wildcards.\n" +
+                    "近战装备吸收时排除的属性，支持 * 和 ? 通配符。")
+            .defineListAllowEmpty("attributeAbsorbMeleeBlacklist",
+                    List.of("minecraft:generic.attack_speed"),
+                    o -> o instanceof String s && !s.isBlank());
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ATTRIBUTE_ABSORB_RANGED_BLACKLIST = BUILDER
+            .comment("Attributes never absorbed when the output is ranged. Supports * and ? wildcards.\n" +
+                    "远程装备吸收时排除的属性，支持 * 和 ? 通配符。")
+            .defineListAllowEmpty("attributeAbsorbRangedBlacklist",
+                    List.of("minecraft:generic.attack_speed"),
+                    o -> o instanceof String s && !s.isBlank());
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ATTRIBUTE_ABSORB_ARMOR_BLACKLIST = BUILDER
+            .comment("Attributes never absorbed when the output is armor. Supports * and ? wildcards.\n" +
+                    "护甲吸收时排除的属性，支持 * 和 ? 通配符。")
+            .defineListAllowEmpty("attributeAbsorbArmorBlacklist",
+                    List.of(
+                            "minecraft:generic.armor",
+                            "minecraft:generic.armor_toughness",
+                            "minecraft:generic.knockback_resistance"),
+                    o -> o instanceof String s && !s.isBlank());
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ATTRIBUTE_ABSORB_SCALE = BUILDER
+            .comment("Per-attribute absorption multiplier, format: attribute_id=value, e.g. irons_spellbooks:*=0.1.\n" +
+                    "Empty = all allowed attributes use 1.0; the first matching pattern wins; supports * and ? wildcards.\n" +
+                    "按属性配置吸收倍率，格式：属性ID=数值，例如 irons_spellbooks:*=0.1。\n" +
+                    "留空 = 所有允许属性倍率为 1.0；按列表顺序取第一个匹配项；支持 * 和 ? 通配符。")
+            .defineListAllowEmpty("attributeAbsorbScale", List.of(),
+                    o -> o instanceof String s && s.contains("=") && !s.isBlank());
 
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> DYNAMIC_STAT_MATERIALS = BUILDER
             .comment("Items listed here use their current main-hand ATTACK_DAMAGE attribute as the base absorption value when used as reinforcement material. Supports * wildcards.\n" +
@@ -162,6 +194,20 @@ public class Config {
             .comment("Enable growth.\n" +
                     "启用成长。")
             .define("enableGrowth", true);
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ATTRIBUTE_GROWTH_BLACKLIST = BUILDER
+            .comment("Attributes that do not receive the growth multiplier. Supports * and ? wildcards.\n" +
+                    "不参与成长倍率的属性，支持 * 和 ? 通配符。")
+            .defineListAllowEmpty("attributeGrowthBlacklist", List.of(),
+                    o -> o instanceof String s && !s.isBlank());
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ATTRIBUTE_GROWTH_CAPS = BUILDER
+            .comment("Per-attribute cap for the final grown additive value, format: attribute_id=cap.\n" +
+                    "Empty = no cap; first matching pattern wins; supports * and ? wildcards.\n" +
+                    "按属性限制成长后的最终加值，格式：属性ID=上限。\n" +
+                    "留空 = 不限制；按列表顺序取第一个匹配项；支持 * 和 ? 通配符。")
+            .defineListAllowEmpty("attributeGrowthCaps", List.of(),
+                    o -> o instanceof String s && s.contains("=") && !s.isBlank());
 
     public static final ForgeConfigSpec.IntValue GROWTH_UNLOCK_REINFORCEMENTS = BUILDER
             .comment("Reinforcement count required to unlock growth. Can be lower than maxReinforcements.\n" +
@@ -590,6 +636,64 @@ public class Config {
             .comment("Damage multiplier against non-boss flying mobs. 2.0 = 200%.\n" +
                     "对非 Boss 飞行生物的伤害倍率。2.0 = 200%。")
             .defineInRange("tenshiFlyingMobMultiplier", 2.0, 1.0, Double.MAX_VALUE);
+
+    public static final ForgeConfigSpec.IntValue TENSHI_DEBUFF_LEVEL = BUILDER
+            .comment("Slowness / Mining Fatigue level applied by Tenshi hits. 7 = level VII (amplifier 6).\n" +
+                    "天子命中时施加的缓慢与挖掘疲劳等级。7 = VII 级（amplifier 6）。")
+            .defineInRange("tenshiDebuffLevel", 7, 1, 255);
+
+    public static final ForgeConfigSpec.IntValue TENSHI_RESISTANCE_MAX_LEVEL = BUILDER
+            .comment("Maximum Resistance level granted by the Tenshi charge. 4 = Resistance IV.\n" +
+                    "天子蓄力提供的最高抗性等级。4 = 抗性 IV。")
+            .defineInRange("tenshiResistanceMaxLevel", 4, 1, 255);
+
+    public static final ForgeConfigSpec.IntValue TENSHI_RESISTANCE_REFRESH_TICKS = BUILDER
+            .comment("Duration (ticks) of each Resistance refresh. 120 = 6 seconds.\n" +
+                    "每次刷新抗性效果的持续时间（tick）。120 = 6 秒。")
+            .defineInRange("tenshiResistanceRefreshTicks", 120, 20, 1200);
+
+    public static final ForgeConfigSpec.IntValue TENSHI_RESISTANCE_THRESHOLD_DIVISOR = BUILDER
+            .comment("The charge threshold is split into this many steps for Resistance levels. 4 = one level per quarter.\n" +
+                    "蓄力阈值分成的段数，用于决定抗性等级。4 = 每四分之一阈值提升一级。")
+            .defineInRange("tenshiResistanceThresholdDivisor", 4, 1, 20);
+
+    public static final ForgeConfigSpec.BooleanValue TENSHI_BUFF_ALLOW_MODDED = BUILDER
+            .comment("Allow beneficial effects from non-minecraft namespaces in the Tenshi random buff pool.\n" +
+                    "Default false for safety; enable to let the whitelist/blacklist include modded effects.\n" +
+                    "是否允许非 minecraft 命名空间的正面效果进入天子随机增益池。\n" +
+                    "默认 false 以保证安全；启用后可用白名单/黑名单筛选模组效果。")
+            .define("tenshiBuffAllowModded", false);
+
+    public static final ForgeConfigSpec.IntValue TENSHI_BUFF_DURATION_SECONDS = BUILDER
+            .comment("Seconds added each time a Tenshi random buff is applied.\n" +
+                    "天子随机增益每次叠加增加的秒数。")
+            .defineInRange("tenshiBuffDurationSeconds", 10, 1, 3600);
+
+    public static final ForgeConfigSpec.IntValue TENSHI_BUFF_DURATION_CAP_SECONDS = BUILDER
+            .comment("Maximum duration of a Tenshi random buff, in seconds.\n" +
+                    "天子随机增益的最大持续时间（秒）。")
+            .defineInRange("tenshiBuffDurationCapSeconds", 60, 1, 7200);
+
+    public static final ForgeConfigSpec.IntValue TENSHI_BUFF_LEVEL_CAP = BUILDER
+            .comment("Maximum level of a Tenshi random buff. 4 = level IV (amplifier 3).\n" +
+                    "天子随机增益的最高等级。4 = IV 级（amplifier 3）。")
+            .defineInRange("tenshiBuffLevelCap", 4, 1, 255);
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> TENSHI_BUFF_WHITELIST = BUILDER
+            .comment("Tenshi random buff whitelist. Empty = all beneficial vanilla effects are allowed.\n" +
+                    "If non-empty, only matching effects can be chosen. Supports * and ? wildcards.\n" +
+                    "天子随机增益白名单。留空 = 允许所有原版正面效果；非空时只有匹配的效果会被选中。支持 * 和 ? 通配符。")
+            .defineListAllowEmpty("tenshiBuffWhitelist", List.of(),
+                    o -> o instanceof String s && !s.isBlank());
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> TENSHI_BUFF_BLACKLIST = BUILDER
+            .comment("Tenshi random buff blacklist. Applied after the whitelist; matching effects are always excluded.\n" +
+                    "Defaults exclude Instant Health and Hero of the Village. Supports * and ? wildcards.\n" +
+                    "天子随机增益黑名单。在白名单之后生效；匹配的效果一律排除。支持 * 和 ? 通配符。\n" +
+                    "默认排除瞬间治疗与村庄英雄。")
+            .defineListAllowEmpty("tenshiBuffBlacklist",
+                    List.of("minecraft:heal", "minecraft:hero_of_the_villager"),
+                    o -> o instanceof String s && !s.isBlank());
 
     static {
         BUILDER.pop();

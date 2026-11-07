@@ -21,8 +21,10 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.*;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -128,8 +130,10 @@ public class KogasaEquipmentHelper {
             return buildHandModifiers(stack, baseDamage, absorbed, -2.9F);
         }
 
-        // 其他未单独处理的 Kogasa 装备（如弓弩）使用默认属性：原版内建属性为空
-        return EMPTY_MODIFIERS;
+        // 其他未单独处理的 Kogasa 装备（如弓弩）：只带吸收的额外属性
+        ImmutableMultimap.Builder<Attribute, AttributeModifier> absorbedOnly = ImmutableMultimap.builder();
+        appendAbsorbedAttributes(absorbedOnly, stack, EquipmentSlot.MAINHAND, true);
+        return absorbedOnly.build();
     }
 
     /**
@@ -155,6 +159,7 @@ public class KogasaEquipmentHelper {
         builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(
                 WEAPON_SPEED_UUID, "Kogasa modifier",
                 totalSpeed, AttributeModifier.Operation.ADDITION));
+        appendAbsorbedAttributes(builder, stack, EquipmentSlot.MAINHAND, false);
         return builder.build();
     }
 
@@ -202,7 +207,59 @@ public class KogasaEquipmentHelper {
                     totalKnockback, AttributeModifier.Operation.ADDITION));
         }
 
+        appendAbsorbedAttributes(builder, stack, slot, false);
         return builder.build();
+    }
+
+    /** 把 AbsorbedAttributes 中除攻击/护甲外的属性追加到 modifier 表。 */
+    @SuppressWarnings("deprecation")
+    private static void appendAbsorbedAttributes(
+            ImmutableMultimap.Builder<Attribute, AttributeModifier> builder,
+            ItemStack stack, EquipmentSlot slot, boolean includeLegacyAttributes) {
+        java.util.Set<ResourceLocation> legacy = java.util.Set.of(
+                ResourceLocation.withDefaultNamespace("generic.attack_damage"),
+                ResourceLocation.withDefaultNamespace("generic.attack_speed"),
+                ResourceLocation.withDefaultNamespace("generic.armor"),
+                ResourceLocation.withDefaultNamespace("generic.armor_toughness"),
+                ResourceLocation.withDefaultNamespace("generic.knockback_resistance"));
+
+        // 物品本来就有的额外属性也参与成长；攻击/护甲/攻速仍由上面的专用公式处理。
+        Map<ResourceLocation, Double> baseAdditive = new java.util.LinkedHashMap<>();
+        for (var entry : stack.getItem().getDefaultAttributeModifiers(slot).entries()) {
+            if (entry.getValue().getOperation() != AttributeModifier.Operation.ADDITION) continue;
+            ResourceLocation id = ForgeRegistries.ATTRIBUTES.getKey(entry.getKey());
+            if (id == null || (!includeLegacyAttributes && legacy.contains(id))) continue;
+            baseAdditive.merge(id, entry.getValue().getAmount(), Double::sum);
+        }
+
+        Map<ResourceLocation, Double> absorbedAdditive = KogasaEquipmentData.getAbsorbedAttributes(stack);
+        Map<ResourceLocation, Double> absorbedMultiplier = KogasaEquipmentData.getAbsorbedAttributeMultipliers(stack);
+
+        java.util.Set<ResourceLocation> all = new java.util.LinkedHashSet<>(baseAdditive.keySet());
+        all.addAll(absorbedAdditive.keySet());
+        all.addAll(absorbedMultiplier.keySet());
+
+        for (ResourceLocation id : all) {
+            if (!includeLegacyAttributes && legacy.contains(id)) continue;
+
+            Attribute attribute = ForgeRegistries.ATTRIBUTES.getValue(id);
+            if (attribute == null) continue;
+
+            double base = baseAdditive.getOrDefault(id, 0.0D);
+            double additive = absorbedAdditive.getOrDefault(id, 0.0D);
+            double multiplicative = absorbedMultiplier.getOrDefault(id, 0.0D);
+            double multiplier = KogasaAttributeGrowth.multiplier(stack, id);
+
+            // 加法吸收并入基础值，最后统一乘一次综合倍率；乘法吸收单独成乘数池。
+            double value = (base + additive) * multiplier * (1.0D + multiplicative);
+            value = KogasaAttributeGrowth.applyCap(id, value);
+            if (value <= 0.0D) continue;
+
+            UUID uuid = UUID.nameUUIDFromBytes(("kogasa_absorbed:" + id).getBytes(StandardCharsets.UTF_8));
+            builder.put(attribute, new AttributeModifier(
+                    uuid, "Kogasa growth " + id, value,
+                    AttributeModifier.Operation.ADDITION));
+        }
     }
 
     /**
@@ -650,6 +707,12 @@ public class KogasaEquipmentHelper {
      * </ol>
      */
     public static boolean matchesReinforcementMaterial(ItemStack left, ItemStack right) {
+        // Curios 装备（法术书/戒指）没有原版装备类层次，跨模组同槽位视为同类材料。
+        if (KogasaCuriosHelper.sharesSlot(left, right)) return true;
+        // 两边都已标记为兼容装备时，不再要求 Java 类相同。
+        if (isKogasaEquipment(left) && isKogasaEquipment(right)) return true;
+        // 护甲对护甲：自定义 ArmorItem / 非 ArmorItem 可穿戴物品都可能被原版类型判定漏掉。
+        if (getArmorEquipmentSlot(left) != null && isGenericReinforcementMaterial(right)) return true;
         // 1) 通用装备（如灾变直接继承 Item 的武器）：类不是原版基类时，先看通用材料
         if (isKogasaEquipment(left) && !isVanillaEquipmentClass(left.getItem())) {
             if (isGenericReinforcementMaterial(right)) return true;
@@ -707,7 +770,12 @@ public class KogasaEquipmentHelper {
         if (KogasaEquipmentKinds.of(stack) != null) return true;
         if (isDynamicStatMaterial(stack)) return true;
         if (getArmorEquipmentSlot(stack) != null) return true;
-        return getAttributeAttackDamageBase(stack) > 0.0D;
+        if (KogasaCuriosHelper.isCurio(stack)) return true;
+        // 自定义 Item 类常常不走 SwordItem/ArmorItem，也没有默认攻击属性；
+        // 有耐久即可视为装备材料（ISS/启示录/灾变等）。
+        if (stack.getMaxDamage() > 0) return true;
+        return getAttributeAttackDamageBase(stack) > 0.0D
+                || getAttributeAttackSpeedBase(stack) > 0.0D;
     }
 
     /**

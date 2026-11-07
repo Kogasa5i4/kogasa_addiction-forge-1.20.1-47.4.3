@@ -334,9 +334,10 @@
   "jei.kogasa_addiction.ability_effect.current.koishi.ranged_crit": "当前：穿甲暴击率 %1$s，倍率 ×%2$s",
   "jei.kogasa_addiction.ability_effect.current.koishi.special": "当前：对末影人/凋灵 ×%1$s，对末影龙 ×%2$s",
   "jei.kogasa_addiction.ability_effect.current.sakuya.time_stop": "当前：每件装备 %1$s 秒，半径 %2$s 格，冷却 %3$s 秒",
+  "jei.kogasa_addiction.ability_effect.current.tenshi.buff": "当前：每次 +%1$s 秒，上限 %2$s 秒、%3$s 级",
   "jei.kogasa_addiction.ability_effect.current.tenshi.burst": "当前：附加目标最大生命 %1$s",
   "jei.kogasa_addiction.ability_effect.current.tenshi.charge": "当前：阈值 %1$s 点伤害",
-  "jei.kogasa_addiction.ability_effect.current.tenshi.debuff": "当前：持续 %1$s 秒",
+  "jei.kogasa_addiction.ability_effect.current.tenshi.debuff": "当前：持续 %1$s 秒，%2$s 级",
   "jei.kogasa_addiction.ability_effect.current.tenshi.flying": "当前：×%1$s",
   "jei.kogasa_addiction.ability_effect.kogasa.combo.desc": "远程命中可累积连击；连击增幅、重置时间与最大层数由配置决定。",
   "jei.kogasa_addiction.ability_effect.kogasa.combo.name": "手感",
@@ -476,5 +477,6 @@
   "tooltip.kogasa_addiction.tenshi.charge": "  当前境界：%1$s / %2$s (§a抗性 %3$s 级§r)",
   "tooltip.kogasa_addiction.tenshi.ready": "  当前境界：§c已蓄满§r（下一次命中触发爆发并清空）",
   "tooltip.kogasa_addiction.timestop.available": "  时停能力目前可用。",
-  "tooltip.kogasa_addiction.timestop.unavailable": "  时停能力目前不可用。"
+  "tooltip.kogasa_addiction.timestop.unavailable": "  时停能力目前不可用。",
+  "tooltip.kogasa_addiction.absorbed.attribute": "  · %1$s +%2$s"
 }

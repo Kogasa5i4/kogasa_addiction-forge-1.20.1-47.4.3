@@ -55,13 +55,8 @@ public final class KogasaTooltipReinforcement {
                 }
             }
 
-            // 吸收值
-            if (absorbed > 0) {
-                tooltip.add(Component.translatable(
-                                "tooltip.kogasa_addiction.absorbed",
-                                KogasaNumberFormatHelper.formatTrimmed(absorbed, 1))
-                        .withStyle(ChatFormatting.LIGHT_PURPLE));
-            }
+            // 吸收属性已经进入物品自身的 AttributeModifier，原版属性区会合并/显示，
+            // 这里不再重复列出，避免同名属性出现两行。
         } else {
             tooltip.add(Component.translatable("tooltip.kogasa_addiction.hint.shift")
                     .withStyle(ChatFormatting.DARK_GRAY));

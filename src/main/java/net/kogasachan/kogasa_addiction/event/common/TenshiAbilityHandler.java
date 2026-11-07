@@ -6,6 +6,7 @@ import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityHelper;
 import net.kogasachan.kogasa_addiction.network.PacketHandler;
 import net.kogasachan.kogasa_addiction.network.TenshiAbilityPacket;
+import net.kogasachan.kogasa_addiction.util.KogasaIdListMatcher;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -114,9 +115,9 @@ public class TenshiAbilityHandler {
 
             // 1. 施加负面效果（VII 级缓慢与挖掘疲劳）
             int debuffDuration = Config.TENSHI_DEBUFF_DURATION_SECONDS.get() * 20;
-            // amplifier 6 代表等级 VII（原版极高级别，近乎定身和无法挖掘）
-            target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, debuffDuration, 6));
-            target.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, debuffDuration, 6));
+            int debuffAmplifier = Math.max(0, Config.TENSHI_DEBUFF_LEVEL.get() - 1);
+            target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, debuffDuration, debuffAmplifier));
+            target.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, debuffDuration, debuffAmplifier));
 
             // 2. 对非 Boss 飞行生物造成额外伤害
             if (isNonBossFlyingMob(target)) {
@@ -148,8 +149,10 @@ public class TenshiAbilityHandler {
 
         double threshold = Config.TENSHI_DOMAIN_THRESHOLD.get();
         double currentCharge = player.getPersistentData().getDouble(NBT_CHARGE);
+        int maxResistance = Config.TENSHI_RESISTANCE_MAX_LEVEL.get();
+        int thresholdDivisor = Math.max(1, Config.TENSHI_RESISTANCE_THRESHOLD_DIVISOR.get());
         int desiredLevel = currentCharge > 0
-                ? (int) Math.min(5, Math.floor(currentCharge / (threshold / 4.0)))
+                ? (int) Math.min(maxResistance, Math.floor(currentCharge / (threshold / thresholdDivisor)))
                 : 0;
 
         if (desiredLevel <= 0) return;
@@ -161,7 +164,7 @@ public class TenshiAbilityHandler {
         if (currentAmp != desiredLevel - 1 || current.getDuration() < 30) {
             player.addEffect(new MobEffectInstance(
                     MobEffects.DAMAGE_RESISTANCE,
-                    120,                 // 持续 6 秒，够撑到下一次检查
+                    Config.TENSHI_RESISTANCE_REFRESH_TICKS.get(),
                     desiredLevel - 1,
                     false, false, true));
         }
@@ -224,38 +227,38 @@ public class TenshiAbilityHandler {
         MobEffect chosen = beneficialEffects.get(player.getRandom().nextInt(beneficialEffects.size()));
         MobEffectInstance current = player.getEffect(chosen);
 
-        int newDuration = 200; // 默认 10 秒
-        int newAmplifier = 0;  // 默认 I 级
+        int durationStep = Config.TENSHI_BUFF_DURATION_SECONDS.get() * 20;
+        int durationCap = Config.TENSHI_BUFF_DURATION_CAP_SECONDS.get() * 20;
+        int levelCap = Math.max(0, Config.TENSHI_BUFF_LEVEL_CAP.get() - 1);
+
+        int newDuration = durationStep;
+        int newAmplifier = 0;
 
         if (current != null) {
-            // 时长叠加：每次 +10秒（200 tick），最高 60秒（1200 tick）
-            newDuration = Math.min(current.getDuration() + 200, 1200);
-            // 等级叠加：每次 +1 级，最高 IV 级（amplifier 3）
-            newAmplifier = Math.min(current.getAmplifier() + 1, 3);
+            newDuration = Math.min(current.getDuration() + durationStep, durationCap);
+            newAmplifier = Math.min(current.getAmplifier() + 1, levelCap);
         }
 
         player.addEffect(new MobEffectInstance(chosen, newDuration, newAmplifier, false, true, true));
     }
 
-    /** 可随机的增益池：惰性构建（首次调用时注册表已填好，不能在静态初始化里遍历） */
-    private static List<MobEffect> beneficialEffects = null;
-
     /**
-     * 遍历原版效果注册表（仅 minecraft 命名空间）+ {@code isBeneficial()} 检查，
-     * 不再硬编码列表——原版后续新增的正面效果会自动进入池子。
-     * 排除两个不适合作随机增益的：瞬间治疗（即时生效、无持续叠加意义）与村庄英雄（情景性）。
+     * 遍历原版效果注册表（仅 minecraft 命名空间）+ {@code isBeneficial()} 检查。
+     * 白名单非空时只允许匹配项；黑名单随后排除匹配项。
      */
     private static List<MobEffect> getBeneficialEffects() {
-        if (beneficialEffects == null) {
-            List<MobEffect> effects = new ArrayList<>();
-            for (MobEffect effect : ForgeRegistries.MOB_EFFECTS) {
-                ResourceLocation id = ForgeRegistries.MOB_EFFECTS.getKey(effect);
-                if (id == null || !"minecraft".equals(id.getNamespace())) continue;
-                if (effect == MobEffects.HEAL || effect == MobEffects.HERO_OF_THE_VILLAGE) continue;
-                if (effect.isBeneficial()) effects.add(effect);
-            }
-            beneficialEffects = effects;
+        List<? extends String> whitelist = Config.TENSHI_BUFF_WHITELIST.get();
+        List<? extends String> blacklist = Config.TENSHI_BUFF_BLACKLIST.get();
+        List<MobEffect> effects = new ArrayList<>();
+        for (MobEffect effect : ForgeRegistries.MOB_EFFECTS) {
+            ResourceLocation id = ForgeRegistries.MOB_EFFECTS.getKey(effect);
+            if (id == null) continue;
+            if (!Config.TENSHI_BUFF_ALLOW_MODDED.get() && !"minecraft".equals(id.getNamespace())) continue;
+            if (!effect.isBeneficial()) continue;
+            if (!whitelist.isEmpty() && !KogasaIdListMatcher.matches(id, whitelist)) continue;
+            if (KogasaIdListMatcher.matches(id, blacklist)) continue;
+            effects.add(effect);
         }
-        return beneficialEffects;
+        return effects;
     }
 }

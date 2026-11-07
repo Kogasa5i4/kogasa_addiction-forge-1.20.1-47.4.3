@@ -1,6 +1,8 @@
 package net.kogasachan.kogasa_addiction_compat.compat;
 
 import com.google.common.collect.Multimap;
+import net.kogasachan.kogasa_addiction.util.KogasaAttributeGrowth;
+import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.kogasachan.kogasa_addiction_compat.KogasaCompatAddon;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -11,6 +13,10 @@ import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 /**
  * 兼容层的数值入口：把成长/强化/封印带来的属性应用到非本模组物品上。
@@ -64,11 +70,15 @@ public final class CompatAttributeHandler {
                     // 会再替换一次护甲属性，两边叠加就是“两套数值”。
                     // 这里只叠加成长/强化带来的增量。
                     applyArmorOverlay(event, stack);
+                } else if (hasNonVanillaAttributes(event)) {
+                    // ISS 剑等虽然继承 SwordItem，但自带法术强度等属性；
+                    // 整体替换会把原生属性清掉，改走叠加式。
+                    applyGenericOverlay(event, stack);
                 } else {
                     Multimap<Attribute, AttributeModifier> modifiers =
                             KogasaEquipmentHelper.getAttributeModifiers(stack.getItem(), slot, stack);
 
-                    // 安全类物品：用主模组公式整体替换，保证与本模组装备完全一致
+                    // 原版属性结构：用主模组公式整体替换，保证与本模组装备完全一致
                     event.clearModifiers();
                     modifiers.forEach(event::addModifier);
                 }
@@ -116,6 +126,49 @@ public final class CompatAttributeHandler {
             event.addModifier(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED,
                     new AttributeModifier(GENERIC_SPEED_UUID, "Kogasa compat speed",
                             speedDelta, AttributeModifier.Operation.ADDITION));
+        }
+
+        applyAbsorbedExtras(event, stack);
+    }
+
+    /** 物品原有属性 + 吸收属性统一成长；同一属性合并成单条，避免同名双行。 */
+    private static void applyAbsorbedExtras(ItemAttributeModifierEvent event, ItemStack stack) {
+        Map<net.minecraft.resources.ResourceLocation, Double> additive =
+                KogasaEquipmentData.getAbsorbedAttributes(stack);
+        Map<net.minecraft.resources.ResourceLocation, Double> multiplicative =
+                KogasaEquipmentData.getAbsorbedAttributeMultipliers(stack);
+
+        java.util.Set<net.minecraft.resources.ResourceLocation> ids = new java.util.LinkedHashSet<>();
+        for (Attribute attribute : event.getModifiers().keySet()) {
+            net.minecraft.resources.ResourceLocation id = ForgeRegistries.ATTRIBUTES.getKey(attribute);
+            if (id != null) ids.add(id);
+        }
+        ids.addAll(additive.keySet());
+        ids.addAll(multiplicative.keySet());
+
+        java.util.Set<net.minecraft.resources.ResourceLocation> legacy = java.util.Set.of(
+                net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.attack_damage"),
+                net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.attack_speed"),
+                net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.armor"),
+                net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.armor_toughness"),
+                net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.knockback_resistance"));
+
+        for (net.minecraft.resources.ResourceLocation id : ids) {
+            if (legacy.contains(id)) continue;
+            Attribute attribute = ForgeRegistries.ATTRIBUTES.getValue(id);
+            if (attribute == null) continue;
+
+            double base = sumAddition(event.getModifiers(), attribute);
+            double add = additive.getOrDefault(id, 0.0D);
+            double mult = multiplicative.getOrDefault(id, 0.0D);
+            double growth = KogasaAttributeGrowth.multiplier(stack, id);
+            double value = KogasaAttributeGrowth.applyCap(id, (base + add) * growth * (1.0D + mult));
+            if (value <= 0.0D) continue;
+
+            event.removeAttribute(attribute);
+            event.addModifier(attribute, new AttributeModifier(
+                    java.util.UUID.nameUUIDFromBytes(("kogasa_absorbed:" + id).getBytes(StandardCharsets.UTF_8)),
+                    "Kogasa growth " + id, value, AttributeModifier.Operation.ADDITION));
         }
     }
 
@@ -166,6 +219,8 @@ public final class CompatAttributeHandler {
                 targetToughness, "Kogasa compat toughness");
         addTotal(event, net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE,
                 targetKnockback, "Kogasa compat knockback");
+
+        applyAbsorbedExtras(event, stack);
     }
 
     private static void addTotal(ItemAttributeModifierEvent event, Attribute attribute,
@@ -197,6 +252,19 @@ public final class CompatAttributeHandler {
      * <p>兼容护甲走 additive overlay：不 clear 原属性，避免和灾变等模组
      * 自己的 {@code ItemAttributeModifierEvent} 叠加成两套数值。
      */
+    private static boolean hasNonVanillaAttributes(ItemAttributeModifierEvent event) {
+        for (Attribute attribute : event.getOriginalModifiers().keySet()) {
+            if (attribute != net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE
+                    && attribute != net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED
+                    && attribute != net.minecraft.world.entity.ai.attributes.Attributes.ARMOR
+                    && attribute != net.minecraft.world.entity.ai.attributes.Attributes.ARMOR_TOUGHNESS
+                    && attribute != net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static boolean isSafeItem(Item item) {
         return item instanceof SwordItem
                 || item instanceof DiggerItem

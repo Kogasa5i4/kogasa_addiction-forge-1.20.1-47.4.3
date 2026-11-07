@@ -34,3 +34,6 @@ run-data
 
 # datagen 缓存（每次 runData 自动清理，不入版本库）
 **/src/generated/resources/.cache/
+
+# 第三方模组 jar（许可不允许二次分发，不入库）
+/libs/

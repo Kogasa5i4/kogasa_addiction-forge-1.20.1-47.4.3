@@ -475,6 +475,8 @@
   "jei.kogasa_addiction.ability_effect.current.sakuya.time_stop": "当前：每件装备 %1$s 秒，半径 %2$s 格，冷却 %3$s 秒",
   "jei.kogasa_addiction.ability_effect.current.tenshi.charge": "当前：阈值 %1$s 点伤害",
   "jei.kogasa_addiction.ability_effect.current.tenshi.burst": "当前：附加目标最大生命 %1$s",
-  "jei.kogasa_addiction.ability_effect.current.tenshi.debuff": "当前：持续 %1$s 秒",
-  "jei.kogasa_addiction.ability_effect.current.tenshi.flying": "当前：×%1$s"
+  "jei.kogasa_addiction.ability_effect.current.tenshi.debuff": "当前：持续 %1$s 秒，%2$s 级",
+  "jei.kogasa_addiction.ability_effect.current.tenshi.flying": "当前：×%1$s",
+  "jei.kogasa_addiction.ability_effect.current.tenshi.buff": "当前：每次 +%1$s 秒，上限 %2$s 秒、%3$s 级",
+  "tooltip.kogasa_addiction.absorbed.attribute": "  · %1$s +%2$s"
 }

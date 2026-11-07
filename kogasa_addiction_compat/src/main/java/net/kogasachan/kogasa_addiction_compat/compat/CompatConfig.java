@@ -23,6 +23,12 @@ public final class CompatConfig {
     /** 转化概率（0~1），默认 1.0 */
     public static final ForgeConfigSpec.DoubleValue RAINBOW_LAVA_CHANCE;
 
+    /** 原版含钻石宝箱额外掉落彩虹水晶的开关 */
+    public static final ForgeConfigSpec.BooleanValue RAINBOW_CHEST_LOOT_ENABLED;
+
+    /** 原版含钻石宝箱额外掉落彩虹水晶的概率（0~1） */
+    public static final ForgeConfigSpec.DoubleValue RAINBOW_CHEST_LOOT_CHANCE;
+
     /** 没有原版工具/武器基类、但需要按“通用装备”兼容的物品（支持 * 通配符） */
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> GENERIC_EQUIPMENT;
 
@@ -60,6 +66,16 @@ public final class CompatConfig {
                         "Chance of the lava conversion, 0~1. 1.0 = always.",
                         "熔岩转化概率，0~1。1.0 表示必定转化。")
                 .defineInRange("lavaConversionChance", 1.0D, 0.0D, 1.0D);
+        RAINBOW_CHEST_LOOT_ENABLED = builder
+                .comment(
+                        "Add a bonus rainbow crystal drop to vanilla chest loot tables that contain diamonds.",
+                        "在含有钻石的原版宝箱战利品中额外加入彩虹水晶掉落。")
+                .define("chestLootEnabled", true);
+        RAINBOW_CHEST_LOOT_CHANCE = builder
+                .comment(
+                        "Chance of the bonus rainbow crystal, 0~1. Default 0.5 = 50%.",
+                        "额外彩虹水晶的掉落概率，0~1，默认 0.5 = 50%。")
+                .defineInRange("chestLootChance", 0.5D, 0.0D, 1.0D);
         builder.pop();
 
         SPEC = builder.build();

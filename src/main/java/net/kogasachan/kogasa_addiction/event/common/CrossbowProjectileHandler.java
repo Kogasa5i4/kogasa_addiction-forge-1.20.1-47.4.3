@@ -5,6 +5,7 @@ import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.entity.projectile.AyaArrowEntity;
 import net.kogasachan.kogasa_addiction.item.ModItems;
+import net.kogasachan.kogasa_addiction.util.KogasaAmmoService;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.kogasachan.kogasa_addiction.util.ModConfigCache;
@@ -49,6 +50,7 @@ public final class CrossbowProjectileHandler {
 
     /** 本次射击是否已经生成过烟花批次的标记（每次 performShooting 开头清空） */
     public static final String TAG_FIREWORK_SPAWNED = "KogasaFireworkSpawned";
+    public static final String TAG_YH_SPAWNED = "KogasaYhSpawned";
 
     /** 概率不消耗触发标记（由 CrossbowNoConsumeMixin 写入） */
     private static final String TAG_NO_CONSUME = "KogasaNoConsume";
@@ -70,6 +72,21 @@ public final class CrossbowProjectileHandler {
 
         Level level = arrow.level();
         CompoundTag crossbowTag = crossbow.getOrCreateTag();
+
+        // ===== 妖归弹幕/符卡 =====
+        if (KogasaAmmoService.hasYhAmmo(crossbow)) {
+            if (!crossbowTag.getBoolean(TAG_YH_SPAWNED)) {
+                crossbowTag.putBoolean(TAG_YH_SPAWNED, true);
+                // 需要锁定目标的符卡/弹幕打不出去时保留原版箭，作为退化行为。
+                if (KogasaAmmoService.fireYh(crossbow, shooter)) {
+                    event.setCanceled(true);
+                    return;
+                }
+            } else {
+                event.setCanceled(true);
+                return;
+            }
+        }
 
         // ===== 烟花弹药：拦掉原版箭矢，改成发射烟花 =====
         if (KogasaAbilityData.getAmmoType(crossbow) == KogasaAbilityData.AmmoType.FIREWORK) {

@@ -3,15 +3,15 @@ package net.kogasachan.kogasa_addiction_compat.compat;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKinds;
+import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.kogasachan.kogasa_addiction.util.KogasaIdListMatcher;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.CuriosApi;
 
 /**

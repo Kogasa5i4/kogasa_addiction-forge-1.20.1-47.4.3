@@ -16,6 +16,10 @@
       "type": "patchouli:crafting",
       "recipe": "kogasa_addiction:aya_crossbow",
       "text": "book.kogasa_addiction.entry.ranged_basics.page3"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "book.kogasa_addiction.entry.ranged_basics.page4"
     }
   ]
 }

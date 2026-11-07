@@ -478,5 +478,10 @@
   "jei.kogasa_addiction.ability_effect.current.tenshi.debuff": "Current: %1$s seconds at level %2$s",
   "jei.kogasa_addiction.ability_effect.current.tenshi.flying": "Current: x%1$s",
   "jei.kogasa_addiction.ability_effect.current.tenshi.buff": "Current: +%1$s seconds per application, cap %2$s seconds, level %3$s",
-  "tooltip.kogasa_addiction.absorbed.attribute": "  · %1$s +%2$s"
+  "tooltip.kogasa_addiction.absorbed.attribute": "  · %1$s +%2$s",
+  "tooltip.kogasa_addiction.ammo.yh": "Loaded: %s",
+  "tooltip.kogasa_addiction.ammo.yh.note": "Danmaku/spellcards that require a target fall back to a normal arrow when no target is available.",
+  "jei.kogasa_addiction.hint.ammo_yh": "Youkai's Homecoming ammo: spellcards always fire once; target-required types fall back to a normal arrow without a target.",
+  "book.kogasa_addiction.entry.ranged_basics.page4": "Special ammo can be loaded into the Aya bow/crossbow at an anvil: potions, fireworks, and Youkai's Homecoming danmaku, lasers and spellcards. Danmaku keep their original type and color. Spellcards always fire once and ignore multishot. For custom spellcards, the actual form is determined by SpellData NBT; JEI and the manual show only the default form. Danmaku or spellcards that require a target fall back to a normal arrow when no valid target is available.",
+  "jei.kogasa_addiction.hint.ammo_yh_custom": "Custom spellcard: JEI shows the default form only; the actual form is determined by SpellData NBT."
 }

@@ -141,6 +141,17 @@ public final class KogasaTooltipAlt {
                     if (!fireworkStack.isEmpty()) {
                         tooltip.addAll(KogasaDisplayHelper.getFireworkInfo(fireworkStack));
                     }
+                } else if (ammoType == KogasaAbilityData.AmmoType.YH_DANMAKU
+                        || ammoType == KogasaAbilityData.AmmoType.YH_LASER
+                        || ammoType == KogasaAbilityData.AmmoType.YH_SPELL) {
+                    ItemStack ammo = KogasaAbilityData.getYhAmmo(stack);
+                    if (!ammo.isEmpty()) {
+                        tooltip.add(Component.translatable("tooltip.kogasa_addiction.ammo.yh",
+                                        ammo.getHoverName())
+                                .withStyle(ChatFormatting.LIGHT_PURPLE));
+                    }
+                    tooltip.add(Component.translatable("tooltip.kogasa_addiction.ammo.yh.note")
+                            .withStyle(ChatFormatting.DARK_GRAY));
                 }
             }
 

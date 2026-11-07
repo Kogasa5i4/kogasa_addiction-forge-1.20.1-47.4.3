@@ -13,11 +13,9 @@ import net.kogasachan.kogasa_addiction.util.KogasaAttributeAbsorption;
 import net.kogasachan.kogasa_addiction.util.KogasaCuriosHelper;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -346,41 +344,7 @@ public class KogasaAnvilHandler {
 
     private static boolean handleAmmoInfusion(AnvilUpdateEvent event,
                                               ItemStack left, ItemStack right) {
-        // ===== 药水（三种） =====
-        if (right.getItem() instanceof PotionItem) {
-            ResourceLocation potionId = ForgeRegistries.POTIONS.getKey(
-                    PotionUtils.getPotion(right));
-            if (potionId == null) return false;
-
-            KogasaAbilityData.PotionKind kind =
-                    right.getItem() instanceof LingeringPotionItem
-                            ? KogasaAbilityData.PotionKind.LINGERING
-                            : right.getItem() instanceof SplashPotionItem
-                            ? KogasaAbilityData.PotionKind.SPLASH
-                            : KogasaAbilityData.PotionKind.REGULAR;
-
-            ItemStack result = left.copy();
-            KogasaAbilityData.setPotionAmmo(result, potionId, kind);
-            event.setOutput(result);
-            event.setCost(Config.AMMO_INFUSION_COST.get());
-            event.setMaterialCost(1);
-            return true;
-        }
-
-        // ===== 烟花 =====
-        if (right.is(Items.FIREWORK_ROCKET)) {
-            CompoundTag nbt = right.getTag();
-            if (nbt == null || !nbt.contains("Fireworks")) return false;
-
-            ItemStack result = left.copy();
-            KogasaAbilityData.setFireworkAmmo(result, nbt.copy());
-            event.setOutput(result);
-            event.setCost(Config.AMMO_INFUSION_COST.get());
-            event.setMaterialCost(1);
-            return true;
-        }
-
-        return false;
+        return net.kogasachan.kogasa_addiction.util.KogasaAmmoService.tryLoad(left, right, event);
     }
 
     /**

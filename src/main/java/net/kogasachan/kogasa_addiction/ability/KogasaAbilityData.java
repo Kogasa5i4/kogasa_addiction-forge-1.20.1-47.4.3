@@ -456,8 +456,9 @@ public class KogasaAbilityData {
     private static final String AMMO_POTION = "Potion";
     private static final String AMMO_POTION_KIND = "PotionKind";
     private static final String AMMO_FIREWORK_NBT = "FireworkNbt";
+    private static final String AMMO_ITEM = "Item";
 
-    public enum AmmoType {POTION, FIREWORK}
+    public enum AmmoType {POTION, FIREWORK, YH_DANMAKU, YH_LASER, YH_SPELL}
 
     public enum PotionKind {REGULAR, SPLASH, LINGERING}
 
@@ -484,6 +485,24 @@ public class KogasaAbilityData {
         saveTag(stack, tag);
     }
 
+    public static void setYhAmmo(ItemStack stack, ItemStack ammo, AmmoType type) {
+        if (ammo.isEmpty()) return;
+        CompoundTag tag = getTag(stack);
+        CompoundTag data = new CompoundTag();
+        data.putString(AMMO_TYPE, type.name().toLowerCase());
+        data.put(AMMO_ITEM, ammo.copyWithCount(1).save(new CompoundTag()));
+        tag.put(AMMO, data);
+        saveTag(stack, tag);
+    }
+
+    public static ItemStack getYhAmmo(ItemStack stack) {
+        CompoundTag tag = getTag(stack);
+        if (!tag.contains(AMMO, Tag.TAG_COMPOUND)) return ItemStack.EMPTY;
+        CompoundTag data = tag.getCompound(AMMO);
+        if (!data.contains(AMMO_ITEM, Tag.TAG_COMPOUND)) return ItemStack.EMPTY;
+        return ItemStack.of(data.getCompound(AMMO_ITEM));
+    }
+
     public static void clearAmmo(ItemStack stack) {
         CompoundTag tag = getTag(stack);
         tag.remove(AMMO);
@@ -498,6 +517,9 @@ public class KogasaAbilityData {
         return switch (type) {
             case "potion" -> AmmoType.POTION;
             case "firework" -> AmmoType.FIREWORK;
+            case "yh_danmaku" -> AmmoType.YH_DANMAKU;
+            case "yh_laser" -> AmmoType.YH_LASER;
+            case "yh_spell" -> AmmoType.YH_SPELL;
             default -> null;
         };
     }

@@ -165,6 +165,37 @@ public class KogasaJEIPlugin implements IModPlugin {
         // 烟花 × 两种弓弩
         registerFireworkAmmoRecipe(recipes, ModItems.AYA_BOW.get());
         registerFireworkAmmoRecipe(recipes, ModItems.AYA_CROSSBOW.get());
+
+        // 妖归弹幕/激光/符卡
+        registerYhAmmoRecipes(recipes);
+    }
+
+    private static void registerYhAmmoRecipes(List<AnvilReinforcementRecipe> recipes) {
+        if (!ModList.get().isLoaded("youkaishomecoming")) return;
+        addYhAmmoRecipe(recipes, ModItems.AYA_BOW.get(), "danmaku", KogasaAbilityData.AmmoType.YH_DANMAKU, RecipeKind.AMMO_YH);
+        addYhAmmoRecipe(recipes, ModItems.AYA_CROSSBOW.get(), "danmaku", KogasaAbilityData.AmmoType.YH_DANMAKU, RecipeKind.AMMO_YH);
+        addYhAmmoRecipe(recipes, ModItems.AYA_BOW.get(), "laser", KogasaAbilityData.AmmoType.YH_LASER, RecipeKind.AMMO_YH);
+        addYhAmmoRecipe(recipes, ModItems.AYA_CROSSBOW.get(), "laser", KogasaAbilityData.AmmoType.YH_LASER, RecipeKind.AMMO_YH);
+        addYhAmmoRecipe(recipes, ModItems.AYA_BOW.get(), "preset_spell", KogasaAbilityData.AmmoType.YH_SPELL, RecipeKind.AMMO_YH);
+        addYhAmmoRecipe(recipes, ModItems.AYA_CROSSBOW.get(), "preset_spell", KogasaAbilityData.AmmoType.YH_SPELL, RecipeKind.AMMO_YH);
+        // 自定义符卡独立显示：NBT 可改变实际形态，JEI 只展示默认形态
+        addYhAmmoRecipe(recipes, ModItems.AYA_BOW.get(), "custom_spell", KogasaAbilityData.AmmoType.YH_SPELL, RecipeKind.AMMO_YH_CUSTOM);
+        addYhAmmoRecipe(recipes, ModItems.AYA_CROSSBOW.get(), "custom_spell", KogasaAbilityData.AmmoType.YH_SPELL, RecipeKind.AMMO_YH_CUSTOM);
+    }
+
+    private static void addYhAmmoRecipe(List<AnvilReinforcementRecipe> recipes, Item weaponItem,
+                                        String tagPath, KogasaAbilityData.AmmoType type, RecipeKind kind) {
+        TagKey<Item> tag = ItemTags.create(ResourceLocation.fromNamespaceAndPath("youkaishomecoming", tagPath));
+        List<ItemStack> ammo = new ArrayList<>();
+        itemsInTag(tag).forEach(item -> {
+            if (item != Items.AIR) ammo.add(new ItemStack(item));
+        });
+        if (ammo.isEmpty()) return;
+
+        ItemStack input = new ItemStack(weaponItem);
+        ItemStack output = input.copy();
+        KogasaAbilityData.setYhAmmo(output, ammo.get(0), type);
+        recipes.add(new AnvilReinforcementRecipe(input, ammo, output, kind));
     }
 
     private static void registerPotionAmmoRecipes(List<AnvilReinforcementRecipe> recipes,

@@ -38,6 +38,7 @@ public class CrossbowMixin {
         // 每次射击清一次"烟花已生成"标记，供实体加入世界时去重
         if (pCrossbowStack.getTag() != null) {
             pCrossbowStack.getTag().remove(CrossbowProjectileHandler.TAG_FIREWORK_SPAWNED);
+            pCrossbowStack.getTag().remove(CrossbowProjectileHandler.TAG_YH_SPAWNED);
         }
 
         if (!net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(pCrossbowStack)) return;

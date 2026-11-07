@@ -152,6 +152,9 @@ dependencies {
 
     // ===== 灾变（L_Ender's Cataclysm）本体：构建 + 运行都用这个 jar =====
     // 灾变运行需要的库：只放运行期，编译期不需要
+    // 妖归联动：开发环境运行依赖（可选，不写入发布 jar）
+    runtimeOnly fg.deobf("local.kogasa:farmersdelight:1.20.1-1.3.1")
+    runtimeOnly fg.deobf("local.kogasa:youkaishomecoming:2.7.2")
     runtimeOnly fg.deobf("maven.modrinth:curios:${curios_version}")
 
     // Mixin 注解处理器（与主模组一致）

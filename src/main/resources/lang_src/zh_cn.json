@@ -478,5 +478,10 @@
   "jei.kogasa_addiction.ability_effect.current.tenshi.debuff": "当前：持续 %1$s 秒，%2$s 级",
   "jei.kogasa_addiction.ability_effect.current.tenshi.flying": "当前：×%1$s",
   "jei.kogasa_addiction.ability_effect.current.tenshi.buff": "当前：每次 +%1$s 秒，上限 %2$s 秒、%3$s 级",
-  "tooltip.kogasa_addiction.absorbed.attribute": "  · %1$s +%2$s"
+  "tooltip.kogasa_addiction.absorbed.attribute": "  · %1$s +%2$s",
+  "tooltip.kogasa_addiction.ammo.yh": "已装填：%s",
+  "tooltip.kogasa_addiction.ammo.yh.note": "需要瞄准目标的弹幕/符卡在没有目标时会退化为普通箭矢。",
+  "jei.kogasa_addiction.hint.ammo_yh": "妖归弹幕/符卡：符卡固定单发；需要锁定目标的类型在无目标时会退化为普通箭矢。",
+  "book.kogasa_addiction.entry.ranged_basics.page4": "可以在铁砧上给碧眼弓/弩装填特殊弹药：药水、烟花，以及装载了妖怪们的归家时的弹幕、激光和符卡。弹幕会保留原本的类型与颜色；符卡固定只发射一发，不会受多重射击影响。自定义符卡的实际形态由 SpellData NBT 决定，JEI/手册只展示默认形态。需要瞄准目标的弹幕或符卡，在没有有效目标时会退化为普通箭矢。",
+  "jei.kogasa_addiction.hint.ammo_yh_custom": "自定义符卡：JEI 只展示默认形态，实际效果由 SpellData NBT 决定。"
 }

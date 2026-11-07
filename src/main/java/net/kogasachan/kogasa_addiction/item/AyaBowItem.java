@@ -4,6 +4,7 @@ import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.entity.projectile.AyaArrowEntity;
 import net.kogasachan.kogasa_addiction.event.common.KogasaGrowthHandler;
+import net.kogasachan.kogasa_addiction.util.KogasaAmmoService;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.kogasachan.kogasa_addiction.util.ModConfigCache;
@@ -59,13 +60,15 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
 
         boolean infinity = player.getAbilities().instabuild
                 || stack.getEnchantmentLevel(Enchantments.INFINITY_ARROWS) > 0;
+        boolean yhAmmo = KogasaAmmoService.hasYhAmmo(stack);
         ItemStack ammo = player.getProjectile(stack);
 
         int charge = this.getUseDuration(stack) - timeLeft;
-        charge = ForgeEventFactory.onArrowLoose(stack, level, player, charge, !ammo.isEmpty() || infinity);
+        charge = ForgeEventFactory.onArrowLoose(stack, level, player, charge,
+                !ammo.isEmpty() || infinity || yhAmmo);
         if (charge < 0) return;
 
-        if (ammo.isEmpty() && !infinity) return;
+        if (ammo.isEmpty() && !infinity && !yhAmmo) return;
         if (ammo.isEmpty()) ammo = new ItemStack(Items.ARROW);
 
         // ===== 自定义 power 计算：拉弓速度成长 =====
@@ -73,6 +76,11 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
         if (power < 0.1F) return;
 
         if (!level.isClientSide) {
+            if (yhAmmo && KogasaAmmoService.fireYh(stack, player)) {
+                stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(player.getUsedItemHand()));
+                KogasaGrowthHandler.addGrowth(stack, player);
+                return;
+            }
             boolean ammoInfinite = player.getAbilities().instabuild
                     || (ammo.getItem() instanceof ArrowItem arrowItem
                     && arrowItem.isInfinite(ammo, stack, player));

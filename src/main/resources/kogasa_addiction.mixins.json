@@ -12,6 +12,7 @@
     "GrindstoneMenuMixin",
     "IceBlockMixin",
     "PlayerItemComparisonMixin",
+    "PlayerProjectileMixin",
     "ServerLevelEntityFreezeMixin"
   ],
   "client": [

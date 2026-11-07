@@ -849,5 +849,29 @@ public class Config {
         BUILDER.pop(3);
     }
 
+    static {
+        BUILDER.push("youkai_homecoming");
+    }
+
+    public static final ForgeConfigSpec.BooleanValue YH_LOOT_ENABLED = BUILDER
+            .comment("Add Youkai's Homecoming items to our Mystia Izakaya / Cirno ice house loot tables.\n" +
+                    "是否把妖怪们的归家物品加入夜雀食堂/琪露诺冰屋宝箱。")
+            .define("lootEnabled", true);
+
+    public static final ForgeConfigSpec.DoubleValue YH_LOOT_CHANCE = BUILDER
+            .comment("Chance for the bonus pool, 0~1. Default 0.5 = 50%.\n" +
+                    "额外战利品池的触发概率，0~1，默认 0.5。")
+            .defineInRange("lootChance", 0.5D, 0.0D, 1.0D);
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> YH_LOOT_BLACKLIST = BUILDER
+            .comment("Youkai's Homecoming item IDs excluded from the loot pools. Supports * and ? wildcards.\n" +
+                    "从战利品池排除的妖归物品 ID，支持 * 和 ? 通配符。")
+            .defineListAllowEmpty("lootBlacklist", List.of(),
+                    o -> o instanceof String s && !s.isBlank());
+
+    static {
+        BUILDER.pop();
+    }
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 }

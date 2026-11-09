@@ -42,7 +42,10 @@ public class KogasaAbilityData {
         if (tag == null) return new CompoundTag();
 
         CompoundTag root = tag.getCompound(ROOT);
-        ensureMigrated(root);
+        if (root.isEmpty()) return root;
+        if (ensureMigrated(root)) {
+            saveTag(stack, root);
+        }
         return root;
     }
 
@@ -50,14 +53,19 @@ public class KogasaAbilityData {
      * 幂等迁移：把根标签从旧版本逐步升级到 {@link #SCHEMA_VERSION}。
      * 以后改数据结构时：SCHEMA_VERSION +1，并在 {@link #migrate} 里为旧版本号加一个 case。
      */
-    private static void ensureMigrated(CompoundTag root) {
-        int version = root.getInt(KEY_SCHEMA_VERSION);
+    private static boolean ensureMigrated(CompoundTag root) {
+        int initialVersion = root.getInt(KEY_SCHEMA_VERSION);
+        int version = initialVersion;
         while (version < SCHEMA_VERSION) {
             version = migrate(root, version);
         }
+        boolean changed = version != initialVersion
+                || root.getInt(KEY_SCHEMA_VERSION) != SCHEMA_VERSION;
         if (root.getInt(KEY_SCHEMA_VERSION) != SCHEMA_VERSION) {
             root.putInt(KEY_SCHEMA_VERSION, SCHEMA_VERSION);
+            changed = true;
         }
+        return changed;
     }
 
     private static int migrate(CompoundTag root, int from) {
@@ -458,7 +466,7 @@ public class KogasaAbilityData {
     private static final String AMMO_FIREWORK_NBT = "FireworkNbt";
     private static final String AMMO_ITEM = "Item";
 
-    public enum AmmoType {POTION, FIREWORK, YH_DANMAKU, YH_LASER, YH_SPELL}
+    public enum AmmoType {POTION, FIREWORK, YH_DANMAKU, YH_LASER, YH_SPELL, SPELL}
 
     public enum PotionKind {REGULAR, SPLASH, LINGERING}
 
@@ -485,11 +493,33 @@ public class KogasaAbilityData {
         saveTag(stack, tag);
     }
 
+    public static void setSpellAmmo(ItemStack stack, ItemStack ammo, boolean requiresTarget) {
+        if (ammo.isEmpty()) return;
+        CompoundTag tag = getTag(stack);
+        CompoundTag data = new CompoundTag();
+        data.putString(AMMO_TYPE, "spell");
+        data.putBoolean("RequiresTarget", requiresTarget);
+        data.put(AMMO_ITEM, ammo.copyWithCount(1).save(new CompoundTag()));
+        tag.put(AMMO, data);
+        saveTag(stack, tag);
+    }
+
+    public static boolean spellRequiresTarget(ItemStack stack) {
+        CompoundTag tag = getTag(stack);
+        return tag.contains(AMMO, Tag.TAG_COMPOUND)
+                && tag.getCompound(AMMO).getBoolean("RequiresTarget");
+    }
+
     public static void setYhAmmo(ItemStack stack, ItemStack ammo, AmmoType type) {
+        setYhAmmo(stack, ammo, type, false);
+    }
+
+    public static void setYhAmmo(ItemStack stack, ItemStack ammo, AmmoType type, boolean requiresTarget) {
         if (ammo.isEmpty()) return;
         CompoundTag tag = getTag(stack);
         CompoundTag data = new CompoundTag();
         data.putString(AMMO_TYPE, type.name().toLowerCase());
+        data.putBoolean("RequiresTarget", requiresTarget);
         data.put(AMMO_ITEM, ammo.copyWithCount(1).save(new CompoundTag()));
         tag.put(AMMO, data);
         saveTag(stack, tag);
@@ -520,6 +550,7 @@ public class KogasaAbilityData {
             case "yh_danmaku" -> AmmoType.YH_DANMAKU;
             case "yh_laser" -> AmmoType.YH_LASER;
             case "yh_spell" -> AmmoType.YH_SPELL;
+            case "spell" -> AmmoType.SPELL;
             default -> null;
         };
     }

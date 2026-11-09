@@ -168,6 +168,66 @@ public class KogasaJEIPlugin implements IModPlugin {
 
         // 妖归弹幕/激光/符卡
         registerYhAmmoRecipes(recipes);
+
+        // ISS / Goety / Ars 法术弹药
+        registerSpellAmmoRecipes(recipes);
+    }
+
+    private static void registerSpellAmmoRecipes(List<AnvilReinforcementRecipe> recipes) {
+        // ISS 卷轴
+        if (ModList.get().isLoaded("irons_spellbooks")) {
+            Item scroll = ForgeRegistries.ITEMS.getValue(
+                    ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "scroll"));
+            if (scroll != null) {
+                List<ItemStack> ammo = List.of(new ItemStack(scroll));
+                addSpellAmmoRecipe(recipes, ModItems.AYA_BOW.get(), ammo);
+                addSpellAmmoRecipe(recipes, ModItems.AYA_CROSSBOW.get(), ammo);
+            }
+        }
+
+        // Goety 聚晶
+        if (ModList.get().isLoaded("goety")) {
+            List<ItemStack> ammo = new ArrayList<>();
+            for (Item item : ForgeRegistries.ITEMS.getValues()) {
+                if (implementsInterface(item, "com.Polarice3.Goety.api.items.magic.IFocus")) {
+                    ammo.add(new ItemStack(item));
+                }
+            }
+            if (!ammo.isEmpty()) {
+                addSpellAmmoRecipe(recipes, ModItems.AYA_BOW.get(), ammo);
+                addSpellAmmoRecipe(recipes, ModItems.AYA_CROSSBOW.get(), ammo);
+            }
+        }
+
+        // Ars 法术羊皮纸
+        if (ModList.get().isLoaded("ars_nouveau")) {
+            Item parchment = ForgeRegistries.ITEMS.getValue(
+                    ResourceLocation.fromNamespaceAndPath("ars_nouveau", "spell_parchment"));
+            if (parchment != null) {
+                List<ItemStack> ammo = List.of(new ItemStack(parchment));
+                addSpellAmmoRecipe(recipes, ModItems.AYA_BOW.get(), ammo);
+                addSpellAmmoRecipe(recipes, ModItems.AYA_CROSSBOW.get(), ammo);
+            }
+        }
+    }
+
+    private static boolean implementsInterface(Item item, String interfaceName) {
+        for (Class<?> c = item.getClass(); c != null; c = c.getSuperclass()) {
+            for (Class<?> i : c.getInterfaces()) {
+                if (i.getName().equals(interfaceName)) return true;
+            }
+        }
+        return false;
+    }
+
+    private static void addSpellAmmoRecipe(List<AnvilReinforcementRecipe> recipes,
+                                           Item weaponItem, List<ItemStack> ammo) {
+        if (ammo.isEmpty()) return;
+        ItemStack input = new ItemStack(weaponItem);
+        ItemStack output = input.copy();
+        KogasaAbilityData.setSpellAmmo(output, ammo.get(0), false);
+        recipes.add(new AnvilReinforcementRecipe(input, new ArrayList<>(ammo), output,
+                RecipeKind.AMMO_SPELL));
     }
 
     private static void registerYhAmmoRecipes(List<AnvilReinforcementRecipe> recipes) {

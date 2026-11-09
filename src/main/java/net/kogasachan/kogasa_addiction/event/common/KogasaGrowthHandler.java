@@ -127,7 +127,7 @@ public class KogasaGrowthHandler {
         }
 
         // Curios 槽位与 EquipmentSlot 平行遍历；法术书/戒指等也能积累成长。
-        KogasaCuriosHelper.forEachEquipped(player, stack -> {
+        KogasaCuriosHelper.forEachEquippedMutable(player, stack -> {
             if (net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(stack)) {
                 addGrowth(stack, player);
             }

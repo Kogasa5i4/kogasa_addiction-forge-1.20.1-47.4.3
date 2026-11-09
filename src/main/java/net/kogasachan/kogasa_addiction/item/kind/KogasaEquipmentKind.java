@@ -93,11 +93,26 @@ public enum KogasaEquipmentKind {
         // 只要名字是 crossbow / pickaxe，就绝不按 bow / axe 处理。
         if (nameEndsWithAny(item, excludedSuffixes)) return false;
 
+        // FUMO 的 materialTag 是宽泛的 forge:tools，不能当物品身份；
+        // 否则弓/弩会先被认成 FUMO，强化分支永远命中不了 CROSSBOW/BOW。
+        if (this == FUMO) {
+            return item instanceof FumoItem || nameEndsWith(item, suffix);
+        }
+
         if (matchesClass(item)) return true;
         // ItemStack.is(TagKey) 自 1.18 起一直是稳定 API，
         // 代替在后续版本被弃用的 builtInRegistryHolder()。
         if (item.getDefaultInstance().is(materialTag)) return true;
         return nameEndsWith(item, suffix);
+    }
+    /**
+     * 宽泛身份兜底：只允许 FUMO 用 {@code forge:tools} 作为“最后一级”身份。
+     * 必须由 {@link KogasaEquipmentKinds#of(Item)} 在所有具体类型之后调用，
+     * 不能直接放进 {@link #matches(Item)}，否则会再次抢占弓/弩。
+     */
+    public boolean matchesBroadIdentity(Item item) {
+        if (this != FUMO || item == null || item == Items.AIR) return false;
+        return item.getDefaultInstance().is(materialTag);
     }
 
     /**

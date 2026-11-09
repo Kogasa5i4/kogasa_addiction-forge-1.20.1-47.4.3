@@ -103,6 +103,11 @@ public class Config {
                     "启用本模组装备的自定义铁砧强化与能力注入配方。")
             .define("enableKogasaEquipment", true);
 
+    public static final ForgeConfigSpec.BooleanValue ENABLE_CURIOS_SLOTS = BUILDER
+            .comment("Allow Kogasa equipment to be equipped in Curios slots. Requires game restart.\n" +
+                    "是否允许本模组装备放入 Curios 槽位。修改后需要重启游戏。")
+            .define("enableCuriosSlots", false);
+
     public static final ForgeConfigSpec.IntValue MAX_REINFORCEMENTS = BUILDER
             .comment("Maximum reinforcement count.\n" +
                     "最大强化数。")
@@ -323,16 +328,6 @@ public class Config {
                     "每级强化增加的挖掘速度加成比例。0.5 = 每级 +50%；默认值 1.5 = 每级 +150%。")
             .defineInRange("miningSpeedRatioPerReinforcement", 1.5, 0.0, Double.MAX_VALUE);
 
-    public static final ForgeConfigSpec.DoubleValue ATTACK_SPEED_CAP = BUILDER
-            .comment("Attack speed cap. Default 4.0 (bare-hand speed).\n" +
-                    "攻速封顶值。默认 4.0（空手攻速）。")
-            .defineInRange("attackSpeedCap", 4.0, 2.0, Double.MAX_VALUE);
-
-    public static final ForgeConfigSpec.DoubleValue ATTACK_SPEED_GROWTH_RATIO = BUILDER
-            .comment("Attack speed growth ratio. progress = min((growth + Aya news value) * ratio, 1.0). A progress of 1.0 reaches the configured bare-hand attack speed cap.\n" +
-                    "攻速成长比例。进度 = min((成长值 + 文文新闻值) × 此倍率, 1.0)；进度达到 1.0 时，攻速达到配置的空手攻速上限。")
-            .defineInRange("attackSpeedGrowthRatio", 1.0, 0.01, Double.MAX_VALUE);
-
     static {
         BUILDER.pop();
     }
@@ -340,16 +335,6 @@ public class Config {
     static {
         BUILDER.push("armor");
     }
-
-    public static final ForgeConfigSpec.DoubleValue KNOCKBACK_BASE_RESISTANCE = BUILDER
-            .comment("Base knockback resistance. Default 0.05 (half of netherite).\n" +
-                    "基础击退抗性。默认 0.05（下界合金的一半）。")
-            .defineInRange("knockbackBaseResistance", 0.05, 0.0, Double.MAX_VALUE);
-
-    public static final ForgeConfigSpec.DoubleValue KNOCKBACK_MAX_PER_PIECE = BUILDER
-            .comment("Asymptotic knockback-resistance cap per armor piece. Growth and Aya news value approach this cap; each reinforcement raises the cap by 50%, up to 1.0.\n" +
-                    "每件护甲的渐近击退抗性上限。成长值与文文新闻值越高，实际抗性越接近上限；每次强化会将该上限提高 50%，但最高不超过 1.0。")
-            .defineInRange("knockbackMaxPerPiece", 0.5, 0.01, Double.MAX_VALUE);
 
     static {
         BUILDER.pop();

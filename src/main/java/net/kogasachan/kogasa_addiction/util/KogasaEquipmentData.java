@@ -3,14 +3,12 @@ package net.kogasachan.kogasa_addiction.util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class KogasaEquipmentData {
 
@@ -21,6 +19,7 @@ public class KogasaEquipmentData {
     private static final String ABSORBED_VALUE = "AbsorbedValue";
     private static final String ABSORBED_ATTRIBUTES = "AbsorbedAttributes";
     private static final String ABSORBED_ATTRIBUTE_MULTIPLIERS = "AbsorbedAttributeMultipliers";
+    private static final String ABSORBED_MULTIPLIER_ENTRIES = "AbsorbedMultiplierEntries";
     /** 弓弩专用：累积吸收的"拉弓速度"（单位 tick，从原版拉满时间中扣减） */
     private static final String DRAW_SPEED_VALUE = "DrawSpeedValue";
     private static final String GROWTH_ENCHANTS_GRANTED = "GrowthEnchantsGranted";
@@ -182,6 +181,61 @@ public class KogasaEquipmentData {
         return result;
     }
 
+    public record AbsorbedMultiplier(UUID uuid, ResourceLocation attribute, double amount,
+                                     net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation operation) {
+    }
+
+    /** 保留来源装备 UUID / operation 的乘法吸收条目。 */
+    public static List<AbsorbedMultiplier> getAbsorbedMultipliers(ItemStack stack) {
+        CompoundTag tag = getTag(stack);
+        List<AbsorbedMultiplier> result = new java.util.ArrayList<>();
+        ListTag list = tag.getList(ABSORBED_MULTIPLIER_ENTRIES, Tag.TAG_COMPOUND);
+        for (int i = 0; i < list.size(); i++) {
+            CompoundTag entry = list.getCompound(i);
+            ResourceLocation id = ResourceLocation.tryParse(entry.getString("Attribute"));
+            UUID uuid = entry.contains("Uuid") ? net.minecraft.nbt.NbtUtils.loadUUID(entry.get("Uuid")) : null;
+            if (id == null || uuid == null) continue;
+            var op = parseOperation(entry.getString("Operation"));
+            result.add(new AbsorbedMultiplier(uuid, id, entry.getDouble("Amount"), op));
+        }
+        if (!result.isEmpty()) return result;
+
+        // 旧数据：AbsorbedAttributeMultipliers 是按属性合并的 map，没有来源 UUID。
+        CompoundTag legacy = tag.getCompound(ABSORBED_ATTRIBUTE_MULTIPLIERS);
+        for (String key : legacy.getAllKeys()) {
+            ResourceLocation id = ResourceLocation.tryParse(key);
+            if (id == null) continue;
+            UUID uuid = UUID.nameUUIDFromBytes(("kogasa_legacy_multiplier:" + key).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            result.add(new AbsorbedMultiplier(uuid, id, legacy.getDouble(key),
+                    net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.MULTIPLY_BASE));
+        }
+        return result;
+    }
+
+    private static net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation parseOperation(String name) {
+        try {
+            return net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.valueOf(name);
+        } catch (RuntimeException ignored) {
+            return net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.MULTIPLY_BASE;
+        }
+    }
+
+    public static void addAbsorbedMultiplier(ItemStack stack, UUID uuid, ResourceLocation attributeId,
+                                             double value,
+                                             net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation operation) {
+        if (value <= 0.0D || uuid == null) return;
+        CompoundTag tag = getTag(stack);
+        ListTag list = tag.getList(ABSORBED_MULTIPLIER_ENTRIES, 10).copy();
+        CompoundTag entry = new CompoundTag();
+        entry.put("Uuid", net.minecraft.nbt.NbtUtils.createUUID(uuid));
+        entry.putString("Attribute", attributeId.toString());
+        entry.putDouble("Amount", value);
+        entry.putString("Operation", operation.name());
+        list.add(entry);
+        tag.put(ABSORBED_MULTIPLIER_ENTRIES, list);
+        saveTag(stack, tag);
+    }
+
     public static void addAbsorbedAttributeMultiplier(ItemStack stack, ResourceLocation attributeId, double value) {
         if (value <= 0.0D) return;
         CompoundTag tag = getTag(stack);
@@ -226,6 +280,7 @@ public class KogasaEquipmentData {
         tag.remove(ABSORBED_VALUE);
         tag.remove(ABSORBED_ATTRIBUTES);
         tag.remove(ABSORBED_ATTRIBUTE_MULTIPLIERS);
+        tag.remove(ABSORBED_MULTIPLIER_ENTRIES);
         tag.remove(DRAW_SPEED_VALUE);
 
         if (isEmptyIgnoringVersion(tag)) {
@@ -251,7 +306,12 @@ public class KogasaEquipmentData {
         if (tag == null) return new CompoundTag();
 
         CompoundTag root = tag.getCompound(ROOT);
-        ensureMigrated(stack, root);
+        if (root.isEmpty()) return root;
+        if (ensureMigrated(stack, root)) {
+            // 迁移结果必须写回 ItemStack，否则只改了内存里的 CompoundTag，
+            // 下次从磁盘读取仍是旧 SchemaVersion。
+            saveTag(stack, root);
+        }
         return root;
     }
 
@@ -259,14 +319,19 @@ public class KogasaEquipmentData {
      * 幂等迁移：把根标签从旧版本逐步升级到 {@link #SCHEMA_VERSION}。
      * 以后改数据结构时：SCHEMA_VERSION +1，并在 {@link #migrate} 里为旧版本号加一个 case。
      */
-    private static void ensureMigrated(ItemStack stack, CompoundTag root) {
-        int version = root.getInt(KEY_SCHEMA_VERSION);
+    private static boolean ensureMigrated(ItemStack stack, CompoundTag root) {
+        int initialVersion = root.getInt(KEY_SCHEMA_VERSION);
+        int version = initialVersion;
         while (version < SCHEMA_VERSION) {
             version = migrate(stack, root, version);
         }
+        boolean changed = version != initialVersion
+                || root.getInt(KEY_SCHEMA_VERSION) != SCHEMA_VERSION;
         if (root.getInt(KEY_SCHEMA_VERSION) != SCHEMA_VERSION) {
             root.putInt(KEY_SCHEMA_VERSION, SCHEMA_VERSION);
+            changed = true;
         }
+        return changed;
     }
 
     private static int migrate(ItemStack stack, CompoundTag root, int from) {

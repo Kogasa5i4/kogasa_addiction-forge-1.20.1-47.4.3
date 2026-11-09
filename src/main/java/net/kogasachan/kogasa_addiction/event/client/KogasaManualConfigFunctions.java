@@ -42,10 +42,6 @@ public final class KogasaManualConfigFunctions {
 
         // ---- 属性 ----
         f("miningSpeedRatioPerReinforcement", () -> pct(ClientConfigCache.get(Config.MINING_SPEED_RATIO_PER_REINFORCEMENT)));
-        f("attackSpeedCap", () -> num(ClientConfigCache.get(Config.ATTACK_SPEED_CAP)));
-        f("attackSpeedGrowthRatio", () -> pct(ClientConfigCache.get(Config.ATTACK_SPEED_GROWTH_RATIO)));
-        f("knockbackBase", () -> pct(ClientConfigCache.get(Config.KNOCKBACK_BASE_RESISTANCE)));
-        f("knockbackMaxPerPiece", () -> pct(ClientConfigCache.get(Config.KNOCKBACK_MAX_PER_PIECE)));
 
         // ---- 能力槽 / 封印 ----
         f("abilitySlotInitial", () -> pct(ClientConfigCache.get(Config.ABILITY_SLOT_INITIAL_GROWTH)));

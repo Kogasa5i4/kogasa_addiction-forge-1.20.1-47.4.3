@@ -13,8 +13,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /** 从强化材料读取可吸收属性；物品 modifier 是相对 0 的增量，不涉及实体默认值。 */
 public final class KogasaAttributeAbsorption {
@@ -26,16 +25,20 @@ public final class KogasaAttributeAbsorption {
     private KogasaAttributeAbsorption() {
     }
 
+    public record Multiplier(UUID uuid, ResourceLocation attribute, double amount,
+                             AttributeModifier.Operation operation) {
+    }
+
     public record Result(Map<ResourceLocation, Double> additive,
-                         Map<ResourceLocation, Double> multiplicative) {
+                         List<Multiplier> multipliers) {
     }
 
     /** 汇总材料所有装备槽的属性 modifier；同一属性取最大值，避免跨槽重复。 */
     @SuppressWarnings("deprecation")
     public static Result collect(ItemStack material, Category category, LivingEntity wearer) {
         Map<ResourceLocation, Double> additive = new LinkedHashMap<>();
-        Map<ResourceLocation, Double> multiplicative = new LinkedHashMap<>();
-        Result result = new Result(additive, multiplicative);
+        List<Multiplier> multipliers = new ArrayList<>();
+        Result result = new Result(additive, multipliers);
         if (material == null || material.isEmpty()) return result;
 
         for (EquipmentSlot slot : EquipmentSlot.values()) {
@@ -73,7 +76,8 @@ public final class KogasaAttributeAbsorption {
             if (entry.getValue().getOperation() == AttributeModifier.Operation.ADDITION) {
                 result.additive().merge(id, amount, Math::max);
             } else {
-                result.multiplicative().merge(id, amount, Math::max);
+                result.multipliers().add(new Multiplier(
+                        entry.getValue().getId(), id, amount, entry.getValue().getOperation()));
             }
         }
     }

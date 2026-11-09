@@ -95,6 +95,26 @@ public final class KogasaInfoCommands {
                 "commands.kogasa_addiction.info.absorbed",
                 KogasaNumberFormatHelper.formatTrimmed(absorbed, 2)), false);
 
+        // ===== 吸收属性（Schema v3+） =====
+        var absorbedAttributes = KogasaEquipmentData.getAbsorbedAttributes(held);
+        var absorbedMultipliers = KogasaEquipmentData.getAbsorbedMultipliers(held);
+        if (!absorbedAttributes.isEmpty() || !absorbedMultipliers.isEmpty()) {
+            KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
+                    "commands.kogasa_addiction.info.absorbed_attributes.header"), false);
+            for (var entry : absorbedAttributes.entrySet()) {
+                KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.literal("  §7- §f")
+                        .append(Component.literal(entry.getKey().toString()))
+                        .append(Component.literal(" §7+§f" +
+                                KogasaNumberFormatHelper.formatTrimmed(entry.getValue(), 3))), false);
+            }
+            for (var entry : absorbedMultipliers) {
+                KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.literal("  §7- §f")
+                        .append(Component.literal(entry.attribute().toString()))
+                        .append(Component.literal(" §7" + entry.operation().name() + " §f" +
+                                KogasaNumberFormatHelper.formatTrimmed(entry.amount(), 3))), false);
+            }
+        }
+
         // ===== 成长附魔次数 =====
         KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                 "commands.kogasa_addiction.info.growth_enchant",
@@ -226,6 +246,17 @@ public final class KogasaInfoCommands {
                 } else if (ammoType == KogasaAbilityData.AmmoType.FIREWORK) {
                     KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
                             "commands.kogasa_addiction.info.ammo.firework"), false);
+                } else if (ammoType == KogasaAbilityData.AmmoType.YH_DANMAKU
+                        || ammoType == KogasaAbilityData.AmmoType.YH_LASER
+                        || ammoType == KogasaAbilityData.AmmoType.YH_SPELL
+                        || ammoType == KogasaAbilityData.AmmoType.SPELL) {
+                    ItemStack ammo = KogasaAbilityData.getYhAmmo(held);
+                    if (!ammo.isEmpty()) {
+                        KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(
+                                        "commands.kogasa_addiction.info.ammo.special",
+                                        ammo.getHoverName())
+                                .append(Component.literal(" §7(" + ammoType.name().toLowerCase() + "§7)")), false);
+                    }
                 }
             } else {
                 KogasaCommandSupport.sendCopyable(ctx.getSource(), Component.translatable(

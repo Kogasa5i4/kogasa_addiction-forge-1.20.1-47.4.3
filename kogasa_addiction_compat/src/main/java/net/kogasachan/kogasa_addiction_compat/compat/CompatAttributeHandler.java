@@ -128,15 +128,16 @@ public final class CompatAttributeHandler {
                             speedDelta, AttributeModifier.Operation.ADDITION));
         }
 
-        applyAbsorbedExtras(event, stack);
+        applyAbsorbedExtras(event, stack, java.util.Set.of(
+                net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.attack_damage")));
+        applyAbsorbedMultipliers(event, stack, java.util.Set.of(
+                net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.attack_damage")));
     }
 
     /** 物品原有属性 + 吸收属性统一成长；同一属性合并成单条，避免同名双行。 */
-    private static void applyAbsorbedExtras(ItemAttributeModifierEvent event, ItemStack stack) {
+    private static void applyAbsorbedExtras(ItemAttributeModifierEvent event, ItemStack stack, java.util.Set<net.minecraft.resources.ResourceLocation> legacy) {
         Map<net.minecraft.resources.ResourceLocation, Double> additive =
                 KogasaEquipmentData.getAbsorbedAttributes(stack);
-        Map<net.minecraft.resources.ResourceLocation, Double> multiplicative =
-                KogasaEquipmentData.getAbsorbedAttributeMultipliers(stack);
 
         java.util.Set<net.minecraft.resources.ResourceLocation> ids = new java.util.LinkedHashSet<>();
         for (Attribute attribute : event.getModifiers().keySet()) {
@@ -144,14 +145,8 @@ public final class CompatAttributeHandler {
             if (id != null) ids.add(id);
         }
         ids.addAll(additive.keySet());
-        ids.addAll(multiplicative.keySet());
 
-        java.util.Set<net.minecraft.resources.ResourceLocation> legacy = java.util.Set.of(
-                net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.attack_damage"),
-                net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.attack_speed"),
-                net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.armor"),
-                net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.armor_toughness"),
-                net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.knockback_resistance"));
+
 
         for (net.minecraft.resources.ResourceLocation id : ids) {
             if (legacy.contains(id)) continue;
@@ -160,9 +155,8 @@ public final class CompatAttributeHandler {
 
             double base = sumAddition(event.getModifiers(), attribute);
             double add = additive.getOrDefault(id, 0.0D);
-            double mult = multiplicative.getOrDefault(id, 0.0D);
             double growth = KogasaAttributeGrowth.multiplier(stack, id);
-            double value = KogasaAttributeGrowth.applyCap(id, (base + add) * growth * (1.0D + mult));
+            double value = KogasaAttributeGrowth.applyCap(id, (base + add) * growth);
             if (value <= 0.0D) continue;
 
             event.removeAttribute(attribute);
@@ -185,7 +179,9 @@ public final class CompatAttributeHandler {
             return;
         }
 
-        Multimap<Attribute, AttributeModifier> current = event.getModifiers();
+        // 只用物品原始属性作为兼容 overlay 的基准：不能用 event.getModifiers()，
+        // 否则其它 handler 临时塞进来的数值会被当成“原装备基础值”再复制一遍。
+        Multimap<Attribute, AttributeModifier> current = event.getOriginalModifiers();
         double multiplier = net.kogasachan.kogasa_addiction.util.KogasaEquipmentData.getMultiplier(stack);
         double absorbed = net.kogasachan.kogasa_addiction.util.KogasaEquipmentData.getAbsorbedValue(stack);
 
@@ -203,8 +199,7 @@ public final class CompatAttributeHandler {
                 ? (baseArmor + absorbed) * multiplier
                 : baseArmor * multiplier + absorbed;
         double targetToughness = baseToughness * multiplier;
-        double targetKnockback = net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper
-                .getKnockbackResistance(stack);
+        double targetKnockback = baseKnockback * multiplier;
 
         // LOWEST 优先级：在灾变自己的 ItemAttributeModifier 之后执行。
         // 先移除同一属性上的基础护甲修饰符，再加一个“总数”修饰符；
@@ -220,7 +215,46 @@ public final class CompatAttributeHandler {
         addTotal(event, net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE,
                 targetKnockback, "Kogasa compat knockback");
 
-        applyAbsorbedExtras(event, stack);
+        applyAbsorbedExtras(event, stack, java.util.Set.of(
+                net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.armor"),
+                net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.armor_toughness"),
+                net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.knockback_resistance")));
+
+        // 护甲韧性：基础韧性已走上面的 total，这里单独追加吸收部分。
+        var toughnessId = net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.armor_toughness");
+        double absorbedToughness = KogasaEquipmentData.getAbsorbedAttributes(stack)
+                .getOrDefault(toughnessId, 0.0D);
+        double toughnessMultiplier = KogasaEquipmentData.getAbsorbedAttributeMultipliers(stack)
+                .getOrDefault(toughnessId, 0.0D);
+        double toughnessGrowth = KogasaAttributeGrowth.multiplier(stack, toughnessId);
+        double toughnessValue = KogasaAttributeGrowth.applyCap(toughnessId,
+                absorbedToughness * toughnessGrowth * (1.0D + toughnessMultiplier));
+        if (toughnessValue > 0.0D) {
+            event.addModifier(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR_TOUGHNESS,
+                    new AttributeModifier(
+                            java.util.UUID.nameUUIDFromBytes(("kogasa_absorbed:" + toughnessId).getBytes(StandardCharsets.UTF_8)),
+                            "Kogasa absorbed toughness", toughnessValue,
+                            AttributeModifier.Operation.ADDITION));
+        }
+
+        // 击退抗性：基础值已走上面的 total，这里单独追加吸收部分。
+        var knockbackId = net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.knockback_resistance");
+        double absorbedKnockback = KogasaEquipmentData.getAbsorbedAttributes(stack)
+                .getOrDefault(knockbackId, 0.0D);
+        double knockbackMultiplier = KogasaEquipmentData.getAbsorbedAttributeMultipliers(stack)
+                .getOrDefault(knockbackId, 0.0D);
+        double knockbackGrowth = KogasaAttributeGrowth.multiplier(stack, knockbackId);
+        double knockbackValue = KogasaAttributeGrowth.applyCap(knockbackId,
+                absorbedKnockback * knockbackGrowth * (1.0D + knockbackMultiplier));
+        if (knockbackValue > 0.0D) {
+            event.addModifier(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE,
+                    new AttributeModifier(
+                            java.util.UUID.nameUUIDFromBytes(("kogasa_absorbed:" + knockbackId).getBytes(StandardCharsets.UTF_8)),
+                            "Kogasa absorbed knockback", knockbackValue,
+                            AttributeModifier.Operation.ADDITION));
+        }
+        applyAbsorbedMultipliers(event, stack, java.util.Set.of(
+                net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.armor")));
     }
 
     private static void addTotal(ItemAttributeModifierEvent event, Attribute attribute,
@@ -263,6 +297,18 @@ public final class CompatAttributeHandler {
             }
         }
         return false;
+    }
+
+    private static void applyAbsorbedMultipliers(ItemAttributeModifierEvent event, ItemStack stack,
+                                                java.util.Set<net.minecraft.resources.ResourceLocation> skip) {
+        for (KogasaEquipmentData.AbsorbedMultiplier entry : KogasaEquipmentData.getAbsorbedMultipliers(stack)) {
+            if (skip.contains(entry.attribute()) || entry.amount() <= 0.0D) continue;
+            Attribute attribute = ForgeRegistries.ATTRIBUTES.getValue(entry.attribute());
+            if (attribute == null) continue;
+            event.addModifier(attribute, new AttributeModifier(
+                    entry.uuid(), "Kogasa absorbed multiplier " + entry.attribute(),
+                    entry.amount(), entry.operation()));
+        }
     }
 
     private static boolean isSafeItem(Item item) {

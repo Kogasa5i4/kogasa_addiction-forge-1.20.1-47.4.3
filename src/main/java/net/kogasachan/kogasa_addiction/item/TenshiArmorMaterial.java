@@ -53,12 +53,12 @@ public class TenshiArmorMaterial {
 
         @Override
         public float getToughness() {
-            return 2.0F;
+            return 1.0F;
         }
 
         @Override
         public float getKnockbackResistance() {
-            return 0.05F;
+            return 0.25F;
         }
     };
 }

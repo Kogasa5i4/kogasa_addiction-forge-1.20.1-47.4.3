@@ -14,6 +14,7 @@ public class ModConfigCache {
     public static double cirnoIngotDropChance = 0.09;
     public static int kogasaIngotSearchHeight = 8;
     public static float rangedMultishotSpread = 8.0f;
+    public static boolean enableCuriosSlots = true;
 
     @SubscribeEvent
     public static void onConfigLoad(ModConfigEvent.Loading event) {
@@ -34,5 +35,6 @@ public class ModConfigCache {
         cirnoIngotDropChance = Config.CIRNO_INGOT_DROP_CHANCE.get();
         kogasaIngotSearchHeight = Config.KOGASA_INGOT_SEARCH_HEIGHT.get();
         rangedMultishotSpread = Config.RANGED_MULTISHOT_SPREAD.get().floatValue();
+        enableCuriosSlots = Config.ENABLE_CURIOS_SLOTS.get();
     }
 }

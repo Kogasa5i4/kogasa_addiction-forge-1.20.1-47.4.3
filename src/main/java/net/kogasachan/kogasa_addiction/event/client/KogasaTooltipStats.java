@@ -50,8 +50,7 @@ public final class KogasaTooltipStats {
         int speedLineIdx = -1;
         if (isKogasa && hasAttackSpeed(stack)) {
             double speed = KogasaEquipmentHelper.getDisplayAttackSpeed(stack);
-            ChatFormatting color = KogasaEquipmentHelper.isAttackSpeedCapped(stack)
-                    ? ChatFormatting.GOLD : ChatFormatting.DARK_GREEN;
+            ChatFormatting color = ChatFormatting.DARK_GREEN;
             // 原版属性行前面有一个空格（CommonComponents.space()），这里补上，保持缩进一致
             MutableComponent speedLine = CommonComponents.space().append(
                     Component.translatable(

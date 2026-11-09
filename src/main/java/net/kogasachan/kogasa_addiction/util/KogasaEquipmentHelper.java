@@ -128,7 +128,7 @@ public class KogasaEquipmentHelper {
 
         // 其他未单独处理的 Kogasa 装备（如弓弩）：只带吸收的额外属性
         ImmutableMultimap.Builder<Attribute, AttributeModifier> absorbedOnly = ImmutableMultimap.builder();
-        appendAbsorbedAttributes(absorbedOnly, stack, EquipmentSlot.MAINHAND, true);
+        appendAbsorbedAttributes(absorbedOnly, stack, EquipmentSlot.MAINHAND, java.util.Set.of(), java.util.Set.of());
         return absorbedOnly.build();
     }
 
@@ -155,7 +155,12 @@ public class KogasaEquipmentHelper {
         builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(
                 WEAPON_SPEED_UUID, "Kogasa modifier",
                 totalSpeed, AttributeModifier.Operation.ADDITION));
-        appendAbsorbedAttributes(builder, stack, EquipmentSlot.MAINHAND, false);
+        appendAbsorbedAttributes(builder, stack, EquipmentSlot.MAINHAND,
+                java.util.Set.of(
+                        ResourceLocation.withDefaultNamespace("generic.attack_damage"),
+                        ResourceLocation.withDefaultNamespace("generic.attack_speed")),
+                java.util.Set.of(
+                        ResourceLocation.withDefaultNamespace("generic.attack_damage")));
         return builder.build();
     }
 
@@ -176,7 +181,7 @@ public class KogasaEquipmentHelper {
         }
 
         double totalToughness = armor.getToughness() * multiplier;
-        double totalKnockback = getKnockbackResistance(stack);
+        double totalKnockback = armor.getMaterial().getKnockbackResistance() * multiplier;
 
         UUID uuid = switch (slot) {
             case LEGS -> ARMOR_UUIDS[1];
@@ -203,7 +208,13 @@ public class KogasaEquipmentHelper {
                     totalKnockback, AttributeModifier.Operation.ADDITION));
         }
 
-        appendAbsorbedAttributes(builder, stack, slot, false);
+        appendAbsorbedAttributes(builder, stack, slot,
+                java.util.Set.of(
+                        ResourceLocation.withDefaultNamespace("generic.armor"),
+                        ResourceLocation.withDefaultNamespace("generic.armor_toughness"),
+                        ResourceLocation.withDefaultNamespace("generic.knockback_resistance")),
+                java.util.Set.of(
+                        ResourceLocation.withDefaultNamespace("generic.armor")));
         return builder.build();
     }
 
@@ -211,50 +222,55 @@ public class KogasaEquipmentHelper {
     @SuppressWarnings("deprecation")
     private static void appendAbsorbedAttributes(
             ImmutableMultimap.Builder<Attribute, AttributeModifier> builder,
-            ItemStack stack, EquipmentSlot slot, boolean includeLegacyAttributes) {
-        java.util.Set<ResourceLocation> legacy = java.util.Set.of(
-                ResourceLocation.withDefaultNamespace("generic.attack_damage"),
-                ResourceLocation.withDefaultNamespace("generic.attack_speed"),
-                ResourceLocation.withDefaultNamespace("generic.armor"),
-                ResourceLocation.withDefaultNamespace("generic.armor_toughness"),
-                ResourceLocation.withDefaultNamespace("generic.knockback_resistance"));
+            ItemStack stack, EquipmentSlot slot,
+            java.util.Set<ResourceLocation> baseLegacy,
+            java.util.Set<ResourceLocation> absorbedLegacy) {
 
         // 物品本来就有的额外属性也参与成长；攻击/护甲/攻速仍由上面的专用公式处理。
         Map<ResourceLocation, Double> baseAdditive = new java.util.LinkedHashMap<>();
         for (var entry : stack.getItem().getDefaultAttributeModifiers(slot).entries()) {
             if (entry.getValue().getOperation() != AttributeModifier.Operation.ADDITION) continue;
             ResourceLocation id = ForgeRegistries.ATTRIBUTES.getKey(entry.getKey());
-            if (id == null || (!includeLegacyAttributes && legacy.contains(id))) continue;
+            if (id == null || baseLegacy.contains(id)) continue;
             baseAdditive.merge(id, entry.getValue().getAmount(), Double::sum);
         }
 
         Map<ResourceLocation, Double> absorbedAdditive = KogasaEquipmentData.getAbsorbedAttributes(stack);
-        Map<ResourceLocation, Double> absorbedMultiplier = KogasaEquipmentData.getAbsorbedAttributeMultipliers(stack);
+        java.util.List<KogasaEquipmentData.AbsorbedMultiplier> absorbedMultipliers =
+                KogasaEquipmentData.getAbsorbedMultipliers(stack);
 
         java.util.Set<ResourceLocation> all = new java.util.LinkedHashSet<>(baseAdditive.keySet());
         all.addAll(absorbedAdditive.keySet());
-        all.addAll(absorbedMultiplier.keySet());
+        for (var entry : absorbedMultipliers) all.add(entry.attribute());
 
         for (ResourceLocation id : all) {
-            if (!includeLegacyAttributes && legacy.contains(id)) continue;
+            if (absorbedLegacy.contains(id)) continue;
 
             Attribute attribute = ForgeRegistries.ATTRIBUTES.getValue(id);
             if (attribute == null) continue;
 
             double base = baseAdditive.getOrDefault(id, 0.0D);
             double additive = absorbedAdditive.getOrDefault(id, 0.0D);
-            double multiplicative = absorbedMultiplier.getOrDefault(id, 0.0D);
             double multiplier = KogasaAttributeGrowth.multiplier(stack, id);
 
-            // 加法吸收并入基础值，最后统一乘一次综合倍率；乘法吸收单独成乘数池。
-            double value = (base + additive) * multiplier * (1.0D + multiplicative);
-            value = KogasaAttributeGrowth.applyCap(id, value);
+            // 加法吸收并入基础值，最后统一乘一次综合倍率。
+            double value = KogasaAttributeGrowth.applyCap(id, (base + additive) * multiplier);
             if (value <= 0.0D) continue;
 
             UUID uuid = UUID.nameUUIDFromBytes(("kogasa_absorbed:" + id).getBytes(StandardCharsets.UTF_8));
             builder.put(attribute, new AttributeModifier(
                     uuid, "Kogasa growth " + id, value,
                     AttributeModifier.Operation.ADDITION));
+        }
+
+        // 乘法吸收保留来源装备的 UUID 与 operation。
+        for (KogasaEquipmentData.AbsorbedMultiplier entry : absorbedMultipliers) {
+            if (absorbedLegacy.contains(entry.attribute())) continue;
+            Attribute attribute = ForgeRegistries.ATTRIBUTES.getValue(entry.attribute());
+            if (attribute == null || entry.amount() <= 0.0D) continue;
+            builder.put(attribute, new AttributeModifier(
+                    entry.uuid(), "Kogasa absorbed multiplier " + entry.attribute(),
+                    entry.amount(), entry.operation()));
         }
     }
 
@@ -535,11 +551,8 @@ public class KogasaEquipmentHelper {
     public static double getAttackSpeedModifier(ItemStack stack, double baseSpeed) {
         double growth = KogasaEquipmentData.getGrowth(stack);
         double news = getAyaNews(stack);
-        double ratio = Config.ATTACK_SPEED_GROWTH_RATIO.get();
-
-        // progress 加上 news 的贡献
-        double progress = Math.min((growth + news) * ratio, 1.0);
-        return baseSpeed * (1.0 - progress);
+        // 攻速基值不再走成长公式；成长/吸收只通过 ATTRIBUTE 加成体现。
+        return baseSpeed;
     }
 
     /**
@@ -567,8 +580,8 @@ public class KogasaEquipmentHelper {
 
     public static double getDisplayAttackSpeed(ItemStack stack) {
         double baseSpeed = getBaseAttackSpeed(stack);
-        double cap = Config.ATTACK_SPEED_CAP.get();
-        return cap + getAttackSpeedModifier(stack, baseSpeed);
+        return net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED.getDefaultValue()
+                + getAttackSpeedModifier(stack, baseSpeed);
     }
 
     /**
@@ -597,30 +610,6 @@ public class KogasaEquipmentHelper {
     /**
      * 攻速是否已封顶
      */
-    public static boolean isAttackSpeedCapped(ItemStack stack) {
-        double growth = KogasaEquipmentData.getGrowth(stack);
-        double news = getAyaNews(stack);
-        double ratio = Config.ATTACK_SPEED_GROWTH_RATIO.get();
-        return (growth + news) * ratio >= 1.0;
-    }
-
-    /**
-     * 击退抗性
-     */
-    public static double getKnockbackResistance(ItemStack stack) {
-        int re = KogasaEquipmentData.getReinforcements(stack);
-        double growth = KogasaEquipmentData.getGrowth(stack);
-        double news = getAyaNews(stack);
-        double base = Config.KNOCKBACK_BASE_RESISTANCE.get();
-        double max = Config.KNOCKBACK_MAX_PER_PIECE.get();
-
-        // 有效成长值 = growth + news，加速逼近上限
-        double effectiveGrowth = growth + news;
-
-        double effectiveMax = Math.min(max * (1.0 + re * 0.5), 1.0);
-        return effectiveMax - (effectiveMax - base) / (effectiveGrowth + 1.0);
-    }
-
     /**
      * 强化倍率（仅在拥有小伞能力时生效）
      */

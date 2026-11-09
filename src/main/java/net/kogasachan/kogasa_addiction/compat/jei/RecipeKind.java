@@ -5,7 +5,8 @@ public enum RecipeKind {
     REINFORCEMENT,  // 强化
     AMMO,
     AMMO_YH,
-    AMMO_YH_CUSTOM,           // 弹药装载
+    AMMO_YH_CUSTOM,
+    AMMO_SPELL,           // 弹药装载
     REPAIR,         // 修复
     CLEAR           // 清除
 }

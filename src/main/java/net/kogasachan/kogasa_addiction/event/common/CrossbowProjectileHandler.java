@@ -77,11 +77,16 @@ public final class CrossbowProjectileHandler {
         if (KogasaAmmoService.hasYhAmmo(crossbow)) {
             if (!crossbowTag.getBoolean(TAG_YH_SPAWNED)) {
                 crossbowTag.putBoolean(TAG_YH_SPAWNED, true);
-                // 需要锁定目标的符卡/弹幕打不出去时保留原版箭，作为退化行为。
-                if (KogasaAmmoService.fireYh(crossbow, shooter)) {
+                KogasaAmmoService.FireResult fire = KogasaAmmoService.fireAmmo(crossbow, shooter);
+                if (fire == KogasaAmmoService.FireResult.IMMEDIATE) {
                     event.setCanceled(true);
                     return;
                 }
+                if (fire == KogasaAmmoService.FireResult.PROJECTILE) {
+                    KogasaAmmoService.markProjectile(arrow, crossbow);
+                    return;
+                }
+                // FAIL：继续走普通箭矢
             } else {
                 event.setCanceled(true);
                 return;

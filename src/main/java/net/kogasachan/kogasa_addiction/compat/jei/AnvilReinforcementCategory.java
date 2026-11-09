@@ -82,6 +82,9 @@ public class AnvilReinforcementCategory implements IRecipeCategory<AnvilReinforc
                         case AMMO_YH_CUSTOM -> tooltip.add(Component.translatable(
                                         "jei.kogasa_addiction.hint.ammo_yh_custom")
                                 .withStyle(ChatFormatting.LIGHT_PURPLE));
+                        case AMMO_SPELL -> tooltip.add(Component.translatable(
+                                        "jei.kogasa_addiction.hint.ammo_spell")
+                                .withStyle(ChatFormatting.LIGHT_PURPLE));
                         case REPAIR -> tooltip.add(Component.translatable(
                                         "jei.kogasa_addiction.hint.repair")
                                 .withStyle(ChatFormatting.BLUE));
@@ -138,7 +141,7 @@ public class AnvilReinforcementCategory implements IRecipeCategory<AnvilReinforc
         int cost = switch (recipe.kind()) {
             case ABILITY -> Config.ABILITY_INFUSION_COST.get();
             case REINFORCEMENT -> Config.REINFORCEMENT_COST.get();
-            case AMMO, AMMO_YH, AMMO_YH_CUSTOM -> Config.AMMO_INFUSION_COST.get();
+            case AMMO, AMMO_YH, AMMO_YH_CUSTOM, AMMO_SPELL -> Config.AMMO_INFUSION_COST.get();
             case REPAIR -> Config.SAKUYA_KNIFE_REPAIR_COST.get();
             case CLEAR -> Config.CLEAR_COST.get();
         };

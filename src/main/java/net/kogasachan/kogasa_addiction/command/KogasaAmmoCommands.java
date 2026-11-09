@@ -8,14 +8,15 @@ import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.ResourceArgument;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.PotionItem;
+import net.minecraft.world.item.alchemy.PotionUtils;
 
 import static net.kogasachan.kogasa_addiction.command.KogasaCommandSupport.ADMIN;
 import static net.kogasachan.kogasa_addiction.command.KogasaCommandSupport.isRangedWeapon;
@@ -30,22 +31,25 @@ public final class KogasaAmmoCommands {
         root.then(Commands.literal("setammo")
                 .requires(ADMIN)
                 .then(Commands.literal("potion")
-                        .then(Commands.argument("potion", ResourceArgument.resource(buildContext, Registries.POTION))
-                                .executes(ctx -> setAmmoPotion(ctx,
-                                        ResourceArgument.getResource(ctx, "potion", Registries.POTION).key().location(),
-                                        KogasaAbilityData.PotionKind.REGULAR))))
+                        .executes(ctx -> setAmmoPotion(ctx, KogasaAbilityData.PotionKind.REGULAR))
+                        .then(Commands.argument("item", ItemArgument.item(buildContext))
+                                .executes(ctx -> setAmmoPotion(ctx, KogasaAbilityData.PotionKind.REGULAR))))
                 .then(Commands.literal("splash")
-                        .then(Commands.argument("potion", ResourceArgument.resource(buildContext, Registries.POTION))
-                                .executes(ctx -> setAmmoPotion(ctx,
-                                        ResourceArgument.getResource(ctx, "potion", Registries.POTION).key().location(),
-                                        KogasaAbilityData.PotionKind.SPLASH))))
+                        .executes(ctx -> setAmmoPotion(ctx, KogasaAbilityData.PotionKind.SPLASH))
+                        .then(Commands.argument("item", ItemArgument.item(buildContext))
+                                .executes(ctx -> setAmmoPotion(ctx, KogasaAbilityData.PotionKind.SPLASH))))
                 .then(Commands.literal("lingering")
-                        .then(Commands.argument("potion", ResourceArgument.resource(buildContext, Registries.POTION))
-                                .executes(ctx -> setAmmoPotion(ctx,
-                                        ResourceArgument.getResource(ctx, "potion", Registries.POTION).key().location(),
-                                        KogasaAbilityData.PotionKind.LINGERING))))
+                        .executes(ctx -> setAmmoPotion(ctx, KogasaAbilityData.PotionKind.LINGERING))
+                        .then(Commands.argument("item", ItemArgument.item(buildContext))
+                                .executes(ctx -> setAmmoPotion(ctx, KogasaAbilityData.PotionKind.LINGERING))))
                 .then(Commands.literal("firework")
-                        .executes(KogasaAmmoCommands::setAmmoFirework)));
+                        .executes(KogasaAmmoCommands::setAmmoFirework)
+                        .then(Commands.argument("item", ItemArgument.item(buildContext))
+                                .executes(KogasaAmmoCommands::setAmmoFirework)))
+                .then(Commands.literal("spell")
+                        .executes(KogasaAmmoCommands::setAmmoSpell)
+                        .then(Commands.argument("item", ItemArgument.item(buildContext))
+                                .executes(KogasaAmmoCommands::setAmmoSpell))));
         root.then(Commands.literal("clearammo")
                 .requires(ADMIN)
                 .executes(KogasaAmmoCommands::clearAmmo));
@@ -54,8 +58,7 @@ public final class KogasaAmmoCommands {
     // ==================== setammo ====================
 
     private static int setAmmoPotion(CommandContext<CommandSourceStack> ctx,
-                                     ResourceLocation potionId,
-                                     KogasaAbilityData.PotionKind kind)
+                                     KogasaAbilityData.PotionKind requestedKind)
             throws CommandSyntaxException {
         ServerPlayer player = ctx.getSource().getPlayerOrException();
         ItemStack held = KogasaCommandSupport.requireKogasaEquipment(ctx);
@@ -66,7 +69,24 @@ public final class KogasaAmmoCommands {
             return 0;
         }
 
-        // 特殊弹药不占用能力槽位
+        ItemStack input = inputStack(ctx, player);
+        if (input.isEmpty() || !(input.getItem() instanceof PotionItem)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.potion_required"));
+            return 0;
+        }
+        ResourceLocation potionId = net.minecraftforge.registries.ForgeRegistries.POTIONS.getKey(
+                PotionUtils.getPotion(input));
+        if (potionId == null) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.potion_required"));
+            return 0;
+        }
+        KogasaAbilityData.PotionKind kind = input.getItem() instanceof net.minecraft.world.item.LingeringPotionItem
+                ? KogasaAbilityData.PotionKind.LINGERING
+                : input.getItem() instanceof net.minecraft.world.item.SplashPotionItem
+                ? KogasaAbilityData.PotionKind.SPLASH
+                : KogasaAbilityData.PotionKind.REGULAR;
         KogasaAbilityData.setPotionAmmo(held, potionId, kind);
         player.getInventory().setChanged();
 
@@ -76,6 +96,15 @@ public final class KogasaAmmoCommands {
                 kind.name().toLowerCase()), true);
         KogasaAdvancementHelper.checkAndGrant(player, held);
         return 1;
+    }
+
+    private static ItemStack inputStack(CommandContext<CommandSourceStack> ctx, ServerPlayer player)
+            throws CommandSyntaxException {
+        try {
+            return ItemArgument.getItem(ctx, "item").createItemStack(1, true);
+        } catch (IllegalArgumentException ignored) {
+            return player.getOffhandItem().copy();
+        }
     }
 
     private static int setAmmoFirework(CommandContext<CommandSourceStack> ctx)
@@ -113,6 +142,30 @@ public final class KogasaAmmoCommands {
         return 1;
     }
 
+
+    private static int setAmmoSpell(CommandContext<CommandSourceStack> ctx)
+            throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        ItemStack held = KogasaCommandSupport.requireKogasaEquipment(ctx);
+        if (held.isEmpty()) return 0;
+        if (!isRangedWeapon(held)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.not_ranged"));
+            return 0;
+        }
+        ItemStack offhand = inputStack(ctx, player);
+        if (offhand.isEmpty() || !net.kogasachan.kogasa_addiction.util.KogasaAmmoService.isSpellAmmo(offhand.getItem())) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.spell_required"));
+            return 0;
+        }
+        KogasaAbilityData.setSpellAmmo(held, offhand, net.kogasachan.kogasa_addiction.util.KogasaAmmoService.requiresTargetFor(offhand));
+        player.getInventory().setChanged();
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.setammo.spell.success", offhand.getHoverName()), true);
+        KogasaAdvancementHelper.checkAndGrant(player, held);
+        return 1;
+    }
 
     // ==================== clearammo ====================
 

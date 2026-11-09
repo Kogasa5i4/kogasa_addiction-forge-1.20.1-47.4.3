@@ -76,10 +76,19 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
         if (power < 0.1F) return;
 
         if (!level.isClientSide) {
-            if (yhAmmo && KogasaAmmoService.fireYh(stack, player)) {
-                stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(player.getUsedItemHand()));
-                KogasaGrowthHandler.addGrowth(stack, player);
-                return;
+            boolean spellProjectile = false;
+            if (yhAmmo) {
+                KogasaAmmoService.FireResult fire = KogasaAmmoService.fireAmmo(stack, player);
+                if (fire == KogasaAmmoService.FireResult.IMMEDIATE) {
+                    // 法术/符卡立即释放时仍照常消耗一支背包箭。
+                    if (!player.getAbilities().instabuild && !infinity && !ammo.isEmpty()) {
+                        ammo.shrink(1);
+                    }
+                    stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(player.getUsedItemHand()));
+                    KogasaGrowthHandler.addGrowth(stack, player);
+                    return;
+                }
+                spellProjectile = fire == KogasaAmmoService.FireResult.PROJECTILE;
             }
             boolean ammoInfinite = player.getAbilities().instabuild
                     || (ammo.getItem() instanceof ArrowItem arrowItem
@@ -148,7 +157,8 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
                     ? ai : (ArrowItem) Items.ARROW;
 
             double multiplier = KogasaEquipmentData.getMultiplier(stack);
-            int arrowCount = KogasaEquipmentHelper.getBowArrowCount(stack);
+            int arrowCount = KogasaAbilityData.getAmmoType(stack) == KogasaAbilityData.AmmoType.SPELL
+                    ? 1 : KogasaEquipmentHelper.getBowArrowCount(stack);
             // 总倍率给基础弹速，强化吸收来的"发射威力"再叠一层
             float velocityMultiplier = (float) (Math.sqrt(multiplier)
                     * KogasaEquipmentHelper.getRangedPowerMultiplier(stack));
@@ -176,6 +186,9 @@ public class AyaBowItem extends BowItem implements IKogasaEquipment {
             for (int i = 0; i < arrowCount; i++) {
                 AbstractArrow arrow = arrowItem.createArrow(level, ammo, player);
                 arrow = customArrow(arrow);
+                if (spellProjectile && i == 0) {
+                    KogasaAmmoService.markProjectile(arrow, stack);
+                }
 
                 // ===== 穿透叠加：原版穿透附魔（customArrow 已写入）+ 弓弩成长穿透 =====
                 // 原先只对 Aya 箭取基础值，普通箭会被成长穿透覆盖掉原版穿透附魔

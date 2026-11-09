@@ -26,9 +26,18 @@ public final class KogasaEquipmentKinds {
     @Nullable
     public static KogasaEquipmentKind of(Item item) {
         if (item == null) return null;
+
+        // FUMO 必须先于 PICKAXE（FumoItem 继承镐），但只认自身类/名字。
+        if (KogasaEquipmentKind.FUMO.matches(item)) return KogasaEquipmentKind.FUMO;
+
+        // 具体类型优先：弩/弓/镐/斧等先判定。
         for (KogasaEquipmentKind kind : ORDER) {
+            if (kind == KogasaEquipmentKind.FUMO) continue;
             if (kind.matches(item)) return kind;
         }
+
+        // 最后的宽泛兜底：未识别的 forge:tools 才归 FUMO。
+        if (KogasaEquipmentKind.FUMO.matchesBroadIdentity(item)) return KogasaEquipmentKind.FUMO;
         return null;
     }
 }

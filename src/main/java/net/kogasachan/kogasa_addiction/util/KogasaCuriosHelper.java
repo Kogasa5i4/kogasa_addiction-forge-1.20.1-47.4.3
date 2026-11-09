@@ -43,4 +43,18 @@ public final class KogasaCuriosHelper {
             }
         });
     }
+
+    /** 可变遍历：写完 NBT 后 setStackInSlot，触发 Curios 的槽位同步。 */
+    public static void forEachEquippedMutable(LivingEntity entity, Consumer<ItemStack> consumer) {
+        if (entity == null || !ModList.get().isLoaded("curios")) return;
+        CuriosApi.getCuriosInventory(entity).ifPresent(handler -> {
+            IItemHandlerModifiable equipped = handler.getEquippedCurios();
+            for (int i = 0; i < equipped.getSlots(); i++) {
+                ItemStack stack = equipped.getStackInSlot(i);
+                if (stack.isEmpty()) continue;
+                consumer.accept(stack);
+                equipped.setStackInSlot(i, stack);
+            }
+        });
+    }
 }

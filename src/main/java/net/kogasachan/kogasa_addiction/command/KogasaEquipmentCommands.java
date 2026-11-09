@@ -9,6 +9,7 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.event.common.FirstJoinRewardHandler;
+import net.kogasachan.kogasa_addiction.event.common.KogasaAnvilHandler;
 import net.kogasachan.kogasa_addiction.event.common.ManualGrantHandler;
 import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKind;
 import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKinds;
@@ -161,12 +162,7 @@ public final class KogasaEquipmentCommands {
         KogasaEquipmentData.setReinforcements(held, re + 1);
         KogasaEquipmentData.addUsedMaterial(held, materialId);
 
-        double baseValue = KogasaEquipmentHelper.getEquipmentBaseValue(material);
-        double ratio = KogasaEquipmentHelper.getAbsorbedRatio(material);
-        double absorb = baseValue * ratio;
-        if (absorb > 0) {
-            KogasaEquipmentData.addAbsorbedValue(held, absorb);
-        }
+        double absorb = KogasaAnvilHandler.applyAbsorption(held, held, material, player);
 
         player.getInventory().setChanged();
 

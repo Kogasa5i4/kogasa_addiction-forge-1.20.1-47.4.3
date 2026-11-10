@@ -6,7 +6,15 @@
   "refmap": "kogasa_addiction_compat.refmap.json",
   "mixins": [
     "ItemEntityMixin",
-    "ItemStackMixin"
+    "ItemStackMixin",
+    "bosstweaks.ApollyonDoomMixin",
+    "bosstweaks.YhBossTweakMixin",
+    "bosstweaks.YhYoukaiSetHealthMixin",
+    "bosstweaks.ApostleInvulMixin",
+    "bosstweaks.UomBaseInvulMixin",
+    "bosstweaks.UomWitherInvulMixin",
+    "bosstweaks.YhEntityInvulMixin",
+    "bosstweaks.YhDanmakuSetHealthMixin"
   ],
   "client": [
     "AbstractContainerScreenMixin",
@@ -14,5 +22,6 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "plugin": "net.kogasachan.kogasa_addiction_compat.bosstweaks.BossTweaksMixinPlugin"
 }

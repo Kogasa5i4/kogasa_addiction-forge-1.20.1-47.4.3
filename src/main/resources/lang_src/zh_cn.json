@@ -492,5 +492,11 @@
   "commands.kogasa_addiction.error.spell_required": "副手需要 ISS 卷轴 / Goety 聚晶 / Ars 法术羊皮纸。",
   "commands.kogasa_addiction.setammo.spell.success": "已装载法术弹药：%s",
   "commands.kogasa_addiction.info.absorbed_attributes.header": "已吸收属性：",
-  "commands.kogasa_addiction.error.potion_required": "副手或参数需要一瓶药水（普通/喷溅/滞留）。"
+  "commands.kogasa_addiction.error.potion_required": "副手或参数需要一瓶药水（普通/喷溅/滞留）。",
+  "commands.kogasa_addiction.tag.header": "§6=== %s §7(%s) §6的 Tag ===",
+  "commands.kogasa_addiction.tag.header_block": "§6=== 方块 %s §7@ %s §6的 Tag ===",
+  "commands.kogasa_addiction.tag.item": "§b物品 Tag（%s 个）：",
+  "commands.kogasa_addiction.tag.block": "§b方块 Tag（%s 个）：",
+  "commands.kogasa_addiction.tag.none": "§7  （无）",
+  "commands.kogasa_addiction.tag.no_block": "§7未看向 5 格内的方块。"
 }

@@ -492,5 +492,11 @@
   "commands.kogasa_addiction.error.spell_required": "Offhand must hold an ISS scroll, Goety focus, or Ars spell parchment.",
   "commands.kogasa_addiction.setammo.spell.success": "Loaded spell ammo: %s",
   "commands.kogasa_addiction.info.absorbed_attributes.header": "Absorbed attributes:",
-  "commands.kogasa_addiction.error.potion_required": "Offhand or argument must be a potion (regular/splash/lingering)."
+  "commands.kogasa_addiction.error.potion_required": "Offhand or argument must be a potion (regular/splash/lingering).",
+  "commands.kogasa_addiction.tag.header": "§6=== Tags of %s §7(%s) §6===",
+  "commands.kogasa_addiction.tag.header_block": "§6=== Tags of block %s §7@ %s §6===",
+  "commands.kogasa_addiction.tag.item": "§bItem tags (%s):",
+  "commands.kogasa_addiction.tag.block": "§bBlock tags (%s):",
+  "commands.kogasa_addiction.tag.none": "§7  (none)",
+  "commands.kogasa_addiction.tag.no_block": "§7No block within 5 blocks."
 }

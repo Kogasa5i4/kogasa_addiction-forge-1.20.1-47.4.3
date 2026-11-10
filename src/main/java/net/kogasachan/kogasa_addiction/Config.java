@@ -162,6 +162,7 @@ public class Config {
                     "护甲吸收时排除的属性，支持 * 和 ? 通配符。")
             .defineListAllowEmpty("attributeAbsorbArmorBlacklist",
                     List.of(
+                            "minecraft:generic.attack_speed",
                             "minecraft:generic.armor",
                             "minecraft:generic.armor_toughness",
                             "minecraft:generic.knockback_resistance"),
@@ -213,6 +214,16 @@ public class Config {
                     "留空 = 不限制；按列表顺序取第一个匹配项；支持 * 和 ? 通配符。")
             .defineListAllowEmpty("attributeGrowthCaps", List.of(),
                     o -> o instanceof String s && s.contains("=") && !s.isBlank());
+
+    public static final ForgeConfigSpec.DoubleValue ATTACK_SPEED_GROWTH_RATIO = BUILDER
+            .comment("Attack speed progress = min(growth * ratio * (1 + Aya news value), 1.0). Growth is the base; Aya news value accelerates reaching the cap.\n" +
+                    "攻速进度 = min(成长值 × 此倍率 × (1 + 文文新闻值), 1.0)；成长值是基础，文文新闻值加快接近上限。")
+            .defineInRange("attackSpeedGrowthRatio", 1.0D, 0.01D, Double.MAX_VALUE);
+
+    public static final ForgeConfigSpec.DoubleValue ATTACK_SPEED_CAP = BUILDER
+            .comment("Final total attack speed cap. 4.0 = bare-hand speed.\n" +
+                    "最终总攻速上限；4.0 = 空手攻速。")
+            .defineInRange("attackSpeedCap", 4.0D, 2.0D, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.IntValue GROWTH_UNLOCK_REINFORCEMENTS = BUILDER
             .comment("Reinforcement count required to unlock growth. Can be lower than maxReinforcements.\n" +

@@ -18,6 +18,8 @@ public class KogasaEquipmentData {
     private static final String GROWTH = "Growth";
     private static final String ABSORBED_VALUE = "AbsorbedValue";
     private static final String ABSORBED_ATTRIBUTES = "AbsorbedAttributes";
+    /** addAbsorbedValue 已同时写入 scalar 与 AbsorbedAttributes 的标记。 */
+    private static final String ABSORBED_SYNCED = "AbsorbedValueSynced";
     private static final String ABSORBED_ATTRIBUTE_MULTIPLIERS = "AbsorbedAttributeMultipliers";
     private static final String ABSORBED_MULTIPLIER_ENTRIES = "AbsorbedMultiplierEntries";
     /** 弓弩专用：累积吸收的"拉弓速度"（单位 tick，从原版拉满时间中扣减） */
@@ -145,6 +147,7 @@ public class KogasaEquipmentData {
         String key = attributeId.toString();
         attributes.putDouble(key, attributes.getDouble(key) + value);
         tag.put(ABSORBED_ATTRIBUTES, attributes);
+        tag.putBoolean(ABSORBED_SYNCED, true);
         saveTag(stack, tag);
     }
 
@@ -279,6 +282,7 @@ public class KogasaEquipmentData {
         tag.remove(USED_MATERIALS);
         tag.remove(ABSORBED_VALUE);
         tag.remove(ABSORBED_ATTRIBUTES);
+        tag.remove(ABSORBED_SYNCED);
         tag.remove(ABSORBED_ATTRIBUTE_MULTIPLIERS);
         tag.remove(ABSORBED_MULTIPLIER_ENTRIES);
         tag.remove(DRAW_SPEED_VALUE);
@@ -290,14 +294,24 @@ public class KogasaEquipmentData {
     }
 
     public static void addAbsorbedValue(ItemStack stack, double value) {
+        if (value <= 0.0D) return;
         CompoundTag tag = getTag(stack);
         double current = tag.getDouble(ABSORBED_VALUE);
         tag.putDouble(ABSORBED_VALUE, current + value);
+
+        // v3 之后 getAbsorbedValue 优先读 AbsorbedAttributes；只写 scalar 会让
+        // 后续吸收看起来不增长（迁移过的装备尤其明显）。主属性必须同步累加。
+        String key = stack.getItem() instanceof net.minecraft.world.item.ArmorItem
+                ? "minecraft:generic.armor"
+                : "minecraft:generic.attack_damage";
+        CompoundTag attributes = tag.getCompound(ABSORBED_ATTRIBUTES);
+        attributes.putDouble(key, attributes.getDouble(key) + value);
+        tag.put(ABSORBED_ATTRIBUTES, attributes);
         saveTag(stack, tag);
     }
 
     /** 装备数据模式版本（存于 KogasaEquipment 根内）。结构变更时 +1，并在 {@link #migrate} 里补步骤。 */
-    public static final int SCHEMA_VERSION = 3;
+    public static final int SCHEMA_VERSION = 4;
     private static final String KEY_SCHEMA_VERSION = "SchemaVersion";
 
     public static CompoundTag getTag(ItemStack stack) {
@@ -347,6 +361,11 @@ public class KogasaEquipmentData {
                 migrateLegacyAbsorbedValue(stack, root);
                 yield 3;
             }
+            // v3 → v4：修复 scalar 与 AbsorbedAttributes 可能不同步的历史数据。
+            case 3 -> {
+                migrateAbsorbedValueConsistency(stack, root);
+                yield 4;
+            }
             default -> SCHEMA_VERSION; // 未知版本号，保守跳到最新
         };
     }
@@ -368,6 +387,50 @@ public class KogasaEquipmentData {
             root.put(ABSORBED_ATTRIBUTES, attributes);
         }
         root.remove(ABSORBED_VALUE);
+    }
+
+    /**
+     * v3 期间 addAbsorbedValue 只写 scalar，而 getAbsorbedValue 优先读
+     * AbsorbedAttributes，导致旧物品后续吸收没有反映到主属性。
+     *
+     * <p>迁移策略：
+     * <ul>
+     *   <li>已有同步标记：两者视为同一份总值，取较大值，避免重复；</li>
+     *   <li>没有同步标记且两者都有值：视为旧版“迁移基数 + 后续 scalar 增量”，相加；</li>
+     *   <li>只有一边有值：直接使用该值。</li>
+     * </ul>
+     * 最终把 scalar 和主属性都写成同一个总值，并打上同步标记。
+     */
+    private static void migrateAbsorbedValueConsistency(ItemStack stack, CompoundTag root) {
+        String key = stack.getItem() instanceof ArmorItem
+                ? "minecraft:generic.armor"
+                : "minecraft:generic.attack_damage";
+        CompoundTag attributes = root.getCompound(ABSORBED_ATTRIBUTES);
+        double scalar = root.getDouble(ABSORBED_VALUE);
+        double attribute = attributes.getDouble(key);
+        boolean synced = root.getBoolean(ABSORBED_SYNCED);
+
+        double total;
+        if (scalar <= 0.0D) {
+            total = attribute;
+        } else if (attribute <= 0.0D) {
+            total = scalar;
+        } else if (synced || Math.abs(scalar - attribute) < 1.0E-6D) {
+            total = Math.max(scalar, attribute);
+        } else {
+            // 旧 v3 数据：attribute 是迁移前的总值，scalar 是迁移后追加的增量。
+            total = scalar + attribute;
+        }
+
+        if (total > 0.0D) {
+            attributes.putDouble(key, total);
+            root.put(ABSORBED_ATTRIBUTES, attributes);
+            root.putDouble(ABSORBED_VALUE, total);
+            root.putBoolean(ABSORBED_SYNCED, true);
+        } else {
+            root.remove(ABSORBED_VALUE);
+            root.remove(ABSORBED_SYNCED);
+        }
     }
 
     public static void saveTag(ItemStack stack, CompoundTag tag) {

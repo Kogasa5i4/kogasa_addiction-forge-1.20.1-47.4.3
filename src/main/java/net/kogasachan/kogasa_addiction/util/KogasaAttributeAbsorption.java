@@ -70,6 +70,8 @@ public final class KogasaAttributeAbsorption {
             Attribute attribute = entry.getKey();
             ResourceLocation id = ForgeRegistries.ATTRIBUTES.getKey(attribute);
             if (id == null || isBlacklisted(id, category)) continue;
+            // 攻速不走吸收：攻速只由成长值/文文新闻值控制。
+            if (id.equals(ResourceLocation.withDefaultNamespace("generic.attack_speed"))) continue;
 
             double amount = entry.getValue().getAmount();
             if (amount <= 0.0D) continue;

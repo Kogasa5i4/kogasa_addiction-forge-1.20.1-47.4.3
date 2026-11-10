@@ -54,6 +54,13 @@ public class KogasaAbilityIngotItem extends Item {
         // 3. 获取方式（剧透）：按住 Shift 才展开，避免提前剧透
         if (net.minecraft.client.gui.screens.Screen.hasShiftDown()) {
             tooltip.add(Component.translatable(
+                            "tooltip.kogasa_addiction.ability_ingot.summary.header")
+                    .withStyle(ChatFormatting.GREEN));
+            tooltip.add(Component.translatable(
+                            "tooltip.kogasa_addiction.ability_ingot.summary." + ability.getId())
+                    .withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.empty());
+            tooltip.add(Component.translatable(
                             "tooltip.kogasa_addiction.ability_ingot.obtain.header")
                     .withStyle(ChatFormatting.YELLOW));
             for (String key : ability.getObtainKeys()) {

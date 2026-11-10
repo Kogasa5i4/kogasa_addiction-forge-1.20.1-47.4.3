@@ -303,7 +303,14 @@ public class KogasaAnvilHandler {
         double materialMultiplier = KogasaEquipmentHelper.getTotalMultiplier(right);
         if (materialMultiplier <= 0.0D) materialMultiplier = 1.0D;
 
-        java.util.Set<String> legacyAttributes = legacyAttributesFor(absorbCategory);
+        java.util.Set<String> legacyAttributes = new java.util.HashSet<>(legacyAttributesFor(absorbCategory));
+        // 外部武器/护甲的基础数值已经写入 scalar baseValue，不能再把同名属性加一次。
+        if (KogasaEquipmentHelper.isExternalWeapon(right)) {
+            legacyAttributes.add("minecraft:generic.attack_damage");
+        }
+        if (KogasaEquipmentHelper.isExternalArmor(right)) {
+            legacyAttributes.add("minecraft:generic.armor");
+        }
         for (var entry : absorbed.additive().entrySet()) {
             String id = entry.getKey().toString();
             if (legacyAttributes.contains(id)) continue;

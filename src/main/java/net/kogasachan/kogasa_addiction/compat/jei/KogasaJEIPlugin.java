@@ -15,6 +15,9 @@ import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.item.KogasaAbilityIngotItem;
 import net.kogasachan.kogasa_addiction.item.ModItems;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
+import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
+import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKind;
+import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKinds;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
@@ -37,9 +40,21 @@ public class KogasaJEIPlugin implements IModPlugin {
     /**
      * ForgeRegistries 版"按标签取物品"：标签缺失时返回空流。
      */
+    private static final List<Item> VANILLA_SWORDS = List.of(
+            Items.WOODEN_SWORD, Items.STONE_SWORD, Items.IRON_SWORD,
+            Items.GOLDEN_SWORD, Items.DIAMOND_SWORD, Items.NETHERITE_SWORD);
+
     private static Stream<Item> itemsInTag(TagKey<Item> tag) {
-        var itemTag = ForgeRegistries.ITEMS.tags().getTag(tag);
-        return itemTag == null ? Stream.empty() : itemTag.stream();
+        // 逐物品用 ItemStack#is(TagKey) 判断。JEI 注册阶段偶尔拿不到已绑定的
+        // Forge ITag（表现为 minecraft:swords 为空），扫描注册表更稳。
+        Stream<Item> found = ForgeRegistries.ITEMS.getValues().stream()
+                .filter(item -> !new ItemStack(item).isEmpty() && new ItemStack(item).is(tag));
+        if (tag.equals(ItemTags.SWORDS)) {
+            // 兜底：即使 JEI 注册时 swords 标签尚未绑定，也保证飞刀/小伞剑页
+            // 至少列出版本内所有原版剑。
+            found = Stream.concat(found, VANILLA_SWORDS.stream()).distinct();
+        }
+        return found;
     }
 
     /**
@@ -48,23 +63,23 @@ public class KogasaJEIPlugin implements IModPlugin {
      */
     private static void registerAbilityRecipes(List<AnvilReinforcementRecipe> recipes) {
         ItemStack sampleEquipment = new ItemStack(ModItems.KOGASA_SWORD.get());
+        List<ItemStack> ingots = new ArrayList<>();
+        List<ItemStack> outputs = new ArrayList<>();
 
-        // 1. 遍历标签内所有物品
         itemsInTag(ModItemTagsProvider.ABILITY_INGOTS).forEach(ingotItem -> {
-            // 2. 过滤：只处理本模组的能力锭类物品
             if (ingotItem instanceof KogasaAbilityIngotItem abilityIngot) {
                 KogasaAbility ability = abilityIngot.getAbility();
-
-                ItemStack input = sampleEquipment.copy();
-                List<ItemStack> materials = List.of(new ItemStack(ingotItem));
-
-                ItemStack output = input.copy();
+                ingots.add(new ItemStack(ingotItem));
+                ItemStack output = sampleEquipment.copy();
                 KogasaAbilityData.addAbility(output, ability);
-
-                recipes.add(new AnvilReinforcementRecipe(
-                        input, materials, output, RecipeKind.ABILITY));
+                outputs.add(output);
             }
         });
+        if (ingots.isEmpty()) return;
+
+        // 能力锭细节由独立的能力页面展示；铁砧页只保留一组“任意能力锭 → 能力装备”的示例。
+        recipes.add(new AnvilReinforcementRecipe(
+                List.of(sampleEquipment), ingots, outputs, RecipeKind.ABILITY));
     }
 
     /**
@@ -106,6 +121,33 @@ public class KogasaJEIPlugin implements IModPlugin {
                     materials.putIfAbsent(item, new ItemStack(item));
                 });
             }
+
+            // 显式同步运行时按类名兼容的 ISS / 灾变装备。
+            KogasaEquipmentKind kind = KogasaEquipmentKinds.of(new ItemStack(kogasaItem));
+            if (kind != null) {
+                for (Item item : ForgeRegistries.ITEMS.getValues()) {
+                    if (item == Items.AIR || item instanceof IKogasaEquipment) continue;
+                    ItemStack stack = new ItemStack(item);
+                    boolean add = false;
+                    if (kind == KogasaEquipmentKind.SWORD || kind == KogasaEquipmentKind.KNIFE) {
+                        add = item instanceof net.minecraft.world.item.SwordItem
+                                || KogasaEquipmentHelper.isExternalWeapon(stack);
+                    } else if (kind == KogasaEquipmentKind.AXE) {
+                        add = KogasaEquipmentHelper.isExternalWeapon(stack);
+                    } else if (kind == KogasaEquipmentKind.HELMET
+                            || kind == KogasaEquipmentKind.CHESTPLATE
+                            || kind == KogasaEquipmentKind.LEGGINGS
+                            || kind == KogasaEquipmentKind.BOOTS) {
+                        var slot = KogasaEquipmentHelper.getArmorEquipmentSlot(stack);
+                        add = KogasaEquipmentHelper.isExternalArmor(stack)
+                                && ((kind == KogasaEquipmentKind.HELMET && slot == net.minecraft.world.entity.EquipmentSlot.HEAD)
+                                || (kind == KogasaEquipmentKind.CHESTPLATE && slot == net.minecraft.world.entity.EquipmentSlot.CHEST)
+                                || (kind == KogasaEquipmentKind.LEGGINGS && slot == net.minecraft.world.entity.EquipmentSlot.LEGS)
+                                || (kind == KogasaEquipmentKind.BOOTS && slot == net.minecraft.world.entity.EquipmentSlot.FEET));
+                    }
+                    if (add) materials.putIfAbsent(item, stack);
+                }
+            }
             if (materials.isEmpty()) continue;
 
             ItemStack input = new ItemStack(kogasaItem);
@@ -116,76 +158,64 @@ public class KogasaJEIPlugin implements IModPlugin {
                     input, new ArrayList<>(materials.values()), output, RecipeKind.REINFORCEMENT));
         }
 
-        // ===== 弓弩强化配方：16 支箭 =====
-        registerBowArrowRecipe(recipes, ModItems.AYA_BOW.get());
-        registerBowArrowRecipe(recipes, ModItems.AYA_CROSSBOW.get());
+        // ===== 弓弩强化配方：16 支箭（弓/弩合并展示）=====
+        registerBowArrowRecipe(recipes, List.of(ModItems.AYA_BOW.get(), ModItems.AYA_CROSSBOW.get()));
     }
 
     /**
      * 弓弩用 16 支箭矢强化
      */
-    private static void registerBowArrowRecipe(List<AnvilReinforcementRecipe> recipes, Item bowItem) {
-        ItemStack input = new ItemStack(bowItem);
-
-        // 用 ItemTags.ARROWS 中的所有箭矢作为代表
+    private static void registerBowArrowRecipe(List<AnvilReinforcementRecipe> recipes, List<Item> weapons) {
+        List<ItemStack> inputs = weapons.stream().map(ItemStack::new).toList();
         List<ItemStack> arrows = new ArrayList<>();
         itemsInTag(ItemTags.ARROWS).forEach(item -> {
             if (item == Items.AIR) return;
-            ItemStack stack = new ItemStack(item, 16);  // count=16 让 JEI 显示 "16x"
-            arrows.add(stack);
+            arrows.add(new ItemStack(item, 16));
         });
         if (arrows.isEmpty()) return;
 
-        ItemStack output = input.copy();
-        KogasaEquipmentData.setReinforcements(output, 1);
+        List<ItemStack> outputs = inputs.stream().map(input -> {
+            ItemStack output = input.copy();
+            KogasaEquipmentData.setReinforcements(output, 1);
+            return output;
+        }).toList();
 
-        recipes.add(new AnvilReinforcementRecipe(
-                input, arrows, output, RecipeKind.REINFORCEMENT));
+        recipes.add(new AnvilReinforcementRecipe(inputs, arrows, outputs, RecipeKind.REINFORCEMENT));
     }
 
     /**
      * 弓弩装载弹药
      */
-    private static void registerAmmoRecipes(List<AnvilReinforcementRecipe> recipes) {
-        // 三种药水 × 两种弓弩
-        registerPotionAmmoRecipes(recipes, ModItems.AYA_BOW.get(),
-                Items.POTION, KogasaAbilityData.PotionKind.REGULAR);
-        registerPotionAmmoRecipes(recipes, ModItems.AYA_BOW.get(),
-                Items.SPLASH_POTION, KogasaAbilityData.PotionKind.SPLASH);
-        registerPotionAmmoRecipes(recipes, ModItems.AYA_BOW.get(),
-                Items.LINGERING_POTION, KogasaAbilityData.PotionKind.LINGERING);
-
-        registerPotionAmmoRecipes(recipes, ModItems.AYA_CROSSBOW.get(),
-                Items.POTION, KogasaAbilityData.PotionKind.REGULAR);
-        registerPotionAmmoRecipes(recipes, ModItems.AYA_CROSSBOW.get(),
-                Items.SPLASH_POTION, KogasaAbilityData.PotionKind.SPLASH);
-        registerPotionAmmoRecipes(recipes, ModItems.AYA_CROSSBOW.get(),
-                Items.LINGERING_POTION, KogasaAbilityData.PotionKind.LINGERING);
-
-        // 烟花 × 两种弓弩
-        registerFireworkAmmoRecipe(recipes, ModItems.AYA_BOW.get());
-        registerFireworkAmmoRecipe(recipes, ModItems.AYA_CROSSBOW.get());
-
-        // 妖归弹幕/激光/符卡
-        registerYhAmmoRecipes(recipes);
-
-        // ISS / Goety / Ars 法术弹药
-        registerSpellAmmoRecipes(recipes);
+    private static List<Item> rangedWeapons() {
+        return List.of(ModItems.AYA_BOW.get(), ModItems.AYA_CROSSBOW.get());
     }
 
-    private static void registerSpellAmmoRecipes(List<AnvilReinforcementRecipe> recipes) {
-        // ISS 卷轴
+    private static void registerAmmoRecipes(List<AnvilReinforcementRecipe> recipes) {
+        List<Item> weapons = rangedWeapons();
+
+        // 三种药水；弓/弩合并为同一页
+        registerPotionAmmoRecipes(recipes, weapons, Items.POTION,
+                KogasaAbilityData.PotionKind.REGULAR);
+        registerPotionAmmoRecipes(recipes, weapons, Items.SPLASH_POTION,
+                KogasaAbilityData.PotionKind.SPLASH);
+        registerPotionAmmoRecipes(recipes, weapons, Items.LINGERING_POTION,
+                KogasaAbilityData.PotionKind.LINGERING);
+
+        registerFireworkAmmoRecipe(recipes, weapons);
+        registerYhAmmoRecipes(recipes, weapons);
+        registerSpellAmmoRecipes(recipes, weapons);
+    }
+
+    private static void registerSpellAmmoRecipes(List<AnvilReinforcementRecipe> recipes,
+                                                 List<Item> weapons) {
         if (ModList.get().isLoaded("irons_spellbooks")) {
             Item scroll = ForgeRegistries.ITEMS.getValue(
                     ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "scroll"));
             if (scroll != null) {
-                List<ItemStack> ammo = List.of(new ItemStack(scroll));
-                addSpellAmmoRecipe(recipes, ModItems.AYA_BOW.get(), ammo);
-                addSpellAmmoRecipe(recipes, ModItems.AYA_CROSSBOW.get(), ammo);
+                addSpellAmmoRecipe(recipes, weapons, List.of(new ItemStack(scroll)));
             }
         }
 
-        // Goety 聚晶
         if (ModList.get().isLoaded("goety")) {
             List<ItemStack> ammo = new ArrayList<>();
             for (Item item : ForgeRegistries.ITEMS.getValues()) {
@@ -193,20 +223,14 @@ public class KogasaJEIPlugin implements IModPlugin {
                     ammo.add(new ItemStack(item));
                 }
             }
-            if (!ammo.isEmpty()) {
-                addSpellAmmoRecipe(recipes, ModItems.AYA_BOW.get(), ammo);
-                addSpellAmmoRecipe(recipes, ModItems.AYA_CROSSBOW.get(), ammo);
-            }
+            addSpellAmmoRecipe(recipes, weapons, ammo);
         }
 
-        // Ars 法术羊皮纸
         if (ModList.get().isLoaded("ars_nouveau")) {
             Item parchment = ForgeRegistries.ITEMS.getValue(
                     ResourceLocation.fromNamespaceAndPath("ars_nouveau", "spell_parchment"));
             if (parchment != null) {
-                List<ItemStack> ammo = List.of(new ItemStack(parchment));
-                addSpellAmmoRecipe(recipes, ModItems.AYA_BOW.get(), ammo);
-                addSpellAmmoRecipe(recipes, ModItems.AYA_CROSSBOW.get(), ammo);
+                addSpellAmmoRecipe(recipes, weapons, List.of(new ItemStack(parchment)));
             }
         }
     }
@@ -221,30 +245,35 @@ public class KogasaJEIPlugin implements IModPlugin {
     }
 
     private static void addSpellAmmoRecipe(List<AnvilReinforcementRecipe> recipes,
-                                           Item weaponItem, List<ItemStack> ammo) {
+                                           List<Item> weapons, List<ItemStack> ammo) {
         if (ammo.isEmpty()) return;
-        ItemStack input = new ItemStack(weaponItem);
-        ItemStack output = input.copy();
-        KogasaAbilityData.setSpellAmmo(output, ammo.get(0), false);
-        recipes.add(new AnvilReinforcementRecipe(input, new ArrayList<>(ammo), output,
+        List<ItemStack> inputs = weapons.stream().map(ItemStack::new).toList();
+        List<ItemStack> outputs = inputs.stream().map(input -> {
+            ItemStack output = input.copy();
+            KogasaAbilityData.setSpellAmmo(output, ammo.get(0), false);
+            return output;
+        }).toList();
+        recipes.add(new AnvilReinforcementRecipe(inputs, new ArrayList<>(ammo), outputs,
                 RecipeKind.AMMO_SPELL));
     }
 
-    private static void registerYhAmmoRecipes(List<AnvilReinforcementRecipe> recipes) {
+    private static void registerYhAmmoRecipes(List<AnvilReinforcementRecipe> recipes,
+                                              List<Item> weapons) {
         if (!ModList.get().isLoaded("youkaishomecoming")) return;
-        addYhAmmoRecipe(recipes, ModItems.AYA_BOW.get(), "danmaku", KogasaAbilityData.AmmoType.YH_DANMAKU, RecipeKind.AMMO_YH);
-        addYhAmmoRecipe(recipes, ModItems.AYA_CROSSBOW.get(), "danmaku", KogasaAbilityData.AmmoType.YH_DANMAKU, RecipeKind.AMMO_YH);
-        addYhAmmoRecipe(recipes, ModItems.AYA_BOW.get(), "laser", KogasaAbilityData.AmmoType.YH_LASER, RecipeKind.AMMO_YH);
-        addYhAmmoRecipe(recipes, ModItems.AYA_CROSSBOW.get(), "laser", KogasaAbilityData.AmmoType.YH_LASER, RecipeKind.AMMO_YH);
-        addYhAmmoRecipe(recipes, ModItems.AYA_BOW.get(), "preset_spell", KogasaAbilityData.AmmoType.YH_SPELL, RecipeKind.AMMO_YH);
-        addYhAmmoRecipe(recipes, ModItems.AYA_CROSSBOW.get(), "preset_spell", KogasaAbilityData.AmmoType.YH_SPELL, RecipeKind.AMMO_YH);
+        addYhAmmoRecipe(recipes, weapons, "danmaku",
+                KogasaAbilityData.AmmoType.YH_DANMAKU, RecipeKind.AMMO_YH);
+        addYhAmmoRecipe(recipes, weapons, "laser",
+                KogasaAbilityData.AmmoType.YH_LASER, RecipeKind.AMMO_YH);
+        addYhAmmoRecipe(recipes, weapons, "preset_spell",
+                KogasaAbilityData.AmmoType.YH_SPELL, RecipeKind.AMMO_YH);
         // 自定义符卡独立显示：NBT 可改变实际形态，JEI 只展示默认形态
-        addYhAmmoRecipe(recipes, ModItems.AYA_BOW.get(), "custom_spell", KogasaAbilityData.AmmoType.YH_SPELL, RecipeKind.AMMO_YH_CUSTOM);
-        addYhAmmoRecipe(recipes, ModItems.AYA_CROSSBOW.get(), "custom_spell", KogasaAbilityData.AmmoType.YH_SPELL, RecipeKind.AMMO_YH_CUSTOM);
+        addYhAmmoRecipe(recipes, weapons, "custom_spell",
+                KogasaAbilityData.AmmoType.YH_SPELL, RecipeKind.AMMO_YH_CUSTOM);
     }
 
-    private static void addYhAmmoRecipe(List<AnvilReinforcementRecipe> recipes, Item weaponItem,
-                                        String tagPath, KogasaAbilityData.AmmoType type, RecipeKind kind) {
+    private static void addYhAmmoRecipe(List<AnvilReinforcementRecipe> recipes,
+                                        List<Item> weapons, String tagPath,
+                                        KogasaAbilityData.AmmoType type, RecipeKind kind) {
         TagKey<Item> tag = ItemTags.create(ResourceLocation.fromNamespaceAndPath("youkaishomecoming", tagPath));
         List<ItemStack> ammo = new ArrayList<>();
         itemsInTag(tag).forEach(item -> {
@@ -252,23 +281,26 @@ public class KogasaJEIPlugin implements IModPlugin {
         });
         if (ammo.isEmpty()) return;
 
-        ItemStack input = new ItemStack(weaponItem);
-        ItemStack output = input.copy();
-        KogasaAbilityData.setYhAmmo(output, ammo.get(0), type);
-        recipes.add(new AnvilReinforcementRecipe(input, ammo, output, kind));
+        List<ItemStack> inputs = weapons.stream().map(ItemStack::new).toList();
+        List<ItemStack> outputs = inputs.stream().map(input -> {
+            ItemStack output = input.copy();
+            KogasaAbilityData.setYhAmmo(output, ammo.get(0), type);
+            return output;
+        }).toList();
+        recipes.add(new AnvilReinforcementRecipe(inputs, ammo, outputs, kind));
     }
 
     private static void registerPotionAmmoRecipes(List<AnvilReinforcementRecipe> recipes,
-                                                  Item weaponItem, Item potionItem,
+                                                  List<Item> weapons, Item potionItem,
                                                   KogasaAbilityData.PotionKind kind) {
-        ItemStack input = new ItemStack(weaponItem);
-        ItemStack output = input.copy();
+        List<ItemStack> inputs = weapons.stream().map(ItemStack::new).toList();
+        List<ItemStack> outputs = inputs.stream().map(input -> {
+            ItemStack output = input.copy();
+            KogasaAbilityData.setPotionAmmo(output,
+                    ResourceLocation.fromNamespaceAndPath("minecraft", "healing"), kind);
+            return output;
+        }).toList();
 
-        // 用代表药水 ID 构造输出；材料列表仅展示常见药水，实际支持任意药水
-        KogasaAbilityData.setPotionAmmo(output,
-                ResourceLocation.fromNamespaceAndPath("minecraft", "healing"), kind);
-
-        // 材料：列举常用的几种药水
         List<ItemStack> potions = new ArrayList<>();
         for (var potion : List.of(
                 net.minecraft.world.item.alchemy.Potions.HEALING,
@@ -282,27 +314,24 @@ public class KogasaJEIPlugin implements IModPlugin {
             potions.add(stack);
         }
 
-        recipes.add(new AnvilReinforcementRecipe(
-                input, potions, output, RecipeKind.AMMO));
+        recipes.add(new AnvilReinforcementRecipe(inputs, potions, outputs, RecipeKind.AMMO));
     }
 
     private static void registerFireworkAmmoRecipe(List<AnvilReinforcementRecipe> recipes,
-                                                   Item weaponItem) {
-        ItemStack input = new ItemStack(weaponItem);
-        ItemStack output = input.copy();
-
-        // 用 Flight=1 的最小烟花 NBT 标记
+                                                   List<Item> weapons) {
+        List<ItemStack> inputs = weapons.stream().map(ItemStack::new).toList();
         CompoundTag emptyFireworkNbt = new CompoundTag();
         CompoundTag fireworkTag = new CompoundTag();
         fireworkTag.putByte("Flight", (byte) 1);
         emptyFireworkNbt.put("Fireworks", fireworkTag);
-        KogasaAbilityData.setFireworkAmmo(output, emptyFireworkNbt);
+        List<ItemStack> outputs = inputs.stream().map(input -> {
+            ItemStack output = input.copy();
+            KogasaAbilityData.setFireworkAmmo(output, emptyFireworkNbt);
+            return output;
+        }).toList();
 
-        // 材料：烟花火箭
-        List<ItemStack> fireworks = List.of(new ItemStack(Items.FIREWORK_ROCKET));
-
-        recipes.add(new AnvilReinforcementRecipe(
-                input, fireworks, output, RecipeKind.AMMO));
+        recipes.add(new AnvilReinforcementRecipe(inputs,
+                List.of(new ItemStack(Items.FIREWORK_ROCKET)), outputs, RecipeKind.AMMO));
     }
 
     private static void registerRepairRecipe(List<AnvilReinforcementRecipe> recipes) {
@@ -316,39 +345,27 @@ public class KogasaJEIPlugin implements IModPlugin {
     private static void registerClearRecipe(List<AnvilReinforcementRecipe> recipes) {
         Item baseSword = ModItems.KOGASA_SWORD.get();
 
-        // 构造输入：带有强化 1、成长 0.5、KOGASA 能力的小伞剑
         ItemStack input = new ItemStack(baseSword);
         KogasaEquipmentData.setReinforcements(input, 1);
         KogasaEquipmentData.setGrowth(input, 0.5);
         KogasaEquipmentData.addUsedMaterial(input, "minecraft:wooden_sword");
         KogasaAbilityData.addAbility(input, KogasaAbility.KOGASA);
 
-        // ==================== 1. 水桶：清除强化 ====================
-        // 构造输出：保留成长和能力，清除强化
-        ItemStack output1 = new ItemStack(baseSword);
-        KogasaEquipmentData.setGrowth(output1, 0.5);
-        KogasaAbilityData.addAbility(output1, KogasaAbility.KOGASA);
+        ItemStack clearReinforcement = new ItemStack(baseSword);
+        KogasaEquipmentData.setGrowth(clearReinforcement, 0.5);
+        KogasaAbilityData.addAbility(clearReinforcement, KogasaAbility.KOGASA);
 
+        ItemStack clearAbility = new ItemStack(baseSword);
+        KogasaEquipmentData.setReinforcements(clearAbility, 1);
+        KogasaEquipmentData.setGrowth(clearAbility, 0.5);
+        KogasaEquipmentData.addUsedMaterial(clearAbility, "minecraft:wooden_sword");
+
+        // 水桶清强化、奶桶清能力合并到同一页，避免两条几乎相同的 JEI 配方。
         recipes.add(new AnvilReinforcementRecipe(
-                input,
-                new ArrayList<>(List.of(new ItemStack(Items.WATER_BUCKET))),
-                output1,
-                RecipeKind.CLEAR
-        ));
-
-        // ==================== 2. 奶桶：清除能力 ====================
-        // 构造输出：保留成长和强化，清除能力
-        ItemStack output2 = new ItemStack(baseSword);
-        KogasaEquipmentData.setReinforcements(output2, 1);
-        KogasaEquipmentData.setGrowth(output2, 0.5);
-        KogasaEquipmentData.addUsedMaterial(output2, "minecraft:wooden_sword");
-
-        recipes.add(new AnvilReinforcementRecipe(
-                input,
-                new ArrayList<>(List.of(new ItemStack(Items.MILK_BUCKET))),
-                output2,
-                RecipeKind.CLEAR
-        ));
+                List.of(input),
+                List.of(new ItemStack(Items.WATER_BUCKET), new ItemStack(Items.MILK_BUCKET)),
+                List.of(clearReinforcement, clearAbility),
+                RecipeKind.CLEAR));
     }
 
     @Override
@@ -368,13 +385,13 @@ public class KogasaJEIPlugin implements IModPlugin {
     public void registerRecipes(@NotNull IRecipeRegistration registration) {
         List<AnvilReinforcementRecipe> recipes = new ArrayList<>();
 
-        // 1. 能力配方（6 个）
+        // 1. 能力配方（合并为一组）
         registerAbilityRecipes(recipes);
 
-        // 2. 强化配方（11 类装备 + 2 种弓弩箭矢）
+        // 2. 强化配方（装备 + 合并后的弓弩箭矢）
         registerReinforcementRecipes(recipes);
 
-        // 3. 弹药配方（8 个）
+        // 3. 弹药配方（弓弩合并）
         registerAmmoRecipes(recipes);
 
         // 4. 修复配方（1 个）

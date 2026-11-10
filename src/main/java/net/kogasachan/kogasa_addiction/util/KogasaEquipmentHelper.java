@@ -88,16 +88,6 @@ public class KogasaEquipmentHelper {
         return stack.getItem() instanceof IKogasaEquipment ? 1.0 : 0.0;
     }
 
-    /** 剑的完整基础攻击加成：Tier 基础值 + SwordItem 附加值。 */
-    private static double swordBaseDamage(SwordItem sword) {
-        return sword.getTier().getAttackDamageBonus() + sword.getDamage();
-    }
-
-    /** 工具/斧的完整基础攻击加成：Tier 基础值 + DiggerItem 附加值。 */
-    private static double diggerBaseDamage(DiggerItem digger) {
-        return digger.getTier().getAttackDamageBonus() + digger.getAttackDamage();
-    }
-
     /**
      * 统一入口：根据物品类型分派属性计算
      */
@@ -118,13 +108,13 @@ public class KogasaEquipmentHelper {
         }
 
         if (item instanceof SwordItem sword) {
-            double baseDamage = emptyHandBonus(stack) + swordBaseDamage(sword);
+            double baseDamage = emptyHandBonus(stack) + sword.getDamage();
             double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
             return buildHandModifiers(stack, baseDamage, absorbed, -2.4F);
         }
 
         if (item instanceof DiggerItem digger) {
-            double baseDamage = emptyHandBonus(stack) + diggerBaseDamage(digger);
+            double baseDamage = emptyHandBonus(stack) + digger.getAttackDamage();
             double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
             float baseSpeed = (float) getBaseAttackSpeed(stack);
             return buildHandModifiers(stack, baseDamage, absorbed, baseSpeed);
@@ -470,12 +460,48 @@ public class KogasaEquipmentHelper {
         return !ItemStack.isSameItemSameTags(newCopy, oldCopy);
     }
 
+    /** ISS/Cataclysm 等外部装备：按包名识别，供吸收与强化材料兼容使用。 */
+    public static boolean isExternalWeapon(ItemStack stack) {
+        if (stack.isEmpty() || isExternalArmor(stack)) return false;
+        Item item = stack.getItem();
+        if (!isExternalEquipment(item)) return false;
+        if (item instanceof BowItem || item instanceof CrossbowItem) return false;
+        if (item instanceof SwordItem || item instanceof DiggerItem || item instanceof TridentItem) return true;
+        if (hasSuperclass(item, "Cataclysm_Weapon_Item")
+                || hasSuperclass(item, "StaffItem")
+                || hasSuperclass(item, "ExtendedSwordItem")) return true;
+        return getAttributeAttackDamageBase(stack) > 0.0D;
+    }
+
+    public static boolean isExternalArmor(ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        Item item = stack.getItem();
+        return isExternalEquipment(item)
+                && (item instanceof ArmorItem || getArmorEquipmentSlot(stack) != null);
+    }
+
+    private static boolean isExternalEquipment(Item item) {
+        String name = item.getClass().getName();
+        return name.startsWith("io.redspace.ironsspellbooks.api.item.weapons.")
+                || name.startsWith("io.redspace.ironsspellbooks.item.weapons.")
+                || name.startsWith("io.redspace.ironsspellbooks.item.armor.")
+                || name.startsWith("com.github.L_Ender.cataclysm.items.");
+    }
+
+    private static boolean hasSuperclass(Item item, String simpleName) {
+        for (Class<?> type = item.getClass(); type != null; type = type.getSuperclass()) {
+            if (type.getSimpleName().equals(simpleName)) return true;
+        }
+        return false;
+    }
+
     /**
      * 获取一件装备的“基础价值”，用于铁砧强化时累加。
      *
-     * <p>判定顺序固定为：
+     * <p>判定顺序：
      * <ol>
      *   <li>配置的 dynamicStatMaterials：读当前主手攻击伤害属性；</li>
+     *   <li>ISS/Cataclysm 武器/护甲：读完整 ATTACK_DAMAGE / ARMOR 属性；</li>
      *   <li>原版剑/工具/护甲/三叉戟：读各自稳定数值；</li>
      *   <li>可穿戴到护甲槽、但不是 {@link ArmorItem} 的普通 Item：读其默认 ARMOR 属性；</li>
      *   <li>其他：0。</li>
@@ -493,11 +519,22 @@ public class KogasaEquipmentHelper {
 
         Item item = stack.getItem();
 
+        // ISS/Cataclysm 的武器/护甲经常不是原版 SwordItem/ArmorItem；
+        // 用它们完整的主手 ATTACK_DAMAGE / ARMOR 属性作为唯一基准，避免只拿到 Tier 附加值。
+        if (isExternalWeapon(stack)) {
+            double attack = getAttributeAttackDamage(stack);
+            if (attack > 0.0D) return attack;
+        }
+        if (isExternalArmor(stack)) {
+            double armor = getAttributeArmorValue(stack);
+            if (armor > 0.0D) return armor;
+        }
+
         if (item instanceof SwordItem sword) {
-            return swordBaseDamage(sword);
+            return sword.getDamage();
         }
         if (item instanceof DiggerItem digger) {
-            return diggerBaseDamage(digger);
+            return digger.getAttackDamage();
         }
         if (item instanceof ArmorItem armor) {
             return armor.getDefense();
@@ -560,9 +597,15 @@ public class KogasaEquipmentHelper {
      */
     public static double getAttackSpeedModifier(ItemStack stack, double baseSpeed) {
         double growth = KogasaEquipmentData.getGrowth(stack);
-        double news = getAyaNews(stack);
-        // 攻速基值不再走成长公式；成长/吸收只通过 ATTRIBUTE 加成体现。
-        return baseSpeed;
+        double ratio = Config.ATTACK_SPEED_GROWTH_RATIO.get();
+        // 文文新闻值是攻速进度乘数：加快接近上限，但总攻速仍封顶 4。
+        double progress = Math.min(growth * ratio * getNewsMultiplier(stack), 1.0D);
+        if (progress <= 0.0D) return baseSpeed;
+
+        // 总攻速 = 默认 4 + modifier；成长值为基础，新闻值作为乘数加快逼近上限。
+        double defaultSpeed = Attributes.ATTACK_SPEED.getDefaultValue();
+        double targetModifier = Config.ATTACK_SPEED_CAP.get() - defaultSpeed;
+        return baseSpeed + (targetModifier - baseSpeed) * progress;
     }
 
     /**
@@ -572,9 +615,9 @@ public class KogasaEquipmentHelper {
         Item item = stack.getItem();
         double baseDamage = 0;
         if (item instanceof SwordItem sword) {
-            baseDamage = emptyHandBonus(stack) + swordBaseDamage(sword);
+            baseDamage = emptyHandBonus(stack) + sword.getDamage();
         } else if (item instanceof DiggerItem digger) {
-            baseDamage = emptyHandBonus(stack) + diggerBaseDamage(digger);
+            baseDamage = emptyHandBonus(stack) + digger.getAttackDamage();
         } else if (item instanceof TridentItem) {
             baseDamage = emptyHandBonus(stack) + getVanillaTridentDamage();
         } else if (isKogasaEquipment(stack)) {
@@ -716,8 +759,11 @@ public class KogasaEquipmentHelper {
 
         // 2) 原版类型匹配
         KogasaEquipmentKind kind = KogasaEquipmentKinds.of(left);
-        if (kind != null && kind.acceptsMaterial(right)) {
-            return true;
+        if (kind != null) {
+            // ISS / Cataclysm 的武器类名不一定是 SwordItem，护甲也可能走自定义基类。
+            if (isExternalWeapon(right) && isMeleeKind(kind)) return true;
+            if (isExternalArmor(right) && isArmorKind(kind)) return true;
+            if (kind.acceptsMaterial(right)) return true;
         }
 
         // 3) 类家族兜底（只对已兼容左件启用，且拒绝过宽根类）
@@ -746,6 +792,19 @@ public class KogasaEquipmentHelper {
             return false;
         }
         return clazz.isInstance(right.getItem());
+    }
+
+    private static boolean isMeleeKind(KogasaEquipmentKind kind) {
+        return kind == KogasaEquipmentKind.SWORD
+                || kind == KogasaEquipmentKind.AXE
+                || kind == KogasaEquipmentKind.KNIFE;
+    }
+
+    private static boolean isArmorKind(KogasaEquipmentKind kind) {
+        return kind == KogasaEquipmentKind.HELMET
+                || kind == KogasaEquipmentKind.CHESTPLATE
+                || kind == KogasaEquipmentKind.LEGGINGS
+                || kind == KogasaEquipmentKind.BOOTS;
     }
 
     /** 是否走原版武器/工具/护甲/弓弩基类的安全属性路径。 */

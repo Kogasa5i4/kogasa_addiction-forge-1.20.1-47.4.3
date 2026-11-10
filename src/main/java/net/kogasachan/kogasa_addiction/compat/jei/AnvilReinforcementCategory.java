@@ -61,10 +61,10 @@ public class AnvilReinforcementCategory implements IRecipeCategory<AnvilReinforc
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, AnvilReinforcementRecipe recipe,
                           @NotNull IFocusGroup focuses) {
-        builder.addInputSlot(1, 1).addItemStack(recipe.input());
+        builder.addInputSlot(1, 1).addItemStacks(recipe.inputs());
         builder.addInputSlot(50, 1).addItemStacks(recipe.materials());
         builder.addOutputSlot(108, 1)
-                .addItemStack(recipe.output())
+                .addItemStacks(recipe.outputs())
                 .addRichTooltipCallback((slotView, tooltip) -> {
                     switch (recipe.kind()) {
                         case ABILITY -> tooltip.add(Component.translatable(

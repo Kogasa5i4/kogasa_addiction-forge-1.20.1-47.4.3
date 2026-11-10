@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class UomBaseInvulMixin {
 
     @Shadow
-    public abstract void setInvulnerableTicks(int ticks);
+    public abstract void setInvulnerableTicks(int p_31511_);
 
     @Inject(method = "hurt", at = @At("HEAD"), require = 0)
     private void kogasa$clearUomSpawnInvul(DamageSource damageSource, float damage, CallbackInfoReturnable<Boolean> cir) {

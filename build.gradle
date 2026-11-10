@@ -96,53 +96,55 @@ repositories {
     maven { url "https://modmaven.dev/" }
 }
 
+def dataRun = gradle.startParameter.taskNames.any { it.toLowerCase().endsWith('rundata') }
+
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
 
     compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"))
     compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"))
-    runtimeOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"))
+    if (!dataRun) runtimeOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"))
 
     compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
-    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")
+    if (!dataRun) runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")
 
     compileOnly fg.deobf("teamtwilight:twilightforest:${twilight_forest_version}:universal")
-    runtimeOnly fg.deobf("teamtwilight:twilightforest:${twilight_forest_version}:universal")
+    if (!dataRun) runtimeOnly fg.deobf("teamtwilight:twilightforest:${twilight_forest_version}:universal")
 
     // ===== 魔法模组兼容：只挂开发环境，不写进 mods.toml =====
     // Iron's Spells / Ars Nouveau / Goety / Goety Revelation 均为软依赖
     compileOnly fg.deobf("maven.modrinth:curios:${curios_version}")
     compileOnly fg.deobf("local.kogasa:geckolib:4.8.4")
-    runtimeOnly fg.deobf("local.kogasa:geckolib:4.8.4")
+    if (!dataRun) runtimeOnly fg.deobf("local.kogasa:geckolib:4.8.4")
     compileOnly fg.deobf("maven.modrinth:playeranimator:${playeranimator_version}")
-    runtimeOnly fg.deobf("maven.modrinth:playeranimator:${playeranimator_version}")
+    if (!dataRun) runtimeOnly fg.deobf("maven.modrinth:playeranimator:${playeranimator_version}")
     compileOnly fg.deobf("maven.modrinth:irons-lib:${irons_lib_version}")
-    runtimeOnly fg.deobf("maven.modrinth:irons-lib:${irons_lib_version}")
+    if (!dataRun) runtimeOnly fg.deobf("maven.modrinth:irons-lib:${irons_lib_version}")
     compileOnly fg.deobf("maven.modrinth:irons-spells-n-spellbooks:${irons_spells_version}")
-    runtimeOnly fg.deobf("maven.modrinth:irons-spells-n-spellbooks:${irons_spells_version}")
+    if (!dataRun) runtimeOnly fg.deobf("maven.modrinth:irons-spells-n-spellbooks:${irons_spells_version}")
     compileOnly fg.deobf("local.kogasa:fantasy_ending:2.7.20g")
-    runtimeOnly fg.deobf("local.kogasa:fantasy_ending:2.7.20g")
+    if (!dataRun) runtimeOnly fg.deobf("local.kogasa:fantasy_ending:2.7.20g")
     compileOnly fg.deobf("local.kogasa:ars_nouveau:4.12.7")
-    runtimeOnly fg.deobf("local.kogasa:ars_nouveau:4.12.7")
+    if (!dataRun) runtimeOnly fg.deobf("local.kogasa:ars_nouveau:4.12.7")
     compileOnly fg.deobf("maven.modrinth:goety:${goety_version}")
-    runtimeOnly fg.deobf("maven.modrinth:goety:${goety_version}")
+    if (!dataRun) runtimeOnly fg.deobf("maven.modrinth:goety:${goety_version}")
     compileOnly fg.deobf("maven.modrinth:endinglibrary:${ending_library_version}")
-    runtimeOnly fg.deobf("maven.modrinth:endinglibrary:${ending_library_version}")
+    if (!dataRun) runtimeOnly fg.deobf("maven.modrinth:endinglibrary:${ending_library_version}")
     compileOnly fg.deobf("maven.modrinth:goety-revelation:${goety_revelation_version}")
-    runtimeOnly fg.deobf("maven.modrinth:goety-revelation:${goety_revelation_version}")
+    if (!dataRun) runtimeOnly fg.deobf("maven.modrinth:goety-revelation:${goety_revelation_version}")
 
     // FantasyEnding 未公开/不便自动拉取，使用本地 jar；不打包进发布 jar
 
     // ===== 灾变（L_Ender's Cataclysm）本体：构建 + 运行都用这个 jar =====
     compileOnly fg.deobf("maven.modrinth:l_enders-cataclysm:${cataclysm_version}")
-    runtimeOnly fg.deobf("maven.modrinth:l_enders-cataclysm:${cataclysm_version}")
+    if (!dataRun) runtimeOnly fg.deobf("maven.modrinth:l_enders-cataclysm:${cataclysm_version}")
     // 灾变运行需要的库：只放运行期，编译期不需要
-    runtimeOnly fg.deobf("maven.modrinth:lionfish-api:${lionfish_version}")
+    if (!dataRun) runtimeOnly fg.deobf("maven.modrinth:lionfish-api:${lionfish_version}")
     // 妖归联动：开发环境运行依赖（可选，不写入发布 jar）
-    runtimeOnly fg.deobf("local.kogasa:farmersdelight:1.20.1-1.3.1")
-    runtimeOnly fg.deobf("local.kogasa:youkaishomecoming:2.7.2")
-    runtimeOnly fg.deobf("maven.modrinth:curios:${curios_version}")
+    if (!dataRun) runtimeOnly fg.deobf("local.kogasa:farmersdelight:1.20.1-1.3.1")
+    if (!dataRun) runtimeOnly fg.deobf("local.kogasa:youkaishomecoming:2.7.2")
+    if (!dataRun) runtimeOnly fg.deobf("maven.modrinth:curios:${curios_version}")
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }

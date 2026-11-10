@@ -88,6 +88,16 @@ public class KogasaEquipmentHelper {
         return stack.getItem() instanceof IKogasaEquipment ? 1.0 : 0.0;
     }
 
+    /** 剑的完整基础攻击加成：Tier 基础值 + SwordItem 附加值。 */
+    private static double swordBaseDamage(SwordItem sword) {
+        return sword.getTier().getAttackDamageBonus() + sword.getDamage();
+    }
+
+    /** 工具/斧的完整基础攻击加成：Tier 基础值 + DiggerItem 附加值。 */
+    private static double diggerBaseDamage(DiggerItem digger) {
+        return digger.getTier().getAttackDamageBonus() + digger.getAttackDamage();
+    }
+
     /**
      * 统一入口：根据物品类型分派属性计算
      */
@@ -108,13 +118,13 @@ public class KogasaEquipmentHelper {
         }
 
         if (item instanceof SwordItem sword) {
-            double baseDamage = emptyHandBonus(stack) + sword.getDamage();
+            double baseDamage = emptyHandBonus(stack) + swordBaseDamage(sword);
             double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
             return buildHandModifiers(stack, baseDamage, absorbed, -2.4F);
         }
 
         if (item instanceof DiggerItem digger) {
-            double baseDamage = emptyHandBonus(stack) + digger.getAttackDamage();
+            double baseDamage = emptyHandBonus(stack) + diggerBaseDamage(digger);
             double absorbed = KogasaEquipmentData.getAbsorbedValue(stack);
             float baseSpeed = (float) getBaseAttackSpeed(stack);
             return buildHandModifiers(stack, baseDamage, absorbed, baseSpeed);
@@ -484,10 +494,10 @@ public class KogasaEquipmentHelper {
         Item item = stack.getItem();
 
         if (item instanceof SwordItem sword) {
-            return sword.getDamage();
+            return swordBaseDamage(sword);
         }
         if (item instanceof DiggerItem digger) {
-            return digger.getAttackDamage();
+            return diggerBaseDamage(digger);
         }
         if (item instanceof ArmorItem armor) {
             return armor.getDefense();
@@ -562,9 +572,9 @@ public class KogasaEquipmentHelper {
         Item item = stack.getItem();
         double baseDamage = 0;
         if (item instanceof SwordItem sword) {
-            baseDamage = emptyHandBonus(stack) + sword.getDamage();
+            baseDamage = emptyHandBonus(stack) + swordBaseDamage(sword);
         } else if (item instanceof DiggerItem digger) {
-            baseDamage = emptyHandBonus(stack) + digger.getAttackDamage();
+            baseDamage = emptyHandBonus(stack) + diggerBaseDamage(digger);
         } else if (item instanceof TridentItem) {
             baseDamage = emptyHandBonus(stack) + getVanillaTridentDamage();
         } else if (isKogasaEquipment(stack)) {

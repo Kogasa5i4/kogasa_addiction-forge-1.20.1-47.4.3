@@ -826,8 +826,8 @@ public class Config {
             .defineInRange("koishiRangedCritMultiplier", 1.5, 1.0, Double.MAX_VALUE);
 
     public static final ForgeConfigSpec.DoubleValue KOISHI_PROJECTILE_IMMUNE_MULTIPLIER = BUILDER
-            .comment("Extra damage multiplier for Koishi ranged attacks: applies once to Endermen and Withers below 50% health, and twice to Ender Dragons (3.0 means x9 against Ender Dragons).\n" +
-                    "恋恋远程攻击的特殊目标额外倍率：对末影人及生命值低于 50% 的凋灵应用一次；对末影龙应用两次（3.0 对末影龙相当于 ×9）。")
+            .comment("Extra damage multiplier for Koishi ranged attacks: applies once to Endermen and powered Withers, and twice to Ender Dragons (3.0 means x9 against Ender Dragons).\n" +
+                    "恋恋远程攻击的特殊目标额外倍率：对末影人及已充能凋灵应用一次；对末影龙应用两次（3.0 对末影龙相当于 ×9）。")
             .defineInRange("koishiProjectileImmuneMultiplier", 3.0, 1.0, Double.MAX_VALUE);
 
     static {

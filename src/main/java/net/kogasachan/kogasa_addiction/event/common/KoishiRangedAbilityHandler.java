@@ -109,8 +109,7 @@ public class KoishiRangedAbilityHandler {
         }
 
         float multiplier = Config.KOISHI_PROJECTILE_IMMUNE_MULTIPLIER.get().floatValue();
-        if ((target instanceof WitherBoss &&
-                ((WitherBoss) target).getHealth() / ((WitherBoss) target).getMaxHealth() < 0.5f) ||
+        if ((target instanceof WitherBoss wither && wither.isPowered()) ||
                 (target instanceof EnderMan)) {
             damage *= multiplier;
         }

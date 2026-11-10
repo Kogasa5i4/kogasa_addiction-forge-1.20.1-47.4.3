@@ -71,18 +71,8 @@ public final class KogasaAmmoService {
             return true;
         }
 
-        if (!ModList.get().isLoaded(YH)) return false;
-        String className = right.getItem().getClass().getName();
-        KogasaAbilityData.AmmoType type;
-        if (className.endsWith("DanmakuItem")) {
-            type = KogasaAbilityData.AmmoType.YH_DANMAKU;
-        } else if (className.endsWith("LaserItem")) {
-            type = KogasaAbilityData.AmmoType.YH_LASER;
-        } else if (implementsSpell(right.getItem())) {
-            type = KogasaAbilityData.AmmoType.YH_SPELL;
-        } else {
-            return false;
-        }
+        KogasaAbilityData.AmmoType type = yhAmmoType(right);
+        if (type == null) return false;
 
         ItemStack result = left.copy();
         if (type == KogasaAbilityData.AmmoType.YH_SPELL) {
@@ -92,6 +82,22 @@ public final class KogasaAmmoService {
         }
         accept(event, result);
         return true;
+    }
+
+    /** 妖归弹药分类；非妖归物品或未安装妖归时返回 null。 */
+    public static KogasaAbilityData.AmmoType yhAmmoType(ItemStack stack) {
+        if (stack.isEmpty() || !ModList.get().isLoaded(YH)) return null;
+        String className = stack.getItem().getClass().getName();
+        if (className.endsWith("DanmakuItem")) {
+            return KogasaAbilityData.AmmoType.YH_DANMAKU;
+        }
+        if (className.endsWith("LaserItem")) {
+            return KogasaAbilityData.AmmoType.YH_LASER;
+        }
+        if (implementsSpell(stack.getItem())) {
+            return KogasaAbilityData.AmmoType.YH_SPELL;
+        }
+        return null;
     }
 
     private static boolean isIssScroll(Item item) {

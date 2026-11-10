@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.util.KogasaAdvancementHelper;
+import net.kogasachan.kogasa_addiction.util.KogasaAmmoService;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -46,6 +47,18 @@ public final class KogasaAmmoCommands {
                         .executes(KogasaAmmoCommands::setAmmoFirework)
                         .then(Commands.argument("item", ItemArgument.item(buildContext))
                                 .executes(KogasaAmmoCommands::setAmmoFirework)))
+                .then(Commands.literal("danmaku")
+                        .executes(ctx -> setAmmoYh(ctx, KogasaAbilityData.AmmoType.YH_DANMAKU))
+                        .then(Commands.argument("item", ItemArgument.item(buildContext))
+                                .executes(ctx -> setAmmoYh(ctx, KogasaAbilityData.AmmoType.YH_DANMAKU))))
+                .then(Commands.literal("laser")
+                        .executes(ctx -> setAmmoYh(ctx, KogasaAbilityData.AmmoType.YH_LASER))
+                        .then(Commands.argument("item", ItemArgument.item(buildContext))
+                                .executes(ctx -> setAmmoYh(ctx, KogasaAbilityData.AmmoType.YH_LASER))))
+                .then(Commands.literal("spellcard")
+                        .executes(ctx -> setAmmoYh(ctx, KogasaAbilityData.AmmoType.YH_SPELL))
+                        .then(Commands.argument("item", ItemArgument.item(buildContext))
+                                .executes(ctx -> setAmmoYh(ctx, KogasaAbilityData.AmmoType.YH_SPELL))))
                 .then(Commands.literal("spell")
                         .executes(KogasaAmmoCommands::setAmmoSpell)
                         .then(Commands.argument("item", ItemArgument.item(buildContext))
@@ -142,6 +155,35 @@ public final class KogasaAmmoCommands {
         return 1;
     }
 
+
+    private static int setAmmoYh(CommandContext<CommandSourceStack> ctx,
+                                  KogasaAbilityData.AmmoType expected)
+            throws CommandSyntaxException {
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
+        ItemStack held = KogasaCommandSupport.requireKogasaEquipment(ctx);
+        if (held.isEmpty()) return 0;
+        if (!isRangedWeapon(held)) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.not_ranged"));
+            return 0;
+        }
+        ItemStack ammo = inputStack(ctx, player);
+        if (KogasaAmmoService.yhAmmoType(ammo) != expected) {
+            ctx.getSource().sendFailure(Component.translatable(
+                    "commands.kogasa_addiction.error.yh_ammo_required"));
+            return 0;
+        }
+        if (expected == KogasaAbilityData.AmmoType.YH_SPELL) {
+            KogasaAbilityData.setSpellAmmo(held, ammo, KogasaAmmoService.requiresTargetFor(ammo));
+        } else {
+            KogasaAbilityData.setYhAmmo(held, ammo, expected, KogasaAmmoService.requiresTargetFor(ammo));
+        }
+        player.getInventory().setChanged();
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "commands.kogasa_addiction.setammo.yh.success", ammo.getHoverName()), true);
+        KogasaAdvancementHelper.checkAndGrant(player, held);
+        return 1;
+    }
 
     private static int setAmmoSpell(CommandContext<CommandSourceStack> ctx)
             throws CommandSyntaxException {

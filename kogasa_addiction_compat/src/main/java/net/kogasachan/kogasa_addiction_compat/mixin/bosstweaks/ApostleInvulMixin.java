@@ -42,7 +42,7 @@ public abstract class ApostleInvulMixin {
     }
 
     @Inject(method = "hurt", at = @At("HEAD"), require = 0, remap = false)
-    private void kogasa$clearApostleInvul(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+    private void kogasa$clearApostleInvul(DamageSource pSource, float pAmount, CallbackInfoReturnable<Boolean> cir) {
         if (!BossTweaks.preventApollyonInvulnerability()) return;
         if (BossTweaks.isApollyonDoom(this)) return; // 尾杀阶段保留无敌
         moddedInvul = 0;

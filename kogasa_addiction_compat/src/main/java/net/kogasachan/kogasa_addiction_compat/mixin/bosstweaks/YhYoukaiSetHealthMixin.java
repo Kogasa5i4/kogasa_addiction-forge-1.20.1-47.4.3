@@ -26,9 +26,9 @@ public abstract class YhYoukaiSetHealthMixin extends PathfinderMob {
     }
 
     @Inject(method = "setHealth", at = @At("HEAD"), cancellable = true, require = 0)
-    private void kogasa$safeSetHealth(float health, CallbackInfo ci) {
-        if (!BossTweaks.preventYhSetHealthState() || !Float.isFinite(health)) return;
-        float clamped = Math.max(0.0F, Math.min(getMaxHealth(), health));
+    private void kogasa$safeSetHealth(float amount, CallbackInfo ci) {
+        if (!BossTweaks.preventYhSetHealthState() || !Float.isFinite(amount)) return;
+        float clamped = Math.max(0.0F, Math.min(getMaxHealth(), amount));
         super.setHealth(clamped);
         ci.cancel();
     }

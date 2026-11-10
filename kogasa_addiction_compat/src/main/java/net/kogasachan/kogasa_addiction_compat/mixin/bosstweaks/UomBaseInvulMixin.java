@@ -8,26 +8,18 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Pseudo
-@Mixin(targets = "com.mega.uom.common.entity.boss.uom.BaseEntity", remap = false)
+@Mixin(targets = "com.mega.uom.common.entity.boss.uom.BaseEntity")
 public abstract class UomBaseInvulMixin {
 
     @Shadow
     public abstract void setInvulnerableTicks(int ticks);
 
-    @Inject(method = "m_6469_", at = @At("HEAD"), require = 0, remap = false)
-    private void kogasa$clearUomSpawnInvul(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "hurt", at = @At("HEAD"), require = 0)
+    private void kogasa$clearUomSpawnInvul(DamageSource damageSource, float damage, CallbackInfoReturnable<Boolean> cir) {
         if (BossTweaks.preventUomInvulnerability()) {
             setInvulnerableTicks(0);
-        }
-    }
-
-    @Inject(method = "m_6673_", at = @At("HEAD"), cancellable = true, require = 0, remap = false)
-    private void kogasa$clearUomIsInvulnerable(DamageSource source, CallbackInfoReturnable<Boolean> cir) {
-        if (BossTweaks.preventUomInvulnerability()) {
-            cir.setReturnValue(false);
         }
     }
 }

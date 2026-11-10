@@ -8,7 +8,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import dev.xkmc.youkaishomecoming.content.entity.youkai.YoukaiEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -54,7 +53,7 @@ public abstract class YhBossTweakMixin extends YoukaiEntity {
         float result = cir.getReturnValueF();
         if (!Float.isFinite(result) || result <= 0.0F || !Float.isFinite(amount)) return;
 
-        float maxHealth = ((LivingEntity) (Object) this).getMaxHealth();
+        float maxHealth = this.getMaxHealth();
         int limit = damageLimit();
         int reduction = nonDanmakuReduction();
         if (limit <= 0 || reduction <= 0) return;
@@ -75,11 +74,11 @@ public abstract class YhBossTweakMixin extends YoukaiEntity {
     }
 
     @Inject(method = "setHealth", at = @At("HEAD"), cancellable = true, require = 0)
-    private void kogasa$safeSetHealth(float health, CallbackInfo ci) {
-        if (!BossTweaks.preventYhSetHealthState() || !Float.isFinite(health)) return;
+    private void kogasa$safeSetHealth(float val, CallbackInfo ci) {
+        if (!BossTweaks.preventYhSetHealthState() || !Float.isFinite(val)) return;
         SAFE_SET_HEALTH.set(true);
         try {
-            float clamped = Math.max(0.0F, Math.min(((LivingEntity) (Object) this).getMaxHealth(), health));
+            float clamped = Math.max(0.0F, Math.min(this.getMaxHealth(), val));
             super.setHealth(clamped);
         } finally {
             SAFE_SET_HEALTH.set(false);
@@ -88,14 +87,14 @@ public abstract class YhBossTweakMixin extends YoukaiEntity {
     }
 
     @Inject(method = "setCombatProgress", at = @At("HEAD"), cancellable = true, require = 0)
-    private void kogasa$safeCombatProgress(float value, CallbackInfo ci) {
+    private void kogasa$safeCombatProgress(float amount, CallbackInfo ci) {
         if (!BossTweaks.preventYhSetHealthState()) return;
-        super.setCombatProgress(value);
+        super.setCombatProgress(amount);
         ci.cancel();
     }
 
     @Inject(method = "notifyIllegalDamage", at = @At("HEAD"), cancellable = true, require = 0)
-    private void kogasa$suppressIllegalState(float amount, Entity source, CallbackInfo ci) {
+    private void kogasa$suppressIllegalState(float amount, Entity causer, CallbackInfo ci) {
         if (SAFE_SET_HEALTH.get() || BossTweaks.preventYhSetHealthState()) {
             ci.cancel();
         }

@@ -16,10 +16,14 @@ public final class KogasaIdListMatcher {
     }
 
     public static boolean matches(ResourceLocation id, List<? extends String> patterns) {
-        if (id == null || patterns == null || patterns.isEmpty()) {
+        return id != null && matchesString(id.toString(), patterns);
+    }
+
+    /** 同一套通配符规则，用于类名/包名等任意字符串。 */
+    public static boolean matchesString(String full, List<? extends String> patterns) {
+        if (full == null || patterns == null || patterns.isEmpty()) {
             return false;
         }
-        String full = id.toString();
         for (String raw : patterns) {
             if (raw == null) continue;
             String pattern = raw.trim();

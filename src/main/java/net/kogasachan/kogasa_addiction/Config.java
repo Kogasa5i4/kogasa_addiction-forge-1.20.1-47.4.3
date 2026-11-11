@@ -176,16 +176,37 @@ public class Config {
             .defineListAllowEmpty("attributeAbsorbScale", List.of(),
                     o -> o instanceof String s && s.contains("=") && !s.isBlank());
 
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> DYNAMIC_STAT_MATERIALS = BUILDER
-            .comment("Items listed here use their current main-hand ATTACK_DAMAGE attribute as the base absorption value when used as reinforcement material. Supports * wildcards.\n" +
-                    "Use *:* to apply this logic to every item. Use modid:* for a whole mod (default: cataclysm:*).\n" +
-                    "WARNING: do NOT add items whose stats change with NBT/growth (this mod's own equipment, Star Meow Craft's Uniforged, etc.). Their current value would be absorbed directly and become extremely overpowered.\n" +
-                    "此处列出的物品作为强化材料时，会用当前主手攻击伤害属性作为吸收基准。支持 * 通配符。\n" +
-                    "填 *:* 可对所有物品生效；按模组用 modid:*（默认 cataclysm:*）。\n" +
-                    "警告：不要加入数值会随 NBT/成长变化的物品（本模组装备、星喵工艺的千刃锻锋等），否则吸收值会非常超模。\n" +
-                    "Format: modid:item_id, e.g. cataclysm:*")
-            .defineListAllowEmpty("dynamicStatMaterials",
-                    List.of("cataclysm:*"),
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> DYNAMIC_STAT_CLASSES = BUILDER
+            .comment("Dynamic-stat equipment classes/packages. Their growth/NBT-driven values are NOT used as the absorption base; the stable fallback is used instead. Supports * and ? wildcards.\n" +
+                    "动态属性装备的类名/包名；这些装备不会用当前 NBT/成长后的属性作为吸收基准，而是使用稳定回退值。支持 * 和 ? 通配符。\n" +
+                    "Default: this mod, Tinkers' Construct, Tetra.")
+            .defineListAllowEmpty("dynamicStatClasses",
+                    List.of("net.kogasachan.kogasa_addiction.item.*",
+                            "slimeknights.tconstruct.*",
+                            "se.mickelus.tetra.*"),
+                    o -> o instanceof String s && !s.isBlank());
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> DYNAMIC_STAT_ITEMS = BUILDER
+            .comment("Dynamic-stat equipment item IDs (modid:item). Same behavior as dynamicStatClasses. Supports * and ? wildcards.\n" +
+                    "动态属性装备的物品 ID（modid:item），行为与 dynamicStatClasses 相同；支持 * 和 ? 通配符。")
+            .defineListAllowEmpty("dynamicStatItems",
+                    List.of("kogasa_addiction:*", "tconstruct:*", "tetra:*"),
+                    o -> o instanceof String s && !s.isBlank());
+
+    /** @deprecated 使用 {@link #DYNAMIC_STAT_ITEMS}。 */
+    @Deprecated
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> DYNAMIC_STAT_MATERIALS = DYNAMIC_STAT_ITEMS;
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> FORCE_ACTUAL_STAT_CLASSES = BUILDER
+            .comment("Classes/packages that always use the item's default ATTACK_DAMAGE, even if also listed as dynamic. Supports * and ? wildcards.\n" +
+                    "始终使用物品默认 ATTACK_DAMAGE 的类名/包名，即使同时命中动态列表；支持 * 和 ? 通配符。")
+            .defineListAllowEmpty("forceActualStatClasses", List.of(),
+                    o -> o instanceof String s && !s.isBlank());
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> FORCE_ACTUAL_STAT_ITEMS = BUILDER
+            .comment("Item IDs (modid:item) that always use the item's default ATTACK_DAMAGE, even if also listed as dynamic. Supports * and ? wildcards.\n" +
+                    "始终使用物品默认 ATTACK_DAMAGE 的物品 ID，即使同时命中动态列表；支持 * 和 ? 通配符。")
+            .defineListAllowEmpty("forceActualStatItems", List.of(),
                     o -> o instanceof String s && !s.isBlank());
 
     static {

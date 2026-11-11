@@ -135,7 +135,7 @@ public enum KogasaEquipmentKind {
         if (this == KNIFE) {
             if (material.is(ItemTags.SWORDS)
                     || material.is(Tags.Items.TOOLS_TRIDENTS)
-                    || material.is(ModItemTagsProvider.KNIVES)) {
+                    || material.is(ModItemTagsProvider.FORGE_TOOLS_KNIVES)) {
                 return true;
             }
             ResourceLocation id = ForgeRegistries.ITEMS.getKey(material.getItem());

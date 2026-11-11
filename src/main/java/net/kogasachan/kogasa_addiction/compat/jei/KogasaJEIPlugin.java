@@ -5,6 +5,7 @@ import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.runtime.IJeiRuntime;
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
@@ -36,6 +37,7 @@ import java.util.stream.Stream;
 @JeiPlugin
 public class KogasaJEIPlugin implements IModPlugin {
     private static final ResourceLocation PLUGIN_UID = ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "jei_plugin");
+    private boolean anvilRecipesAdded;
 
     /**
      * ForgeRegistries 版"按标签取物品"：标签缺失时返回空流。
@@ -45,16 +47,16 @@ public class KogasaJEIPlugin implements IModPlugin {
             Items.GOLDEN_SWORD, Items.DIAMOND_SWORD, Items.NETHERITE_SWORD);
 
     private static Stream<Item> itemsInTag(TagKey<Item> tag) {
-        // 逐物品用 ItemStack#is(TagKey) 判断。JEI 注册阶段偶尔拿不到已绑定的
-        // Forge ITag（表现为 minecraft:swords 为空），扫描注册表更稳。
-        Stream<Item> found = ForgeRegistries.ITEMS.getValues().stream()
-                .filter(item -> !new ItemStack(item).isEmpty() && new ItemStack(item).is(tag));
-        if (tag.equals(ItemTags.SWORDS)) {
-            // 兜底：即使 JEI 注册时 swords 标签尚未绑定，也保证飞刀/小伞剑页
-            // 至少列出版本内所有原版剑。
-            found = Stream.concat(found, VANILLA_SWORDS.stream()).distinct();
+        // 逐物品用 ItemStack#is(TagKey) 判断。必须放在 JEI runtime 阶段调用：
+        // 数据包 tag 在 JEI registerRecipes 阶段可能尚未绑定，过早扫描只会拿到空集。
+        List<Item> found = ForgeRegistries.ITEMS.getValues().stream()
+                .filter(item -> !new ItemStack(item).isEmpty() && new ItemStack(item).is(tag))
+                .toList();
+        if (found.isEmpty() && tag.equals(ItemTags.SWORDS)) {
+            // 仅当 tag 确实为空时兜底原版剑；正常情况使用完整 tag + 外部兼容扫描。
+            return VANILLA_SWORDS.stream();
         }
-        return found;
+        return found.stream();
     }
 
     /**
@@ -106,7 +108,7 @@ public class KogasaJEIPlugin implements IModPlugin {
         equipmentTags.put(ModItems.SAKUYA_KNIFE.get(), List.of(
                 Tags.Items.TOOLS_TRIDENTS,
                 ItemTags.SWORDS,
-                ModItemTagsProvider.KNIVES));
+                ModItemTagsProvider.FORGE_TOOLS_KNIVES));
 
         for (Map.Entry<Item, List<TagKey<Item>>> entry : equipmentTags.entrySet()) {
             Item kogasaItem = entry.getKey();
@@ -128,18 +130,20 @@ public class KogasaJEIPlugin implements IModPlugin {
                 for (Item item : ForgeRegistries.ITEMS.getValues()) {
                     if (item == Items.AIR || item instanceof IKogasaEquipment) continue;
                     ItemStack stack = new ItemStack(item);
-                    boolean add = false;
+                    // tag 可能被外部数据包追加，也可能有模组装备没打 tag；
+                    // 以运行时类型判定为准补全，避免 JEI 只显示“原版/早期 tag”物品。
+                    boolean add = KogasaEquipmentKinds.of(stack) == kind;
                     if (kind == KogasaEquipmentKind.SWORD || kind == KogasaEquipmentKind.KNIFE) {
-                        add = item instanceof net.minecraft.world.item.SwordItem
+                        add |= item instanceof net.minecraft.world.item.SwordItem
                                 || KogasaEquipmentHelper.isExternalWeapon(stack);
                     } else if (kind == KogasaEquipmentKind.AXE) {
-                        add = KogasaEquipmentHelper.isExternalWeapon(stack);
+                        add |= KogasaEquipmentHelper.isExternalWeapon(stack);
                     } else if (kind == KogasaEquipmentKind.HELMET
                             || kind == KogasaEquipmentKind.CHESTPLATE
                             || kind == KogasaEquipmentKind.LEGGINGS
                             || kind == KogasaEquipmentKind.BOOTS) {
                         var slot = KogasaEquipmentHelper.getArmorEquipmentSlot(stack);
-                        add = KogasaEquipmentHelper.isExternalArmor(stack)
+                        add |= KogasaEquipmentHelper.isExternalArmor(stack)
                                 && ((kind == KogasaEquipmentKind.HELMET && slot == net.minecraft.world.entity.EquipmentSlot.HEAD)
                                 || (kind == KogasaEquipmentKind.CHESTPLATE && slot == net.minecraft.world.entity.EquipmentSlot.CHEST)
                                 || (kind == KogasaEquipmentKind.LEGGINGS && slot == net.minecraft.world.entity.EquipmentSlot.LEGS)
@@ -368,6 +372,30 @@ public class KogasaJEIPlugin implements IModPlugin {
                 RecipeKind.CLEAR));
     }
 
+    private static List<AnvilReinforcementRecipe> buildAnvilRecipes() {
+        List<AnvilReinforcementRecipe> recipes = new ArrayList<>();
+        registerAbilityRecipes(recipes);
+        registerReinforcementRecipes(recipes);
+        registerAmmoRecipes(recipes);
+        registerRepairRecipe(recipes);
+        registerClearRecipe(recipes);
+        return recipes;
+    }
+
+    @Override
+    public void onRuntimeAvailable(@NotNull IJeiRuntime runtime) {
+        if (anvilRecipesAdded) return;
+        List<AnvilReinforcementRecipe> recipes = buildAnvilRecipes();
+        runtime.getRecipeManager().addRecipes(AnvilReinforcementCategory.RECIPE_TYPE, recipes);
+        anvilRecipesAdded = true;
+        KogasaAddiction.LOGGER.info("Registered {} JEI anvil recipes at runtime", recipes.size());
+    }
+
+    @Override
+    public void onRuntimeUnavailable() {
+        anvilRecipesAdded = false;
+    }
+
     @Override
     public @NotNull ResourceLocation getPluginUid() {
         return PLUGIN_UID;
@@ -383,25 +411,8 @@ public class KogasaJEIPlugin implements IModPlugin {
 
     @Override
     public void registerRecipes(@NotNull IRecipeRegistration registration) {
-        List<AnvilReinforcementRecipe> recipes = new ArrayList<>();
-
-        // 1. 能力配方（合并为一组）
-        registerAbilityRecipes(recipes);
-
-        // 2. 强化配方（装备 + 合并后的弓弩箭矢）
-        registerReinforcementRecipes(recipes);
-
-        // 3. 弹药配方（弓弩合并）
-        registerAmmoRecipes(recipes);
-
-        // 4. 修复配方（1 个）
-        registerRepairRecipe(recipes);
-
-        // 5. 清除配方（2 个）
-        registerClearRecipe(recipes);
-
-        KogasaAddiction.LOGGER.info("Registered {} JEI anvil recipes", recipes.size());
-        registration.addRecipes(AnvilReinforcementCategory.RECIPE_TYPE, recipes);
+        // 铁砧配方依赖数据包 tag（剑/工具/箭矢等），必须等 JEI runtime 可用、
+        // tag 完整绑定后再构建，见 onRuntimeAvailable。这里只注册不依赖 tag 的能力说明页。
 
         // ===== 能力锭信息分类：六种能力各一条 =====
         List<AbilityIngotRecipe> abilityRecipes = new ArrayList<>();

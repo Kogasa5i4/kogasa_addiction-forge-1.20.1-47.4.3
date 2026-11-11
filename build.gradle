@@ -145,6 +145,9 @@ dependencies {
     if (!dataRun) runtimeOnly fg.deobf("local.kogasa:farmersdelight:1.20.1-1.3.1")
     if (!dataRun) runtimeOnly fg.deobf("local.kogasa:youkaishomecoming:2.7.2")
     if (!dataRun) runtimeOnly fg.deobf("maven.modrinth:curios:${curios_version}")
+    // Bosses'Rise 本体 + 剧情跳过器：仅开发运行环境，不打包。
+    if (!dataRun) runtimeOnly fg.deobf("curse.maven:bossesrise-${bosses_rise_curse_id}:${bosses_rise_curse_file}")
+    if (!dataRun) runtimeOnly fg.deobf("curse.maven:bosses-rise-intro-skipper-${bosses_rise_intro_skipper_curse_id}:${bosses_rise_intro_skipper_curse_file}")
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }

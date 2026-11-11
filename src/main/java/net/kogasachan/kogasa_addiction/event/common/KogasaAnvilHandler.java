@@ -304,8 +304,8 @@ public class KogasaAnvilHandler {
         if (materialMultiplier <= 0.0D) materialMultiplier = 1.0D;
 
         java.util.Set<String> legacyAttributes = new java.util.HashSet<>(legacyAttributesFor(absorbCategory));
-        // 外部武器/护甲的基础数值已经写入 scalar baseValue，不能再把同名属性加一次。
-        if (KogasaEquipmentHelper.isExternalWeapon(right)) {
+        // 基础攻击已经写入 scalar baseValue；无论左侧是什么分类，都不能再吸一次 attack_damage。
+        if (KogasaEquipmentHelper.usesAttackDamageBase(right)) {
             legacyAttributes.add("minecraft:generic.attack_damage");
         }
         if (KogasaEquipmentHelper.isExternalArmor(right)) {

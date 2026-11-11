@@ -34,13 +34,11 @@ public class ModItemTagsProvider extends ItemTagsProvider {
             ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "ability_ingots")
     );
 
-    public static final TagKey<Item> KNIVES = TagKey.create(
-            Registries.ITEM,
-            ResourceLocation.fromNamespaceAndPath("forge", "tools/knives")
-    );
-
     // Forge 没有为这些工具定义 Tags.Items 常量，但数据包 tag 名是通用的。
     public static final TagKey<Item> FORGE_SWORDS = forgeTag("swords");
+    public static final TagKey<Item> FORGE_TOOLS_SWORDS = forgeTag("tools/swords");
+    public static final TagKey<Item> FORGE_KNIVES = forgeTag("knives");
+    public static final TagKey<Item> FORGE_TOOLS_KNIVES = forgeTag("tools/knives");
     public static final TagKey<Item> FORGE_PICKAXES = forgeTag("tools/pickaxes");
     public static final TagKey<Item> FORGE_AXES = forgeTag("tools/axes");
     public static final TagKey<Item> FORGE_SHOVELS = forgeTag("tools/shovels");
@@ -63,6 +61,7 @@ public class ModItemTagsProvider extends ItemTagsProvider {
 
         // ===== Forge 通用工具标签 =====
         this.tag(FORGE_SWORDS).add(ModItems.KOGASA_SWORD.get(), ModItems.SAKUYA_KNIFE.get());
+        this.tag(FORGE_TOOLS_SWORDS).add(ModItems.KOGASA_SWORD.get(), ModItems.SAKUYA_KNIFE.get());
         this.tag(FORGE_PICKAXES).add(ModItems.KOGASA_PICKAXE.get());
         this.tag(FORGE_AXES).add(ModItems.KOGASA_AXE.get());
         this.tag(FORGE_SHOVELS).add(ModItems.KOGASA_SHOVEL.get());
@@ -87,7 +86,8 @@ public class ModItemTagsProvider extends ItemTagsProvider {
 
         // ==== 咲夜飞刀：加入 Forge 通用标签 =====
         this.tag(Tags.Items.TOOLS_TRIDENTS).add(ModItems.SAKUYA_KNIFE.get());
-        this.tag(KNIVES).add(ModItems.SAKUYA_KNIFE.get());
+        this.tag(FORGE_KNIVES).add(ModItems.SAKUYA_KNIFE.get());
+        this.tag(FORGE_TOOLS_KNIVES).add(ModItems.SAKUYA_KNIFE.get());
 
         // ===== 能力锭：由能力注册表自动生成，新增能力无需改这里 =====
         var ingotTag = this.tag(ABILITY_INGOTS);

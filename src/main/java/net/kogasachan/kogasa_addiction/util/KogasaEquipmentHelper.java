@@ -3,7 +3,6 @@ package net.kogasachan.kogasa_addiction.util;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.kogasachan.kogasa_addiction.Config;
-import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbility;
 import net.kogasachan.kogasa_addiction.ability.KogasaAbilityData;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
@@ -23,7 +22,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 public class KogasaEquipmentHelper {
@@ -40,9 +38,6 @@ public class KogasaEquipmentHelper {
      */
     private static final Multimap<Attribute, AttributeModifier> EMPTY_MODIFIERS =
             ImmutableMultimap.of();
-
-    /** 已警告过的动态数值材料 id，避免每次铁砧都刷日志。 */
-    private static final Set<String> WARNED_DYNAMIC_MATERIALS = ConcurrentHashMap.newKeySet();
 
     /** 原版三叉戟基准攻击伤害的惰性缓存（首次属性计算时读取注册表，之后复用）。 */
     private static Double vanillaTridentDamage = null;
@@ -485,7 +480,8 @@ public class KogasaEquipmentHelper {
         return name.startsWith("io.redspace.ironsspellbooks.api.item.weapons.")
                 || name.startsWith("io.redspace.ironsspellbooks.item.weapons.")
                 || name.startsWith("io.redspace.ironsspellbooks.item.armor.")
-                || name.startsWith("com.github.L_Ender.cataclysm.items.");
+                || name.startsWith("com.github.L_Ender.cataclysm.items.")
+                || name.startsWith("net.unusual.block_factorys_bosses.item.");
     }
 
     private static boolean hasSuperclass(Item item, String simpleName) {
@@ -496,68 +492,102 @@ public class KogasaEquipmentHelper {
     }
 
     /**
-     * 获取一件装备的“基础价值”，用于铁砧强化时累加。
+     * 获取一件装备用于吸收的“基础价值”。
      *
-     * <p>判定顺序：
-     * <ol>
-     *   <li>配置的 dynamicStatMaterials：读当前主手攻击伤害属性；</li>
-     *   <li>ISS/Cataclysm 武器/护甲：读完整 ATTACK_DAMAGE / ARMOR 属性；</li>
-     *   <li>原版剑/工具/护甲/三叉戟：读各自稳定数值；</li>
-     *   <li>可穿戴到护甲槽、但不是 {@link ArmorItem} 的普通 Item：读其默认 ARMOR 属性；</li>
-     *   <li>其他：0。</li>
-     * </ol>
+     * <p>攻击力规则（A+A）：
+     * <ul>
+     *   <li>护甲仍按原有护甲值逻辑；</li>
+     *   <li>dynamicStatClasses / dynamicStatItems 命中：使用稳定的 legacy 值，不读实时 NBT；</li>
+     *   <li>forceActualStatClasses / forceActualStatItems 命中：强制使用默认 ATTACK_DAMAGE；</li>
+     *   <li>非动态装备：actual 与 legacy 不一致时以 actual 为准（通常说明类重写了属性表），
+     *       相同时取两者最大值兜底。</li>
+     * </ul>
      */
     public static double getEquipmentBaseValue(ItemStack stack) {
-        // 1) 动态数值材料：按配置列表，用当前主手攻击伤害属性表作为吸收基准
-        if (isDynamicStatMaterial(stack)) {
-            double dynamicDamage = getAttributeAttackDamage(stack);
-            if (dynamicDamage > 0.0D) {
-                warnDynamicMaterial(stack);
-                return dynamicDamage;
-            }
-        }
-
         Item item = stack.getItem();
 
-        // ISS/Cataclysm 的武器/护甲经常不是原版 SwordItem/ArmorItem；
-        // 用它们完整的主手 ATTACK_DAMAGE / ARMOR 属性作为唯一基准，避免只拿到 Tier 附加值。
-        if (isExternalWeapon(stack)) {
-            double attack = getAttributeAttackDamage(stack);
-            if (attack > 0.0D) return attack;
-        }
+        // 护甲优先：外部自定义护甲通常不是标准 ArmorItem。
         if (isExternalArmor(stack)) {
             double armor = getAttributeArmorValue(stack);
             if (armor > 0.0D) return armor;
         }
-
-        if (item instanceof SwordItem sword) {
-            return sword.getDamage();
-        }
-        if (item instanceof DiggerItem digger) {
-            return digger.getAttackDamage();
-        }
         if (item instanceof ArmorItem armor) {
             return armor.getDefense();
         }
-        if (item instanceof TridentItem) {
-            return getVanillaTridentDamage();
-        }
-
-        // 3) 非 ArmorItem、但能进护甲槽的普通 Item：按 ARMOR 属性算护甲价值
         if (getArmorEquipmentSlot(stack) != null) {
             double armor = getAttributeArmorValue(stack);
-            if (armor > 0.0D) {
-                return armor;
-            }
+            if (armor > 0.0D) return armor;
         }
-        return 0;
+
+        double legacy = getLegacyAttackDamage(stack);
+        double actual = getDefaultAttackDamage(stack);
+
+        if (isForceActualStatEquipment(stack)) return actual;
+        if (isDynamicStatEquipment(stack)) return legacy;
+        if (actual > 0.0D && actual != legacy) return actual;
+        return Math.max(actual, legacy);
     }
 
-    /** 该物品是否在 dynamicStatMaterials 列表中，强化时读取动态属性表。 */
+    /** 旧版稳定攻击力读取：SwordItem/DiggerItem/原版三叉戟字段。 */
+    private static double getLegacyAttackDamage(ItemStack stack) {
+        Item item = stack.getItem();
+        if (item instanceof SwordItem sword) return sword.getDamage();
+        if (item instanceof DiggerItem digger) return digger.getAttackDamage();
+        if (item instanceof TridentItem) return getVanillaTridentDamage();
+        return 0.0D;
+    }
+
+    /** 物品自己的默认主手 ATTACK_DAMAGE（不触发 Forge 事件、不含附魔）。 */
+    @SuppressWarnings("deprecation")
+    public static double getDefaultAttackDamage(ItemStack stack) {
+        double sum = 0.0D;
+        if (stack.isEmpty()) return sum;
+        for (var entry : stack.getItem()
+                .getDefaultAttributeModifiers(EquipmentSlot.MAINHAND).entries()) {
+            if (entry.getKey() == Attributes.ATTACK_DAMAGE
+                    && entry.getValue().getOperation() == AttributeModifier.Operation.ADDITION) {
+                sum += entry.getValue().getAmount();
+            }
+        }
+        return sum;
+    }
+
+    /** 该类/物品是否被视为动态属性装备（使用稳定 legacy 基准，不读实时属性）。 */
+    public static boolean isDynamicStatEquipment(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return false;
+        Item item = stack.getItem();
+        // 附属模组通过 registerEquipmentPredicate 标记的兼容装备也自动按动态处理，
+        // 不需要再手动写进 dynamicStatClasses / dynamicStatItems。
+        if (isKogasaEquipment(stack)) return true;
+
+        ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
+        if (KogasaIdListMatcher.matches(id, Config.DYNAMIC_STAT_ITEMS.get())) return true;
+        return KogasaIdListMatcher.matchesString(item.getClass().getName(), Config.DYNAMIC_STAT_CLASSES.get());
+    }
+
+    /** @deprecated 使用 {@link #isDynamicStatEquipment(ItemStack)}。 */
+    @Deprecated
     public static boolean isDynamicStatMaterial(ItemStack stack) {
-        if (stack.isEmpty()) return false;
-        ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
-        return KogasaIdListMatcher.matches(id, Config.DYNAMIC_STAT_MATERIALS.get());
+        return isDynamicStatEquipment(stack);
+    }
+
+    /** 该类/物品是否强制使用默认 ATTACK_DAMAGE（优先级高于动态列表）。 */
+    public static boolean isForceActualStatEquipment(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return false;
+        Item item = stack.getItem();
+        ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
+        if (KogasaIdListMatcher.matches(id, Config.FORCE_ACTUAL_STAT_ITEMS.get())) return true;
+        return KogasaIdListMatcher.matchesString(item.getClass().getName(), Config.FORCE_ACTUAL_STAT_CLASSES.get());
+    }
+
+    /**
+     * 该材料的基础攻击力是否来自武器攻击属性；是的话吸收时要排除 attack_damage，
+     * 防止“基础值 + 属性”重复计算。
+     */
+    public static boolean usesAttackDamageBase(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return false;
+        if (stack.getItem() instanceof ArmorItem || getArmorEquipmentSlot(stack) != null) return false;
+        return getDefaultAttackDamage(stack) > 0.0D || getLegacyAttackDamage(stack) > 0.0D;
     }
 
     /** 主手攻击伤害的 ADDITION 修饰符之和（调用物品自己的属性表）。 */
@@ -570,15 +600,6 @@ public class KogasaEquipmentHelper {
             }
         }
         return sum;
-    }
-
-    private static void warnDynamicMaterial(ItemStack stack) {
-        ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
-        if (id != null && WARNED_DYNAMIC_MATERIALS.add(id.toString())) {
-            KogasaAddiction.LOGGER.warn(
-                    "Dynamic-stat material {} uses its current ATTACK_DAMAGE attribute as reinforcement base; items with NBT/growth-driven stats can produce extremely high values.",
-                    id);
-        }
     }
 
     /**
@@ -822,7 +843,7 @@ public class KogasaEquipmentHelper {
         if (stack.isEmpty()) return false;
         if (stack.getItem() instanceof IKogasaEquipment) return true;
         if (KogasaEquipmentKinds.of(stack) != null) return true;
-        if (isDynamicStatMaterial(stack)) return true;
+        if (isDynamicStatEquipment(stack)) return true;
         if (getArmorEquipmentSlot(stack) != null) return true;
         if (KogasaCuriosHelper.isCurio(stack)) return true;
         // 自定义 Item 类常常不走 SwordItem/ArmorItem，也没有默认攻击属性；

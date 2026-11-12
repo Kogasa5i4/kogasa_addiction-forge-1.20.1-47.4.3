@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 })
 public abstract class YhEntityInvulMixin {
 
-    @Inject(method = "isInvulnerableTo", at = @At("HEAD"), cancellable = true, require = 0)
+    @Inject(method = {"isInvulnerableTo", "m_6673_"}, at = @At("HEAD"), cancellable = true, require = 0, remap = false)
     private void kogasa$clearYhEntityInvul(DamageSource source, CallbackInfoReturnable<Boolean> cir) {
         if (BossTweaks.preventYhEntityInvulnerability()) {
             cir.setReturnValue(false);

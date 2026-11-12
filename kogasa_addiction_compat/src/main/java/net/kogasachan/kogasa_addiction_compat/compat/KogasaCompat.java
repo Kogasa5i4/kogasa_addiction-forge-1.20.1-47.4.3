@@ -10,6 +10,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -37,6 +41,13 @@ public final class KogasaCompat {
      * 兼容总开关。配置还没加载时（游戏启动早期、物品注册阶段）安全地返回 false，
      * 避免在 {@code ItemStack#getMaxDamage} 之类的早期调用里炸掉。
      */
+    private static final List<Predicate<ItemStack>> EXTRA_COMPATIBILITY = new ArrayList<>();
+
+    /** 附属注册额外的“自动兼容”判定（例如 SlashBlade 的 bladeState）。 */
+    public static void registerCompatibilityPredicate(Predicate<ItemStack> predicate) {
+        if (predicate != null) EXTRA_COMPATIBILITY.add(predicate);
+    }
+
     public static boolean isEnabled() {
         try {
             return CompatConfig.SPEC.isLoaded() && CompatConfig.ENABLE_COMPAT.get();
@@ -52,6 +63,13 @@ public final class KogasaCompat {
         }
         if (stack.getItem() instanceof IKogasaEquipment) {
             return true;
+        }
+        for (Predicate<ItemStack> predicate : EXTRA_COMPATIBILITY) {
+            try {
+                if (predicate.test(stack)) return true;
+            } catch (RuntimeException ignored) {
+                // 可选模组状态异常时忽略
+            }
         }
         return hasMarker(stack) || stack.is(CompatTags.COMPATIBLE);
     }

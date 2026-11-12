@@ -1,6 +1,7 @@
 package net.kogasachan.kogasa_addiction.event.client;
 
 import net.kogasachan.kogasa_addiction.KogasaAddiction;
+import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.minecraft.network.chat.Component;
@@ -42,8 +43,10 @@ public final class KogasaTooltipHandler {
         // 原版属性行与本模组行之间的空行
         tooltip.add(Component.empty());
 
-        // 数值行：攻伤替换（含空手 +1）、攻速替换、挖掘速度、蓄力/弹速
-        KogasaTooltipStats.apply(stack, tooltip, true);
+        // 只有本模组原生装备替换攻击伤害/攻速行；外部兼容装备保留它自己的
+        // 原生 Tooltip（拔刀剑的 bladeState 伤害不能被 SwordItem 字段覆盖）。
+        boolean nativeKogasa = stack.getItem() instanceof IKogasaEquipment;
+        KogasaTooltipStats.apply(stack, tooltip, nativeKogasa);
 
         int re = KogasaEquipmentData.getReinforcements(stack);
         double growth = KogasaEquipmentData.getGrowth(stack);

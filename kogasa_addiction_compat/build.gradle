@@ -148,6 +148,13 @@ dependencies {
     compileOnly fg.deobf("maven.modrinth:goety-revelation:${goety_revelation_version}")
     runtimeOnly fg.deobf("maven.modrinth:goety-revelation:${goety_revelation_version}")
 
+    // SlashBlade: Resharped（拔刀剑兼容/吸收）
+    compileOnly fg.deobf("curse.maven:slashblade-resharped-${slashblade_resharped_curse_id}:${slashblade_resharped_curse_file}")
+    runtimeOnly fg.deobf("curse.maven:slashblade-resharped-${slashblade_resharped_curse_id}:${slashblade_resharped_curse_file}")
+    runtimeOnly fg.deobf("curse.maven:legendreliclib-${legendreliclib_curse_id}:${legendreliclib_curse_file}")
+    runtimeOnly fg.deobf("local.kogasa:yakumoblade:1.1.4")
+    runtimeOnly fg.deobf("curse.maven:timeless-and-classics-zero-${tacz_curse_id}:${tacz_curse_file}")
+
     // FantasyEnding 未公开/不便自动拉取，使用本地 jar；不打包进发布 jar
 
     // ===== 灾变（L_Ender's Cataclysm）本体：构建 + 运行都用这个 jar =====
@@ -156,7 +163,7 @@ dependencies {
     runtimeOnly fg.deobf("local.kogasa:farmersdelight:1.20.1-1.3.1")
     compileOnly fg.deobf("local.kogasa:youkaishomecoming:2.7.2")
     compileOnly files("../libs/l2serial-1.2.4.jar", "../libs/l2library-2.4.25-slim.jar", "../libs/l2damagetracker-0.3.7.jar")
-runtimeOnly fg.deobf("local.kogasa:youkaishomecoming:2.7.2")
+    runtimeOnly fg.deobf("local.kogasa:youkaishomecoming:2.7.2")
     runtimeOnly fg.deobf("maven.modrinth:curios:${curios_version}")
 
     // Mixin 注解处理器（与主模组一致）
@@ -295,6 +302,13 @@ tasks.register('syncMainMod', Copy) {
             throw new GradleException(
                     "缺少主模组开发版 jar：${mainModDevJar}" +
                     "\n请先在主工程目录执行：gradlew devJar")
+        }
+        // 删除旧版本 dev jar，避免 run/mods 里多个同 modid 的旧主模组被加载。
+        file('run/mods').listFiles()?.each { old ->
+            if (old.name.startsWith("${mainModId}-") && old.name.endsWith("-dev.jar")
+                    && old.name != mainModDevJar.name) {
+                old.delete()
+            }
         }
     }
 }

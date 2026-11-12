@@ -5,6 +5,7 @@ import net.kogasachan.kogasa_addiction_compat.compat.CompatConfig;
 import net.kogasachan.kogasa_addiction_compat.compat.CompatConfigEntries;
 import net.kogasachan.kogasa_addiction_compat.compat.CompatRegistry;
 import net.kogasachan.kogasa_addiction_compat.compat.KogasaCompat;
+import net.kogasachan.kogasa_addiction_compat.compat.SlashBladeCompat;
 import net.kogasachan.kogasa_addiction_compat.network.CompatNetwork;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -38,6 +39,9 @@ public final class KogasaCompatAddon {
 
         // 把“兼容物品”接入主模组的统一装备判定（主模组侧只保留一个注册点，逻辑仍在 compat 包）
         KogasaEquipmentHelper.registerEquipmentPredicate(KogasaCompat::isCompatible);
+        if (net.minecraftforge.fml.ModList.get().isLoaded("slashblade")) {
+            SlashBladeCompat.register();
+        }
 
         CompatNetwork.register();
         // 接入主模组的 /kogasa config（路径前缀 compat:）

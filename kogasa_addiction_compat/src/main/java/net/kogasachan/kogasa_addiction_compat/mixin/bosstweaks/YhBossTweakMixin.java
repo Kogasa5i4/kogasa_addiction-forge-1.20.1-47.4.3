@@ -30,24 +30,24 @@ public abstract class YhBossTweakMixin extends YoukaiEntity {
     @Unique
     private static final ThreadLocal<Boolean> SAFE_SET_HEALTH = ThreadLocal.withInitial(() -> false);
 
-    @Shadow
+    @Shadow(remap = false)
     protected abstract int damageLimit();
 
-    @Shadow
+    @Shadow(remap = false)
     protected abstract int nonDanmakuReduction();
 
     protected YhBossTweakMixin(EntityType<? extends YoukaiEntity> type, Level level) {
         super(type, level);
     }
 
-    @Inject(method = "getCD", at = @At("HEAD"), cancellable = true, require = 0)
+    @Inject(method = "getCD", at = @At("HEAD"), cancellable = true, require = 0, remap = false)
     private void kogasa$removeYhDamageImmunity(DamageSource source, CallbackInfoReturnable<Integer> cir) {
         if (BossTweaks.preventYhDamageImmunity()) {
             cir.setReturnValue(0);
         }
     }
 
-    @Inject(method = "clampDamage", at = @At("RETURN"), cancellable = true, require = 0)
+    @Inject(method = "clampDamage", at = @At("RETURN"), cancellable = true, require = 0, remap = false)
     private void kogasa$relaxYhDamageCap(DamageSource source, float amount,
                                          CallbackInfoReturnable<Float> cir) {
         float result = cir.getReturnValueF();
@@ -73,7 +73,7 @@ public abstract class YhBossTweakMixin extends YoukaiEntity {
         }
     }
 
-    @Inject(method = "setHealth", at = @At("HEAD"), cancellable = true, require = 0)
+    @Inject(method = {"setHealth", "m_21153_"}, at = @At("HEAD"), cancellable = true, require = 0, remap = false)
     private void kogasa$safeSetHealth(float val, CallbackInfo ci) {
         if (!BossTweaks.preventYhSetHealthState() || !Float.isFinite(val)) return;
         SAFE_SET_HEALTH.set(true);
@@ -86,14 +86,14 @@ public abstract class YhBossTweakMixin extends YoukaiEntity {
         ci.cancel();
     }
 
-    @Inject(method = "setCombatProgress", at = @At("HEAD"), cancellable = true, require = 0)
+    @Inject(method = "setCombatProgress", at = @At("HEAD"), cancellable = true, require = 0, remap = false)
     private void kogasa$safeCombatProgress(float amount, CallbackInfo ci) {
         if (!BossTweaks.preventYhSetHealthState()) return;
         super.setCombatProgress(amount);
         ci.cancel();
     }
 
-    @Inject(method = "notifyIllegalDamage", at = @At("HEAD"), cancellable = true, require = 0)
+    @Inject(method = "notifyIllegalDamage", at = @At("HEAD"), cancellable = true, require = 0, remap = false)
     private void kogasa$suppressIllegalState(float amount, Entity causer, CallbackInfo ci) {
         if (SAFE_SET_HEALTH.get() || BossTweaks.preventYhSetHealthState()) {
             ci.cancel();

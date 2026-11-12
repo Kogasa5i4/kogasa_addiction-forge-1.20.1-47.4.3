@@ -16,10 +16,10 @@ import org.objectweb.asm.Opcodes;
 @Mixin(targets = "com.Polarice3.Goety.common.entities.boss.Apostle", remap = false)
 public abstract class ApostleInvulMixin {
 
-    @Shadow
+    @Shadow(remap = false)
     public int moddedInvul;
 
-    @Shadow
+    @Shadow(remap = false)
     public int obsidianInvul;
 
     @Redirect(method = "aiStep",

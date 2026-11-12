@@ -32,9 +32,16 @@ public final class KogasaDisplayHelper {
      */
     public static Component getItemDisplayName(String id) {
         String actualId = id;
+        String variant = null;
+        int hash = actualId.indexOf('#');
+        if (hash >= 0) {
+            variant = actualId.substring(hash + 1);
+            actualId = actualId.substring(0, hash);
+        }
+
         boolean isArrow = false;
-        if (id.startsWith("arrow:")) {
-            actualId = id.substring("arrow:".length());
+        if (actualId.startsWith("arrow:")) {
+            actualId = actualId.substring("arrow:".length());
             isArrow = true;
         }
 
@@ -49,6 +56,14 @@ public final class KogasaDisplayHelper {
             // 显示"16× 箭"而不是"箭"，提示消耗数量
             return Component.translatable(
                     "tooltip.kogasa_addiction.reinforcement.entry.arrow", name);
+        }
+        if (variant != null && !variant.isBlank()) {
+            // SlashBlade 的变体键是翻译键，显示真实刀名而不是内部去重键。
+            if (variant.startsWith("item.") || variant.startsWith("block.")
+                    || variant.startsWith("entity.")) {
+                return Component.translatable(variant);
+            }
+            return Component.literal(variant);
         }
         return name;
     }

@@ -114,13 +114,13 @@ public class KogasaJEIPlugin implements IModPlugin {
             Item kogasaItem = entry.getKey();
 
             // 收集所有标签内物品（排除 Kogasa 自身和空气），跨标签去重
-            Map<Item, ItemStack> materials = new LinkedHashMap<>();
+            Map<String, ItemStack> materials = new LinkedHashMap<>();
             for (TagKey<Item> tag : entry.getValue()) {
                 itemsInTag(tag).forEach(item -> {
                     if (item == Items.AIR) return;
                     // 防止用本模组装备互相强化（运行时对同名物品也会拦下）
                     if (item instanceof IKogasaEquipment) return;
-                    materials.putIfAbsent(item, new ItemStack(item));
+                    addMaterialVariants(materials, new ItemStack(item));
                 });
             }
 
@@ -149,7 +149,7 @@ public class KogasaJEIPlugin implements IModPlugin {
                                 || (kind == KogasaEquipmentKind.LEGGINGS && slot == net.minecraft.world.entity.EquipmentSlot.LEGS)
                                 || (kind == KogasaEquipmentKind.BOOTS && slot == net.minecraft.world.entity.EquipmentSlot.FEET));
                     }
-                    if (add) materials.putIfAbsent(item, stack);
+                    if (add) addMaterialVariants(materials, stack);
                 }
             }
             if (materials.isEmpty()) continue;
@@ -164,6 +164,17 @@ public class KogasaJEIPlugin implements IModPlugin {
 
         // ===== 弓弩强化配方：16 支箭（弓/弩合并展示）=====
         registerBowArrowRecipe(recipes, List.of(ModItems.AYA_BOW.get(), ModItems.AYA_CROSSBOW.get()));
+    }
+
+    /** 把注册物品展开成实际变体（例如拔刀剑的 bladeState）；无展开器时保留原 ItemStack。 */
+    private static void addMaterialVariants(Map<String, ItemStack> materials, ItemStack base) {
+        List<ItemStack> expanded = KogasaEquipmentHelper.expandMaterialStacks(base);
+        if (expanded.isEmpty()) expanded = List.of(base.copy());
+        for (ItemStack stack : expanded) {
+            if (stack == null || stack.isEmpty()) continue;
+            String key = stack.getItem() + "|" + stack.getTag();
+            materials.putIfAbsent(key, stack.copy());
+        }
     }
 
     /**

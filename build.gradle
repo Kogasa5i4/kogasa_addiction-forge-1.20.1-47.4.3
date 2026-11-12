@@ -148,6 +148,11 @@ dependencies {
     // Bosses'Rise 本体 + 剧情跳过器：仅开发运行环境，不打包。
     if (!dataRun) runtimeOnly fg.deobf("curse.maven:bossesrise-${bosses_rise_curse_id}:${bosses_rise_curse_file}")
     if (!dataRun) runtimeOnly fg.deobf("curse.maven:bosses-rise-intro-skipper-${bosses_rise_intro_skipper_curse_id}:${bosses_rise_intro_skipper_curse_file}")
+    // SlashBlade: Resharped：仅开发运行环境，供附属做拔刀剑兼容/吸收测试，不打包。
+    if (!dataRun) runtimeOnly fg.deobf("curse.maven:slashblade-resharped-${slashblade_resharped_curse_id}:${slashblade_resharped_curse_file}")
+    if (!dataRun) runtimeOnly fg.deobf("curse.maven:legendreliclib-${legendreliclib_curse_id}:${legendreliclib_curse_file}")
+    if (!dataRun) runtimeOnly fg.deobf("local.kogasa:yakumoblade:1.1.4")
+      if (!dataRun) runtimeOnly fg.deobf("curse.maven:timeless-and-classics-zero-${tacz_curse_id}:${tacz_curse_file}")
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }

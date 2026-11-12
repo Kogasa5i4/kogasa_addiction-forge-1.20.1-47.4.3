@@ -19,6 +19,7 @@ public class KogasaAnvilTakeHandler {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
 
         ItemStack output = event.getOutput();
+        KogasaAnvilHandler.applyPendingSe(player, output);
 
         // 普通点击取出：直接检查输出槽的物品
         if (!output.isEmpty() && net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper.isKogasaEquipment(output)) {

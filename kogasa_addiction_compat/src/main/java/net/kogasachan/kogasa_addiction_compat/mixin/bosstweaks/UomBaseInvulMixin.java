@@ -13,10 +13,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(targets = "com.mega.uom.common.entity.boss.uom.BaseEntity")
 public abstract class UomBaseInvulMixin {
 
-    @Shadow
+    @Shadow(remap = false)
     public abstract void setInvulnerableTicks(int p_31511_);
 
-    @Inject(method = "hurt", at = @At("HEAD"), require = 0)
+    @Inject(method = {"hurt", "m_6469_"}, at = @At("HEAD"), require = 0, remap = false)
     private void kogasa$clearUomSpawnInvul(DamageSource damageSource, float damage, CallbackInfoReturnable<Boolean> cir) {
         if (BossTweaks.preventUomInvulnerability()) {
             setInvulnerableTicks(0);

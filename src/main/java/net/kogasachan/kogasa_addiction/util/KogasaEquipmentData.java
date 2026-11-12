@@ -1,9 +1,6 @@
 package net.kogasachan.kogasa_addiction.util;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
@@ -196,7 +193,13 @@ public class KogasaEquipmentData {
         for (int i = 0; i < list.size(); i++) {
             CompoundTag entry = list.getCompound(i);
             ResourceLocation id = ResourceLocation.tryParse(entry.getString("Attribute"));
-            UUID uuid = entry.contains("Uuid") ? net.minecraft.nbt.NbtUtils.loadUUID(entry.get("Uuid")) : null;
+            UUID uuid = null;
+            if (entry.contains("Uuid")) {
+                Tag pTag = entry.get("Uuid");
+                if (pTag != null) {
+                    uuid = NbtUtils.loadUUID(pTag);
+                }
+            }
             if (id == null || uuid == null) continue;
             var op = parseOperation(entry.getString("Operation"));
             result.add(new AbsorbedMultiplier(uuid, id, entry.getDouble("Amount"), op));

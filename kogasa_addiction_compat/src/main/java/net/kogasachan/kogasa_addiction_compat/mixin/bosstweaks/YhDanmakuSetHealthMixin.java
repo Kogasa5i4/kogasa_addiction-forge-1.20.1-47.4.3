@@ -17,8 +17,9 @@ public abstract class YhDanmakuSetHealthMixin {
 
     @Redirect(method = "onDanmakuImmune",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/LivingEntity;setHealth(F)V"),
-            require = 0)
+                    target = "Lnet/minecraft/world/entity/LivingEntity;setHealth(F)V",
+                      remap = true),
+            require = 0, remap = false)
     private void kogasa$replaceDanmakuSetHealth(LivingEntity target, float newHealth) {
         if (!BossTweaks.replaceYhDanmakuSetHealth()) {
             target.setHealth(newHealth);

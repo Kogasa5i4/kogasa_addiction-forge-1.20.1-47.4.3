@@ -13,10 +13,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(targets = "com.mega.uom.common.entity.boss.uom.UomWither")
 public abstract class UomWitherInvulMixin {
 
-    @Shadow
+    @Shadow(remap = false)
     public int customInvulnerableTime;
 
-    @Inject(method = "hurt", at = @At("HEAD"), require = 0)
+    @Inject(method = {"hurt", "m_6469_"}, at = @At("HEAD"), require = 0, remap = false)
     private void kogasa$clearUomCustomInvul(DamageSource damageSource, float damage, CallbackInfoReturnable<Boolean> cir) {
         if (BossTweaks.preventUomInvulnerability()) {
             customInvulnerableTime = 0;

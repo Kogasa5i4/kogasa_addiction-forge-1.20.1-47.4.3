@@ -5,6 +5,7 @@ import net.kogasachan.kogasa_addiction.util.KogasaAttributeGrowth;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.kogasachan.kogasa_addiction_compat.KogasaCompatAddon;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -70,8 +71,8 @@ public final class CompatAttributeHandler {
                     // 会再替换一次护甲属性，两边叠加就是“两套数值”。
                     // 这里只叠加成长/强化带来的增量。
                     applyArmorOverlay(event, stack);
-                } else if (hasNonVanillaAttributes(event)) {
-                    // ISS 剑等虽然继承 SwordItem，但自带法术强度等属性；
+                } else if (!isPlainVanillaItem(stack.getItem()) || hasNonVanillaAttributes(event)) {
+                    // ISS/拔刀剑等虽然继承 SwordItem，但自带数据驱动属性或自定义属性；
                     // 整体替换会把原生属性清掉，改走叠加式。
                     applyGenericOverlay(event, stack);
                 } else {
@@ -115,23 +116,39 @@ public final class CompatAttributeHandler {
                 : baseDamage * multiplier + absorbed;
         double damageDelta = targetDamage - baseDamage;
         if (Math.abs(damageDelta) > 1.0E-6) {
-            event.addModifier(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE,
-                    new AttributeModifier(GENERIC_DAMAGE_UUID, "Kogasa compat damage",
-                            damageDelta, AttributeModifier.Operation.ADDITION));
+            // 不新增第二条 attack_damage modifier；把原生的第一条 ADDITION 改成目标值，
+            // 否则铁砧输出会出现两条“攻击伤害”行。
+            adjustFirstAddition(event, net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE,
+                    damageDelta, GENERIC_DAMAGE_UUID, "Kogasa compat damage");
         }
 
         double targetSpeed = KogasaEquipmentHelper.getAttackSpeedModifier(stack, baseSpeed);
         double speedDelta = targetSpeed - baseSpeed;
         if (Math.abs(speedDelta) > 1.0E-6) {
-            event.addModifier(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED,
-                    new AttributeModifier(GENERIC_SPEED_UUID, "Kogasa compat speed",
-                            speedDelta, AttributeModifier.Operation.ADDITION));
+            adjustFirstAddition(event, net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED,
+                    speedDelta, GENERIC_SPEED_UUID, "Kogasa compat speed");
         }
 
         applyAbsorbedExtras(event, stack, java.util.Set.of(
                 net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.attack_damage")));
         applyAbsorbedMultipliers(event, stack, java.util.Set.of(
                 net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.attack_damage")));
+    }
+
+    /** 调整原生第一条 ADDITION，而不是新增一条同属性 modifier。 */
+    private static void adjustFirstAddition(ItemAttributeModifierEvent event, Attribute attribute,
+                                             double delta, java.util.UUID fallbackId, String fallbackName) {
+        for (AttributeModifier modifier : new java.util.ArrayList<>(event.getModifiers().get(attribute))) {
+            if (modifier.getOperation() != AttributeModifier.Operation.ADDITION) continue;
+            event.removeModifier(attribute, modifier);
+            event.addModifier(attribute, new AttributeModifier(
+                    modifier.getId(), modifier.getName(),
+                    modifier.getAmount() + delta,
+                    AttributeModifier.Operation.ADDITION));
+            return;
+        }
+        event.addModifier(attribute, new AttributeModifier(
+                fallbackId, fallbackName, delta, AttributeModifier.Operation.ADDITION));
     }
 
     /** 物品原有属性 + 吸收属性统一成长；同一属性合并成单条，避免同名双行。 */
@@ -309,6 +326,12 @@ public final class CompatAttributeHandler {
                     entry.uuid(), "Kogasa absorbed multiplier " + entry.attribute(),
                     entry.amount(), entry.operation()));
         }
+    }
+
+    /** 只有 registry 命名空间为 minecraft 的真正原版装备才允许整体替换属性表。 */
+    private static boolean isPlainVanillaItem(Item item) {
+        ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
+        return id != null && "minecraft".equals(id.getNamespace()) && isSafeItem(item);
     }
 
     private static boolean isSafeItem(Item item) {

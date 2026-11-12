@@ -18,14 +18,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(targets = "dev.xkmc.youkaishomecoming.content.entity.youkai.YoukaiEntity")
 public abstract class YhYoukaiSetHealthMixin extends PathfinderMob {
 
-    @Shadow
+    @Shadow(remap = false)
     public CombatProgress combatProgress;
 
     protected YhYoukaiSetHealthMixin(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
     }
 
-    @Inject(method = "setHealth", at = @At("HEAD"), cancellable = true, require = 0)
+    @Inject(method = {"setHealth", "m_21153_"}, at = @At("HEAD"), cancellable = true, require = 0, remap = false)
     private void kogasa$safeSetHealth(float amount, CallbackInfo ci) {
         if (!BossTweaks.preventYhSetHealthState() || !Float.isFinite(amount)) return;
         float clamped = Math.max(0.0F, Math.min(getMaxHealth(), amount));
@@ -33,7 +33,7 @@ public abstract class YhYoukaiSetHealthMixin extends PathfinderMob {
         ci.cancel();
     }
 
-    @Inject(method = "getCombatProgress", at = @At("HEAD"), cancellable = true, require = 0)
+    @Inject(method = "getCombatProgress", at = @At("HEAD"), cancellable = true, require = 0, remap = false)
     private void kogasa$syncCombatProgress(CallbackInfoReturnable<Float> cir) {
         if (!BossTweaks.preventYhSetHealthState()) return;
         float health = super.getHealth();
@@ -41,14 +41,14 @@ public abstract class YhYoukaiSetHealthMixin extends PathfinderMob {
         cir.setReturnValue(health);
     }
 
-    @Inject(method = "die", at = @At("HEAD"), cancellable = true, require = 0)
+    @Inject(method = {"die", "m_6667_"}, at = @At("HEAD"), cancellable = true, require = 0, remap = false)
     private void kogasa$safeDie(DamageSource source, CallbackInfo ci) {
         if (!BossTweaks.preventYhSetHealthState()) return;
         super.die(source);
         ci.cancel();
     }
 
-    @Inject(method = "tickDeath", at = @At("HEAD"), cancellable = true, require = 0)
+    @Inject(method = {"tickDeath", "m_6153_"}, at = @At("HEAD"), cancellable = true, require = 0, remap = false)
     private void kogasa$safeTickDeath(CallbackInfo ci) {
         if (!BossTweaks.preventYhSetHealthState()) return;
         super.tickDeath();

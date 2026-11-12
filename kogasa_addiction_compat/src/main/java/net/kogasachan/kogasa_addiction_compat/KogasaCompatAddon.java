@@ -42,6 +42,10 @@ public final class KogasaCompatAddon {
         if (net.minecraftforge.fml.ModList.get().isLoaded("slashblade")) {
             SlashBladeCompat.register();
         }
+        if (net.minecraftforge.fml.ModList.get().isLoaded("tacz")) {
+            net.kogasachan.kogasa_addiction_compat.compat.tacz.TaczCompat.register();
+            net.kogasachan.kogasa_addiction_compat.compat.tacz.TaczEventHandler.register();
+        }
 
         CompatNetwork.register();
         // 接入主模组的 /kogasa config（路径前缀 compat:）

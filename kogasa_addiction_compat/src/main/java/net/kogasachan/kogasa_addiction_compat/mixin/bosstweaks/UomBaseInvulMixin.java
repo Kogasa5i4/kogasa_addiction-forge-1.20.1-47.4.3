@@ -16,6 +16,7 @@ public abstract class UomBaseInvulMixin {
     @Shadow(remap = false)
     public abstract void setInvulnerableTicks(int p_31511_);
 
+    @SuppressWarnings("UnresolvedMixinReference")
     @Inject(method = {"hurt", "m_6469_"}, at = @At("HEAD"), require = 0, remap = false)
     private void kogasa$clearUomSpawnInvul(DamageSource damageSource, float damage, CallbackInfoReturnable<Boolean> cir) {
         if (BossTweaks.preventUomInvulnerability()) {

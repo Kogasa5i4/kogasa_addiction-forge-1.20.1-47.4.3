@@ -373,6 +373,7 @@ public class KogasaAnvilHandler {
         if (drawAbsorb > 0) {
             KogasaEquipmentData.addDrawSpeedValue(result, drawAbsorb);
         }
+        KogasaEquipmentHelper.notifyAbsorption(result, right);
         return absorb;
     }
 

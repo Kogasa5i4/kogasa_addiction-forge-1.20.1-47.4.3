@@ -16,6 +16,7 @@ public abstract class UomWitherInvulMixin {
     @Shadow(remap = false)
     public int customInvulnerableTime;
 
+    @SuppressWarnings("UnresolvedMixinReference")
     @Inject(method = {"hurt", "m_6469_"}, at = @At("HEAD"), require = 0, remap = false)
     private void kogasa$clearUomCustomInvul(DamageSource damageSource, float damage, CallbackInfoReturnable<Boolean> cir) {
         if (BossTweaks.preventUomInvulnerability()) {

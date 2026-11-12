@@ -42,8 +42,15 @@ public final class KogasaCompat {
      * 避免在 {@code ItemStack#getMaxDamage} 之类的早期调用里炸掉。
      */
     private static final List<Predicate<ItemStack>> EXTRA_COMPATIBILITY = new ArrayList<>();
+    /** 只允许彩虹水晶结合、但不自动兼容的装备（例如 TaCZ 枪械）。 */
+    private static final List<Predicate<ItemStack>> COMBINABLE_PREDICATES = new ArrayList<>();
 
     /** 附属注册额外的“自动兼容”判定（例如 SlashBlade 的 bladeState）。 */
+    /** 附属注册“可被彩虹水晶结合”的判定；不会自动变成兼容物品。 */
+    public static void registerCombinablePredicate(Predicate<ItemStack> predicate) {
+        if (predicate != null) COMBINABLE_PREDICATES.add(predicate);
+    }
+
     public static void registerCompatibilityPredicate(Predicate<ItemStack> predicate) {
         if (predicate != null) EXTRA_COMPATIBILITY.add(predicate);
     }
@@ -93,6 +100,13 @@ public final class KogasaCompat {
         if (stack.isEmpty() || !isEnabled()) {
             return false;
         }
+        for (Predicate<ItemStack> predicate : COMBINABLE_PREDICATES) {
+        try {
+        if (predicate.test(stack)) return true;
+        } catch (RuntimeException ignored) {
+        }
+          }
+
         if (stack.getItem() instanceof IKogasaEquipment || hasMarker(stack)) {
             return false;
         }

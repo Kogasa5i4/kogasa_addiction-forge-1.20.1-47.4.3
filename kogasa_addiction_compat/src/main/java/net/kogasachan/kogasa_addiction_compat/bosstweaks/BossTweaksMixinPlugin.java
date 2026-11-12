@@ -14,6 +14,7 @@ public final class BossTweaksMixinPlugin implements IMixinConfigPlugin {
     private boolean youkaiHomecomingPresent;
     private boolean goetyPresent;
     private boolean uomPresent;
+    private boolean taczPresent;
 
     @Override
     public void onLoad(String mixinPackage) {

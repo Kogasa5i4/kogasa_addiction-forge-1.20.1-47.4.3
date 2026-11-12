@@ -153,6 +153,7 @@ dependencies {
     runtimeOnly fg.deobf("curse.maven:slashblade-resharped-${slashblade_resharped_curse_id}:${slashblade_resharped_curse_file}")
     runtimeOnly fg.deobf("curse.maven:legendreliclib-${legendreliclib_curse_id}:${legendreliclib_curse_file}")
     runtimeOnly fg.deobf("local.kogasa:yakumoblade:1.1.4")
+    compileOnly fg.deobf("curse.maven:timeless-and-classics-zero-${tacz_curse_id}:${tacz_curse_file}")
     runtimeOnly fg.deobf("curse.maven:timeless-and-classics-zero-${tacz_curse_id}:${tacz_curse_file}")
 
     // FantasyEnding 未公开/不便自动拉取，使用本地 jar；不打包进发布 jar

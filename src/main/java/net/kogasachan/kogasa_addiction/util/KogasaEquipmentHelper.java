@@ -46,7 +46,12 @@ public class KogasaEquipmentHelper {
     /** 附属注册的变体身份解析（例如拔刀剑 bladeState）；用于材料去重与实际物品匹配。 */
     private static final List<Function<ItemStack, String>> STAT_VARIANT_RESOLVERS = new ArrayList<>();
     /** 附属注册的 JEI 材料展开器（例如一条 slashblade 注册名展开成多把带 NBT 的刀）。 */
-    private static final List<Function<ItemStack, List<ItemStack>>> MATERIAL_STACK_EXPANDERS = new ArrayList<>();
+    private static final List<Function<ItemStack, List<ItemStack>>> MATERIAL_STACK_EXPANDERS = new ArrayList<>();    /** 附属注册的额外强化材料匹配（例如 TaCZ 枪械对枪械）。 */
+    private static final List<java.util.function.BiPredicate<ItemStack, ItemStack>> REINFORCEMENT_MATCHERS =
+            new ArrayList<>();
+    /** 附属注册的吸收后回调（result 已复制左侧装备，right 是材料）。 */
+    private static final List<java.util.function.BiConsumer<ItemStack, ItemStack>> ABSORPTION_LISTENERS =
+            new ArrayList<>();
 
     /** 原版三叉戟基准攻击伤害的惰性缓存（首次属性计算时读取注册表，之后复用）。 */
     private static Double vanillaTridentDamage = null;
@@ -667,6 +672,26 @@ public class KogasaEquipmentHelper {
     }
 
     /** 附属注册 JEI 材料展开器；返回空列表时使用原始 ItemStack。 */
+    public static void registerReinforcementMatcher(
+            java.util.function.BiPredicate<ItemStack, ItemStack> matcher) {
+        if (matcher != null) REINFORCEMENT_MATCHERS.add(matcher);
+    }
+
+    public static void registerAbsorptionListener(
+            java.util.function.BiConsumer<ItemStack, ItemStack> listener) {
+        if (listener != null) ABSORPTION_LISTENERS.add(listener);
+    }
+
+    public static void notifyAbsorption(ItemStack result, ItemStack right) {
+        for (var listener : ABSORPTION_LISTENERS) {
+            try {
+                listener.accept(result, right);
+            } catch (RuntimeException ignored) {
+                // 可选模组吸收异常不影响主流程
+            }
+        }
+    }
+
     public static void registerMaterialStackExpander(Function<ItemStack, List<ItemStack>> expander) {
         if (expander != null) MATERIAL_STACK_EXPANDERS.add(expander);
     }
@@ -896,6 +921,13 @@ public class KogasaEquipmentHelper {
     public static boolean matchesReinforcementMaterial(ItemStack left, ItemStack right) {
         // Curios 装备（法术书/戒指）没有原版装备类层次，跨模组同槽位视为同类材料。
         if (KogasaCuriosHelper.sharesSlot(left, right)) return true;
+        // 附属自定义材料对（例如 TaCZ 枪械对枪械）。
+        for (var matcher : REINFORCEMENT_MATCHERS) {
+            try {
+                if (matcher.test(left, right)) return true;
+            } catch (RuntimeException ignored) {
+            }
+        }
         // 两边都已标记为兼容装备时，不再要求 Java 类相同。
         if (isKogasaEquipment(left) && isKogasaEquipment(right)) return true;
         // 护甲对护甲：自定义 ArmorItem / 非 ArmorItem 可穿戴物品都可能被原版类型判定漏掉。

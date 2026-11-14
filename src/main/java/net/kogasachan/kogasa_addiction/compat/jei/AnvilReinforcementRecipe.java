@@ -18,12 +18,16 @@ public record AnvilReinforcementRecipe(
         this(List.of(input), materials, List.of(output), kind);
     }
 
-    /** 供旧调用/搜索使用的首个输入。 */
+    /**
+     * 供旧调用/搜索使用的首个输入。
+     */
     public ItemStack input() {
         return inputs.isEmpty() ? ItemStack.EMPTY : inputs.get(0);
     }
 
-    /** 供旧调用/搜索使用的首个输出。 */
+    /**
+     * 供旧调用/搜索使用的首个输出。
+     */
     public ItemStack output() {
         return outputs.isEmpty() ? ItemStack.EMPTY : outputs.get(0);
     }

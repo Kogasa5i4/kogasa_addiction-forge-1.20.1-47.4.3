@@ -14,7 +14,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** 子弹创建后按 Kogasa 吸收值降低 gravity。 */
+/**
+ * 子弹创建后按 Kogasa 吸收值降低 gravity。
+ */
 @Mixin(EntityKineticBullet.class)
 public abstract class EntityKineticBulletMixin {
 

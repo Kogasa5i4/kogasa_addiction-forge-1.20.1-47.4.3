@@ -22,7 +22,10 @@ import net.minecraft.world.item.*;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -41,19 +44,34 @@ public class KogasaEquipmentHelper {
     private static final Multimap<Attribute, AttributeModifier> EMPTY_MODIFIERS =
             ImmutableMultimap.of();
 
-    /** 附属注册的“强制实际数值”判定；优先于动态列表。 */
+    /**
+     * 附属注册的“强制实际数值”判定；优先于动态列表。
+     */
     private static final List<Predicate<ItemStack>> FORCE_ACTUAL_STAT_PREDICATES = new ArrayList<>();
-    /** 附属注册的变体身份解析（例如拔刀剑 bladeState）；用于材料去重与实际物品匹配。 */
+    /**
+     * 附属注册的变体身份解析（例如拔刀剑 bladeState）；用于材料去重与实际物品匹配。
+     */
     private static final List<Function<ItemStack, String>> STAT_VARIANT_RESOLVERS = new ArrayList<>();
-    /** 附属注册的 JEI 材料展开器（例如一条 slashblade 注册名展开成多把带 NBT 的刀）。 */
-    private static final List<Function<ItemStack, List<ItemStack>>> MATERIAL_STACK_EXPANDERS = new ArrayList<>();    /** 附属注册的额外强化材料匹配（例如 TaCZ 枪械对枪械）。 */
+    /**
+     * 附属注册的 JEI 材料展开器（例如一条 slashblade 注册名展开成多把带 NBT 的刀）。
+     */
+    private static final List<Function<ItemStack, List<ItemStack>>> MATERIAL_STACK_EXPANDERS = new ArrayList<>();
+    /**
+     * 附属注册的额外强化材料匹配（例如 TaCZ 枪械对枪械）。
+     */
     private static final List<java.util.function.BiPredicate<ItemStack, ItemStack>> REINFORCEMENT_MATCHERS =
             new ArrayList<>();
-    /** 附属注册的吸收后回调（result 已复制左侧装备，right 是材料）。 */
+    /**
+     * 附属注册的吸收后回调（result 已复制左侧装备，right 是材料）。
+     */
     private static final List<java.util.function.BiConsumer<ItemStack, ItemStack>> ABSORPTION_LISTENERS =
             new ArrayList<>();
+    private static final List<java.util.function.BiConsumer<ItemStack, net.minecraft.world.entity.player.Player>> ABSORPTION_COMPLETE_LISTENERS =
+            new ArrayList<>();
 
-    /** 原版三叉戟基准攻击伤害的惰性缓存（首次属性计算时读取注册表，之后复用）。 */
+    /**
+     * 原版三叉戟基准攻击伤害的惰性缓存（首次属性计算时读取注册表，之后复用）。
+     */
     private static Double vanillaTridentDamage = null;
 
     /**
@@ -231,7 +249,9 @@ public class KogasaEquipmentHelper {
         return builder.build();
     }
 
-    /** 把 AbsorbedAttributes 中除攻击/护甲外的属性追加到 modifier 表。 */
+    /**
+     * 把 AbsorbedAttributes 中除攻击/护甲外的属性追加到 modifier 表。
+     */
     @SuppressWarnings("deprecation")
     private static void appendAbsorbedAttributes(
             ImmutableMultimap.Builder<Attribute, AttributeModifier> builder,
@@ -319,8 +339,34 @@ public class KogasaEquipmentHelper {
      */
     private static final double VANILLA_CROSSBOW_DRAW_TICKS = 25.0D;
 
+    private static final List<Predicate<ItemStack>> RANGED_PREDICATES = new ArrayList<>();
+    private static final List<Function<ItemStack, Double>> RANGED_POWER_PROVIDERS = new ArrayList<>();
+    private static final List<Function<ItemStack, Double>> RANGED_DRAW_PROVIDERS = new ArrayList<>();
+
+    /**
+     * 附属注册“按远程处理”的装备（例如 TaCZ 枪械）；不会改变物品类型。
+     */
+    public static void registerRangedPredicate(Predicate<ItemStack> predicate) {
+        if (predicate != null) RANGED_PREDICATES.add(predicate);
+    }
+
+    public static void registerRangedPowerProvider(Function<ItemStack, Double> provider) {
+        if (provider != null) RANGED_POWER_PROVIDERS.add(provider);
+    }
+
+    public static void registerRangedDrawProvider(Function<ItemStack, Double> provider) {
+        if (provider != null) RANGED_DRAW_PROVIDERS.add(provider);
+    }
+
     public static boolean isRanged(ItemStack stack) {
-        return stack.getItem() instanceof BowItem || stack.getItem() instanceof CrossbowItem;
+        if (stack.getItem() instanceof BowItem || stack.getItem() instanceof CrossbowItem) return true;
+        for (Predicate<ItemStack> predicate : RANGED_PREDICATES) {
+            try {
+                if (predicate.test(stack)) return true;
+            } catch (RuntimeException ignored) {
+            }
+        }
+        return false;
     }
 
     /**
@@ -330,6 +376,13 @@ public class KogasaEquipmentHelper {
      * 因此这里只看左侧这件装备自己是弓还是弩，与材料是什么无关。
      */
     public static double getRangedBasePower(ItemStack rangedStack) {
+        for (Function<ItemStack, Double> provider : RANGED_POWER_PROVIDERS) {
+            try {
+                double value = provider.apply(rangedStack);
+                if (value > 0.0D) return value;
+            } catch (RuntimeException ignored) {
+            }
+        }
         if (rangedStack.getItem() instanceof CrossbowItem) return VANILLA_CROSSBOW_POWER;
         if (rangedStack.getItem() instanceof BowItem) return VANILLA_BOW_POWER;
         return 0.0D;
@@ -339,6 +392,13 @@ public class KogasaEquipmentHelper {
      * 弓弩的"基础拉弓时间"（tick），口径同上。
      */
     public static double getRangedBaseDrawTicks(ItemStack rangedStack) {
+        for (Function<ItemStack, Double> provider : RANGED_DRAW_PROVIDERS) {
+            try {
+                double value = provider.apply(rangedStack);
+                if (value > 0.0D) return value;
+            } catch (RuntimeException ignored) {
+            }
+        }
         if (rangedStack.getItem() instanceof CrossbowItem) return VANILLA_CROSSBOW_DRAW_TICKS;
         if (rangedStack.getItem() instanceof BowItem) return VANILLA_BOW_DRAW_TICKS;
         return 0.0D;
@@ -371,10 +431,14 @@ public class KogasaEquipmentHelper {
         return (int) Math.max(1L, reduced);
     }
 
-    /** 原版三叉戟蓄满所需 tick（ThrownTrident 满力蓄力时间） */
+    /**
+     * 原版三叉戟蓄满所需 tick（ThrownTrident 满力蓄力时间）
+     */
     private static final double VANILLA_TRIDENT_DRAW_TICKS = 10.0D;
 
-    /** 原版三叉戟投掷初速 */
+    /**
+     * 原版三叉戟投掷初速
+     */
     private static final double VANILLA_TRIDENT_POWER = 2.5D;
 
     /**
@@ -473,7 +537,9 @@ public class KogasaEquipmentHelper {
         return !ItemStack.isSameItemSameTags(newCopy, oldCopy);
     }
 
-    /** ISS/Cataclysm 等外部装备：按包名识别，供吸收与强化材料兼容使用。 */
+    /**
+     * ISS/Cataclysm 等外部装备：按包名识别，供吸收与强化材料兼容使用。
+     */
     public static boolean isExternalWeapon(ItemStack stack) {
         if (stack.isEmpty() || isExternalArmor(stack)) return false;
         Item item = stack.getItem();
@@ -559,7 +625,9 @@ public class KogasaEquipmentHelper {
         return Math.max(actual, legacy);
     }
 
-    /** 旧版稳定攻击力读取：SwordItem/DiggerItem/原版三叉戟字段。 */
+    /**
+     * 旧版稳定攻击力读取：SwordItem/DiggerItem/原版三叉戟字段。
+     */
     private static double getLegacyAttackDamage(ItemStack stack) {
         Item item = stack.getItem();
         if (item instanceof SwordItem sword) return sword.getDamage();
@@ -568,7 +636,9 @@ public class KogasaEquipmentHelper {
         return 0.0D;
     }
 
-    /** 物品自己的默认主手 ATTACK_DAMAGE（不触发 Forge 事件、不含附魔）。 */
+    /**
+     * 物品自己的默认主手 ATTACK_DAMAGE（不触发 Forge 事件、不含附魔）。
+     */
     @SuppressWarnings("deprecation")
     public static double getDefaultAttackDamage(ItemStack stack) {
         double sum = 0.0D;
@@ -583,7 +653,9 @@ public class KogasaEquipmentHelper {
         return sum;
     }
 
-    /** 该类/物品是否被视为动态属性装备（使用稳定 legacy 基准，不读实时属性）。 */
+    /**
+     * 该类/物品是否被视为动态属性装备（使用稳定 legacy 基准，不读实时属性）。
+     */
     public static boolean isDynamicStatEquipment(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return false;
         Item item = stack.getItem();
@@ -596,13 +668,17 @@ public class KogasaEquipmentHelper {
         return KogasaIdListMatcher.matchesString(item.getClass().getName(), Config.DYNAMIC_STAT_CLASSES.get());
     }
 
-    /** @deprecated 使用 {@link #isDynamicStatEquipment(ItemStack)}。 */
+    /**
+     * @deprecated 使用 {@link #isDynamicStatEquipment(ItemStack)}。
+     */
     @Deprecated
     public static boolean isDynamicStatMaterial(ItemStack stack) {
         return isDynamicStatEquipment(stack);
     }
 
-    /** 该类/物品是否强制使用实际 ATTACK_DAMAGE（优先级高于动态列表）。 */
+    /**
+     * 该类/物品是否强制使用实际 ATTACK_DAMAGE（优先级高于动态列表）。
+     */
     public static boolean isForceActualStatEquipment(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return false;
         for (Predicate<ItemStack> predicate : FORCE_ACTUAL_STAT_PREDICATES) {
@@ -623,12 +699,16 @@ public class KogasaEquipmentHelper {
         return KogasaIdListMatcher.matchesString(item.getClass().getName(), Config.FORCE_ACTUAL_STAT_CLASSES.get());
     }
 
-    /** 附属注册“该物品强制按实际数值吸收”的判定。 */
+    /**
+     * 附属注册“该物品强制按实际数值吸收”的判定。
+     */
     public static void registerForceActualStatPredicate(Predicate<ItemStack> predicate) {
         if (predicate != null) FORCE_ACTUAL_STAT_PREDICATES.add(predicate);
     }
 
-    /** 附属注册变体身份解析；返回 null 表示该物品没有变体概念。 */
+    /**
+     * 附属注册变体身份解析；返回 null 表示该物品没有变体概念。
+     */
     public static void registerStatVariantResolver(Function<ItemStack, String> resolver) {
         if (resolver != null) STAT_VARIANT_RESOLVERS.add(resolver);
     }
@@ -639,7 +719,9 @@ public class KogasaEquipmentHelper {
     private static final List<java.util.function.BiConsumer<ItemStack, CompoundTag>> BLADE_STATE_APPLIERS =
             new ArrayList<>();
 
-    /** 附属注册完整的 bladeState → capability 同步（拔刀剑）。 */
+    /**
+     * 附属注册完整的 bladeState → capability 同步（拔刀剑）。
+     */
     public static void registerBladeStateApplier(
             java.util.function.BiConsumer<ItemStack, CompoundTag> applier) {
         if (applier != null) BLADE_STATE_APPLIERS.add(applier);
@@ -655,7 +737,9 @@ public class KogasaEquipmentHelper {
         }
     }
 
-    /** 附属注册“SE 写入 ItemStack 后同步到能力状态”的回调（拔刀剑需要）。 */
+    /**
+     * 附属注册“SE 写入 ItemStack 后同步到能力状态”的回调（拔刀剑需要）。
+     */
     public static void registerSpecialEffectApplier(
             java.util.function.BiConsumer<ItemStack, List<String>> applier) {
         if (applier != null) SPECIAL_EFFECT_APPLIERS.add(applier);
@@ -671,7 +755,9 @@ public class KogasaEquipmentHelper {
         }
     }
 
-    /** 附属注册 JEI 材料展开器；返回空列表时使用原始 ItemStack。 */
+    /**
+     * 附属注册 JEI 材料展开器；返回空列表时使用原始 ItemStack。
+     */
     public static void registerReinforcementMatcher(
             java.util.function.BiPredicate<ItemStack, ItemStack> matcher) {
         if (matcher != null) REINFORCEMENT_MATCHERS.add(matcher);
@@ -680,6 +766,24 @@ public class KogasaEquipmentHelper {
     public static void registerAbsorptionListener(
             java.util.function.BiConsumer<ItemStack, ItemStack> listener) {
         if (listener != null) ABSORPTION_LISTENERS.add(listener);
+    }
+
+    /**
+     * 吸收完成后的 result 回调（此时 result NBT 已写完，可用于刷新外部模组缓存）。
+     */
+    public static void registerAbsorptionCompleteListener(
+            java.util.function.BiConsumer<ItemStack, net.minecraft.world.entity.player.Player> listener) {
+        if (listener != null) ABSORPTION_COMPLETE_LISTENERS.add(listener);
+    }
+
+    public static void notifyAbsorptionComplete(ItemStack result,
+                                                net.minecraft.world.entity.player.Player player) {
+        for (var listener : ABSORPTION_COMPLETE_LISTENERS) {
+            try {
+                listener.accept(result, player);
+            } catch (RuntimeException ignored) {
+            }
+        }
     }
 
     public static void notifyAbsorption(ItemStack result, ItemStack right) {
@@ -696,7 +800,9 @@ public class KogasaEquipmentHelper {
         if (expander != null) MATERIAL_STACK_EXPANDERS.add(expander);
     }
 
-    /** 物品的稳定变体身份（例如拔刀剑的 bladeState 键）；无变体返回 null。 */
+    /**
+     * 物品的稳定变体身份（例如拔刀剑的 bladeState 键）；无变体返回 null。
+     */
     public static String getStatVariantKey(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return null;
         for (Function<ItemStack, String> resolver : STAT_VARIANT_RESOLVERS) {
@@ -710,13 +816,17 @@ public class KogasaEquipmentHelper {
         return null;
     }
 
-    /** 物品 ID + 变体身份，作为“已使用材料”的去重键。 */
+    /**
+     * 物品 ID + 变体身份，作为“已使用材料”的去重键。
+     */
     public static String getMaterialId(ItemStack stack, String baseId) {
         String variant = getStatVariantKey(stack);
         return variant == null ? baseId : baseId + "#" + variant;
     }
 
-    /** 把单个注册物品展开成多个带 NBT 的 JEI 材料；空列表表示不展开。 */
+    /**
+     * 把单个注册物品展开成多个带 NBT 的 JEI 材料；空列表表示不展开。
+     */
     public static List<ItemStack> expandMaterialStacks(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return List.of();
         java.util.LinkedHashMap<String, ItemStack> result = new java.util.LinkedHashMap<>();
@@ -746,7 +856,9 @@ public class KogasaEquipmentHelper {
         return getDefaultAttackDamage(stack) > 0.0D || getLegacyAttackDamage(stack) > 0.0D;
     }
 
-    /** 主手攻击伤害的 ADDITION 修饰符之和（调用物品自己的属性表）。 */
+    /**
+     * 主手攻击伤害的 ADDITION 修饰符之和（调用物品自己的属性表）。
+     */
     public static double getAttributeAttackDamage(ItemStack stack) {
         double sum = 0.0D;
         for (var entry : stack.getAttributeModifiers(EquipmentSlot.MAINHAND).entries()) {
@@ -988,7 +1100,9 @@ public class KogasaEquipmentHelper {
                 || kind == KogasaEquipmentKind.BOOTS;
     }
 
-    /** 是否走原版武器/工具/护甲/弓弩基类的安全属性路径。 */
+    /**
+     * 是否走原版武器/工具/护甲/弓弩基类的安全属性路径。
+     */
     public static boolean isVanillaEquipmentClass(Item item) {
         return item instanceof SwordItem
                 || item instanceof DiggerItem
@@ -998,7 +1112,9 @@ public class KogasaEquipmentHelper {
                 || item instanceof CrossbowItem;
     }
 
-    /** 普通 Item 通用装备的强化材料：已识别装备、本模组装备、动态材料、有攻击属性或可穿护甲槽。 */
+    /**
+     * 普通 Item 通用装备的强化材料：已识别装备、本模组装备、动态材料、有攻击属性或可穿护甲槽。
+     */
     public static boolean isGenericReinforcementMaterial(ItemStack stack) {
         if (stack.isEmpty()) return false;
         if (stack.getItem() instanceof IKogasaEquipment) return true;
@@ -1032,7 +1148,9 @@ public class KogasaEquipmentHelper {
         return null;
     }
 
-    /** 默认属性表中的 ARMOR 值（供非 ArmorItem 的可穿戴物品使用）。 */
+    /**
+     * 默认属性表中的 ARMOR 值（供非 ArmorItem 的可穿戴物品使用）。
+     */
     public static double getAttributeArmorValue(ItemStack stack) {
         EquipmentSlot armorSlot = getArmorEquipmentSlot(stack);
         if (armorSlot == null) return 0.0D;
@@ -1048,12 +1166,16 @@ public class KogasaEquipmentHelper {
         return sum;
     }
 
-    /** 从物品自己的默认属性表读主手攻击伤害（不触发 ItemAttributeModifierEvent）。 */
+    /**
+     * 从物品自己的默认属性表读主手攻击伤害（不触发 ItemAttributeModifierEvent）。
+     */
     public static double getAttributeAttackDamageBase(ItemStack stack) {
         return sumDefaultAddition(stack, Attributes.ATTACK_DAMAGE);
     }
 
-    /** 从物品自己的默认属性表读主手攻速（不触发 ItemAttributeModifierEvent）。 */
+    /**
+     * 从物品自己的默认属性表读主手攻速（不触发 ItemAttributeModifierEvent）。
+     */
     public static double getAttributeAttackSpeedBase(ItemStack stack) {
         return sumDefaultAddition(stack, Attributes.ATTACK_SPEED);
     }
@@ -1096,7 +1218,9 @@ public class KogasaEquipmentHelper {
         return Tiers.WOOD;
     }
 
-    /** 原版 Tier → 旧数字等级（木/金 0，石 1，铁 2，钻 3，下界合金 4）；非原版材质视为 0。 */
+    /**
+     * 原版 Tier → 旧数字等级（木/金 0，石 1，铁 2，钻 3，下界合金 4）；非原版材质视为 0。
+     */
     private static int indexOfVanillaTier(Tier tier) {
         if (tier == Tiers.NETHERITE) return 4;
         if (tier == Tiers.DIAMOND) return 3;

@@ -10,7 +10,9 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
-/** Curios 可选的轻量封装；未安装 Curios 时所有方法安全返回空/false。 */
+/**
+ * Curios 可选的轻量封装；未安装 Curios 时所有方法安全返回空/false。
+ */
 public final class KogasaCuriosHelper {
 
     private KogasaCuriosHelper() {
@@ -21,7 +23,9 @@ public final class KogasaCuriosHelper {
         return CuriosApi.getCurio(stack).isPresent();
     }
 
-    /** 两个 Curios 是否至少共享一个槽位类型（法术书只能配法术书，戒指只配戒指）。 */
+    /**
+     * 两个 Curios 是否至少共享一个槽位类型（法术书只能配法术书，戒指只配戒指）。
+     */
     public static boolean sharesSlot(ItemStack a, ItemStack b) {
         if (!isCurio(a) || !isCurio(b)) return false;
         Set<String> left = new LinkedHashSet<>(CuriosApi.getItemStackSlots(a, false).keySet());
@@ -32,7 +36,9 @@ public final class KogasaCuriosHelper {
         return false;
     }
 
-    /** 遍历玩家当前装备的 Curios（不含 cosmetic），用于成长触发。 */
+    /**
+     * 遍历玩家当前装备的 Curios（不含 cosmetic），用于成长触发。
+     */
     public static void forEachEquipped(LivingEntity entity, Consumer<ItemStack> consumer) {
         if (entity == null || !ModList.get().isLoaded("curios")) return;
         CuriosApi.getCuriosInventory(entity).ifPresent(handler -> {
@@ -44,7 +50,9 @@ public final class KogasaCuriosHelper {
         });
     }
 
-    /** 可变遍历：写完 NBT 后 setStackInSlot，触发 Curios 的槽位同步。 */
+    /**
+     * 可变遍历：写完 NBT 后 setStackInSlot，触发 Curios 的槽位同步。
+     */
     public static void forEachEquippedMutable(LivingEntity entity, Consumer<ItemStack> consumer) {
         if (entity == null || !ModList.get().isLoaded("curios")) return;
         CuriosApi.getCuriosInventory(entity).ifPresent(handler -> {

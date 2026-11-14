@@ -1,24 +1,24 @@
 {
-    "pages":  [
-                  {
-                      "text":  "book.kogasa_addiction.entry.ranged_numbers.page1",
-                      "type":  "patchouli:text"
-                  },
-                  {
-                      "text":  "book.kogasa_addiction.entry.ranged_numbers.page2",
-                      "type":  "patchouli:text"
-                  },
-                  {
-                      "text":  "book.kogasa_addiction.entry.ranged_numbers.page3",
-                      "type":  "patchouli:text"
-                  },
-                  {
-                      "text":  "book.kogasa_addiction.entry.ranged_numbers.page4",
-                      "type":  "patchouli:text"
-                  }
-              ],
-    "icon":  "minecraft:bow",
-    "category":  "kogasa_addiction:equipment",
-    "name":  "book.kogasa_addiction.entry.ranged_numbers.name",
-    "sortnum":  5
+  "pages": [
+    {
+      "text": "book.kogasa_addiction.entry.ranged_numbers.page1",
+      "type": "patchouli:text"
+    },
+    {
+      "text": "book.kogasa_addiction.entry.ranged_numbers.page2",
+      "type": "patchouli:text"
+    },
+    {
+      "text": "book.kogasa_addiction.entry.ranged_numbers.page3",
+      "type": "patchouli:text"
+    },
+    {
+      "text": "book.kogasa_addiction.entry.ranged_numbers.page4",
+      "type": "patchouli:text"
+    }
+  ],
+  "icon": "minecraft:bow",
+  "category": "kogasa_addiction:equipment",
+  "name": "book.kogasa_addiction.entry.ranged_numbers.name",
+  "sortnum": 5
 }

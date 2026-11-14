@@ -21,17 +21,23 @@ public final class KogasaAbilityTooltipContext {
         this.tooltip = tooltip;
     }
 
-    /** 被查看的装备 */
+    /**
+     * 被查看的装备
+     */
     public ItemStack stack() {
         return stack;
     }
 
-    /** 该装备当前的成长值 */
+    /**
+     * 该装备当前的成长值
+     */
     public double growth() {
         return growth;
     }
 
-    /** 追加一行 tooltip */
+    /**
+     * 追加一行 tooltip
+     */
     public void add(Component line) {
         tooltip.add(line);
     }

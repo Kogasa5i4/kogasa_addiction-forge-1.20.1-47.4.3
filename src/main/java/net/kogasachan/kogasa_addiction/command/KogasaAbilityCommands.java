@@ -19,7 +19,9 @@ import net.minecraft.world.item.ItemStack;
 import static net.kogasachan.kogasa_addiction.command.KogasaCommandSupport.ABILITY_SUGGESTIONS;
 import static net.kogasachan.kogasa_addiction.command.KogasaCommandSupport.ADMIN;
 
-/** /kogasa addability|removeability|clearabilities|newsvalue|setnewsvalue —— 能力侧数据命令组。 */
+/**
+ * /kogasa addability|removeability|clearabilities|newsvalue|setnewsvalue —— 能力侧数据命令组。
+ */
 public final class KogasaAbilityCommands {
 
     private KogasaAbilityCommands() {

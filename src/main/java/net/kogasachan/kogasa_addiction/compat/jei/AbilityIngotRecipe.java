@@ -6,7 +6,9 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-/** JEI 能力锭信息分类的一条“配方”。 */
+/**
+ * JEI 能力锭信息分类的一条“配方”。
+ */
 public record AbilityIngotRecipe(
         KogasaAbility ability,
         ItemStack ingot,

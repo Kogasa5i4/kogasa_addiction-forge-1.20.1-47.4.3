@@ -30,7 +30,9 @@ public class FumoHandler {
     private static final Map<TableKey, int[]> ENCHANT_LEVELS =
             new HashMap<>();
 
-    /** 每名玩家的独立冷却截止时间（世界 gameTime），存在玩家持久数据里，重登不清零 */
+    /**
+     * 每名玩家的独立冷却截止时间（世界 gameTime），存在玩家持久数据里，重登不清零
+     */
     private static final String TAG_COOLDOWN_UNTIL = "KogasaFumoCooldownUntil";
 
     /**

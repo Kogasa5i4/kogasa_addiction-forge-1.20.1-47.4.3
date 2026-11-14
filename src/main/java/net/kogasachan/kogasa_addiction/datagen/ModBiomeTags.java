@@ -6,7 +6,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 
-/** 结构用的“基础群系 - 排除群系”组合 tag。 */
+/**
+ * 结构用的“基础群系 - 排除群系”组合 tag。
+ */
 public final class ModBiomeTags {
 
     public static final TagKey<Biome> OVERWORLD_NO_OCEAN = TagKey.create(

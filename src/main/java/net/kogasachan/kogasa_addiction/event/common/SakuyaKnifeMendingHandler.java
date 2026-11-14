@@ -60,7 +60,9 @@ public final class SakuyaKnifeMendingHandler {
         inventory.setChanged();
     }
 
-    /** 找到第一把带经验修补的损坏飞刀所在的背包槽位，没有返回 -1 */
+    /**
+     * 找到第一把带经验修补的损坏飞刀所在的背包槽位，没有返回 -1
+     */
     private static int findMendingBrokenKnife(ServerPlayer player) {
         var inventory = player.getInventory();
         for (int i = 0; i < inventory.getContainerSize(); i++) {

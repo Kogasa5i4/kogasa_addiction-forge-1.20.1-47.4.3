@@ -2,7 +2,9 @@ package net.kogasachan.kogasa_addiction_compat.bosstweaks;
 
 import net.kogasachan.kogasa_addiction_compat.compat.CompatConfig;
 
-/** Boss 行为修正的运行时开关；配置尚未加载时按默认全开处理。 */
+/**
+ * Boss 行为修正的运行时开关；配置尚未加载时按默认全开处理。
+ */
 public final class BossTweaks {
 
     private BossTweaks() {
@@ -53,7 +55,9 @@ public final class BossTweaks {
         }
     }
 
-    /** 反射判断亚波伦是否处于 Doom 尾杀阶段；读不到时按“普通阶段”处理。 */
+    /**
+     * 反射判断亚波伦是否处于 Doom 尾杀阶段；读不到时按“普通阶段”处理。
+     */
     public static boolean isApollyonDoom(Object apostle) {
         if (apostle == null) return false;
         for (String name : new String[]{"getDoom", "isDoomNow", "allTitlesApostle_1_20_1$getDoom"}) {
@@ -77,7 +81,9 @@ public final class BossTweaks {
         return false;
     }
 
-    /** 让 YH 实体在 setHealth<=0 时真正进入死亡，而不是停在 0 血。 */
+    /**
+     * 让 YH 实体在 setHealth<=0 时真正进入死亡，而不是停在 0 血。
+     */
     public static void killYhEntity(net.minecraft.world.entity.LivingEntity entity) {
         // 这里不能用 isDeadOrDying(): setHealth(0) 后它已经是 true，
         // 但 YH 的 die() 仍需要被调用才会真正进入死亡流程。

@@ -45,7 +45,9 @@ public final class ManualGrantHandler {
         giveManualDirect(player, true);
     }
 
-    /** 发一本手册；markGranted=true 时同时写入“已发放”标记。 */
+    /**
+     * 发一本手册；markGranted=true 时同时写入“已发放”标记。
+     */
     public static void giveManualDirect(ServerPlayer player, boolean markGranted) {
         ItemStack manual = new ItemStack(ModItems.KOGASA_MANUAL.get());
         if (!player.getInventory().add(manual)) {

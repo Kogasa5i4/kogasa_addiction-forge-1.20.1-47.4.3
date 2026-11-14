@@ -8,17 +8,20 @@
     "ItemEntityMixin",
     "ItemStackMixin",
     "bosstweaks.ApollyonDoomMixin",
-    "bosstweaks.YhBossTweakMixin",
-    "bosstweaks.YhYoukaiSetHealthMixin",
     "bosstweaks.ApostleInvulMixin",
     "bosstweaks.UomBaseInvulMixin",
     "bosstweaks.UomWitherInvulMixin",
+    "bosstweaks.YhBossTweakMixin",
+    "bosstweaks.YhDanmakuSetHealthMixin",
     "bosstweaks.YhEntityInvulMixin",
-    "bosstweaks.YhDanmakuSetHealthMixin"
+    "bosstweaks.YhYoukaiSetHealthMixin",
+    "tacz.AttachmentDataUtilsMixin",
+    "tacz.EntityKineticBulletMixin"
   ],
   "client": [
     "AbstractContainerScreenMixin",
-    "CreativeModeInventoryScreenMixin"
+    "CreativeModeInventoryScreenMixin",
+    "tacz.ClientGunTooltipMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -23,7 +23,9 @@ import java.util.Map;
  */
 public final class KogasaAbilityRegistry {
 
-    /** 能力 → 能力锭物品。用 LinkedHashMap 保持注册顺序稳定。 */
+    /**
+     * 能力 → 能力锭物品。用 LinkedHashMap 保持注册顺序稳定。
+     */
     private static final Map<KogasaAbility, RegistryObject<Item>> INGOTS = new LinkedHashMap<>();
 
     private KogasaAbilityRegistry() {
@@ -38,7 +40,9 @@ public final class KogasaAbilityRegistry {
         return INGOTS.get(ability);
     }
 
-    /** 已注册的 能力 → 能力锭 映射（不可变视图，顺序稳定） */
+    /**
+     * 已注册的 能力 → 能力锭 映射（不可变视图，顺序稳定）
+     */
     public static Map<KogasaAbility, RegistryObject<Item>> ingots() {
         return Collections.unmodifiableMap(INGOTS);
     }

@@ -193,7 +193,9 @@ public class Config {
                     List.of("kogasa_addiction:*", "tconstruct:*", "tetra:*"),
                     o -> o instanceof String s && !s.isBlank());
 
-    /** @deprecated 使用 {@link #DYNAMIC_STAT_ITEMS}。 */
+    /**
+     * @deprecated 使用 {@link #DYNAMIC_STAT_ITEMS}。
+     */
     @Deprecated
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> DYNAMIC_STAT_MATERIALS = DYNAMIC_STAT_ITEMS;
 

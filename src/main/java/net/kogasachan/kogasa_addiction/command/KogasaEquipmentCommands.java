@@ -34,7 +34,9 @@ import javax.annotation.Nullable;
 import static net.kogasachan.kogasa_addiction.command.KogasaCommandSupport.ABILITY_SUGGESTIONS;
 import static net.kogasachan.kogasa_addiction.command.KogasaCommandSupport.ADMIN;
 
-/** /kogasa grow|reinforce|reset|resetfirstjoin|seal|unseal —— 修改装备本体数据的命令组。 */
+/**
+ * /kogasa grow|reinforce|reset|resetfirstjoin|seal|unseal —— 修改装备本体数据的命令组。
+ */
 public final class KogasaEquipmentCommands {
 
     private KogasaEquipmentCommands() {
@@ -179,7 +181,9 @@ public final class KogasaEquipmentCommands {
 
     // ==================== seal / unseal ====================
 
-    /** 封印主手装备：注入指定（或随机）能力 + Locked=true，模拟战利品开出的封印装备。 */
+    /**
+     * 封印主手装备：注入指定（或随机）能力 + Locked=true，模拟战利品开出的封印装备。
+     */
     private static int seal(CommandContext<CommandSourceStack> ctx, @Nullable String abilityId)
             throws CommandSyntaxException {
         ServerPlayer player = ctx.getSource().getPlayerOrException();

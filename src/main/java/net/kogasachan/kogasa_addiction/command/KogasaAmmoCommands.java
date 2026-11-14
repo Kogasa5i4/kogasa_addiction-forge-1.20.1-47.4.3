@@ -22,7 +22,9 @@ import net.minecraft.world.item.alchemy.PotionUtils;
 import static net.kogasachan.kogasa_addiction.command.KogasaCommandSupport.ADMIN;
 import static net.kogasachan.kogasa_addiction.command.KogasaCommandSupport.isRangedWeapon;
 
-/** /kogasa setammo|clearammo —— 弓弩弹药命令组。 */
+/**
+ * /kogasa setammo|clearammo —— 弓弩弹药命令组。
+ */
 public final class KogasaAmmoCommands {
 
     private KogasaAmmoCommands() {
@@ -157,7 +159,7 @@ public final class KogasaAmmoCommands {
 
 
     private static int setAmmoYh(CommandContext<CommandSourceStack> ctx,
-                                  KogasaAbilityData.AmmoType expected)
+                                 KogasaAbilityData.AmmoType expected)
             throws CommandSyntaxException {
         ServerPlayer player = ctx.getSource().getPlayerOrException();
         ItemStack held = KogasaCommandSupport.requireKogasaEquipment(ctx);

@@ -36,7 +36,9 @@ public final class CompatGenericEquipment {
         return isGeneric(stack, original);
     }
 
-    /** 事件里用 getOriginalModifiers()，避免递归触发属性事件。 */
+    /**
+     * 事件里用 getOriginalModifiers()，避免递归触发属性事件。
+     */
     public static boolean isGeneric(ItemStack stack, Multimap<Attribute, AttributeModifier> original) {
         if (!KogasaCompat.isCompatOnly(stack)) return false;
 

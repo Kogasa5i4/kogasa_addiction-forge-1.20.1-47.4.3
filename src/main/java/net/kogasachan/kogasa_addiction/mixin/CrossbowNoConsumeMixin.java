@@ -31,7 +31,9 @@ public class CrossbowNoConsumeMixin {
     @Unique
     private static final String TAG_NO_CONSUME = "KogasaNoConsume";
 
-    /** 原版私有装填方法：把一支弹药物品追加到弩的 ChargedProjectiles 列表 */
+    /**
+     * 原版私有装填方法：把一支弹药物品追加到弩的 ChargedProjectiles 列表
+     */
     @Invoker("addChargedProjectile")
     static void kogasa$addChargedProjectile(ItemStack pCrossbowStack, ItemStack pAmmoStack) {
         throw new AssertionError();

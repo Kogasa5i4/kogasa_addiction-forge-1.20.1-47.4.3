@@ -507,5 +507,9 @@
   "commands.kogasa_addiction.tag.none": "§7  (none)",
   "commands.kogasa_addiction.tag.no_block": "§7No block within 5 blocks.",
   "commands.kogasa_addiction.error.yh_ammo_required": "§cOffhand or item argument must be a YH danmaku, laser, or spell card.",
-  "commands.kogasa_addiction.setammo.yh.success": "§aLoaded YH ammo: %s"
+  "commands.kogasa_addiction.setammo.yh.success": "§aLoaded YH ammo: %s",
+  "tooltip.kogasa_addiction.tacz.header": "TaCZ Enhanced Stats",
+  "tooltip.kogasa_addiction.tacz.damage": "Bullet Damage: %s",
+  "tooltip.kogasa_addiction.tacz.rpm": "RPM: %s",
+  "tooltip.kogasa_addiction.tacz.ammo": "Magazine: %s"
 }

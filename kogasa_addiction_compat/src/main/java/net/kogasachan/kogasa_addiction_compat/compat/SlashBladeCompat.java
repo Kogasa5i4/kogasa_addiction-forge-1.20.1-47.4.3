@@ -1,5 +1,8 @@
 package net.kogasachan.kogasa_addiction_compat.compat;
 
+import mods.flammpfeil.slashblade.SlashBlade;
+import mods.flammpfeil.slashblade.item.ItemSlashBlade;
+import mods.flammpfeil.slashblade.registry.slashblade.SlashBladeDefinition;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
@@ -14,9 +17,6 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import mods.flammpfeil.slashblade.SlashBlade;
-import mods.flammpfeil.slashblade.item.ItemSlashBlade;
-import mods.flammpfeil.slashblade.registry.slashblade.SlashBladeDefinition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,9 @@ public final class SlashBladeCompat {
         return root != null && root.contains(BLADE_STATE, Tag.TAG_COMPOUND);
     }
 
-    /** 把完整 bladeState 数值同步到 SlashBlade capability。 */
+    /**
+     * 把完整 bladeState 数值同步到 SlashBlade capability。
+     */
     public static void applyBladeState(ItemStack stack, CompoundTag bladeState) {
         if (!(stack.getItem() instanceof ItemSlashBlade)) return;
         stack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
@@ -69,7 +71,9 @@ public final class SlashBladeCompat {
         });
     }
 
-    /** 把 SE 同步到 SlashBlade capability，Tooltip/实际效果读取的是 capability 而不是裸 NBT。 */
+    /**
+     * 把 SE 同步到 SlashBlade capability，Tooltip/实际效果读取的是 capability 而不是裸 NBT。
+     */
     public static void applySpecialEffects(ItemStack stack, java.util.List<String> effects) {
         if (!(stack.getItem() instanceof ItemSlashBlade)) return;
         stack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
@@ -83,7 +87,9 @@ public final class SlashBladeCompat {
         });
     }
 
-    /** 同一注册名下的稳定变体身份；优先翻译键，其次模型/贴图，最后 bladeId。 */
+    /**
+     * 同一注册名下的稳定变体身份；优先翻译键，其次模型/贴图，最后 bladeId。
+     */
     public static String variantKey(ItemStack stack) {
         if (!isSlashBlade(stack)) return null;
 

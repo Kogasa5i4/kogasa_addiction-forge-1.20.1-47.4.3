@@ -136,7 +136,9 @@ public class ClientSetup {
                                 ? 1.0F : 0.0F);
     }
 
-    /** 装了兼容附属时，显示主手册里的“兼容”分类（未装则整类隐藏） */
+    /**
+     * 装了兼容附属时，显示主手册里的“兼容”分类（未装则整类隐藏）
+     */
     private static void setCompatEntriesFlag() {
         if (!ModList.get().isLoaded("patchouli")) {
             return;

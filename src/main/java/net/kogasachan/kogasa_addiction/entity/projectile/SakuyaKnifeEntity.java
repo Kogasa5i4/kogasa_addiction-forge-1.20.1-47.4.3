@@ -32,7 +32,9 @@ public class SakuyaKnifeEntity extends ThrownTrident {
     private static final EntityDataAccessor<Integer> DATA_REINFORCEMENT =
             SynchedEntityData.defineId(SakuyaKnifeEntity.class, EntityDataSerializers.INT);
 
-    /** getPickupItem 的结果缓存；保证同一实体只掷一次损坏骰 */
+    /**
+     * getPickupItem 的结果缓存；保证同一实体只掷一次损坏骰
+     */
     private ItemStack pickupCache = ItemStack.EMPTY;
     private boolean pickupResolved = false;
 

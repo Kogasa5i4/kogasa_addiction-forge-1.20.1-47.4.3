@@ -121,7 +121,9 @@ public class KogasaAdvancementHelper {
         }
     }
 
-    /** 扫描背包 + 已装备 Curios，作为所有成就检查的统一入口。 */
+    /**
+     * 扫描背包 + 已装备 Curios，作为所有成就检查的统一入口。
+     */
     public static void scanAllAndGrant(ServerPlayer player) {
         scanInventoryAndGrant(player);
         KogasaCuriosHelper.forEachEquipped(player, stack -> checkAndGrant(player, stack));

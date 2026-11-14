@@ -30,7 +30,9 @@ public class CombineCrystalPacket {
 
     private final int slotIndex;
     private final boolean inventorySlot;
-    /** 创造模式专用：客户端看到的目标物品，服务端槽位为空时用它兜底 */
+    /**
+     * 创造模式专用：客户端看到的目标物品，服务端槽位为空时用它兜底
+     */
     private final ItemStack targetStack;
 
     public CombineCrystalPacket(int slotIndex, boolean inventorySlot) {
@@ -71,7 +73,9 @@ public class CombineCrystalPacket {
         }
     }
 
-    /** 创造模式：按背包槽位定位目标，不消耗水晶 */
+    /**
+     * 创造模式：按背包槽位定位目标，不消耗水晶
+     */
     private static void handleCreative(ServerPlayer player, int inventorySlot, ItemStack provided) {
         // 只接受创造模式玩家，避免生存模式借此绕过水晶消耗
         if (!player.getAbilities().instabuild) {
@@ -95,7 +99,9 @@ public class CombineCrystalPacket {
         playSuccess(player);
     }
 
-    /** 生存模式：水晶在鼠标携带栏，扣 1 个 */
+    /**
+     * 生存模式：水晶在鼠标携带栏，扣 1 个
+     */
     private static void handleSurvival(ServerPlayer player, int slotIndex) {
         AbstractContainerMenu menu = player.containerMenu;
 
@@ -121,7 +127,9 @@ public class CombineCrystalPacket {
         playSuccess(player);
     }
 
-    /** 目标物品是否可结合；不可时给玩家提示 */
+    /**
+     * 目标物品是否可结合；不可时给玩家提示
+     */
     private static boolean checkTarget(ServerPlayer player, ItemStack target) {
         if (target.isEmpty()) {
             return false;

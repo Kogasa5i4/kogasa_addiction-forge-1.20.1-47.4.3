@@ -1,12 +1,12 @@
 {
-    "pages":  [
-                  {
-                      "text":  "book.kogasa_addiction.entry.structure_hut.page1",
-                      "type":  "patchouli:text"
-                  }
-              ],
-    "icon":  "minecraft:packed_ice",
-    "category":  "kogasa_addiction:structures",
-    "name":  "book.kogasa_addiction.entry.structure_hut.name",
-    "sortnum":  2
+  "pages": [
+    {
+      "text": "book.kogasa_addiction.entry.structure_hut.page1",
+      "type": "patchouli:text"
+    }
+  ],
+  "icon": "minecraft:packed_ice",
+  "category": "kogasa_addiction:structures",
+  "name": "book.kogasa_addiction.entry.structure_hut.name",
+  "sortnum": 2
 }

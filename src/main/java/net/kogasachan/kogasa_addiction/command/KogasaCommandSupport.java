@@ -37,7 +37,9 @@ public final class KogasaCommandSupport {
      */
     public static final Predicate<CommandSourceStack> ADMIN = source -> source.hasPermission(2);
 
-    /** 能力 id 补全 */
+    /**
+     * 能力 id 补全
+     */
     public static final SuggestionProvider<CommandSourceStack> ABILITY_SUGGESTIONS =
             (ctx, builder) -> {
                 for (KogasaAbility ability : KogasaAbility.values()) {
@@ -46,7 +48,9 @@ public final class KogasaCommandSupport {
                 return builder.buildFuture();
             };
 
-    /** 主手装备上"已有附魔"的 id 补全 */
+    /**
+     * 主手装备上"已有附魔"的 id 补全
+     */
     public static final SuggestionProvider<CommandSourceStack> EXISTING_ENCHANT_SUGGESTIONS =
             (ctx, builder) -> {
                 try {
@@ -92,6 +96,7 @@ public final class KogasaCommandSupport {
     public static Component getMaterialDisplayName(String id) {
         return KogasaDisplayHelper.getItemDisplayName(id);
     }
+
     /**
      * 通用"主手必须有物品"前置校验：不要求是本模组装备。
      * 主手为空时发 {@code error.empty_hand} 并返回 {@link ItemStack#EMPTY}。
@@ -107,7 +112,9 @@ public final class KogasaCommandSupport {
         return held;
     }
 
-    /** 给一行文本加上"点击复制整行"与悬停提示 */
+    /**
+     * 给一行文本加上"点击复制整行"与悬停提示
+     */
     public static Component copyable(Component line) {
         // 去掉 § 颜色码与首尾空白，复制到剪贴板的才是"有意义的部分"
         String plain = net.minecraft.ChatFormatting.stripFormatting(line.getString()).trim();
@@ -124,7 +131,9 @@ public final class KogasaCommandSupport {
         source.sendSuccess(() -> copyable(line), false);
     }
 
-    /** 兼容原来的 sendSuccess(supplier, false) 调用形态，便于批量替换 */
+    /**
+     * 兼容原来的 sendSuccess(supplier, false) 调用形态，便于批量替换
+     */
     public static void sendCopyable(CommandSourceStack source, Component line, boolean broadcast) {
         source.sendSuccess(() -> copyable(line), broadcast);
     }

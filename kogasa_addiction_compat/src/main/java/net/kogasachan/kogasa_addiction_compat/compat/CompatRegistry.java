@@ -30,7 +30,9 @@ public final class CompatRegistry {
     public static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(ForgeRegistries.ITEMS, KogasaCompatAddon.MODID);
 
-    /** 彩虹矿石：只在高空（默认 Y≥128）生成 */
+    /**
+     * 彩虹矿石：只在高空（默认 Y≥128）生成
+     */
     public static final RegistryObject<Block> RAINBOW_ORE = BLOCKS.register("rainbow_ore",
             () -> new DropExperienceBlock(
                     BlockBehaviour.Properties.copy(Blocks.IRON_ORE)
@@ -39,7 +41,9 @@ public final class CompatRegistry {
                             .sound(SoundType.STONE),
                     UniformInt.of(0, 2)));
 
-    /** 彩虹水晶：兼容层的“钥匙”物品 */
+    /**
+     * 彩虹水晶：兼容层的“钥匙”物品
+     */
     public static final RegistryObject<Item> RAINBOW_CRYSTAL = ITEMS.register("rainbow_crystal",
             () -> new RainbowCrystalItem(new Item.Properties().fireResistant()));
 

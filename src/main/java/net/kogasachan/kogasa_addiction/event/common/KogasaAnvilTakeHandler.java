@@ -39,7 +39,9 @@ public class KogasaAnvilTakeHandler {
         }
     }
 
-    /** 给玩家一个空铁桶（背包满则掉在脚下）。 */
+    /**
+     * 给玩家一个空铁桶（背包满则掉在脚下）。
+     */
     public static void giveBucket(ServerPlayer player) {
         ItemStack bucket = new ItemStack(Items.BUCKET);
         if (!player.getInventory().add(bucket)) {

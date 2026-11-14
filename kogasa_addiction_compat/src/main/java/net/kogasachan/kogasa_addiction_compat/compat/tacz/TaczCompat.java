@@ -2,12 +2,10 @@ package net.kogasachan.kogasa_addiction_compat.compat.tacz;
 
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.IGun;
-import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.BulletData;
 import com.tacz.guns.resource.pojo.data.gun.ExtraDamage;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
-import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.kogasachan.kogasa_addiction_compat.compat.KogasaCompat;
@@ -34,7 +32,13 @@ public final class TaczCompat {
     public static void register() {
         KogasaEquipmentHelper.registerReinforcementMatcher(TaczCompat::matchesMaterial);
         KogasaEquipmentHelper.registerAbsorptionListener(TaczCompat::absorb);
+        KogasaEquipmentHelper.registerAbsorptionCompleteListener(TaczCompat::refreshCache);
         KogasaEquipmentHelper.registerStatVariantResolver(TaczCompat::variantKey);
+        KogasaEquipmentHelper.registerRangedPredicate(TaczCompat::isGun);
+        KogasaEquipmentHelper.registerRangedPowerProvider(TaczCompat::rangedPower);
+        KogasaEquipmentHelper.registerRangedDrawProvider(TaczCompat::rangedDrawTicks);
+        net.kogasachan.kogasa_addiction.util.KogasaDisplayHelper
+                .registerDisplayNameResolver(TaczCompat::displayName);
         net.kogasachan.kogasa_addiction_compat.compat.KogasaCompat
                 .registerCombinablePredicate(TaczCompat::isGun);
     }
@@ -57,6 +61,91 @@ public final class TaczCompat {
         return id.isBlank() ? null : id;
     }
 
+    /**
+     * 吸收完成后主动让 TaCZ 重算该玩家手枪的附件缓存。
+     */
+    public static void refreshCache(ItemStack stack, net.minecraft.world.entity.player.Player player) {
+        if (player == null || !isGun(stack)) return;
+        com.tacz.guns.resource.modifier.AttachmentPropertyManager.postChangeEvent(player, stack);
+    }
+
+    public static void restoreOneAmmo(ItemStack stack) {
+        IGun gun = IGun.getIGunOrNull(stack);
+        GunData data = gunData(stack);
+        if (gun == null || data == null) return;
+        int max = com.tacz.guns.util.AttachmentDataUtils.getAmmoCountWithAttachment(stack, data);
+        int current = gun.getCurrentAmmoCount(stack);
+        if (current < max) {
+            gun.setCurrentAmmoCount(stack, current + 1);
+        }
+    }
+
+    public static net.minecraft.network.chat.Component displayName(String id) {
+        int hash = id.indexOf('#');
+        if (hash < 0) return null;
+        String variant = id.substring(hash + 1);
+        ResourceLocation gunId = ResourceLocation.tryParse(variant);
+        if (gunId == null) return null;
+        com.tacz.guns.client.resource.index.ClientGunIndex index =
+                com.tacz.guns.api.TimelessAPI.getClientGunIndex(gunId).orElse(null);
+        if (index != null && index.getName() != null && !index.getName().isBlank()) {
+            return net.minecraft.network.chat.Component.translatable(index.getName());
+        }
+        return null;
+    }
+
+    public static float displayArmorIgnore(ItemStack stack) {
+        GunData data = gunData(stack);
+        if (data == null || data.getBulletData() == null) return 0.0F;
+        ExtraDamage extra = data.getBulletData().getExtraDamage();
+        float base = extra == null ? 0.0F : extra.getArmorIgnore();
+        return (float) increase(stack, base, armorIgnoreBonus(stack));
+    }
+
+    public static float displayHeadshot(ItemStack stack) {
+        GunData data = gunData(stack);
+        if (data == null || data.getBulletData() == null) return 1.0F;
+        ExtraDamage extra = data.getBulletData().getExtraDamage();
+        float base = extra == null ? 1.0F : extra.getHeadShotMultiplier();
+        return (float) increase(stack, base, headshotBonus(stack));
+    }
+
+    public static float displayWeight(ItemStack stack) {
+        GunData data = gunData(stack);
+        if (data == null) return 0.0F;
+        return (float) decrease(stack, data.getWeight(), weightBonus(stack));
+    }
+
+    public static int displayRpm(ItemStack stack) {
+        GunData data = gunData(stack);
+        if (data == null) return 0;
+        return (int) Math.round(increase(stack, data.getRoundsPerMinute(), rpmBonus(stack)));
+    }
+
+    public static int displayAmmo(ItemStack stack) {
+        GunData data = gunData(stack);
+        if (data == null) return 0;
+        int base = com.tacz.guns.util.AttachmentDataUtils.getAmmoCountWithAttachment(stack, data);
+        return base + (int) Math.round(ammoBonus(stack, base,
+                com.tacz.guns.util.AttachmentDataUtils.getMagExtendLevel(stack, data)));
+    }
+
+    public static float displayDamage(ItemStack stack) {
+        GunData data = gunData(stack);
+        if (data == null || data.getBulletData() == null) return 0.0F;
+        return (float) (data.getBulletData().getDamageAmount() * damageFactor(stack));
+    }
+
+    public static double rangedPower(ItemStack stack) {
+        return baseDamage(stack);
+    }
+
+    public static double rangedDrawTicks(ItemStack stack) {
+        GunData data = gunData(stack);
+        if (data == null) return 0.0D;
+        return Math.max(1.0D, data.getDrawTime() * 20.0D);
+    }
+
     public static boolean hasData(ItemStack stack) {
         return !read(stack).isEmpty();
     }
@@ -70,7 +159,9 @@ public final class TaczCompat {
         return index == null ? null : index.getGunData();
     }
 
-    /** Anvil 吸收后把右侧枪械基础值的比例累加到左侧枪。 */
+    /**
+     * Anvil 吸收后把右侧枪械基础值的比例累加到左侧枪。
+     */
     public static void absorb(ItemStack result, ItemStack right) {
         if (!isGun(result) || !isGun(right)) return;
         if (!KogasaCompat.isCompatible(result)) return;
@@ -103,33 +194,76 @@ public final class TaczCompat {
     }
 
     public static double growth(ItemStack stack) {
-        return Math.max(0.0D, Math.min(1.0D, KogasaEquipmentData.getGrowth(stack)));
+        return Math.max(0.0D, KogasaEquipmentData.getGrowth(stack));
     }
 
-    /** 增加类属性的成长：满成长总量为当前累计值的 2x。 */
+    public static double growthProgress(ItemStack stack) {
+        double max = net.kogasachan.kogasa_addiction.Config.MAX_GROWTH.get();
+        if (max <= 0.0D) return 0.0D;
+        return Math.max(0.0D, Math.min(1.0D, growth(stack) / max));
+    }
+
+    /**
+     * 增加类属性的成长：满成长总量为当前累计值的 2x。
+     */
     public static double increase(ItemStack stack, double base, double bonus) {
-        return (base + bonus) * (1.0D + growth(stack));
+        // 小伞的“综合值”包含强化数、成长和文文新闻值；不能只乘 growth。
+        return (base + bonus) * KogasaEquipmentHelper.getTotalMultiplier(stack);
     }
 
-    /** 降低类属性的成长：满成长总量为当前累计值的 0.5x。 */
+    /**
+     * 降低类属性的成长：满成长总量为当前累计值的 0.5x。
+     */
     public static double decrease(ItemStack stack, double base, double bonus) {
-        return Math.max(0.0D, (base + bonus) * (1.0D - 0.5D * growth(stack)));
+        return Math.max(0.0D, (base + bonus) * (1.0D - 0.5D * growthProgress(stack)));
     }
 
-    /** 弹匣：满成长总量为当前累计值的 10x。 */
+    /**
+     * 弹匣：满成长总量为当前累计值的 10x。
+     */
     public static double ammo(ItemStack stack, double base, double bonus) {
-        return Math.max(0.0D, (base + bonus) * (1.0D + 9.0D * growth(stack)));
+        return Math.max(0.0D, (base + bonus) * (1.0D + 9.0D * growthProgress(stack)));
     }
 
-    public static double rpmBonus(ItemStack stack) { return read(stack).rpm; }
-    public static double armorIgnoreBonus(ItemStack stack) { return read(stack).armorIgnore; }
-    public static double headshotBonus(ItemStack stack) { return read(stack).headshot; }
-    public static double speedBonus(ItemStack stack) { return read(stack).speed; }
-    public static double pierceBonus(ItemStack stack) { return read(stack).pierce; }
-    public static double gravityBonus(ItemStack stack) { return read(stack).gravity; }
-    public static double weightBonus(ItemStack stack) { return read(stack).weight; }
+    public static double rpmBonus(ItemStack stack) {
+        return read(stack).rpm;
+    }
 
-    /** 枪械基础伤害（不含附件）。 */
+    public static double armorIgnoreBonus(ItemStack stack) {
+        return read(stack).armorIgnore;
+    }
+
+    public static double headshotBonus(ItemStack stack) {
+        return read(stack).headshot;
+    }
+
+    public static double speedBonus(ItemStack stack) {
+        return read(stack).speed;
+    }
+
+    public static double pierceBonus(ItemStack stack) {
+        return read(stack).pierce;
+    }
+
+    public static double gravityBonus(ItemStack stack) {
+        return read(stack).gravity;
+    }
+
+    public static double weightBonus(ItemStack stack) {
+        return read(stack).weight;
+    }
+
+    /**
+     * 后坐力按幅值降低：正数减、负数加，避免负值被减成更大。
+     */
+    public static float reduceRecoil(float value, double amount) {
+        if (value >= 0.0F) return Math.max(0.0F, (float) (value - amount));
+        return Math.min(0.0F, (float) (value + amount));
+    }
+
+    /**
+     * 枪械基础伤害（不含附件）。
+     */
     public static double baseDamage(ItemStack stack) {
         GunData data = gunData(stack);
         return data == null || data.getBulletData() == null ? 0.0D : data.getBulletData().getDamageAmount();
@@ -152,7 +286,9 @@ public final class TaczCompat {
         return meleeDamage(stack) / base;
     }
 
-    /** 在 TaCZ 已算出的容量基础上，叠加吸收值并应用成长。 */
+    /**
+     * 在 TaCZ 已算出的容量基础上，叠加吸收值并应用成长。
+     */
     public static double ammoBonus(ItemStack stack, int baseCapacity, int magLevel) {
         TaczData data = read(stack);
         if (data.isEmpty()) return 0.0D;
@@ -162,7 +298,9 @@ public final class TaczCompat {
         return Math.max(0.0D, target - baseCapacity);
     }
 
-    /** 子弹重力：越低越强，满成长最多 /2。 */
+    /**
+     * 子弹重力：越低越强，满成长最多 /2。
+     */
     public static float applyGravity(ItemStack stack, float base) {
         TaczData data = read(stack);
         if (data.isEmpty()) return base;

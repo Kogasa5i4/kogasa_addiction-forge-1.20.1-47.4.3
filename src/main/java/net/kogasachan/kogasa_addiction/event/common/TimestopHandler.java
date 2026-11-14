@@ -65,12 +65,16 @@ public class TimestopHandler {
      */
     private static final List<ServerPlayer> ACTIVE_OWNERS = new ArrayList<>();
 
-    /** 本 tick 生效的时停半径平方（配置每 tick 读一次，避免每个实体都读） */
+    /**
+     * 本 tick 生效的时停半径平方（配置每 tick 读一次，避免每个实体都读）
+     */
     private static double activeRadiusSquared = 0.0D;
 
     private static final String FROZEN_TAG = "KogasaTimeStopFrozen";
 
-    /** 玩家持久数据：下一次允许发动时停的世界时间（gameTime，0 表示从未用过） */
+    /**
+     * 玩家持久数据：下一次允许发动时停的世界时间（gameTime，0 表示从未用过）
+     */
     private static final String TAG_TIMESTOP_READY_AT = "KogasaTimestopReadyAt";
 
     private TimestopHandler() {
@@ -78,12 +82,16 @@ public class TimestopHandler {
 
     // ==================== 查询接口（供 mixin / 其它 handler 使用） ====================
 
-    /** 当前是否有任意玩家处在时停中 */
+    /**
+     * 当前是否有任意玩家处在时停中
+     */
     public static boolean isTimestopActive() {
         return !SESSIONS.isEmpty();
     }
 
-    /** 该玩家自己是否正在时停中 */
+    /**
+     * 该玩家自己是否正在时停中
+     */
     public static boolean isTimestopActiveFor(UUID playerId) {
         return playerId != null && SESSIONS.containsKey(playerId);
     }
@@ -132,7 +140,7 @@ public class TimestopHandler {
         if (now < readyAt) {
             long remainSeconds = (readyAt - now + 19L) / 20L;
             player.displayClientMessage(Component.translatable(
-                    "message.kogasa_addiction.timestop.cooldown", remainSeconds)
+                            "message.kogasa_addiction.timestop.cooldown", remainSeconds)
                     .withStyle(ChatFormatting.RED), true);
             return;
         }

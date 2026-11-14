@@ -10,13 +10,13 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.registries.ForgeRegistries;
+import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.registries.ForgeRegistries;
-import top.theillusivec4.curios.api.CuriosApi;
 
 /**
  * 兼容层判定入口。
@@ -31,7 +31,9 @@ import top.theillusivec4.curios.api.CuriosApi;
  */
 public final class KogasaCompat {
 
-    /** 物品根标签上的兼容标记（boolean） */
+    /**
+     * 物品根标签上的兼容标记（boolean）
+     */
     public static final String MARKER_KEY = "KogasaCompat";
 
     private KogasaCompat() {
@@ -42,11 +44,15 @@ public final class KogasaCompat {
      * 避免在 {@code ItemStack#getMaxDamage} 之类的早期调用里炸掉。
      */
     private static final List<Predicate<ItemStack>> EXTRA_COMPATIBILITY = new ArrayList<>();
-    /** 只允许彩虹水晶结合、但不自动兼容的装备（例如 TaCZ 枪械）。 */
+    /**
+     * 只允许彩虹水晶结合、但不自动兼容的装备（例如 TaCZ 枪械）。
+     */
     private static final List<Predicate<ItemStack>> COMBINABLE_PREDICATES = new ArrayList<>();
 
     /** 附属注册额外的“自动兼容”判定（例如 SlashBlade 的 bladeState）。 */
-    /** 附属注册“可被彩虹水晶结合”的判定；不会自动变成兼容物品。 */
+    /**
+     * 附属注册“可被彩虹水晶结合”的判定；不会自动变成兼容物品。
+     */
     public static void registerCombinablePredicate(Predicate<ItemStack> predicate) {
         if (predicate != null) COMBINABLE_PREDICATES.add(predicate);
     }
@@ -63,7 +69,9 @@ public final class KogasaCompat {
         }
     }
 
-    /** 是否应用本模组机制（本模组装备也返回 true，但总开关关闭时一律 false） */
+    /**
+     * 是否应用本模组机制（本模组装备也返回 true，但总开关关闭时一律 false）
+     */
     public static boolean isCompatible(ItemStack stack) {
         if (stack.isEmpty() || !isEnabled()) {
             return false;
@@ -101,11 +109,11 @@ public final class KogasaCompat {
             return false;
         }
         for (Predicate<ItemStack> predicate : COMBINABLE_PREDICATES) {
-        try {
-        if (predicate.test(stack)) return true;
-        } catch (RuntimeException ignored) {
+            try {
+                if (predicate.test(stack)) return true;
+            } catch (RuntimeException ignored) {
+            }
         }
-          }
 
         if (stack.getItem() instanceof IKogasaEquipment || hasMarker(stack)) {
             return false;
@@ -145,7 +153,9 @@ public final class KogasaCompat {
         return tag != null && tag.getBoolean(MARKER_KEY);
     }
 
-    /** 给物品打上兼容标记（彩虹水晶结合时调用） */
+    /**
+     * 给物品打上兼容标记（彩虹水晶结合时调用）
+     */
     public static void markCompatible(ItemStack stack) {
         if (stack.isEmpty()) {
             return;
@@ -153,7 +163,9 @@ public final class KogasaCompat {
         stack.getOrCreateTag().putBoolean(MARKER_KEY, true);
     }
 
-    /** 这件非本模组物品上是否有本模组添加的数据（标记/强化/成长/能力/弹药）。 */
+    /**
+     * 这件非本模组物品上是否有本模组添加的数据（标记/强化/成长/能力/弹药）。
+     */
     public static boolean hasKogasaData(ItemStack stack) {
         if (stack.isEmpty()) {
             return false;
@@ -163,7 +175,9 @@ public final class KogasaCompat {
                 || KogasaAbilityData.hasData(stack);
     }
 
-    /** 删除本模组给非本模组物品添加的全部 NBT（恢复原始状态）。 */
+    /**
+     * 删除本模组给非本模组物品添加的全部 NBT（恢复原始状态）。
+     */
     public static void clearAddedData(ItemStack stack) {
         if (stack.isEmpty()) {
             return;

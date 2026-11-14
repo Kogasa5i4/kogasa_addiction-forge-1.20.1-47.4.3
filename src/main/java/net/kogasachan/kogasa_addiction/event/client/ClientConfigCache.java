@@ -22,12 +22,16 @@ public final class ClientConfigCache {
     private ClientConfigCache() {
     }
 
-    /** 由 {@code ConfigSyncPacket} 调用，替换整份缓存 */
+    /**
+     * 由 {@code ConfigSyncPacket} 调用，替换整份缓存
+     */
     public static void accept(Map<String, String> values) {
         synced = new HashMap<>(values);
     }
 
-    /** 有同步值时优先用同步值，否则回退到本地配置 */
+    /**
+     * 有同步值时优先用同步值，否则回退到本地配置
+     */
     @SuppressWarnings("unchecked")
     public static <T> T get(ForgeConfigSpec.ConfigValue<T> value) {
         String raw = synced.get(ConfigEntries.pathOf(value));

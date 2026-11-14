@@ -15,7 +15,9 @@ import top.theillusivec4.curios.api.SlotContext;
 
 import java.util.*;
 
-/** 从强化材料读取可吸收属性；物品 modifier 是相对 0 的增量，不涉及实体默认值。 */
+/**
+ * 从强化材料读取可吸收属性；物品 modifier 是相对 0 的增量，不涉及实体默认值。
+ */
 public final class KogasaAttributeAbsorption {
 
     public enum Category {
@@ -33,7 +35,9 @@ public final class KogasaAttributeAbsorption {
                          List<Multiplier> multipliers) {
     }
 
-    /** 汇总材料所有装备槽的属性 modifier；同一属性取最大值，避免跨槽重复。 */
+    /**
+     * 汇总材料所有装备槽的属性 modifier；同一属性取最大值，避免跨槽重复。
+     */
     @SuppressWarnings("deprecation")
     public static Result collect(ItemStack material, Category category, LivingEntity wearer) {
         Map<ResourceLocation, Double> additive = new LinkedHashMap<>();
@@ -94,7 +98,9 @@ public final class KogasaAttributeAbsorption {
         return KogasaIdListMatcher.matches(id, list);
     }
 
-    /** 按 attributeAbsorbScale 取倍率；第一个匹配的 pattern 生效，默认 1.0。 */
+    /**
+     * 按 attributeAbsorbScale 取倍率；第一个匹配的 pattern 生效，默认 1.0。
+     */
     public static double scale(ResourceLocation id) {
         for (String raw : Config.ATTRIBUTE_ABSORB_SCALE.get()) {
             if (raw == null) continue;

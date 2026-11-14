@@ -1,36 +1,36 @@
 {
-    "pages":  [
-                  {
-                      "text":  "book.kogasa_addiction.entry.numbers.page1",
-                      "type":  "patchouli:text"
-                  },
-                  {
-                      "text":  "book.kogasa_addiction.entry.numbers.page2",
-                      "type":  "patchouli:text"
-                  },
-                  {
-                      "text":  "book.kogasa_addiction.entry.numbers.page3",
-                      "type":  "patchouli:text"
-                  },
-                  {
-                      "text":  "book.kogasa_addiction.entry.numbers.page4",
-                      "type":  "patchouli:text"
-                  },
-                  {
-                      "text":  "book.kogasa_addiction.entry.numbers.page5",
-                      "type":  "patchouli:text"
-                  },
-                  {
-                      "text":  "book.kogasa_addiction.entry.numbers.page6",
-                      "type":  "patchouli:text"
-                  },
-                  {
-                      "text":  "book.kogasa_addiction.entry.numbers.page7",
-                      "type":  "patchouli:text"
-                  }
-              ],
-    "icon":  "minecraft:book",
-    "category":  "kogasa_addiction:growth",
-    "name":  "book.kogasa_addiction.entry.numbers.name",
-    "sortnum":  10
+  "pages": [
+    {
+      "text": "book.kogasa_addiction.entry.numbers.page1",
+      "type": "patchouli:text"
+    },
+    {
+      "text": "book.kogasa_addiction.entry.numbers.page2",
+      "type": "patchouli:text"
+    },
+    {
+      "text": "book.kogasa_addiction.entry.numbers.page3",
+      "type": "patchouli:text"
+    },
+    {
+      "text": "book.kogasa_addiction.entry.numbers.page4",
+      "type": "patchouli:text"
+    },
+    {
+      "text": "book.kogasa_addiction.entry.numbers.page5",
+      "type": "patchouli:text"
+    },
+    {
+      "text": "book.kogasa_addiction.entry.numbers.page6",
+      "type": "patchouli:text"
+    },
+    {
+      "text": "book.kogasa_addiction.entry.numbers.page7",
+      "type": "patchouli:text"
+    }
+  ],
+  "icon": "minecraft:book",
+  "category": "kogasa_addiction:growth",
+  "name": "book.kogasa_addiction.entry.numbers.name",
+  "sortnum": 10
 }

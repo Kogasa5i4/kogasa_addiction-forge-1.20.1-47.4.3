@@ -9,7 +9,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** 创造模式背包自己重写了 slotClicked，必须在子类单独拦截。 */
+/**
+ * 创造模式背包自己重写了 slotClicked，必须在子类单独拦截。
+ */
 @Mixin(CreativeModeInventoryScreen.class)
 public abstract class CreativeModeInventoryScreenMixin {
 

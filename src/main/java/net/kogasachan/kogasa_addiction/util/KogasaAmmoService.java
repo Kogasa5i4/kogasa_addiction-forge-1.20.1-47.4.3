@@ -29,7 +29,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-/** 弓弩共用弹药：装载、判定、发射。 */
+/**
+ * 弓弩共用弹药：装载、判定、发射。
+ */
 public final class KogasaAmmoService {
 
     private static final String YH = "youkaishomecoming";
@@ -37,7 +39,9 @@ public final class KogasaAmmoService {
     private KogasaAmmoService() {
     }
 
-    /** 铁砧装载：药水、烟花、妖归弹幕/激光/符卡。 */
+    /**
+     * 铁砧装载：药水、烟花、妖归弹幕/激光/符卡。
+     */
     public static boolean tryLoad(ItemStack left, ItemStack right, AnvilUpdateEvent event) {
         if (right.isEmpty()) return false;
 
@@ -84,7 +88,9 @@ public final class KogasaAmmoService {
         return true;
     }
 
-    /** 妖归弹药分类；非妖归物品或未安装妖归时返回 null。 */
+    /**
+     * 妖归弹药分类；非妖归物品或未安装妖归时返回 null。
+     */
     public static KogasaAbilityData.AmmoType yhAmmoType(ItemStack stack) {
         if (stack.isEmpty() || !ModList.get().isLoaded(YH)) return null;
         String className = stack.getItem().getClass().getName();
@@ -138,7 +144,9 @@ public final class KogasaAmmoService {
                 || type == KogasaAbilityData.AmmoType.SPELL;
     }
 
-    /** 符卡固定单发；弹幕/激光按弓弩多发数。 */
+    /**
+     * 符卡固定单发；弹幕/激光按弓弩多发数。
+     */
     public static int shotCount(ItemStack weapon) {
         KogasaAbilityData.AmmoType type = KogasaAbilityData.getAmmoType(weapon);
         return type == KogasaAbilityData.AmmoType.YH_SPELL
@@ -213,6 +221,7 @@ public final class KogasaAmmoService {
             return false;
         }
     }
+
     public enum FireResult {IMMEDIATE, PROJECTILE, FAIL}
 
     public static FireResult fireAmmo(ItemStack weapon, ServerPlayer player) {
@@ -247,7 +256,9 @@ public final class KogasaAmmoService {
         return FireResult.IMMEDIATE;
     }
 
-    /** 兼容旧调用：只有立即释放才算 true。 */
+    /**
+     * 兼容旧调用：只有立即释放才算 true。
+     */
     public static boolean fireYh(ItemStack weapon, ServerPlayer player) {
         return fireAmmo(weapon, player) == FireResult.IMMEDIATE;
     }
@@ -326,13 +337,13 @@ public final class KogasaAmmoService {
     private static void showSoulInsufficient(ServerPlayer player) {
         // 复用 Goety 本体的提示文案（仪式与聚晶共用同一句“没有足够的灵魂能量”）。
         player.displayClientMessage(net.minecraft.network.chat.Component.translatable(
-                "info.goety.ritual.noSouls.fail")
+                        "info.goety.ritual.noSouls.fail")
                 .withStyle(net.minecraft.ChatFormatting.RED), true);
     }
 
     private static void showTargetRequired(ServerPlayer player) {
         player.displayClientMessage(net.minecraft.network.chat.Component.translatable(
-                "message.kogasa_addiction.spell.requires_target")
+                        "message.kogasa_addiction.spell.requires_target")
                 .withStyle(net.minecraft.ChatFormatting.RED), true);
     }
 
@@ -389,7 +400,7 @@ public final class KogasaAmmoService {
             if (supplier == null) return false;
             Class<?> container = Class.forName("dev.xkmc.youkaishomecoming.content.spell.item.SpellContainer");
             container.getMethod("castSpell", ServerPlayer.class, java.util.function.Supplier.class,
-                    net.minecraft.world.entity.LivingEntity.class)
+                            net.minecraft.world.entity.LivingEntity.class)
                     .invoke(null, player, supplier, target);
             return true;
         } catch (ReflectiveOperationException | RuntimeException e) {
@@ -468,9 +479,9 @@ public final class KogasaAmmoService {
         // 必须走 attemptInitiateCast：直接 castSpell 只会进入内部状态，不会真正执行
         // onCast/onServerCastComplete，所以会出现“扣了蓝但没效果”。
         boolean ok = (boolean) spell.getClass().getMethod("attemptInitiateCast",
-                ItemStack.class, int.class, Level.class,
-                net.minecraft.world.entity.player.Player.class,
-                sourceType, boolean.class, String.class)
+                        ItemStack.class, int.class, Level.class,
+                        net.minecraft.world.entity.player.Player.class,
+                        sourceType, boolean.class, String.class)
                 .invoke(spell, ammo, level, player.level(), player, source, false, "");
         return ok;
     }
@@ -479,7 +490,7 @@ public final class KogasaAmmoService {
         Object spell = ammo.getItem().getClass().getMethod("getSpell").invoke(ammo.getItem());
         if (!player.isCreative()) {
             int cost = (int) spell.getClass().getMethod("soulCost",
-                    net.minecraft.world.entity.LivingEntity.class, ItemStack.class)
+                            net.minecraft.world.entity.LivingEntity.class, ItemStack.class)
                     .invoke(spell, player, ammo);
             Class<?> se = Class.forName("com.Polarice3.Goety.utils.SEHelper");
             int souls = (int) se.getMethod("getSESouls", net.minecraft.world.entity.player.Player.class)
@@ -496,7 +507,7 @@ public final class KogasaAmmoService {
         Object stats = spell.getClass().getMethod("defaultStats").invoke(spell);
         Class<?> statType = Class.forName("com.Polarice3.Goety.common.magic.SpellStat");
         spell.getClass().getMethod("SpellResult", net.minecraft.server.level.ServerLevel.class,
-                net.minecraft.world.entity.LivingEntity.class, ItemStack.class, statType)
+                        net.minecraft.world.entity.LivingEntity.class, ItemStack.class, statType)
                 .invoke(spell, player.level(), player, ammo, stats);
         return true;
     }
@@ -505,9 +516,9 @@ public final class KogasaAmmoService {
         Object caster = ammo.getItem().getClass().getMethod("getSpellCaster", ItemStack.class)
                 .invoke(ammo.getItem(), ammo);
         Object result = caster.getClass().getMethod("castSpell", Level.class,
-                net.minecraft.world.entity.LivingEntity.class,
-                net.minecraft.world.InteractionHand.class,
-                net.minecraft.network.chat.Component.class)
+                        net.minecraft.world.entity.LivingEntity.class,
+                        net.minecraft.world.InteractionHand.class,
+                        net.minecraft.network.chat.Component.class)
                 .invoke(caster, player.level(), player,
                         net.minecraft.world.InteractionHand.MAIN_HAND,
                         net.minecraft.network.chat.Component.empty());
@@ -518,7 +529,7 @@ public final class KogasaAmmoService {
 
     private static final TagKey<Item> REQUIRES_TARGET =
             TagKey.create(Registries.ITEM,
-                ResourceLocation.fromNamespaceAndPath("kogasa_addiction", "requires_target_spell_ammo"));
+                    ResourceLocation.fromNamespaceAndPath("kogasa_addiction", "requires_target_spell_ammo"));
 
     public static boolean requiresTargetFor(ItemStack ammo) {
         return requiresTarget(ammo);

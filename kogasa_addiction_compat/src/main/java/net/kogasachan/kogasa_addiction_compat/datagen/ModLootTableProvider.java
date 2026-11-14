@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/** 方块战利品表：彩虹矿石套用铁矿掉落。 */
+/**
+ * 方块战利品表：彩虹矿石套用铁矿掉落。
+ */
 public class ModLootTableProvider extends LootTableProvider {
 
     public ModLootTableProvider(PackOutput output) {

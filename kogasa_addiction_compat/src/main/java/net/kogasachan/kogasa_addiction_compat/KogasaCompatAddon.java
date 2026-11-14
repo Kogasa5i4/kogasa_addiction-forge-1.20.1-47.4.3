@@ -1,11 +1,7 @@
 package net.kogasachan.kogasa_addiction_compat;
 
 import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
-import net.kogasachan.kogasa_addiction_compat.compat.CompatConfig;
-import net.kogasachan.kogasa_addiction_compat.compat.CompatConfigEntries;
-import net.kogasachan.kogasa_addiction_compat.compat.CompatRegistry;
-import net.kogasachan.kogasa_addiction_compat.compat.KogasaCompat;
-import net.kogasachan.kogasa_addiction_compat.compat.SlashBladeCompat;
+import net.kogasachan.kogasa_addiction_compat.compat.*;
 import net.kogasachan.kogasa_addiction_compat.network.CompatNetwork;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;

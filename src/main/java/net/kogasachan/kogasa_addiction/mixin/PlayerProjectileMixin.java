@@ -9,7 +9,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** 妖归弹幕/符卡装在弩上时，让原版弩把“已装填”当成有箭，实际发射由事件替换。 */
+/**
+ * 妖归弹幕/符卡装在弩上时，让原版弩把“已装填”当成有箭，实际发射由事件替换。
+ */
 @Mixin(Player.class)
 public abstract class PlayerProjectileMixin {
 

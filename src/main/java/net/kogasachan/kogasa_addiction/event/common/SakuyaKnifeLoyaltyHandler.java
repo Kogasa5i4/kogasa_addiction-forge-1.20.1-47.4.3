@@ -35,7 +35,9 @@ public final class SakuyaKnifeLoyaltyHandler {
     private SakuyaKnifeLoyaltyHandler() {
     }
 
-    /** 飞刀掉出世界时的回收 */
+    /**
+     * 飞刀掉出世界时的回收
+     */
     @SubscribeEvent
     public static void onEntityLeaveLevel(EntityLeaveLevelEvent event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
@@ -49,7 +51,9 @@ public final class SakuyaKnifeLoyaltyHandler {
         giveBack(owner, trident.tridentItem.copy());
     }
 
-    /** 主人死亡：先收回所有在外的飞刀，再交给正常的死亡掉落流程处理 */
+    /**
+     * 主人死亡：先收回所有在外的飞刀，再交给正常的死亡掉落流程处理
+     */
     @SubscribeEvent
     public static void onOwnerDeath(LivingDeathEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
@@ -57,7 +61,9 @@ public final class SakuyaKnifeLoyaltyHandler {
         returnAllKnives(player, level);
     }
 
-    /** 主人换维度：收回留在旧维度的飞刀 */
+    /**
+     * 主人换维度：收回留在旧维度的飞刀
+     */
     @SubscribeEvent
     public static void onOwnerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
@@ -71,7 +77,9 @@ public final class SakuyaKnifeLoyaltyHandler {
         }
     }
 
-    /** 把这一维度里该玩家射出、尚未收回的忠诚飞刀全部收回 */
+    /**
+     * 把这一维度里该玩家射出、尚未收回的忠诚飞刀全部收回
+     */
     private static void returnAllKnives(ServerPlayer owner, ServerLevel level) {
         // getAllEntities 只遍历已加载实体，不会触发区块加载
         for (Entity entity : level.getAllEntities()) {

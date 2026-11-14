@@ -11,7 +11,9 @@ import net.minecraft.world.item.Item;
  */
 public final class CompatTags {
 
-    /** 允许吃兼容机制的工具/武器/护甲；默认含原版工具武器与护甲标签 */
+    /**
+     * 允许吃兼容机制的工具/武器/护甲；默认含原版工具武器与护甲标签
+     */
     public static final TagKey<Item> COMPATIBLE = TagKey.create(Registries.ITEM,
             ResourceLocation.fromNamespaceAndPath(KogasaCompatAddon.MODID, "compatible"));
 

@@ -46,31 +46,39 @@ public final class VillagerTradeHandler {
       模组构造阶段物品尚未注册会抛 "Registry Object not present"
       （datagen/启动都会先触发本类的订阅者扫描）。解析延迟到 getOffer。
      */
-    /** 盔甲匠：天子护甲四件 */
+    /**
+     * 盔甲匠：天子护甲四件
+     */
     @SuppressWarnings("unchecked")
-    private static final RegistryObject<Item>[] ARMOR_POOL = new RegistryObject[] {
+    private static final RegistryObject<Item>[] ARMOR_POOL = new RegistryObject[]{
             ModItems.TENSHI_HELMET,
             ModItems.TENSHI_CHESTPLATE,
             ModItems.TENSHI_LEGGINGS,
             ModItems.TENSHI_BOOTS
     };
-    /** 武器匠：剑、斧 */
+    /**
+     * 武器匠：剑、斧
+     */
     @SuppressWarnings("unchecked")
-    private static final RegistryObject<Item>[] SWORD_AXE_POOL = new RegistryObject[] {
+    private static final RegistryObject<Item>[] SWORD_AXE_POOL = new RegistryObject[]{
             ModItems.KOGASA_SWORD,
             ModItems.KOGASA_AXE
     };
-    /** 工具匠：镐、斧、锹、锄 */
+    /**
+     * 工具匠：镐、斧、锹、锄
+     */
     @SuppressWarnings("unchecked")
-    private static final RegistryObject<Item>[] TOOL_POOL = new RegistryObject[] {
+    private static final RegistryObject<Item>[] TOOL_POOL = new RegistryObject[]{
             ModItems.KOGASA_PICKAXE,
             ModItems.KOGASA_AXE,
             ModItems.KOGASA_SHOVEL,
             ModItems.KOGASA_HOE
     };
-    /** 制箭师：弓、弩 */
+    /**
+     * 制箭师：弓、弩
+     */
     @SuppressWarnings("unchecked")
-    private static final RegistryObject<Item>[] BOW_CROSSBOW_POOL = new RegistryObject[] {
+    private static final RegistryObject<Item>[] BOW_CROSSBOW_POOL = new RegistryObject[]{
             ModItems.AYA_BOW,
             ModItems.AYA_CROSSBOW
     };
@@ -114,14 +122,18 @@ public final class VillagerTradeHandler {
         return event.getTrades().computeIfAbsent(level, k -> new ArrayList<>());
     }
 
-    /** 读取配置价格倍率并换算绿宝石数量（最少 1 个）。 */
+    /**
+     * 读取配置价格倍率并换算绿宝石数量（最少 1 个）。
+     */
     private static int emeralds(int base) {
         return Math.max(1, (int) Math.round(base * Config.VILLAGER_TRADE_PRICE_MULTIPLIER.get()));
     }
 
     // ==================== 交易实现 ====================
 
-    /** 锭 + 中量绿宝石 → 随机装备（职业限定）+ 对应能力 */
+    /**
+     * 锭 + 中量绿宝石 → 随机装备（职业限定）+ 对应能力
+     */
     private record IngotForAbilityEquipment(Item ingot, int baseEmeralds,
                                             RegistryObject<Item>[] pool,
                                             KogasaAbility ability, int maxUses, int xp)
@@ -137,7 +149,9 @@ public final class VillagerTradeHandler {
         }
     }
 
-    /** 绿宝石 → 文文箭若干（无能力，量大） */
+    /**
+     * 绿宝石 → 文文箭若干（无能力，量大）
+     */
     private record EmeraldForAyaArrows(int baseEmeralds, int count, int maxUses, int xp)
             implements VillagerTrades.ItemListing {
         @Override
@@ -149,12 +163,14 @@ public final class VillagerTradeHandler {
         }
     }
 
-    /** 少量绿宝石 + 随机锭 → 随机封印装备（能力随机，不一定对应） */
+    /**
+     * 少量绿宝石 + 随机锭 → 随机封印装备（能力随机，不一定对应）
+     */
     private record IngotAndEmeraldForSealedEquipment(int baseEmeralds, int maxUses, int xp)
             implements VillagerTrades.ItemListing {
 
         @SuppressWarnings("unchecked")
-        private static final RegistryObject<Item>[] INGOTS = new RegistryObject[] {
+        private static final RegistryObject<Item>[] INGOTS = new RegistryObject[]{
                 ModItems.KOGASA_INGOT,
                 ModItems.AYA_INGOT,
                 ModItems.CIRNO_INGOT,
@@ -174,7 +190,9 @@ public final class VillagerTradeHandler {
         }
     }
 
-    /** 绿宝石 → 随机"可酿造"原版药水文文箭（排除吸收/幸运等非酿造药水与无效果药水） */
+    /**
+     * 绿宝石 → 随机"可酿造"原版药水文文箭（排除吸收/幸运等非酿造药水与无效果药水）
+     */
     private record EmeraldForRandomTippedAyaArrow(int baseEmeralds, int count, int maxUses, int xp)
             implements VillagerTrades.ItemListing {
 

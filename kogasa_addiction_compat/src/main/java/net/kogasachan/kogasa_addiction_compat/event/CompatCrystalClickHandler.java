@@ -82,7 +82,9 @@ public final class CompatCrystalClickHandler {
         return true;
     }
 
-    /** 熔岩桶右键：清掉非本模组物品上的本模组 NBT，恢复原始状态。 */
+    /**
+     * 熔岩桶右键：清掉非本模组物品上的本模组 NBT，恢复原始状态。
+     */
     private static boolean tryClearSlot(AbstractContainerScreen<?> screen, Slot slot) {
         ItemStack target = slot.getItem();
         if (target.isEmpty() || target.getItem() instanceof IKogasaEquipment) {

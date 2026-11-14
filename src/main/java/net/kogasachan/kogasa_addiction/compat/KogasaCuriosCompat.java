@@ -7,7 +7,9 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
-/** Curios 是可选依赖；真正注册放在另一个类里，避免未安装时加载 Curios 类型。 */
+/**
+ * Curios 是可选依赖；真正注册放在另一个类里，避免未安装时加载 Curios 类型。
+ */
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class KogasaCuriosCompat {
 

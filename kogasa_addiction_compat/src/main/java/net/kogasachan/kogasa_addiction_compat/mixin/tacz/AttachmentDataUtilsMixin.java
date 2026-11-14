@@ -9,7 +9,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** 把 Kogasa 吸收的弹匣容量叠加到 TaCZ 的换弹容量计算上。 */
+/**
+ * 把 Kogasa 吸收的弹匣容量叠加到 TaCZ 的换弹容量计算上。
+ */
 @Mixin(AttachmentDataUtils.class)
 public abstract class AttachmentDataUtilsMixin {
 

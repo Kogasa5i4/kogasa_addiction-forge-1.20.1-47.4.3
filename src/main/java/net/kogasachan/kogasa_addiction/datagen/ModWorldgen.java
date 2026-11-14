@@ -36,7 +36,9 @@ import java.util.Optional;
  */
 public final class ModWorldgen {
 
-    /** 结构定义：名称、生物群系（tag 以 # 开头）、起始高度、是否投影到 WORLD_SURFACE_WG */
+    /**
+     * 结构定义：名称、生物群系（tag 以 # 开头）、起始高度、是否投影到 WORLD_SURFACE_WG
+     */
     private record Def(String name, String biome, int startHeight, boolean projectToSurface,
                        int spacing, int separation, int salt) {
     }

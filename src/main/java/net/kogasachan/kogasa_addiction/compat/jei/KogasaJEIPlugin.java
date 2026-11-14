@@ -15,10 +15,10 @@ import net.kogasachan.kogasa_addiction.datagen.ModItemTagsProvider;
 import net.kogasachan.kogasa_addiction.item.IKogasaEquipment;
 import net.kogasachan.kogasa_addiction.item.KogasaAbilityIngotItem;
 import net.kogasachan.kogasa_addiction.item.ModItems;
-import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
-import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKind;
 import net.kogasachan.kogasa_addiction.item.kind.KogasaEquipmentKinds;
+import net.kogasachan.kogasa_addiction.util.KogasaEquipmentData;
+import net.kogasachan.kogasa_addiction.util.KogasaEquipmentHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
@@ -166,7 +166,9 @@ public class KogasaJEIPlugin implements IModPlugin {
         registerBowArrowRecipe(recipes, List.of(ModItems.AYA_BOW.get(), ModItems.AYA_CROSSBOW.get()));
     }
 
-    /** 把注册物品展开成实际变体（例如拔刀剑的 bladeState）；无展开器时保留原 ItemStack。 */
+    /**
+     * 把注册物品展开成实际变体（例如拔刀剑的 bladeState）；无展开器时保留原 ItemStack。
+     */
     private static void addMaterialVariants(Map<String, ItemStack> materials, ItemStack base) {
         List<ItemStack> expanded = KogasaEquipmentHelper.expandMaterialStacks(base);
         if (expanded.isEmpty()) expanded = List.of(base.copy());

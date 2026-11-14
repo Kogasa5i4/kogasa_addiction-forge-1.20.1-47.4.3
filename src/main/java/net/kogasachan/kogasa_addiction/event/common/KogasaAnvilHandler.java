@@ -32,7 +32,9 @@ import java.util.Map;
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class KogasaAnvilHandler {
 
-    /** 待写入最终取出物品的 SE（AnvilUpdateEvent 输出可能在取出时被重算）。 */
+    /**
+     * 待写入最终取出物品的 SE（AnvilUpdateEvent 输出可能在取出时被重算）。
+     */
     private static final java.util.Map<java.util.UUID, java.util.List<String>> PENDING_SE =
             new java.util.concurrent.ConcurrentHashMap<>();
 
@@ -245,8 +247,7 @@ public class KogasaAnvilHandler {
 
         // ===== 判断材料是否有效 =====
         KogasaEquipmentKind leftKind = KogasaEquipmentKinds.of(left);
-        boolean isBowOrCrossbow = leftKind == KogasaEquipmentKind.BOW
-                || leftKind == KogasaEquipmentKind.CROSSBOW;
+        boolean isBowOrCrossbow = KogasaEquipmentHelper.isRanged(left);
         boolean isArrowMaterial = isBowOrCrossbow && right.is(ItemTags.ARROWS);
 
         String materialId;
@@ -300,7 +301,9 @@ public class KogasaAnvilHandler {
         event.setMaterialCost(isArrowMaterial ? 16 : 1);
     }
 
-    /** 把一件材料装备的吸收应用到 result；铁砧与 /kogasa reinforce 共用。 */
+    /**
+     * 把一件材料装备的吸收应用到 result；铁砧与 /kogasa reinforce 共用。
+     */
     public static double applyAbsorption(ItemStack result, ItemStack left, ItemStack right, Player player) {
         // 两把拔刀剑：先把右侧 SE 转移进输出，再计算普通吸收。
         absorbSlashBladeSpecialEffects(result, right);
@@ -374,6 +377,7 @@ public class KogasaAnvilHandler {
             KogasaEquipmentData.addDrawSpeedValue(result, drawAbsorb);
         }
         KogasaEquipmentHelper.notifyAbsorption(result, right);
+        KogasaEquipmentHelper.notifyAbsorptionComplete(result, player);
         return absorb;
     }
 
@@ -439,7 +443,9 @@ public class KogasaAnvilHandler {
         event.setMaterialCost(Math.max(1, event.getMaterialCost()));
     }
 
-    /** 用原版铁砧的附魔合并规则：同级加一级，否则取较高等级；冲突的附魔跳过。 */
+    /**
+     * 用原版铁砧的附魔合并规则：同级加一级，否则取较高等级；冲突的附魔跳过。
+     */
     private static boolean mergeBladeEnchantments(ItemStack output, ItemStack right) {
         Map<Enchantment, Integer> rightEnchants = EnchantmentHelper.getEnchantments(right);
         if (rightEnchants.isEmpty()) return false;
@@ -470,7 +476,9 @@ public class KogasaAnvilHandler {
         return changed;
     }
 
-    /** 累加拔刀剑的 RepairCounter/refine、killCount、proudSoul。 */
+    /**
+     * 累加拔刀剑的 RepairCounter/refine、killCount、proudSoul。
+     */
     private static boolean mergeBladeCounters(ItemStack output, ItemStack right) {
         CompoundTag outputRoot = output.getTag();
         CompoundTag rightRoot = right.getTag();
@@ -542,7 +550,9 @@ public class KogasaAnvilHandler {
         return result;
     }
 
-    /** 取出时把待转移 SE 写到最终输出（防止 AnvilUpdateEvent 结果被重算覆盖）。 */
+    /**
+     * 取出时把待转移 SE 写到最终输出（防止 AnvilUpdateEvent 结果被重算覆盖）。
+     */
     public static boolean applyPendingSe(Player player, ItemStack output) {
         java.util.List<String> pending = consumePendingSe(player);
         if (pending.isEmpty() || output.isEmpty()) return false;

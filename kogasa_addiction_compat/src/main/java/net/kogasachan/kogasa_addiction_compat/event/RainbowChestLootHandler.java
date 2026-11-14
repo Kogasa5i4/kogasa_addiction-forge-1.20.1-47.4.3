@@ -19,7 +19,9 @@ import net.minecraftforge.fml.common.Mod;
 import java.lang.reflect.Field;
 import java.util.List;
 
-/** 给所有含钻石的原版宝箱表追加一次 50% 彩虹水晶奖励。 */
+/**
+ * 给所有含钻石的原版宝箱表追加一次 50% 彩虹水晶奖励。
+ */
 @Mod.EventBusSubscriber(modid = KogasaCompatAddon.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class RainbowChestLootHandler {
 

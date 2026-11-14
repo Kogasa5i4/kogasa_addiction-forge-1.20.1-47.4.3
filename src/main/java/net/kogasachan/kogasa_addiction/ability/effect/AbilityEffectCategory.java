@@ -1,6 +1,8 @@
 package net.kogasachan.kogasa_addiction.ability.effect;
 
-/** 能力效果在 JEI / 手册中的分组顺序。 */
+/**
+ * 能力效果在 JEI / 手册中的分组顺序。
+ */
 public enum AbilityEffectCategory {
     GENERAL("general"),
     MELEE("melee"),

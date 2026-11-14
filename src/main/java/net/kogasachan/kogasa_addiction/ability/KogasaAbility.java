@@ -31,17 +31,23 @@ public enum KogasaAbility {
         return id;
     }
 
-    /** 能力显示名（本地化）。 */
+    /**
+     * 能力显示名（本地化）。
+     */
     public Component getDisplayName() {
         return Component.translatable("ability.kogasa_addiction." + id);
     }
 
-    /** 能力描述（本地化，锭 tooltip 第二行）。 */
+    /**
+     * 能力描述（本地化，锭 tooltip 第二行）。
+     */
     public Component getDescription() {
         return Component.translatable("ability.kogasa_addiction." + id + ".desc");
     }
 
-    /** 锭 tooltip 的"获取方式（剧透）"语言键列表。 */
+    /**
+     * 锭 tooltip 的"获取方式（剧透）"语言键列表。
+     */
     public List<String> getObtainKeys() {
         return switch (this) {
             case KOGASA -> List.of(
@@ -68,7 +74,9 @@ public enum KogasaAbility {
         };
     }
 
-    /** 按 id 查找能力，未知 id 返回 null。 */
+    /**
+     * 按 id 查找能力，未知 id 返回 null。
+     */
     @Nullable
     public static KogasaAbility byId(String id) {
         for (KogasaAbility ability : values()) {
@@ -79,7 +87,9 @@ public enum KogasaAbility {
         return null;
     }
 
-    /** 按资源位置（取 path 作为 id）查找能力，未知返回 null。 */
+    /**
+     * 按资源位置（取 path 作为 id）查找能力，未知返回 null。
+     */
     @Nullable
     public static KogasaAbility byResourceLocation(@Nullable ResourceLocation loc) {
         return loc == null ? null : byId(loc.getPath());

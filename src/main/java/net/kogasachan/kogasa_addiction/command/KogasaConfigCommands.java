@@ -5,6 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.kogasachan.kogasa_addiction.Config;
+import net.kogasachan.kogasa_addiction.KogasaAddiction;
 import net.kogasachan.kogasa_addiction.event.common.ConfigSyncHandler;
 import net.kogasachan.kogasa_addiction.util.ConfigEntries;
 import net.kogasachan.kogasa_addiction.util.ModConfigCache;
@@ -48,14 +49,18 @@ public final class KogasaConfigCommands {
     private static final java.util.List<ExternalConfig> EXTERNAL_CONFIGS = new java.util.ArrayList<>();
 
     public static void registerExternalConfig(String prefix, ForgeConfigSpec spec,
-            java.util.function.Supplier<Map<String, ForgeConfigSpec.ConfigValue<?>>> values) {
+                                              java.util.function.Supplier<Map<String, ForgeConfigSpec.ConfigValue<?>>> values) {
         EXTERNAL_CONFIGS.add(new ExternalConfig(prefix, spec, values));
     }
 
-    /** 路径 → 配置值句柄（首次使用时构建） */
+    /**
+     * 路径 → 配置值句柄（首次使用时构建）
+     */
     private static Map<String, ForgeConfigSpec.ConfigValue<?>> values;
 
-    /** 路径补全 */
+    /**
+     * 路径补全
+     */
     private static final SuggestionProvider<CommandSourceStack> PATH_SUGGESTIONS =
             (ctx, builder) -> {
                 for (String path : valueMap().keySet()) {
@@ -64,7 +69,9 @@ public final class KogasaConfigCommands {
                 return builder.buildFuture();
             };
 
-    /** 布尔项的值补全 */
+    /**
+     * 布尔项的值补全
+     */
     private static final SuggestionProvider<CommandSourceStack> BOOLEAN_VALUE_SUGGESTIONS =
             (ctx, builder) -> {
                 String path = StringArgumentType.getString(ctx, "path");
@@ -221,7 +228,9 @@ public final class KogasaConfigCommands {
         return 0;
     }
 
-    /** 按默认值的类型解析输入 */
+    /**
+     * 按默认值的类型解析输入
+     */
     private static Object parse(Object defaultValue, String raw) {
         String text = raw.trim();
         if (defaultValue instanceof Boolean) {
@@ -260,7 +269,9 @@ public final class KogasaConfigCommands {
         ((ForgeConfigSpec.ConfigValue) value).set(newValue);
     }
 
-    /** "路径 → 句柄"表：主模组配置 + 附属注册的外部配置（带 prefix: 前缀） */
+    /**
+     * "路径 → 句柄"表：主模组配置 + 附属注册的外部配置（带 prefix: 前缀）
+     */
     private static Map<String, ForgeConfigSpec.ConfigValue<?>> valueMap() {
         Map<String, ForgeConfigSpec.ConfigValue<?>> merged =
                 new java.util.LinkedHashMap<>(ConfigEntries.values());
@@ -272,11 +283,34 @@ public final class KogasaConfigCommands {
         return merged;
     }
 
-    /** 保存主模组与所有外部 spec */
-    private static void saveAllSpecs() {
-        Config.SPEC.save();
+    /**
+     * 保存主模组与所有外部 spec；配置文件被其它进程/杀软短暂锁住时重试一次。
+     */
+    private static synchronized void saveAllSpecs() {
+        saveWithRetry(Config.SPEC, "main");
         for (ExternalConfig external : EXTERNAL_CONFIGS) {
-            external.spec().save();
+            saveWithRetry(external.spec(), external.prefix());
+        }
+    }
+
+    private static void saveWithRetry(ForgeConfigSpec spec, String name) {
+        for (int attempt = 0; attempt < 2; attempt++) {
+            try {
+                spec.save();
+                return;
+            } catch (RuntimeException ex) {
+                if (attempt == 0) {
+                    try {
+                        Thread.sleep(50L);
+                    } catch (InterruptedException interrupted) {
+                        Thread.currentThread().interrupt();
+                    }
+                } else {
+                    KogasaAddiction.LOGGER.error(
+                            "Failed to save Kogasa config '{}' (file may be locked by another process)",
+                            name, ex);
+                }
+            }
         }
     }
 }

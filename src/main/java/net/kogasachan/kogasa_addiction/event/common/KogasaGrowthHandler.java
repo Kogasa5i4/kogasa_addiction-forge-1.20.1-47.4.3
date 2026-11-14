@@ -308,17 +308,23 @@ public class KogasaGrowthHandler {
         return candidates.get(player.getRandom().nextInt(candidates.size()));
     }
 
-    /** 模式 1：绝对黑名单。 */
+    /**
+     * 模式 1：绝对黑名单。
+     */
     public static boolean isBlacklisted(ResourceLocation id) {
         return KogasaIdListMatcher.matches(id, Config.GROWTH_ENCHANT_BLACKLIST.get());
     }
 
-    /** 模式 2：本来没有就不给，有的可以升级。 */
+    /**
+     * 模式 2：本来没有就不给，有的可以升级。
+     */
     private static boolean isUpgradeOnly(ResourceLocation id) {
         return KogasaIdListMatcher.matches(id, Config.GROWTH_ENCHANT_UPGRADE_ONLY.get());
     }
 
-    /** 模式 3：本来有也不动、不升级；没有也不给。 */
+    /**
+     * 模式 3：本来有也不动、不升级；没有也不给。
+     */
     private static boolean isFrozen(ResourceLocation id) {
         return KogasaIdListMatcher.matches(id, Config.GROWTH_ENCHANT_FROZEN.get());
     }

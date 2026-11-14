@@ -31,7 +31,9 @@ public final class KogasaNbtCommands {
                         .executes(KogasaNbtCommands::dumpPath)));
     }
 
-    /** 输出物品 id、数量与完整 NBT */
+    /**
+     * 输出物品 id、数量与完整 NBT
+     */
     private static int dump(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         ItemStack held = KogasaCommandSupport.requireAnyHeldItem(ctx);
         if (held.isEmpty()) {
@@ -57,7 +59,9 @@ public final class KogasaNbtCommands {
         return 1;
     }
 
-    /** 只输出指定路径的 NBT 值 */
+    /**
+     * 只输出指定路径的 NBT 值
+     */
     private static int dumpPath(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         ItemStack held = KogasaCommandSupport.requireAnyHeldItem(ctx);
         if (held.isEmpty()) {

@@ -45,7 +45,9 @@ public class KoishiRangedAbilityHandler {
             Registries.DAMAGE_TYPE,
             ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "koishi_ranged"));
 
-    /** 天子强制命中（远程）：自带死亡消息，不再借用 indirectMagic 的通用魔法击杀文本 */
+    /**
+     * 天子强制命中（远程）：自带死亡消息，不再借用 indirectMagic 的通用魔法击杀文本
+     */
     public static final ResourceKey<DamageType> TENSHI_FORCED = ResourceKey.create(
             Registries.DAMAGE_TYPE,
             ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "tenshi_forced"));

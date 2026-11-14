@@ -5,7 +5,9 @@
   },
   "overrides": [
     {
-      "predicate": { "kogasa_addiction:custom_name_check": 1.0 },
+      "predicate": {
+        "kogasa_addiction:custom_name_check": 1.0
+      },
       "model": "kogasa_addiction:item/daiyousei_bomb"
     }
   ]

@@ -1,12 +1,12 @@
 {
-    "pages":  [
-                  {
-                      "text":  "book.kogasa_addiction.entry.structure_cirno.page1",
-                      "type":  "patchouli:text"
-                  }
-              ],
-    "icon":  "minecraft:ice",
-    "category":  "kogasa_addiction:structures",
-    "name":  "book.kogasa_addiction.entry.structure_cirno.name",
-    "sortnum":  4
+  "pages": [
+    {
+      "text": "book.kogasa_addiction.entry.structure_cirno.page1",
+      "type": "patchouli:text"
+    }
+  ],
+  "icon": "minecraft:ice",
+  "category": "kogasa_addiction:structures",
+  "name": "book.kogasa_addiction.entry.structure_cirno.name",
+  "sortnum": 4
 }

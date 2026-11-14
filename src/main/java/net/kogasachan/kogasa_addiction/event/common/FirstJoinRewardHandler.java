@@ -80,7 +80,9 @@ public class FirstJoinRewardHandler {
         }
     }
 
-    /** 发放一件随机本模组装备（带随机能力），并结算相关成就。 */
+    /**
+     * 发放一件随机本模组装备（带随机能力），并结算相关成就。
+     */
     public static ItemStack giveRandomEquipment(ServerPlayer player) {
         Supplier<Item> chosenSupplier =
                 EQUIPMENT_POOL.get(player.getRandom().nextInt(EQUIPMENT_POOL.size()));

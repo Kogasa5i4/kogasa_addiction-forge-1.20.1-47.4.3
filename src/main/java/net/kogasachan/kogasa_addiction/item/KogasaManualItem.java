@@ -22,11 +22,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public class KogasaManualItem extends Item {
 
-    /** 主模组自己的手册 */
+    /**
+     * 主模组自己的手册
+     */
     public static final ResourceLocation BOOK_ID =
             ResourceLocation.fromNamespaceAndPath(KogasaAddiction.MODID, "kogasa_manual");
 
-    /** 兼容附属手册分类的可见性 flag（只有装了附属才打开） */
+    /**
+     * 兼容附属手册分类的可见性 flag（只有装了附属才打开）
+     */
     public static final String COMPAT_ENTRIES_FLAG = "kogasa_addiction:compat_entries";
 
     public KogasaManualItem(Properties properties) {

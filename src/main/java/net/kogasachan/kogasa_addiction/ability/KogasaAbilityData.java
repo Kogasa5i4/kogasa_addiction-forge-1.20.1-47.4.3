@@ -32,7 +32,9 @@ public class KogasaAbilityData {
 
     // ==================== 基础读写 ====================
 
-    /** 能力数据模式版本（存于 KogasaAbilities 根内）。结构变更时 +1，并在 {@link #migrate} 里补步骤。 */
+    /**
+     * 能力数据模式版本（存于 KogasaAbilities 根内）。结构变更时 +1，并在 {@link #migrate} 里补步骤。
+     */
     public static final int SCHEMA_VERSION = 1;
     private static final String KEY_SCHEMA_VERSION = "SchemaVersion";
 
@@ -286,7 +288,9 @@ public class KogasaAbilityData {
     // 之所以没把记录搬到玩家身上：玩家的 persistentData 也是无上限增长的（只是不走物品同步），
     // 所以"确保不溢出"严格来说不成立；位图则是构造上就有界，且不改变"按件"的既有玩法。
 
-    /** 伤害类型记录（字符串列表）的硬上限，防止数据包驱动的注册表把 NBT 撑爆 */
+    /**
+     * 伤害类型记录（字符串列表）的硬上限，防止数据包驱动的注册表把 NBT 撑爆
+     */
     private static final int MAX_DAMAGE_TYPE_RECORDS = 256;
 
     /**

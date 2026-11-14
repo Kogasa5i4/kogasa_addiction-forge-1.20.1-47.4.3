@@ -20,7 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-/** 夜雀食堂 / 琪露诺冰屋宝箱加入妖怪们的归家物品。 */
+/**
+ * 夜雀食堂 / 琪露诺冰屋宝箱加入妖怪们的归家物品。
+ */
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class YoukaiHomecomingLootHandler {
 

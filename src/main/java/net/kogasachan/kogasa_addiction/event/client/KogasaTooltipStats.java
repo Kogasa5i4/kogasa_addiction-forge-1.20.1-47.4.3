@@ -54,9 +54,9 @@ public final class KogasaTooltipStats {
             // 原版属性行前面有一个空格（CommonComponents.space()），这里补上，保持缩进一致
             MutableComponent speedLine = CommonComponents.space().append(
                     Component.translatable(
-                            "attribute.modifier.equals.0",
-                            KogasaNumberFormatHelper.formatTrimmed(speed, 1),
-                            Component.translatable("attribute.name.generic.attack_speed"))
+                                    "attribute.modifier.equals.0",
+                                    KogasaNumberFormatHelper.formatTrimmed(speed, 1),
+                                    Component.translatable("attribute.name.generic.attack_speed"))
                             .withStyle(color));
 
             int insertAt = insertionPoint(tooltip, damageLineIdx);
@@ -137,7 +137,9 @@ public final class KogasaTooltipStats {
         return damageLineIdx;
     }
 
-    /** 攻速行的插入位置：优先紧跟攻击伤害行，其次属性区块末尾，最后才追加到 tooltip 末尾 */
+    /**
+     * 攻速行的插入位置：优先紧跟攻击伤害行，其次属性区块末尾，最后才追加到 tooltip 末尾
+     */
     private static int insertionPoint(List<Component> tooltip, int damageLineIdx) {
         if (damageLineIdx >= 0 && damageLineIdx < tooltip.size()) {
             return damageLineIdx + 1;
@@ -149,7 +151,9 @@ public final class KogasaTooltipStats {
         return tooltip.size();
     }
 
-    /** 找到"在主手时："表头（精确匹配，避免命中附魔描述） */
+    /**
+     * 找到"在主手时："表头（精确匹配，避免命中附魔描述）
+     */
     private static int findMainHandHeader(List<Component> tooltip) {
         String header = translated(MAIN_HAND_HEADER_KEY);
         for (int i = 0; i < tooltip.size(); i++) {
@@ -160,7 +164,9 @@ public final class KogasaTooltipStats {
         return -1;
     }
 
-    /** 属性区块结束下标：从表头往后，连续的"以空格开头的属性行" */
+    /**
+     * 属性区块结束下标：从表头往后，连续的"以空格开头的属性行"
+     */
     private static int attributeBlockEnd(List<Component> tooltip, int header) {
         int end = header + 1;
         while (end < tooltip.size() && isAttributeLine(tooltip.get(end))) {
@@ -250,7 +256,9 @@ public final class KogasaTooltipStats {
         return max;
     }
 
-    /** 弓/弩/三叉戟（用于蓄力/弹速 tooltip 的范围判断） */
+    /**
+     * 弓/弩/三叉戟（用于蓄力/弹速 tooltip 的范围判断）
+     */
     private static boolean isRangedWeaponOrTrident(ItemStack stack) {
         return stack.getItem() instanceof BowItem
                 || stack.getItem() instanceof CrossbowItem
@@ -300,7 +308,9 @@ public final class KogasaTooltipStats {
         tooltip.addAll(insertAt, lines);
     }
 
-    /** 原版 F3+H 高级提示区块的起点（item id 行）；找不到就返回末尾 */
+    /**
+     * 原版 F3+H 高级提示区块的起点（item id 行）；找不到就返回末尾
+     */
     private static int advancedTooltipStart(List<Component> tooltip, ItemStack stack) {
         net.minecraft.resources.ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
         if (id == null) {

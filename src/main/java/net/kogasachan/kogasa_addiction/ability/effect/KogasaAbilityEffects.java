@@ -6,7 +6,9 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-/** 六种能力的效果条目，供 JEI 分类统一读取。 */
+/**
+ * 六种能力的效果条目，供 JEI 分类统一读取。
+ */
 public final class KogasaAbilityEffects {
 
     private static final Map<KogasaAbility, List<AbilityEffect>> EFFECTS =

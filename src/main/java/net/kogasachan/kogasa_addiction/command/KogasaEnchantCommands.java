@@ -26,7 +26,9 @@ import java.util.Map;
 import static net.kogasachan.kogasa_addiction.command.KogasaCommandSupport.ADMIN;
 import static net.kogasachan.kogasa_addiction.command.KogasaCommandSupport.EXISTING_ENCHANT_SUGGESTIONS;
 
-/** /kogasa enchant|growenchant|triggerenchant|removeenchant|clearenchants|setenchantlevel|resetgrowthenchant —— 附魔与成长附魔命令组。 */
+/**
+ * /kogasa enchant|growenchant|triggerenchant|removeenchant|clearenchants|setenchantlevel|resetgrowthenchant —— 附魔与成长附魔命令组。
+ */
 public final class KogasaEnchantCommands {
 
     private KogasaEnchantCommands() {

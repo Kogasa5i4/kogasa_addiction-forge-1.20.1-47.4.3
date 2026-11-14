@@ -27,6 +27,17 @@ public final class KogasaDisplayHelper {
     private KogasaDisplayHelper() {
     }
 
+    private static final List<java.util.function.Function<String, Component>> DISPLAY_NAME_RESOLVERS =
+            new ArrayList<>();
+
+    /**
+     * 附属注册变体物品显示名（例如 TaCZ 的 GunId）。返回 null 表示不处理。
+     */
+    public static void registerDisplayNameResolver(
+            java.util.function.Function<String, Component> resolver) {
+        if (resolver != null) DISPLAY_NAME_RESOLVERS.add(resolver);
+    }
+
     /**
      * 把 "minecraft:iron_sword" 或 "arrow:minecraft:arrow" 转成当前语言下的显示名。
      */
@@ -50,6 +61,14 @@ public final class KogasaDisplayHelper {
 
         var item = ForgeRegistries.ITEMS.getValue(loc);
         if (item == null || item == Items.AIR) return Component.literal(id);
+
+        for (java.util.function.Function<String, Component> resolver : DISPLAY_NAME_RESOLVERS) {
+            try {
+                Component resolved = resolver.apply(id);
+                if (resolved != null) return resolved;
+            } catch (RuntimeException ignored) {
+            }
+        }
 
         Component name = new ItemStack(item).getHoverName();
         if (isArrow) {

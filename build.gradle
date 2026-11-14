@@ -152,7 +152,7 @@ dependencies {
     if (!dataRun) runtimeOnly fg.deobf("curse.maven:slashblade-resharped-${slashblade_resharped_curse_id}:${slashblade_resharped_curse_file}")
     if (!dataRun) runtimeOnly fg.deobf("curse.maven:legendreliclib-${legendreliclib_curse_id}:${legendreliclib_curse_file}")
     if (!dataRun) runtimeOnly fg.deobf("local.kogasa:yakumoblade:1.1.4")
-      if (!dataRun) runtimeOnly fg.deobf("curse.maven:timeless-and-classics-zero-${tacz_curse_id}:${tacz_curse_file}")
+    if (!dataRun) runtimeOnly fg.deobf("curse.maven:timeless-and-classics-zero-${tacz_curse_id}:${tacz_curse_file}")
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }

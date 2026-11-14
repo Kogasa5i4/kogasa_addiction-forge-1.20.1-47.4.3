@@ -56,7 +56,7 @@ public class KogasaLockedEquipmentFunction implements LootItemFunction {
      * {@link #apply}（战利品生成时，注册必然已完成）再解析。
      */
     @SuppressWarnings("unchecked")
-    private static final RegistryObject<Item>[] EQUIPMENT_POOL = new RegistryObject[] {
+    private static final RegistryObject<Item>[] EQUIPMENT_POOL = new RegistryObject[]{
             ModItems.KOGASA_SWORD,
             ModItems.KOGASA_PICKAXE,
             ModItems.KOGASA_AXE,
@@ -102,7 +102,9 @@ public class KogasaLockedEquipmentFunction implements LootItemFunction {
         return Collections.emptySet();
     }
 
-    /** JSON 序列化：无参数，反序列化即构造。 */
+    /**
+     * JSON 序列化：无参数，反序列化即构造。
+     */
     public static class Serializer
             implements net.minecraft.world.level.storage.loot.Serializer<KogasaLockedEquipmentFunction> {
 

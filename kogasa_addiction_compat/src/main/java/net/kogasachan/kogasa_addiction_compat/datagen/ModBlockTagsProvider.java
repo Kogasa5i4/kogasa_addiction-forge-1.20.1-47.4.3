@@ -15,7 +15,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
-/** 方块标签：挖掘工具、挖掘等级、Forge 通用矿石标签。 */
+/**
+ * 方块标签：挖掘工具、挖掘等级、Forge 通用矿石标签。
+ */
 public class ModBlockTagsProvider extends BlockTagsProvider {
 
     public static final TagKey<Block> FORGE_ORES =

@@ -4,7 +4,9 @@ import net.kogasachan.kogasa_addiction.Config;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-/** 额外属性的成长倍率、黑名单与上限。 */
+/**
+ * 额外属性的成长倍率、黑名单与上限。
+ */
 public final class KogasaAttributeGrowth {
 
     private KogasaAttributeGrowth() {

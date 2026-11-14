@@ -9,66 +9,106 @@ import java.util.List;
  */
 public final class CompatConfig {
 
-    /** 配置文件版本号：拼进文件名（kogasa_addiction_compat-common-<版本>.toml），目前 0 */
+    /**
+     * 配置文件版本号：拼进文件名（kogasa_addiction_compat-common-<版本>.toml），目前 0
+     */
     public static final String CONFIG_VERSION = "0";
 
     public static final ForgeConfigSpec SPEC;
 
-    /** 兼容总开关：关闭时本模组机制不会作用于任何非本模组物品 */
+    /**
+     * 兼容总开关：关闭时本模组机制不会作用于任何非本模组物品
+     */
     public static final ForgeConfigSpec.BooleanValue ENABLE_COMPAT;
 
-    /** 彩虹水晶丢进熔岩/熔岩炼药锅后转化能力锭的开关 */
+    /**
+     * 彩虹水晶丢进熔岩/熔岩炼药锅后转化能力锭的开关
+     */
     public static final ForgeConfigSpec.BooleanValue RAINBOW_LAVA_ENABLED;
 
-    /** 转化概率（0~1），默认 1.0 */
+    /**
+     * 转化概率（0~1），默认 1.0
+     */
     public static final ForgeConfigSpec.DoubleValue RAINBOW_LAVA_CHANCE;
 
-    /** 原版含钻石宝箱额外掉落彩虹水晶的开关 */
+    /**
+     * 原版含钻石宝箱额外掉落彩虹水晶的开关
+     */
     public static final ForgeConfigSpec.BooleanValue RAINBOW_CHEST_LOOT_ENABLED;
 
-    /** 原版含钻石宝箱额外掉落彩虹水晶的概率（0~1） */
+    /**
+     * 原版含钻石宝箱额外掉落彩虹水晶的概率（0~1）
+     */
     public static final ForgeConfigSpec.DoubleValue RAINBOW_CHEST_LOOT_CHANCE;
 
-    /** Boss 行为修正总开关（bossTweaks 模块）。 */
+    /**
+     * Boss 行为修正总开关（bossTweaks 模块）。
+     */
     public static final ForgeConfigSpec.BooleanValue ENABLE_BOSS_TWEAKS;
 
-    /** 亚波伦 Doom：阻止没收护甲/Curios。 */
+    /**
+     * 亚波伦 Doom：阻止没收护甲/Curios。
+     */
     public static final ForgeConfigSpec.BooleanValue APOLLYON_PREVENT_ITEM_THEFT;
 
-    /** 亚波伦 Doom：阻止 alwaysBase 属性模式。 */
+    /**
+     * 亚波伦 Doom：阻止 alwaysBase 属性模式。
+     */
     public static final ForgeConfigSpec.BooleanValue APOLLYON_PREVENT_ATTRIBUTE_RESET;
 
-    /** 亚波伦 Doom：阻止长物品冷却。 */
+    /**
+     * 亚波伦 Doom：阻止长物品冷却。
+     */
     public static final ForgeConfigSpec.BooleanValue APOLLYON_PREVENT_COOLDOWN;
 
-    /** YH YoukaiEntity：取消 based-on-CD 的伤害免疫等级。 */
+    /**
+     * YH YoukaiEntity：取消 based-on-CD 的伤害免疫等级。
+     */
     public static final ForgeConfigSpec.BooleanValue YH_PREVENT_DAMAGE_IMMUNITY;
 
-    /** YH 普通伤害上限（最大生命比例，默认 0.05）。 */
+    /**
+     * YH 普通伤害上限（最大生命比例，默认 0.05）。
+     */
     public static final ForgeConfigSpec.DoubleValue YH_NORMAL_DAMAGE_CAP;
 
-    /** YH 弹幕伤害上限（最大生命比例，默认 0.20）。 */
+    /**
+     * YH 弹幕伤害上限（最大生命比例，默认 0.20）。
+     */
     public static final ForgeConfigSpec.DoubleValue YH_DANMAKU_DAMAGE_CAP;
 
-    /** YH：setHealth 不再进入 illegalDamage/flag32/负血量状态。 */
+    /**
+     * YH：setHealth 不再进入 illegalDamage/flag32/负血量状态。
+     */
     public static final ForgeConfigSpec.BooleanValue YH_PREVENT_SET_HEALTH_STATE;
 
-    /** 亚波伦：取消 moddedInvul/obsidianInvul（Doom 尾杀阶段除外）。 */
+    /**
+     * 亚波伦：取消 moddedInvul/obsidianInvul（Doom 尾杀阶段除外）。
+     */
     public static final ForgeConfigSpec.BooleanValue APOLLYON_PREVENT_INVULNERABILITY;
 
-    /** UOM：取消 BaseEntity 出生无敌与 m_6673_ 免疫。 */
+    /**
+     * UOM：取消 BaseEntity 出生无敌与 m_6673_ 免疫。
+     */
     public static final ForgeConfigSpec.BooleanValue UOM_PREVENT_INVULNERABILITY;
 
-    /** YH：取消 YoukaiEntity/Cirno/Rumia 的 m_6673_ 伤害免疫。 */
+    /**
+     * YH：取消 YoukaiEntity/Cirno/Rumia 的 m_6673_ 伤害免疫。
+     */
     public static final ForgeConfigSpec.BooleanValue YH_PREVENT_ENTITY_INVULNERABILITY;
 
-    /** 亚波伦/使徒：解除对附近玩家飞行的强制关闭。 */
+    /**
+     * 亚波伦/使徒：解除对附近玩家飞行的强制关闭。
+     */
     public static final ForgeConfigSpec.BooleanValue APOLLYON_PREVENT_FLIGHT_BAN;
 
-    /** YH：把 onDanmakuImmune 里直接 setHealth 改为等额 generic.kill 伤害。 */
+    /**
+     * YH：把 onDanmakuImmune 里直接 setHealth 改为等额 generic.kill 伤害。
+     */
     public static final ForgeConfigSpec.BooleanValue YH_REPLACE_DANMAKU_SET_HEALTH;
 
-    /** 没有原版工具/武器基类、但需要按“通用装备”兼容的物品（支持 * 通配符） */
+    /**
+     * 没有原版工具/武器基类、但需要按“通用装备”兼容的物品（支持 * 通配符）
+     */
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> GENERIC_EQUIPMENT;
 
     static {

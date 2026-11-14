@@ -27,7 +27,9 @@ public final class RainbowLavaHandler {
     private static final String NEXT_TRY_KEY = "KogasaLavaTry";
     private static final int RETRY_TICKS = 10;
 
-    /** 可转化的能力锭（与主模组一致的六种） */
+    /**
+     * 可转化的能力锭（与主模组一致的六种）
+     */
     private static final List<RegistryObject<Item>> ABILITY_INGOTS = List.of(
             ModItems.KOGASA_INGOT,
             ModItems.AYA_INGOT,

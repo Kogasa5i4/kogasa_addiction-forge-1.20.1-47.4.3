@@ -9,7 +9,9 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-/** 需要瞄准目标的法术弹药：箭矢命中后让发射者朝命中点施法。 */
+/**
+ * 需要瞄准目标的法术弹药：箭矢命中后让发射者朝命中点施法。
+ */
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class SpellAmmoImpactHandler {
 

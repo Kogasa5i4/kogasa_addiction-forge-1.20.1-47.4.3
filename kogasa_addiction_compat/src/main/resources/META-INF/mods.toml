@@ -1,113 +1,113 @@
-modLoader="javafml"
-loaderVersion="${loader_version_range}"
-license="${mod_license}"
+modLoader = "javafml"
+loaderVersion = "${loader_version_range}"
+license = "${mod_license}"
 
 [[mods]]
-modId="${mod_id}"
-version="${mod_version}"
-displayName="${mod_name}"
-authors="${mod_authors}"
-description='''${mod_description}'''
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+authors = "${mod_authors}"
+description = '''${mod_description}'''
 
-[[dependencies.${mod_id}]]
-    modId="forge"
-    mandatory=true
-    versionRange="${forge_version_range}"
-    ordering="NONE"
-    side="BOTH"
+[[dependencies.${ mod_id }]]
+modId = "forge"
+mandatory = true
+versionRange = "${forge_version_range}"
+ordering = "NONE"
+side = "BOTH"
 
-[[dependencies.${mod_id}]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="${minecraft_version_range}"
-    ordering="NONE"
-    side="BOTH"
+[[dependencies.${ mod_id }]]
+modId = "minecraft"
+mandatory = true
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"
 
-[[dependencies.${mod_id}]]
-    modId="${main_mod_id}"
-    mandatory=true
-    versionRange="${main_mod_version_range}"
-    ordering="NONE"
-    side="BOTH"
+[[dependencies.${ mod_id }]]
+modId = "${main_mod_id}"
+mandatory = true
+versionRange = "${main_mod_version_range}"
+ordering = "NONE"
+side = "BOTH"
 
 # ===== 魔法模组兼容：全部可选 =====
-[[dependencies.${mod_id}]]
-    modId="irons_spellbooks"
-    mandatory=false
-    versionRange="[1.20.1,)"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.${mod_id}]]
-    modId="ars_nouveau"
-    mandatory=false
-    versionRange="[4.0.0,)"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.${mod_id}]]
-    modId="goety"
-    mandatory=false
-    versionRange="[2.0.0,)"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.${mod_id}]]
-    modId="goety_revelation"
-    mandatory=false
-    versionRange="[2.0.0,)"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.${mod_id}]]
-    modId="fantasy_ending"
-    mandatory=false
-    versionRange="[2.7.0,)"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.${mod_id}]]
-    modId="ending_library"
-    mandatory=false
-    versionRange="[2.0.0,)"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.${mod_id}]]
-    modId="irons_lib"
-    mandatory=false
-    versionRange="[1.20.1-2.0.0,)"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.${mod_id}]]
-    modId="geckolib"
-    mandatory=false
-    versionRange="[1.20.1:4.8.0,)"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.${mod_id}]]
-    modId="playeranimator"
-    mandatory=false
-    versionRange="[1.0.2-rc1+1.20,)"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.${mod_id}]]
-    modId="curios"
-    mandatory=false
-    versionRange="[5.14.1+1.20.1,)"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.${mod_id}]]
-    modId="patchouli"
-    mandatory=false
-    versionRange="[1,)"
-    ordering="NONE"
-    side="BOTH"
+[[dependencies.${ mod_id }]]
+modId = "irons_spellbooks"
+mandatory = false
+versionRange = "[1.20.1,)"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.${ mod_id }]]
+modId = "ars_nouveau"
+mandatory = false
+versionRange = "[4.0.0,)"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.${ mod_id }]]
+modId = "goety"
+mandatory = false
+versionRange = "[2.0.0,)"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.${ mod_id }]]
+modId = "goety_revelation"
+mandatory = false
+versionRange = "[2.0.0,)"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.${ mod_id }]]
+modId = "fantasy_ending"
+mandatory = false
+versionRange = "[2.7.0,)"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.${ mod_id }]]
+modId = "ending_library"
+mandatory = false
+versionRange = "[2.0.0,)"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.${ mod_id }]]
+modId = "irons_lib"
+mandatory = false
+versionRange = "[1.20.1-2.0.0,)"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.${ mod_id }]]
+modId = "geckolib"
+mandatory = false
+versionRange = "[1.20.1:4.8.0,)"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.${ mod_id }]]
+modId = "playeranimator"
+mandatory = false
+versionRange = "[1.0.2-rc1+1.20,)"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.${ mod_id }]]
+modId = "curios"
+mandatory = false
+versionRange = "[5.14.1+1.20.1,)"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.${ mod_id }]]
+modId = "patchouli"
+mandatory = false
+versionRange = "[1,)"
+ordering = "NONE"
+side = "BOTH"
 
-[[dependencies.${mod_id}]]
-    modId="farmersdelight"
-    mandatory=false
-    versionRange="[1.20.1-1.3,)"
-    ordering="AFTER"
-    side="BOTH"
-[[dependencies.${mod_id}]]
-    modId="youkaishomecoming"
-    mandatory=false
-    versionRange="[2.7.0,)"
-    ordering="AFTER"
-    side="BOTH"
+[[dependencies.${ mod_id }]]
+modId = "farmersdelight"
+mandatory = false
+versionRange = "[1.20.1-1.3,)"
+ordering = "AFTER"
+side = "BOTH"
+[[dependencies.${ mod_id }]]
+modId = "youkaishomecoming"
+mandatory = false
+versionRange = "[2.7.0,)"
+ordering = "AFTER"
+side = "BOTH"
 

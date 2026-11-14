@@ -15,15 +15,21 @@ public class KogasaEquipmentData {
     private static final String GROWTH = "Growth";
     private static final String ABSORBED_VALUE = "AbsorbedValue";
     private static final String ABSORBED_ATTRIBUTES = "AbsorbedAttributes";
-    /** addAbsorbedValue 已同时写入 scalar 与 AbsorbedAttributes 的标记。 */
+    /**
+     * addAbsorbedValue 已同时写入 scalar 与 AbsorbedAttributes 的标记。
+     */
     private static final String ABSORBED_SYNCED = "AbsorbedValueSynced";
     private static final String ABSORBED_ATTRIBUTE_MULTIPLIERS = "AbsorbedAttributeMultipliers";
     private static final String ABSORBED_MULTIPLIER_ENTRIES = "AbsorbedMultiplierEntries";
-    /** 弓弩专用：累积吸收的"拉弓速度"（单位 tick，从原版拉满时间中扣减） */
+    /**
+     * 弓弩专用：累积吸收的"拉弓速度"（单位 tick，从原版拉满时间中扣减）
+     */
     private static final String DRAW_SPEED_VALUE = "DrawSpeedValue";
     private static final String GROWTH_ENCHANTS_GRANTED = "GrowthEnchantsGranted";
     private static final String GROWTH_ENCHANT_FAIL_NOTIFIED = "GrowthEnchantFailNotified";
-    /** 战利品开出的"封印装备"：能力已注入但不生效，成长达到阈值后自动解封 */
+    /**
+     * 战利品开出的"封印装备"：能力已注入但不生效，成长达到阈值后自动解封
+     */
     private static final String LOCKED = "Locked";
 
     // 新旧位置用的是同一个键名，只是父标签不同：
@@ -104,7 +110,9 @@ public class KogasaEquipmentData {
         return tag.getDouble(ABSORBED_VALUE);
     }
 
-    /** 指定属性的吸收值；旧装备的 scalar 只作为 attack/armor 的兼容回退。 */
+    /**
+     * 指定属性的吸收值；旧装备的 scalar 只作为 attack/armor 的兼容回退。
+     */
     public static double getAbsorbedValue(ItemStack stack, ResourceLocation attributeId) {
         CompoundTag tag = getTag(stack);
         CompoundTag attributes = tag.getCompound(ABSORBED_ATTRIBUTES);
@@ -124,7 +132,9 @@ public class KogasaEquipmentData {
         return 0.0D;
     }
 
-    /** 已吸收的额外属性（attribute id → value），不包含旧 scalar。 */
+    /**
+     * 已吸收的额外属性（attribute id → value），不包含旧 scalar。
+     */
     public static Map<ResourceLocation, Double> getAbsorbedAttributes(ItemStack stack) {
         CompoundTag attributes = getTag(stack).getCompound(ABSORBED_ATTRIBUTES);
         Map<ResourceLocation, Double> result = new LinkedHashMap<>();
@@ -185,7 +195,9 @@ public class KogasaEquipmentData {
                                      net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation operation) {
     }
 
-    /** 保留来源装备 UUID / operation 的乘法吸收条目。 */
+    /**
+     * 保留来源装备 UUID / operation 的乘法吸收条目。
+     */
     public static List<AbsorbedMultiplier> getAbsorbedMultipliers(ItemStack stack) {
         CompoundTag tag = getTag(stack);
         List<AbsorbedMultiplier> result = new java.util.ArrayList<>();
@@ -313,7 +325,9 @@ public class KogasaEquipmentData {
         saveTag(stack, tag);
     }
 
-    /** 装备数据模式版本（存于 KogasaEquipment 根内）。结构变更时 +1，并在 {@link #migrate} 里补步骤。 */
+    /**
+     * 装备数据模式版本（存于 KogasaEquipment 根内）。结构变更时 +1，并在 {@link #migrate} 里补步骤。
+     */
     public static final int SCHEMA_VERSION = 4;
     private static final String KEY_SCHEMA_VERSION = "SchemaVersion";
 

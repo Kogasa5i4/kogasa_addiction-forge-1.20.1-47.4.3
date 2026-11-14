@@ -19,7 +19,9 @@ public final class KogasaIdListMatcher {
         return id != null && matchesString(id.toString(), patterns);
     }
 
-    /** 同一套通配符规则，用于类名/包名等任意字符串。 */
+    /**
+     * 同一套通配符规则，用于类名/包名等任意字符串。
+     */
     public static boolean matchesString(String full, List<? extends String> patterns) {
         if (full == null || patterns == null || patterns.isEmpty()) {
             return false;
@@ -46,8 +48,7 @@ public final class KogasaIdListMatcher {
             switch (c) {
                 case '*' -> sb.append(".*");
                 case '?' -> sb.append('.');
-                case '.', '(', ')', '[', ']', '{', '}', '+', '^', '$', '|', '\\' ->
-                        sb.append('\\').append(c);
+                case '.', '(', ')', '[', ']', '{', '}', '+', '^', '$', '|', '\\' -> sb.append('\\').append(c);
                 default -> sb.append(c);
             }
         }

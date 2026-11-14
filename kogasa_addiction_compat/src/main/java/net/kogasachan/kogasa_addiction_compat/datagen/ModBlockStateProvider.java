@@ -6,7 +6,9 @@ import net.minecraft.data.PackOutput;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
-/** 方块状态与方块/物品模型。 */
+/**
+ * 方块状态与方块/物品模型。
+ */
 public class ModBlockStateProvider extends BlockStateProvider {
 
     public ModBlockStateProvider(PackOutput output, ExistingFileHelper existingFileHelper) {

@@ -34,7 +34,9 @@ public final class PatchouliReminderHandler {
         return FMLPaths.CONFIGDIR.get().resolve("kogasa_addiction_patchouli_reminder.txt");
     }
 
-    /** 本次游戏进程是否已经检查过，避免每 tick 重复 */
+    /**
+     * 本次游戏进程是否已经检查过，避免每 tick 重复
+     */
     private static boolean handledThisSession;
 
     private PatchouliReminderHandler() {

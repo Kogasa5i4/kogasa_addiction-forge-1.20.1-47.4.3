@@ -167,9 +167,10 @@ public final class KogasaTooltipAlt {
             }
 
             // ===== 远程武器专属：穿透、多发、不消耗 =====
-            if (stack.getItem() instanceof BowItem || stack.getItem() instanceof CrossbowItem) {
-                int pierceLevel = KogasaEquipmentHelper.getBowPierceLevel(stack);
-                int arrowCount = KogasaEquipmentHelper.getBowArrowCount(stack);
+            boolean bowLike = stack.getItem() instanceof BowItem || stack.getItem() instanceof CrossbowItem;
+            if (bowLike || KogasaEquipmentHelper.isRanged(stack)) {
+                int pierceLevel = bowLike ? KogasaEquipmentHelper.getBowPierceLevel(stack) : 0;
+                int arrowCount = bowLike ? KogasaEquipmentHelper.getBowArrowCount(stack) : 1;
 
                 if (pierceLevel > 0) {
                     tooltip.add(Component.translatable(

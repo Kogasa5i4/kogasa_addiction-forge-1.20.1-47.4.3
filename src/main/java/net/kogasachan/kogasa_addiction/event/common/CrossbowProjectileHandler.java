@@ -48,14 +48,20 @@ import java.util.List;
 @Mod.EventBusSubscriber(modid = KogasaAddiction.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class CrossbowProjectileHandler {
 
-    /** 本次射击是否已经生成过烟花批次的标记（每次 performShooting 开头清空） */
+    /**
+     * 本次射击是否已经生成过烟花批次的标记（每次 performShooting 开头清空）
+     */
     public static final String TAG_FIREWORK_SPAWNED = "KogasaFireworkSpawned";
     public static final String TAG_YH_SPAWNED = "KogasaYhSpawned";
 
-    /** 概率不消耗触发标记（由 CrossbowNoConsumeMixin 写入） */
+    /**
+     * 概率不消耗触发标记（由 CrossbowNoConsumeMixin 写入）
+     */
     private static final String TAG_NO_CONSUME = "KogasaNoConsume";
 
-    /** 原版弩的箭矢初速（CrossbowItem.ARROW_POWER），烟花沿用它做基准 */
+    /**
+     * 原版弩的箭矢初速（CrossbowItem.ARROW_POWER），烟花沿用它做基准
+     */
     private static final float VANILLA_ARROW_POWER = 3.15F;
 
     private CrossbowProjectileHandler() {

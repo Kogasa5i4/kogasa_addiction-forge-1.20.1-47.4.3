@@ -135,9 +135,11 @@ public final class CompatAttributeHandler {
                 net.minecraft.resources.ResourceLocation.withDefaultNamespace("generic.attack_damage")));
     }
 
-    /** 调整原生第一条 ADDITION，而不是新增一条同属性 modifier。 */
+    /**
+     * 调整原生第一条 ADDITION，而不是新增一条同属性 modifier。
+     */
     private static void adjustFirstAddition(ItemAttributeModifierEvent event, Attribute attribute,
-                                             double delta, java.util.UUID fallbackId, String fallbackName) {
+                                            double delta, java.util.UUID fallbackId, String fallbackName) {
         for (AttributeModifier modifier : new java.util.ArrayList<>(event.getModifiers().get(attribute))) {
             if (modifier.getOperation() != AttributeModifier.Operation.ADDITION) continue;
             event.removeModifier(attribute, modifier);
@@ -151,7 +153,9 @@ public final class CompatAttributeHandler {
                 fallbackId, fallbackName, delta, AttributeModifier.Operation.ADDITION));
     }
 
-    /** 物品原有属性 + 吸收属性统一成长；同一属性合并成单条，避免同名双行。 */
+    /**
+     * 物品原有属性 + 吸收属性统一成长；同一属性合并成单条，避免同名双行。
+     */
     private static void applyAbsorbedExtras(ItemAttributeModifierEvent event, ItemStack stack, java.util.Set<net.minecraft.resources.ResourceLocation> legacy) {
         Map<net.minecraft.resources.ResourceLocation, Double> additive =
                 KogasaEquipmentData.getAbsorbedAttributes(stack);
@@ -162,7 +166,6 @@ public final class CompatAttributeHandler {
             if (id != null) ids.add(id);
         }
         ids.addAll(additive.keySet());
-
 
 
         for (net.minecraft.resources.ResourceLocation id : ids) {
@@ -317,7 +320,7 @@ public final class CompatAttributeHandler {
     }
 
     private static void applyAbsorbedMultipliers(ItemAttributeModifierEvent event, ItemStack stack,
-                                                java.util.Set<net.minecraft.resources.ResourceLocation> skip) {
+                                                 java.util.Set<net.minecraft.resources.ResourceLocation> skip) {
         for (KogasaEquipmentData.AbsorbedMultiplier entry : KogasaEquipmentData.getAbsorbedMultipliers(stack)) {
             if (skip.contains(entry.attribute()) || entry.amount() <= 0.0D) continue;
             Attribute attribute = ForgeRegistries.ATTRIBUTES.getValue(entry.attribute());
@@ -328,7 +331,9 @@ public final class CompatAttributeHandler {
         }
     }
 
-    /** 只有 registry 命名空间为 minecraft 的真正原版装备才允许整体替换属性表。 */
+    /**
+     * 只有 registry 命名空间为 minecraft 的真正原版装备才允许整体替换属性表。
+     */
     private static boolean isPlainVanillaItem(Item item) {
         ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
         return id != null && "minecraft".equals(id.getNamespace()) && isSafeItem(item);

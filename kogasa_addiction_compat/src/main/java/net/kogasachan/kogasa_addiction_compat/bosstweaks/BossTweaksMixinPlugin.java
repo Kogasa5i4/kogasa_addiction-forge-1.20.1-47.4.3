@@ -7,7 +7,9 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import java.util.List;
 import java.util.Set;
 
-/** 只在 RevelationFix 的 PlayerTickrateExecutor 真实存在时应用对应 mixin。 */
+/**
+ * 只在 RevelationFix 的 PlayerTickrateExecutor 真实存在时应用对应 mixin。
+ */
 public final class BossTweaksMixinPlugin implements IMixinConfigPlugin {
 
     private boolean revelationFixPresent;
@@ -28,6 +30,8 @@ public final class BossTweaksMixinPlugin implements IMixinConfigPlugin {
                 "com/Polarice3/Goety/common/entities/boss/Apostle.class") != null;
         uomPresent = BossTweaksMixinPlugin.class.getClassLoader().getResource(
                 "com/mega/uom/common/entity/boss/uom/BaseEntity.class") != null;
+        taczPresent = BossTweaksMixinPlugin.class.getClassLoader().getResource(
+                "com/tacz/guns/api/item/IGun.class") != null;
     }
 
     @Override
@@ -52,6 +56,9 @@ public final class BossTweaksMixinPlugin implements IMixinConfigPlugin {
         if (mixinClassName.endsWith("UomBaseInvulMixin")
                 || mixinClassName.endsWith("UomWitherInvulMixin")) {
             return uomPresent;
+        }
+        if (mixinClassName.contains(".tacz.")) {
+            return taczPresent;
         }
         return true;
     }

@@ -9,6 +9,8 @@ package net.kogasachan.kogasa_addiction.ability.tooltip;
 @FunctionalInterface
 public interface KogasaAbilityTooltip {
 
-    /** 把该能力的描述追加进 {@code ctx} */
+    /**
+     * 把该能力的描述追加进 {@code ctx}
+     */
     void append(KogasaAbilityTooltipContext ctx);
 }

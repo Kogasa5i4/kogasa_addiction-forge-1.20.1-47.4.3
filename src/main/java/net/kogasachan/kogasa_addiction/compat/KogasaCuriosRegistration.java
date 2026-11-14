@@ -15,7 +15,9 @@ import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 import java.util.UUID;
 
-/** 只在 Curios 已加载时由 KogasaCuriosCompat 调用。 */
+/**
+ * 只在 Curios 已加载时由 KogasaCuriosCompat 调用。
+ */
 final class KogasaCuriosRegistration {
 
     private KogasaCuriosRegistration() {

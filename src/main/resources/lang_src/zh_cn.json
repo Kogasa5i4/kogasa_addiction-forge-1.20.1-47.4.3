@@ -507,5 +507,9 @@
   "commands.kogasa_addiction.tag.none": "§7  （无）",
   "commands.kogasa_addiction.tag.no_block": "§7未看向 5 格内的方块。",
   "commands.kogasa_addiction.error.yh_ammo_required": "§c副手或物品参数需要妖归弹幕 / 激光 / 符卡。",
-  "commands.kogasa_addiction.setammo.yh.success": "§a已装载妖归弹药：%s"
+  "commands.kogasa_addiction.setammo.yh.success": "§a已装载妖归弹药：%s",
+  "tooltip.kogasa_addiction.tacz.header": "TaCZ 强化数值",
+  "tooltip.kogasa_addiction.tacz.damage": "子弹伤害：%s",
+  "tooltip.kogasa_addiction.tacz.rpm": "射速：%s RPM",
+  "tooltip.kogasa_addiction.tacz.ammo": "弹匣：%s"
 }

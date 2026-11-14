@@ -33,7 +33,9 @@ public final class KogasaAbilityTooltips {
     private KogasaAbilityTooltips() {
     }
 
-    /** 若该能力注册过渲染器，则把其描述追加进 ctx */
+    /**
+     * 若该能力注册过渲染器，则把其描述追加进 ctx
+     */
     public static void append(KogasaAbility ability, KogasaAbilityTooltipContext ctx) {
         KogasaAbilityTooltip renderer = RENDERERS.get(ability);
         if (renderer != null) {

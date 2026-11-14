@@ -6,7 +6,9 @@ import net.kogasachan.kogasa_addiction.util.KogasaNumberFormatHelper;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
-/** JEI 悬停时显示的“当前配置数值”，与 Alt 装备提示使用同一套 ClientConfigCache。 */
+/**
+ * JEI 悬停时显示的“当前配置数值”，与 Alt 装备提示使用同一套 ClientConfigCache。
+ */
 public final class AbilityEffectValues {
 
     private static final String PREFIX = "jei.kogasa_addiction.ability_effect.current.";
@@ -45,8 +47,8 @@ public final class AbilityEffectValues {
             }
             case "cirno.revive" -> ClientConfigCache.get(Config.CIRNO_REVIVE_ENABLED)
                     ? Component.translatable(PREFIX + "cirno.revive",
-                            KogasaNumberFormatHelper.formatTrimmed(
-                                    ClientConfigCache.get(Config.CIRNO_REVIVE_GROWTH_COST), 2))
+                    KogasaNumberFormatHelper.formatTrimmed(
+                            ClientConfigCache.get(Config.CIRNO_REVIVE_GROWTH_COST), 2))
                     : Component.translatable(PREFIX + "disabled");
             case "kogasa.multiplier" -> Component.translatable(PREFIX + "kogasa.multiplier",
                     percent(ClientConfigCache.get(Config.KOGASA_REINFORCEMENT_MULTIPLIER_PER_LEVEL)));

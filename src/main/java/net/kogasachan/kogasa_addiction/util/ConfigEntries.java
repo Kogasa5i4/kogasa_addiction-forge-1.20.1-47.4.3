@@ -23,7 +23,9 @@ import java.util.TreeMap;
  */
 public final class ConfigEntries {
 
-    /** 列表值在同步包里的分隔符（配置文件里的列表项不会包含它） */
+    /**
+     * 列表值在同步包里的分隔符（配置文件里的列表项不会包含它）
+     */
     public static final char LIST_SEPARATOR = '\u001f';
 
     private static Map<String, ForgeConfigSpec.ConfigValue<?>> values;
@@ -58,12 +60,16 @@ public final class ConfigEntries {
         return values;
     }
 
-    /** 配置文件的点分路径，例如 {@code growth.growthPerUse} */
+    /**
+     * 配置文件的点分路径，例如 {@code growth.growthPerUse}
+     */
     public static String pathOf(ForgeConfigSpec.ConfigValue<?> value) {
         return String.join(".", value.getPath());
     }
 
-    /** 全部配置的"路径 → 值字符串"快照（列表用 {@link #LIST_SEPARATOR} 连接） */
+    /**
+     * 全部配置的"路径 → 值字符串"快照（列表用 {@link #LIST_SEPARATOR} 连接）
+     */
     public static Map<String, String> snapshot() {
         Map<String, String> snapshot = new LinkedHashMap<>();
         for (Map.Entry<String, ForgeConfigSpec.ConfigValue<?>> entry : values().entrySet()) {
@@ -72,7 +78,9 @@ public final class ConfigEntries {
         return snapshot;
     }
 
-    /** 把配置值转成同步用的字符串 */
+    /**
+     * 把配置值转成同步用的字符串
+     */
     public static String stringify(Object value) {
         if (value instanceof List<?> list) {
             StringBuilder builder = new StringBuilder();

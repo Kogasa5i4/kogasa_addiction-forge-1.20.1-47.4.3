@@ -1,12 +1,12 @@
 {
-    "pages":  [
-                  {
-                      "text":  "book.kogasa_addiction.entry.structure_mystia.page1",
-                      "type":  "patchouli:text"
-                  }
-              ],
-    "icon":  "minecraft:campfire",
-    "category":  "kogasa_addiction:structures",
-    "name":  "book.kogasa_addiction.entry.structure_mystia.name",
-    "sortnum":  6
+  "pages": [
+    {
+      "text": "book.kogasa_addiction.entry.structure_mystia.page1",
+      "type": "patchouli:text"
+    }
+  ],
+  "icon": "minecraft:campfire",
+  "category": "kogasa_addiction:structures",
+  "name": "book.kogasa_addiction.entry.structure_mystia.name",
+  "sortnum": 6
 }

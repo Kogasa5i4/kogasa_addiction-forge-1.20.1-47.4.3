@@ -57,7 +57,9 @@ public enum KogasaEquipmentKind {
     private final String suffix;
     private final TagKey<Item> materialTag;
     private final double baseAttackSpeed;
-    /** 更具体的同义后缀：命中这些后缀时说明是别的类型（如 crossbow / pickaxe），本类型必须让位 */
+    /**
+     * 更具体的同义后缀：命中这些后缀时说明是别的类型（如 crossbow / pickaxe），本类型必须让位
+     */
     private final String[] excludedSuffixes;
 
     KogasaEquipmentKind(String suffix, TagKey<Item> materialTag, double baseAttackSpeed,
@@ -68,17 +70,23 @@ public enum KogasaEquipmentKind {
         this.excludedSuffixes = excludedSuffixes;
     }
 
-    /** 类型后缀，用于 tooltip / 进度 / 资源名拼接 */
+    /**
+     * 类型后缀，用于 tooltip / 进度 / 资源名拼接
+     */
     public String suffix() {
         return suffix;
     }
 
-    /** 强化时右侧材料应匹配的 tag */
+    /**
+     * 强化时右侧材料应匹配的 tag
+     */
     public TagKey<Item> materialTag() {
         return materialTag;
     }
 
-    /** 原版攻速基准（AttributeModifier 的 ADDITION 值） */
+    /**
+     * 原版攻速基准（AttributeModifier 的 ADDITION 值）
+     */
     public double baseAttackSpeed() {
         return baseAttackSpeed;
     }
@@ -105,6 +113,7 @@ public enum KogasaEquipmentKind {
         if (item.getDefaultInstance().is(materialTag)) return true;
         return nameEndsWith(item, suffix);
     }
+
     /**
      * 宽泛身份兜底：只允许 FUMO 用 {@code forge:tools} 作为“最后一级”身份。
      * 必须由 {@link KogasaEquipmentKinds#of(Item)} 在所有具体类型之后调用，
